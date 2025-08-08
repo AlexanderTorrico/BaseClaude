@@ -12,12 +12,14 @@ import Dashboard from "../pages/Dashboard/index";
 import CrudBasic from "../pages/CrudBasic/index";
 import CrudModern from "../pages/CrudModern/index";
 import CrudV1 from "../pages/CrudV1/index";
+import CrudV2 from "../pages/CrudV2/index";
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
   { path: "/crud_basic", component: <CrudBasic /> },
   { path: "/crud_modern", component: <CrudModern /> },
   { path: "/crud_v1", component: <CrudV1 /> },
+  { path: "/crud_v2", component: <CrudV2 /> },
 
   //   // this route should be at the end of all other routes
   //   // eslint-disable-next-line react/display-name

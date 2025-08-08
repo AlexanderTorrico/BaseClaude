@@ -336,7 +336,7 @@ const UsersCrudV1 = () => {
   const VistaCards = () => (
     <Row>
       {usuariosFiltrados.map(usuario => (
-        <Col lg={4} md={6} key={usuario.id} className="mb-4">
+        <Col xl={4} lg={6} md={6} sm={12} key={usuario.id} className="mb-4">
           <Card className="user-card h-100 shadow-sm border-0">
             <CardBody className="p-4">
               <div className="d-flex justify-content-between align-items-start mb-3">
@@ -532,13 +532,13 @@ const UsersCrudV1 = () => {
         <Card className="border-0 shadow-sm mb-4">
           <CardBody>
             <Row className="align-items-center">
-              <Col md={6}>
+              <Col lg={6} md={12}>
                 <h4 className="mb-0">Gestión de Usuarios V1</h4>
-                <p className="text-muted mb-0">
+                <p className="text-muted mb-md-0 mb-3">
                   Sistema moderno de administración de usuarios
                   {(terminoBusqueda || Object.keys(busquedaAvanzada).length > 0) && (
                     <span className="ms-2">
-                      <Badge color="info" className="fs-6">
+                      <Badge color="info" style={{ fontSize: '0.65rem' }}>
                         <i className="mdi mdi-filter-check me-1"></i>
                         {usuariosFiltrados.length} de {usuarios.length} resultados
                       </Badge>
@@ -546,47 +546,57 @@ const UsersCrudV1 = () => {
                   )}
                 </p>
               </Col>
-              <Col md={6} className="text-end">
-                <Button 
-                  color={panelBusquedaAbierto ? 'primary' : 'outline-primary'} 
-                  onClick={() => setPanelBusquedaAbierto(!panelBusquedaAbierto)} 
-                  className="me-2"
-                  title="Configurar búsquedas"
-                >
-                  <i className={`mdi ${panelBusquedaAbierto ? 'mdi-tune' : 'mdi-tune-variant'} me-1`}></i>
-                  {panelBusquedaAbierto ? 'Ocultar' : 'Búsquedas'}
-                  {(terminoBusqueda || Object.keys(busquedaAvanzada).length > 0) && !panelBusquedaAbierto && (
-                    <Badge color="danger" className="ms-2 position-absolute top-0 start-100 translate-middle p-1 rounded-circle">
-                      <span className="visually-hidden">Filtros activos</span>
-                    </Badge>
+              <Col lg={6} md={12} className="text-lg-end text-center">
+                <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
+                  <Button 
+                    color={panelBusquedaAbierto ? 'primary' : 'outline-primary'} 
+                    onClick={() => setPanelBusquedaAbierto(!panelBusquedaAbierto)} 
+                    className="position-relative"
+                    size="sm"
+                    title="Configurar búsquedas"
+                  >
+                    <i className={`mdi ${panelBusquedaAbierto ? 'mdi-tune' : 'mdi-tune-variant'} me-1`}></i>
+                    <span className="d-none d-sm-inline">{panelBusquedaAbierto ? 'Ocultar' : 'Búsquedas'}</span>
+                    <span className="d-sm-none">Filtros</span>
+                    {(terminoBusqueda || Object.keys(busquedaAvanzada).length > 0) && !panelBusquedaAbierto && (
+                      <Badge color="danger" className="ms-1 position-absolute top-0 start-100 translate-middle p-1 rounded-circle">
+                        <span className="visually-hidden">Filtros activos</span>
+                      </Badge>
+                    )}
+                  </Button>
+
+                  <Button color="primary" onClick={manejarAgregarUsuario} size="sm">
+                    <i className="mdi mdi-plus me-1"></i>
+                    <span className="d-none d-sm-inline">Nuevo Usuario</span>
+                    <span className="d-sm-none">Nuevo</span>
+                  </Button>
+                  
+                  {usuariosSeleccionados.length > 0 && (
+                    <Button color="danger" outline onClick={manejarEliminarMasivo} size="sm">
+                      <i className="mdi mdi-delete me-1"></i>
+                      <span className="d-none d-sm-inline">Eliminar ({usuariosSeleccionados.length})</span>
+                      <span className="d-sm-none">({usuariosSeleccionados.length})</span>
+                    </Button>
                   )}
-                </Button>
 
-                <Button color="primary" onClick={manejarAgregarUsuario} className="me-2">
-                  <i className="mdi mdi-plus me-1"></i>
-                  Nuevo Usuario
-                </Button>
-                
-                {usuariosSeleccionados.length > 0 && (
-                  <Button color="danger" outline onClick={manejarEliminarMasivo} className="me-2">
-                    <i className="mdi mdi-delete me-1"></i>
-                    Eliminar ({usuariosSeleccionados.length})
-                  </Button>
-                )}
-
-                <div className="btn-group">
-                  <Button 
-                    color={modoVista === 'cards' ? 'primary' : 'light'}
-                    onClick={() => setModoVista('cards')}
-                  >
-                    <i className="mdi mdi-view-grid"></i>
-                  </Button>
-                  <Button 
-                    color={modoVista === 'table' ? 'primary' : 'light'}
-                    onClick={() => setModoVista('table')}
-                  >
-                    <i className="mdi mdi-view-list"></i>
-                  </Button>
+                  <div className="btn-group" role="group">
+                    <Button 
+                      color={modoVista === 'cards' ? 'primary' : 'light'}
+                      onClick={() => setModoVista('cards')}
+                      size="sm"
+                      title="Vista de tarjetas"
+                    >
+                      <i className="mdi mdi-view-grid"></i>
+                    </Button>
+                    <Button 
+                      color={modoVista === 'table' ? 'primary' : 'light'}
+                      onClick={() => setModoVista('table')}
+                      size="sm"
+                      title="Vista de tabla"
+                    >
+                      <i className="mdi mdi-view-list"></i>
+                    </Button>
+                  </div>
                 </div>
               </Col>
             </Row>
@@ -594,9 +604,9 @@ const UsersCrudV1 = () => {
             {/* Panel de búsqueda colapsable */}
             <div className={`search-panel ${panelBusquedaAbierto ? 'open' : 'closed'}`}>
               <Row className="mt-4">
-                <Col md={6}>
-                  <div className="position-relative">
-                    <InputGroup>
+                <Col lg={5} md={7} className="mb-3 mb-lg-0">
+                  <div className="position-relative" style={{ maxWidth: '400px' }}>
+                    <InputGroup size="sm">
                       <Input
                         type="text"
                         placeholder="Buscar por nombre..."
@@ -619,16 +629,18 @@ const UsersCrudV1 = () => {
                     )}
                   </div>
                 </Col>
-                <Col md={6} className="d-flex justify-content-end align-items-start">
+                <Col lg={7} md={5} className="d-flex justify-content-lg-end justify-content-center align-items-start">
                   <Button 
                     color="outline-primary"
                     onClick={() => setModalBusquedaAvanzada(true)}
                     className="position-relative"
+                    size="sm"
                   >
                     <i className="mdi mdi-filter-variant me-1"></i>
-                    Búsqueda Avanzada
+                    <span className="d-none d-sm-inline">Búsqueda Avanzada</span>
+                    <span className="d-sm-none">Avanzada</span>
                     {Object.keys(busquedaAvanzada).length > 0 && (
-                      <Badge color="primary" className="ms-2">
+                      <Badge color="primary" className="ms-2" style={{ fontSize: '0.7rem' }}>
                         {Object.keys(busquedaAvanzada).length}
                       </Badge>
                     )}
@@ -641,10 +653,11 @@ const UsersCrudV1 = () => {
                 <Row className="mt-3">
                   <Col xs={12}>
                     <div className="active-filters-container p-3 bg-light rounded">
-                      <div className="d-flex align-items-center flex-wrap">
-                        <span className="text-muted small me-2 fw-medium">
+                      <div className="d-flex align-items-start flex-wrap">
+                        <span className="text-muted small me-2 fw-medium mb-2">
                           <i className="mdi mdi-filter-check me-1"></i>
-                          Filtros aplicados:
+                          <span className="d-none d-sm-inline">Filtros aplicados:</span>
+                          <span className="d-sm-none">Filtros:</span>
                         </span>
                         {Object.entries(busquedaAvanzada).map(([field, config]) => {
                           const fieldConfig = camposBusquedaAvanzada.find(f => f.value === field);
@@ -739,6 +752,8 @@ const UsersCrudV1 = () => {
           isOpen={modalAbierto} 
           toggle={() => setModalAbierto(!modalAbierto)} 
           size="lg"
+          centered
+          className="modal-responsive"
         >
           <ModalHeader toggle={() => setModalAbierto(false)} className="border-bottom">
             <div>
@@ -749,7 +764,7 @@ const UsersCrudV1 = () => {
           <ModalBody className="p-4">
             <Form>
               <Row>
-                <Col md={12} className="mb-3">
+                <Col xs={12} className="mb-3">
                   <FormGroup>
                     <Label htmlFor="nombre">Nombre Completo *</Label>
                     <Input
@@ -761,7 +776,7 @@ const UsersCrudV1 = () => {
                     />
                   </FormGroup>
                 </Col>
-                <Col md={12} className="mb-3">
+                <Col xs={12} className="mb-3">
                   <FormGroup>
                     <Label htmlFor="email">Correo Electrónico *</Label>
                     <Input
@@ -773,7 +788,7 @@ const UsersCrudV1 = () => {
                     />
                   </FormGroup>
                 </Col>
-                <Col md={6} className="mb-3">
+                <Col md={6} xs={12} className="mb-3">
                   <FormGroup>
                     <Label htmlFor="telefono">Teléfono</Label>
                     <Input
@@ -785,7 +800,7 @@ const UsersCrudV1 = () => {
                     />
                   </FormGroup>
                 </Col>
-                <Col md={6} className="mb-3">
+                <Col md={6} xs={12} className="mb-3">
                   <FormGroup>
                     <Label htmlFor="ciudad">Ciudad</Label>
                     <Input
@@ -797,7 +812,7 @@ const UsersCrudV1 = () => {
                     />
                   </FormGroup>
                 </Col>
-                <Col md={6} className="mb-3">
+                <Col md={6} xs={12} className="mb-3">
                   <FormGroup>
                     <Label htmlFor="rol">Rol</Label>
                     <CustomSelect
@@ -808,7 +823,7 @@ const UsersCrudV1 = () => {
                     />
                   </FormGroup>
                 </Col>
-                <Col md={6} className="mb-3">
+                <Col md={6} xs={12} className="mb-3">
                   <FormGroup>
                     <Label htmlFor="departamento">Departamento</Label>
                     <CustomSelect
@@ -819,7 +834,7 @@ const UsersCrudV1 = () => {
                     />
                   </FormGroup>
                 </Col>
-                <Col md={6} className="mb-3">
+                <Col md={6} xs={12} className="mb-3">
                   <FormGroup>
                     <Label htmlFor="estado">Estado</Label>
                     <CustomSelect
@@ -830,7 +845,7 @@ const UsersCrudV1 = () => {
                     />
                   </FormGroup>
                 </Col>
-                <Col md={6} className="mb-3">
+                <Col md={6} xs={12} className="mb-3">
                   <FormGroup>
                     <Label htmlFor="empresa">Empresa</Label>
                     <Input
@@ -842,7 +857,7 @@ const UsersCrudV1 = () => {
                     />
                   </FormGroup>
                 </Col>
-                <Col md={6} className="mb-3">
+                <Col md={6} xs={12} className="mb-3">
                   <FormGroup>
                     <Label htmlFor="salario">Salario (€)</Label>
                     <Input
@@ -853,7 +868,7 @@ const UsersCrudV1 = () => {
                     />
                   </FormGroup>
                 </Col>
-                <Col md={6} className="mb-3">
+                <Col md={6} xs={12} className="mb-3">
                   <FormGroup>
                     <Label htmlFor="experiencia">Años de experiencia</Label>
                     <Input
@@ -868,13 +883,16 @@ const UsersCrudV1 = () => {
             </Form>
           </ModalBody>
           <ModalFooter className="border-top">
-            <Button color="light" onClick={() => setModalAbierto(false)} className="me-2">
-              Cancelar
-            </Button>
-            <Button color="primary" onClick={manejarGuardarUsuario} size="lg">
-              <i className="mdi mdi-check me-1"></i>
-              {esEdicion ? "Actualizar Usuario" : "Crear Usuario"}
-            </Button>
+            <div className="d-flex flex-column flex-sm-row gap-2 w-100 justify-content-end">
+              <Button color="light" onClick={() => setModalAbierto(false)} className="order-2 order-sm-1">
+                Cancelar
+              </Button>
+              <Button color="primary" onClick={manejarGuardarUsuario} className="order-1 order-sm-2">
+                <i className="mdi mdi-check me-1"></i>
+                <span className="d-none d-sm-inline">{esEdicion ? "Actualizar Usuario" : "Crear Usuario"}</span>
+                <span className="d-sm-none">{esEdicion ? "Actualizar" : "Crear"}</span>
+              </Button>
+            </div>
           </ModalFooter>
         </Modal>
 
@@ -958,6 +976,48 @@ const UsersCrudV1 = () => {
         .search-panel .badge:hover {
           transform: translateY(-1px);
           box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+          .user-card {
+            margin-bottom: 1rem !important;
+          }
+          
+          .search-panel {
+            padding: 0 !important;
+          }
+
+          .active-filters-container {
+            padding: 1rem !important;
+          }
+
+          .modal-responsive .modal-dialog {
+            margin: 0.5rem;
+          }
+
+          .table-responsive {
+            font-size: 0.875rem;
+          }
+        }
+
+        @media (max-width: 576px) {
+          .user-card .card-body {
+            padding: 1.5rem !important;
+          }
+          
+          .btn-group {
+            width: 100%;
+          }
+          
+          .btn-group .btn {
+            flex: 1;
+          }
+
+          .active-filters-container .badge {
+            font-size: 0.7rem !important;
+            margin-bottom: 0.5rem;
+          }
         }
       `}</style>
     </React.Fragment>

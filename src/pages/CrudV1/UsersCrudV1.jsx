@@ -445,6 +445,7 @@ const UsersCrudV1 = () => {
       ),
       accessorKey: "select",
       enableSorting: false,
+      enableColumnFilter: false,
       cell: ({ row }) => (
         <Input
           type="checkbox"
@@ -463,6 +464,7 @@ const UsersCrudV1 = () => {
       header: "Usuario",
       accessorKey: "nombre",
       enableSorting: true,
+      enableColumnFilter: false,
       cell: ({ row }) => (
         <div className="d-flex align-items-center">
           <div className="avatar-xs rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3">
@@ -479,33 +481,39 @@ const UsersCrudV1 = () => {
       header: "Rol",
       accessorKey: "rol",
       enableSorting: true,
+      enableColumnFilter: false,
     },
     {
       header: "Departamento",
       accessorKey: "departamento",
       enableSorting: true,
+      enableColumnFilter: false,
     },
     {
       header: "Estado",
       accessorKey: "estado",
       enableSorting: true,
+      enableColumnFilter: false,
       cell: ({ getValue }) => obtenerBadgeEstado(getValue()),
     },
     {
       header: "Teléfono",
       accessorKey: "telefono",
       enableSorting: false,
+      enableColumnFilter: false,
     },
     {
       header: "Salario",
       accessorKey: "salario",
       enableSorting: true,
+      enableColumnFilter: false,
       cell: ({ getValue }) => `€${getValue().toLocaleString()}`,
     },
     {
       header: "Acciones",
       accessorKey: "actions",
       enableSorting: false,
+      enableColumnFilter: false,
       cell: ({ row }) => (
         <div className="d-flex gap-2">
           <Button
@@ -735,7 +743,7 @@ const UsersCrudV1 = () => {
                 data={usuariosFiltrados}
                 isGlobalFilter={false}
                 isPagination={true}
-                isCustomPageSize={true}
+                isCustomPageSize={false}
                 SearchPlaceholder="Filtrar..."
                 divClassName="table-responsive table-card mb-1"
                 tableClass="align-middle table-nowrap"

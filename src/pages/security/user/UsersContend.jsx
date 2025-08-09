@@ -23,8 +23,8 @@ import {
   Progress,
 } from "reactstrap";
 import { toast } from "react-toastify";
-import TableContainer from "../../components/Common/TableContainer";
-import DeleteModal from "../../components/Common/DeleteModal";
+import TableContainer from "../../../components/Common/TableContainer";
+import DeleteModal from "../../../components/Common/DeleteModal";
 
 const CustomSelect = ({ value, onChange, options, placeholder, icon }) => {
   return (
@@ -220,7 +220,7 @@ const generateUsers = () => {
   }));
 };
 
-const UsersCrudV2 = () => {
+const UserContend = () => {
   const [usuarios, setUsuarios] = useState(generateUsers());
   const [modoVista, setModoVista] = useState('cards');
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -792,7 +792,8 @@ const UsersCrudV2 = () => {
                       title="Limpiar todos los filtros"
                     >
                       <i className="mdi mdi-filter-remove me-1"></i>
-                      Limpiar Filtros
+                      <span className="d-none d-sm-inline">Limpiar Filtros</span>
+                      <span className="d-sm-none">Limpiar</span>
                     </Button>
                   )}
                   
@@ -804,23 +805,26 @@ const UsersCrudV2 = () => {
                       title="Quitar ordenamiento"
                     >
                       <i className="mdi mdi-sort-variant-remove me-1"></i>
-                      Quitar Orden
+                      <span className="d-none d-sm-inline">Quitar Orden</span>
+                      <span className="d-sm-none">Orden</span>
                     </Button>
                   )}
 
                   <Button color="primary" onClick={manejarAgregarUsuario} size="sm">
                     <i className="mdi mdi-plus me-1"></i>
-                    Nuevo Usuario
+                    <span className="d-none d-sm-inline">Nuevo Usuario</span>
+                    <span className="d-sm-none">Nuevo</span>
                   </Button>
                   
                   {usuariosSeleccionados.length > 0 && (
                     <Button color="danger" outline onClick={manejarEliminarMasivo} size="sm">
                       <i className="mdi mdi-delete me-1"></i>
-                      Eliminar ({usuariosSeleccionados.length})
+                      <span className="d-none d-sm-inline">Eliminar ({usuariosSeleccionados.length})</span>
+                      <span className="d-sm-none">({usuariosSeleccionados.length})</span>
                     </Button>
                   )}
 
-                  <div className="btn-group d-none d-md-flex" role="group">
+                  <div className="btn-group" role="group">
                     <Button 
                       color={modoVista === 'cards' ? 'primary' : 'light'}
                       onClick={() => setModoVista('cards')}
@@ -850,7 +854,8 @@ const UsersCrudV2 = () => {
                     <div className="d-flex align-items-start flex-wrap">
                       <span className="text-muted small me-2 fw-medium mb-2">
                         <i className="mdi mdi-filter-check me-1"></i>
-                        Filtros y ordenamiento activos:
+                        <span className="d-none d-sm-inline">Filtros y ordenamiento activos:</span>
+                        <span className="d-sm-none">Filtros:</span>
                       </span>
                       
                       {/* Mostrar ordenamiento activo */}
@@ -920,33 +925,27 @@ const UsersCrudV2 = () => {
           </CardBody>
         </Card>
 
-        {/* En móvil siempre mostrar cards, en desktop permitir selección */}
-        <div className="d-md-none">
+        {modoVista === 'cards' ? (
           <VistaCards />
-        </div>
-        <div className="d-none d-md-block">
-          {modoVista === 'cards' ? (
-            <VistaCards />
-          ) : (
-            <Card className="border-0 shadow-sm">
-              <CardBody>
-                <TableContainer
-                  columns={columnas}
-                  data={usuariosFiltrados}
-                  isGlobalFilter={false}
-                  isPagination={true}
-                  isCustomPageSize={false}
-                  SearchPlaceholder="Filtrar..."
-                  divClassName="table-responsive table-card mb-1"
-                  tableClass="align-middle table-nowrap"
-                  theadClass="table-light text-muted"
-                  paginationWrapper="dataTables_paginate paging_simple_numbers pagination-rounded"
-                  pagination="pagination"
-                />
-              </CardBody>
-            </Card>
-          )}
-        </div>
+        ) : (
+          <Card className="border-0 shadow-sm">
+            <CardBody>
+              <TableContainer
+                columns={columnas}
+                data={usuariosFiltrados}
+                isGlobalFilter={false}
+                isPagination={true}
+                isCustomPageSize={false}
+                SearchPlaceholder="Filtrar..."
+                divClassName="table-responsive table-card mb-1"
+                tableClass="align-middle table-nowrap"
+                theadClass="table-light text-muted"
+                paginationWrapper="dataTables_paginate paging_simple_numbers pagination-rounded"
+                pagination="pagination"
+              />
+            </CardBody>
+          </Card>
+        )}
 
         {/* Modal para agregar/editar usuario */}
         <Modal 
@@ -1090,7 +1089,8 @@ const UsersCrudV2 = () => {
               </Button>
               <Button color="primary" onClick={manejarGuardarUsuario} className="order-1 order-sm-2">
                 <i className="mdi mdi-check me-1"></i>
-{esEdicion ? "Actualizar Usuario" : "Crear Usuario"}
+                <span className="d-none d-sm-inline">{esEdicion ? "Actualizar Usuario" : "Crear Usuario"}</span>
+                <span className="d-sm-none">{esEdicion ? "Actualizar" : "Crear"}</span>
               </Button>
             </div>
           </ModalFooter>
@@ -1233,4 +1233,4 @@ const UsersCrudV2 = () => {
   );
 };
 
-export default UsersCrudV2;
+export default UserContend;

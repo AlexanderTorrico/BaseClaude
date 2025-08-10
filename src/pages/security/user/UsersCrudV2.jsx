@@ -23,23 +23,10 @@ import {
   Progress,
 } from "reactstrap";
 import { toast } from "react-toastify";
-import TableContainer from "../../components/Common/TableContainer";
-import DeleteModal from "../../components/Common/DeleteModal";
+import TableContainer from "../../../components/Common/TableContainer";
+import DeleteModal from "../../../components/Common/DeleteModal";
 
-const CustomSelect = ({ value, onChange, options, placeholder, icon, size = "sm" }) => {
-  const sizeStyles = {
-    sm: {
-      padding: '0.25rem 0.5rem',
-      fontSize: '0.8125rem'
-    },
-    default: {
-      padding: '0.5rem 0.75rem',
-      fontSize: '0.875rem'
-    }
-  };
-
-  const currentSize = sizeStyles[size] || sizeStyles.default;
-
+const CustomSelect = ({ value, onChange, options, placeholder, icon }) => {
   return (
     <UncontrolledDropdown>
       <DropdownToggle 
@@ -49,11 +36,10 @@ const CustomSelect = ({ value, onChange, options, placeholder, icon, size = "sm"
           textAlign: 'left',
           border: '1px solid #ced4da',
           borderRadius: '0.375rem',
-          padding: currentSize.padding,
-          fontSize: currentSize.fontSize,
+          padding: '0.5rem 0.75rem',
+          fontSize: '0.875rem',
           fontWeight: 'normal',
-          color: value === 'all' || !value ? '#6c757d' : '#495057',
-          height: '31px' // Altura equivalente a btn-sm
+          color: value === 'all' || !value ? '#6c757d' : '#495057'
         }}
       >
         <span className="d-flex align-items-center">
@@ -244,11 +230,6 @@ const UsersCrudV2 = () => {
   const [esEdicion, setEsEdicion] = useState(false);
   const [columnFilters, setColumnFilters] = useState({});
   const [sorting, setSorting] = useState({ column: null, direction: null }); // null, 'asc', 'desc'
-  
-  // Estados específicos para búsqueda en vista de cards
-  const [cardSearchTerm, setCardSearchTerm] = useState("");
-  const [cardSearchColumn, setCardSearchColumn] = useState("all"); // Columna específica para buscar
-  const [cardSorting, setCardSorting] = useState({ field: "nombre", direction: "asc" });
   const [datosFormulario, setDatosFormulario] = useState({
     nombre: "",
     email: "",
@@ -289,33 +270,6 @@ const UsersCrudV2 = () => {
       { value: 'Suspendido', label: 'Suspendido', icon: 'mdi-alert-circle' }
     ]
   };
-
-  // Opciones para columnas de búsqueda
-  const opcionesColumnaBusqueda = [
-    { value: 'all', label: 'Todas las columnas', icon: 'mdi-view-column' },
-    { value: 'nombre', label: 'Nombre', icon: 'mdi-account' },
-    { value: 'email', label: 'Email', icon: 'mdi-email' },
-    { value: 'telefono', label: 'Teléfono', icon: 'mdi-phone' },
-    { value: 'rol', label: 'Rol', icon: 'mdi-shield-account' },
-    { value: 'departamento', label: 'Departamento', icon: 'mdi-office-building' },
-    { value: 'estado', label: 'Estado', icon: 'mdi-check-circle' },
-    { value: 'ciudad', label: 'Ciudad', icon: 'mdi-map-marker' },
-    { value: 'empresa', label: 'Empresa', icon: 'mdi-domain' }
-  ];
-
-  // Opciones de ordenamiento por campo
-  const opcionesOrdenamiento = [
-    { value: 'nombre', label: 'Nombre', icon: 'mdi-account' },
-    { value: 'email', label: 'Email', icon: 'mdi-email' },
-    { value: 'rol', label: 'Rol', icon: 'mdi-shield-account' },
-    { value: 'departamento', label: 'Departamento', icon: 'mdi-office-building' },
-    { value: 'estado', label: 'Estado', icon: 'mdi-check-circle' },
-    { value: 'salario', label: 'Salario', icon: 'mdi-currency-eur' },
-    { value: 'experiencia', label: 'Experiencia', icon: 'mdi-clock-outline' },
-    { value: 'rendimiento', label: 'Rendimiento', icon: 'mdi-trending-up' },
-    { value: 'ciudad', label: 'Ciudad', icon: 'mdi-map-marker' },
-    { value: 'empresa', label: 'Empresa', icon: 'mdi-domain' }
-  ];
 
 
   const usuariosFiltrados = useMemo(() => {
@@ -365,63 +319,6 @@ const UsersCrudV2 = () => {
 
     return resultado;
   }, [usuarios, columnFilters, sorting]);
-
-  // Función separada para filtrar usuarios en vista de cards
-  const usuariosFiltradosCards = useMemo(() => {
-    let resultado = usuarios;
-
-    // Aplicar búsqueda por término específico o general
-    if (cardSearchTerm && cardSearchTerm.trim() !== '') {
-      const searchTerm = cardSearchTerm.toLowerCase().trim();
-      
-      if (cardSearchColumn === 'all') {
-        // Buscar en todas las columnas
-        resultado = resultado.filter(usuario => 
-          usuario.nombre.toLowerCase().includes(searchTerm) ||
-          usuario.email.toLowerCase().includes(searchTerm) ||
-          usuario.telefono.toLowerCase().includes(searchTerm) ||
-          usuario.rol.toLowerCase().includes(searchTerm) ||
-          usuario.departamento.toLowerCase().includes(searchTerm) ||
-          usuario.estado.toLowerCase().includes(searchTerm) ||
-          usuario.ciudad.toLowerCase().includes(searchTerm) ||
-          usuario.empresa.toLowerCase().includes(searchTerm)
-        );
-      } else {
-        // Buscar en columna específica
-        resultado = resultado.filter(usuario => {
-          const columnValue = usuario[cardSearchColumn];
-          return columnValue && columnValue.toString().toLowerCase().includes(searchTerm);
-        });
-      }
-    }
-
-    // Aplicar ordenamiento
-    if (cardSorting.field && cardSorting.direction) {
-      resultado = [...resultado].sort((a, b) => {
-        const aValue = a[cardSorting.field];
-        const bValue = b[cardSorting.field];
-        
-        // Manejar valores nulos o undefined
-        if (aValue === null || aValue === undefined) return cardSorting.direction === 'asc' ? -1 : 1;
-        if (bValue === null || bValue === undefined) return cardSorting.direction === 'asc' ? 1 : -1;
-        
-        // Comparar números
-        if (typeof aValue === 'number' && typeof bValue === 'number') {
-          return cardSorting.direction === 'asc' ? aValue - bValue : bValue - aValue;
-        }
-        
-        // Comparar strings (fechas también se ordenan como strings en este caso)
-        const aStr = aValue.toString().toLowerCase();
-        const bStr = bValue.toString().toLowerCase();
-        
-        if (aStr < bStr) return cardSorting.direction === 'asc' ? -1 : 1;
-        if (aStr > bStr) return cardSorting.direction === 'asc' ? 1 : -1;
-        return 0;
-      });
-    }
-
-    return resultado;
-  }, [usuarios, cardSearchTerm, cardSearchColumn, cardSorting]);
 
   const manejarAgregarUsuario = () => {
     setEsEdicion(false);
@@ -585,46 +482,6 @@ const UsersCrudV2 = () => {
     clearSorting();
   }, [clearAllFilters, clearSorting]);
 
-  // Funciones para manejo de filtros en vista de cards
-  const handleCardSearchChange = useCallback((value) => {
-    setCardSearchTerm(value);
-  }, []);
-
-  const handleCardSearchColumnChange = useCallback((column) => {
-    setCardSearchColumn(column);
-  }, []);
-
-  const handleCardSortFieldChange = useCallback((field) => {
-    setCardSorting(prev => ({ ...prev, field }));
-  }, []);
-
-  const handleCardSortDirectionChange = useCallback((direction) => {
-    setCardSorting(prev => ({ ...prev, direction }));
-  }, []);
-
-  const clearCardFilters = useCallback(() => {
-    setCardSearchTerm("");
-    setCardSearchColumn("all");
-    setCardSorting({ field: "nombre", direction: "asc" });
-  }, []);
-
-  // Función helper para obtener filtros activos en cards
-  const getActiveCardFilters = useCallback(() => {
-    const activeFilters = [];
-    
-    if (cardSearchTerm && cardSearchTerm.trim() !== '') {
-      const columnLabel = cardSearchColumn === 'all' ? 'Todas las columnas' : 
-        opcionesColumnaBusqueda.find(opt => opt.value === cardSearchColumn)?.label || cardSearchColumn;
-      activeFilters.push({ 
-        type: 'search', 
-        value: cardSearchTerm,
-        column: columnLabel
-      });
-    }
-    
-    return activeFilters;
-  }, [cardSearchTerm, cardSearchColumn]);
-
   // Función helper para obtener solo los filtros activos (no vacíos)
   const getActiveFilters = useCallback(() => {
     return Object.entries(columnFilters).filter(([column, filterValue]) => 
@@ -633,264 +490,100 @@ const UsersCrudV2 = () => {
   }, [columnFilters]);
 
 
-  // Componente del panel de búsqueda compacto para cards
-  const CardSearchPanel = () => (
-    <Card className="border-0 shadow-sm mb-4">
-      <CardBody className="p-3">
-        {/* Fila única con todos los controles */}
-        <Row className="g-2 align-items-end">
-          {/* Barra de búsqueda */}
-          <Col lg={6} md={12} sm={12} xs={12}>
-            <InputGroup size="sm" className="search-input-group">
-              <InputGroupText className="bg-light">
-                <i className="mdi mdi-magnify text-muted"></i>
-              </InputGroupText>
-              <Input
-                type="text"
-                placeholder="Buscar usuarios..."
-                value={cardSearchTerm}
-                onChange={(e) => handleCardSearchChange(e.target.value)}
-                className="form-control-sm"
-              />
-              {cardSearchTerm && (
-                <InputGroupText 
-                  className="bg-light cursor-pointer"
-                  onClick={() => handleCardSearchChange("")}
-                  title="Limpiar búsqueda"
-                >
-                  <i className="mdi mdi-close text-muted"></i>
-                </InputGroupText>
-              )}
-            </InputGroup>
-          </Col>
-          
-
-          
-          {/* Selector de campo de ordenamiento */}
-          <Col lg={2} md={3} sm={4} xs={6}>
-            <CustomSelect
-              value={cardSorting.field}
-              onChange={handleCardSortFieldChange}
-              options={opcionesOrdenamiento}
-              placeholder="Ordenar por"
-              icon="mdi-sort"
-              size="sm"
-            />
-          </Col>
-          
-          {/* Botones de dirección de ordenamiento */}
-          <Col lg={1} md={2} sm={4} xs={6}>
-            <div className="btn-group w-100" role="group">
-              <Button 
-                color={cardSorting.direction === 'asc' ? 'primary' : 'light'}
-                size="sm"
-                onClick={() => handleCardSortDirectionChange('asc')}
-                title="Ascendente"
-                className="d-flex align-items-center justify-content-center"
-                style={{ height: '31px' }}
-              >
-                <i className="mdi mdi-sort-ascending"></i>
-              </Button>
-              <Button 
-                color={cardSorting.direction === 'desc' ? 'primary' : 'light'}
-                size="sm"
-                onClick={() => handleCardSortDirectionChange('desc')}
-                title="Descendente"
-                className="d-flex align-items-center justify-content-center"
-                style={{ height: '31px' }}
-              >
-                <i className="mdi mdi-sort-descending"></i>
-              </Button>
-            </div>
-          </Col>
-          
-          {/* Botón limpiar filtros */}
-          <Col lg={1} md={2} sm={6} xs={6}>
-            {getActiveCardFilters().length > 0 ? (
-              <Button 
-                color="outline-secondary" 
-                size="sm"
-                onClick={clearCardFilters}
-                className="w-100"
-                title="Limpiar filtros"
-              >
-                <i className="mdi mdi-filter-remove"></i>
-              </Button>
-            ) : (
-              <div className="text-center">
-                <small className="text-muted">
-                  {usuariosFiltradosCards.length}/{usuarios.length}
-                </small>
-              </div>
-            )}
-          </Col>
-        </Row>
-
-        {/* Panel de filtros activos (solo si hay filtros) */}
-        {getActiveCardFilters().length > 0 && (
-          <Row className="mt-3">
-            <Col xs={12}>
-              <div className="d-flex align-items-center flex-wrap">
-                <span className="text-muted small me-2 fw-medium">
-                  <i className="mdi mdi-filter-check me-1"></i>
-                  Filtros activos:
-                </span>
-                
-                {getActiveCardFilters().map((filter, index) => (
-                  <Badge 
-                    key={index}
-                    color="primary" 
-                    className="me-2 mb-2 d-inline-flex align-items-center"
-                    style={{ fontSize: '0.7rem' }}
-                  >
-                    <i className="mdi mdi-magnify me-1"></i>
-                    <span className="text-truncate" style={{ maxWidth: '150px' }}>
-                      {filter.column}: "{filter.value}"
-                    </span>
-                    <Button
-                      color="link"
-                      size="sm"
-                      className="p-0 ms-1 text-white"
-                      onClick={() => handleCardSearchChange('')}
-                      style={{ fontSize: '0.7rem', lineHeight: '1' }}
-                      title="Eliminar filtro"
-                    >
-                      <i className="mdi mdi-close"></i>
-                    </Button>
-                  </Badge>
-                ))}
-                
-                <small className="text-muted ms-2">
-                  ({usuariosFiltradosCards.length} resultado{usuariosFiltradosCards.length !== 1 ? 's' : ''})
-                </small>
-              </div>
-            </Col>
-          </Row>
-        )}
-      </CardBody>
-    </Card>
-  );
-
   const VistaCards = () => (
-    <>
-      <CardSearchPanel />
-      <Row>
-        {usuariosFiltradosCards.map(usuario => (
-          <Col xl={4} lg={6} md={6} sm={12} key={usuario.id} className="mb-4">
-            <Card className="user-card h-100 shadow-sm border-0">
-              <CardBody className="p-4">
-                <div className="d-flex justify-content-between align-items-start mb-3">
-                  <div className="d-flex align-items-center">
-                    <div className="avatar-md rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3">
-                      {usuario.nombre.charAt(0)}
-                    </div>
-                    <div>
-                      <h6 className="mb-1 font-weight-bold">{usuario.nombre}</h6>
-                      <p className="text-muted mb-0 small">{usuario.rol}</p>
-                    </div>
+    <Row>
+      {usuariosFiltrados.map(usuario => (
+        <Col xl={4} lg={6} md={6} sm={12} key={usuario.id} className="mb-4">
+          <Card className="user-card h-100 shadow-sm border-0">
+            <CardBody className="p-4">
+              <div className="d-flex justify-content-between align-items-start mb-3">
+                <div className="d-flex align-items-center">
+                  <div className="avatar-md rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3">
+                    {usuario.nombre.charAt(0)}
                   </div>
-                  
-                  <UncontrolledDropdown>
-                    <DropdownToggle tag="button" className="btn btn-light btn-sm">
-                      <i className="mdi mdi-dots-vertical"></i>
-                    </DropdownToggle>
-                    <DropdownMenu end>
-                      <DropdownItem onClick={() => manejarEditarUsuario(usuario)}>
-                        <i className="mdi mdi-pencil me-2"></i>Editar
-                      </DropdownItem>
-                      <DropdownItem onClick={() => manejarEliminarUsuario(usuario)}>
-                        <i className="mdi mdi-delete me-2"></i>Eliminar
-                      </DropdownItem>
-                      <DropdownItem divider />
-                      <DropdownItem>
-                        <i className="mdi mdi-eye me-2"></i>Ver perfil
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </UncontrolledDropdown>
-                </div>
-
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  {obtenerBadgeEstado(usuario.estado)}
-                  <span className="badge bg-light text-dark">{usuario.departamento}</span>
-                </div>
-
-                <div className="mb-3">
-                  <p className="mb-1 small text-muted">
-                    <i className="mdi mdi-email-outline me-2"></i>
-                    {usuario.email}
-                  </p>
-                  <p className="mb-1 small text-muted">
-                    <i className="mdi mdi-phone me-2"></i>
-                    {usuario.telefono}
-                  </p>
-                  <p className="mb-0 small text-muted">
-                    <i className="mdi mdi-map-marker me-2"></i>
-                    {usuario.ciudad}
-                  </p>
-                </div>
-
-                <div className="mb-3">
-                  <div className="d-flex justify-content-between align-items-center mb-1">
-                    <small className="text-muted">Rendimiento</small>
-                    <small className="font-weight-bold">{usuario.rendimiento}%</small>
-                  </div>
-                  <Progress 
-                    value={usuario.rendimiento} 
-                    color={obtenerColorRendimiento(usuario.rendimiento)}
-                    className="progress-sm"
-                  />
-                </div>
-
-                <div className="row g-2 mt-3 pt-3 border-top">
-                  <div className="col-4 text-center">
-                    <h6 className="mb-0">{usuario.proyectos}</h6>
-                    <small className="text-muted">Proyectos</small>
-                  </div>
-                  <div className="col-4 text-center">
-                    <h6 className="mb-0">{usuario.experiencia}</h6>
-                    <small className="text-muted">Años exp.</small>
-                  </div>
-                  <div className="col-4 text-center">
-                    <h6 className="mb-0">€{(usuario.salario / 1000).toFixed(0)}K</h6>
-                    <small className="text-muted">Salario</small>
+                  <div>
+                    <h6 className="mb-1 font-weight-bold">{usuario.nombre}</h6>
+                    <p className="text-muted mb-0 small">{usuario.rol}</p>
                   </div>
                 </div>
-
-                <div className="mt-3 pt-3 border-top">
-                  <small className="text-muted">
-                    <i className="mdi mdi-clock-outline me-1"></i>
-                    {usuario.ultimaActividad}
-                  </small>
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-        ))}
-        
-        {usuariosFiltradosCards.length === 0 && (
-          <Col xs={12}>
-            <div className="text-center py-5">
-              <div className="avatar-lg rounded-circle bg-light mx-auto mb-4 d-flex align-items-center justify-content-center">
-                <i className="mdi mdi-account-search mdi-36px text-muted"></i>
+                
+                <UncontrolledDropdown>
+                  <DropdownToggle tag="button" className="btn btn-light btn-sm">
+                    <i className="mdi mdi-dots-vertical"></i>
+                  </DropdownToggle>
+                  <DropdownMenu end>
+                    <DropdownItem onClick={() => manejarEditarUsuario(usuario)}>
+                      <i className="mdi mdi-pencil me-2"></i>Editar
+                    </DropdownItem>
+                    <DropdownItem onClick={() => manejarEliminarUsuario(usuario)}>
+                      <i className="mdi mdi-delete me-2"></i>Eliminar
+                    </DropdownItem>
+                    <DropdownItem divider />
+                    <DropdownItem>
+                      <i className="mdi mdi-eye me-2"></i>Ver perfil
+                    </DropdownItem>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
               </div>
-              <h5 className="mb-3">No se encontraron usuarios</h5>
-              <p className="text-muted mb-4">
-                No hay usuarios que coincidan con los criterios de búsqueda y filtros aplicados.
-              </p>
-              <Button 
-                color="primary" 
-                outline 
-                onClick={clearCardFilters}
-                className="d-inline-flex align-items-center"
-              >
-                <i className="mdi mdi-filter-remove me-2"></i>
-                Limpiar filtros
-              </Button>
-            </div>
-          </Col>
-        )}
-      </Row>
-    </>
+
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                {obtenerBadgeEstado(usuario.estado)}
+                <span className="badge bg-light text-dark">{usuario.departamento}</span>
+              </div>
+
+              <div className="mb-3">
+                <p className="mb-1 small text-muted">
+                  <i className="mdi mdi-email-outline me-2"></i>
+                  {usuario.email}
+                </p>
+                <p className="mb-1 small text-muted">
+                  <i className="mdi mdi-phone me-2"></i>
+                  {usuario.telefono}
+                </p>
+                <p className="mb-0 small text-muted">
+                  <i className="mdi mdi-map-marker me-2"></i>
+                  {usuario.ciudad}
+                </p>
+              </div>
+
+              <div className="mb-3">
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <small className="text-muted">Rendimiento</small>
+                  <small className="font-weight-bold">{usuario.rendimiento}%</small>
+                </div>
+                <Progress 
+                  value={usuario.rendimiento} 
+                  color={obtenerColorRendimiento(usuario.rendimiento)}
+                  className="progress-sm"
+                />
+              </div>
+
+              <div className="row g-2 mt-3 pt-3 border-top">
+                <div className="col-4 text-center">
+                  <h6 className="mb-0">{usuario.proyectos}</h6>
+                  <small className="text-muted">Proyectos</small>
+                </div>
+                <div className="col-4 text-center">
+                  <h6 className="mb-0">{usuario.experiencia}</h6>
+                  <small className="text-muted">Años exp.</small>
+                </div>
+                <div className="col-4 text-center">
+                  <h6 className="mb-0">€{(usuario.salario / 1000).toFixed(0)}K</h6>
+                  <small className="text-muted">Salario</small>
+                </div>
+              </div>
+
+              <div className="mt-3 pt-3 border-top">
+                <small className="text-muted">
+                  <i className="mdi mdi-clock-outline me-1"></i>
+                  {usuario.ultimaActividad}
+                </small>
+              </div>
+            </CardBody>
+          </Card>
+        </Col>
+      ))}
+    </Row>
   );
 
   // Crear headers estáticos para evitar re-renders
@@ -1099,7 +792,8 @@ const UsersCrudV2 = () => {
                       title="Limpiar todos los filtros"
                     >
                       <i className="mdi mdi-filter-remove me-1"></i>
-                      Limpiar Filtros
+                      <span className="d-none d-sm-inline">Limpiar Filtros</span>
+                      <span className="d-sm-none">Limpiar</span>
                     </Button>
                   )}
                   
@@ -1111,23 +805,26 @@ const UsersCrudV2 = () => {
                       title="Quitar ordenamiento"
                     >
                       <i className="mdi mdi-sort-variant-remove me-1"></i>
-                      Quitar Orden
+                      <span className="d-none d-sm-inline">Quitar Orden</span>
+                      <span className="d-sm-none">Orden</span>
                     </Button>
                   )}
 
                   <Button color="primary" onClick={manejarAgregarUsuario} size="sm">
                     <i className="mdi mdi-plus me-1"></i>
-                    Nuevo Usuario
+                    <span className="d-none d-sm-inline">Nuevo Usuario</span>
+                    <span className="d-sm-none">Nuevo</span>
                   </Button>
                   
                   {usuariosSeleccionados.length > 0 && (
                     <Button color="danger" outline onClick={manejarEliminarMasivo} size="sm">
                       <i className="mdi mdi-delete me-1"></i>
-                      Eliminar ({usuariosSeleccionados.length})
+                      <span className="d-none d-sm-inline">Eliminar ({usuariosSeleccionados.length})</span>
+                      <span className="d-sm-none">({usuariosSeleccionados.length})</span>
                     </Button>
                   )}
 
-                  <div className="btn-group d-none d-md-flex" role="group">
+                  <div className="btn-group" role="group">
                     <Button 
                       color={modoVista === 'cards' ? 'primary' : 'light'}
                       onClick={() => setModoVista('cards')}
@@ -1157,7 +854,8 @@ const UsersCrudV2 = () => {
                     <div className="d-flex align-items-start flex-wrap">
                       <span className="text-muted small me-2 fw-medium mb-2">
                         <i className="mdi mdi-filter-check me-1"></i>
-                        Filtros y ordenamiento activos:
+                        <span className="d-none d-sm-inline">Filtros y ordenamiento activos:</span>
+                        <span className="d-sm-none">Filtros:</span>
                       </span>
                       
                       {/* Mostrar ordenamiento activo */}
@@ -1227,33 +925,27 @@ const UsersCrudV2 = () => {
           </CardBody>
         </Card>
 
-        {/* En móvil siempre mostrar cards, en desktop permitir selección */}
-        <div className="d-md-none">
+        {modoVista === 'cards' ? (
           <VistaCards />
-        </div>
-        <div className="d-none d-md-block">
-          {modoVista === 'cards' ? (
-            <VistaCards />
-          ) : (
-            <Card className="border-0 shadow-sm">
-              <CardBody>
-                <TableContainer
-                  columns={columnas}
-                  data={usuariosFiltrados}
-                  isGlobalFilter={false}
-                  isPagination={true}
-                  isCustomPageSize={false}
-                  SearchPlaceholder="Filtrar..."
-                  divClassName="table-responsive table-card mb-1"
-                  tableClass="align-middle table-nowrap"
-                  theadClass="table-light text-muted"
-                  paginationWrapper="dataTables_paginate paging_simple_numbers pagination-rounded"
-                  pagination="pagination"
-                />
-              </CardBody>
-            </Card>
-          )}
-        </div>
+        ) : (
+          <Card className="border-0 shadow-sm">
+            <CardBody>
+              <TableContainer
+                columns={columnas}
+                data={usuariosFiltrados}
+                isGlobalFilter={false}
+                isPagination={true}
+                isCustomPageSize={false}
+                SearchPlaceholder="Filtrar..."
+                divClassName="table-responsive table-card mb-1"
+                tableClass="align-middle table-nowrap"
+                theadClass="table-light text-muted"
+                paginationWrapper="dataTables_paginate paging_simple_numbers pagination-rounded"
+                pagination="pagination"
+              />
+            </CardBody>
+          </Card>
+        )}
 
         {/* Modal para agregar/editar usuario */}
         <Modal 
@@ -1397,7 +1089,8 @@ const UsersCrudV2 = () => {
               </Button>
               <Button color="primary" onClick={manejarGuardarUsuario} className="order-1 order-sm-2">
                 <i className="mdi mdi-check me-1"></i>
-{esEdicion ? "Actualizar Usuario" : "Crear Usuario"}
+                <span className="d-none d-sm-inline">{esEdicion ? "Actualizar Usuario" : "Crear Usuario"}</span>
+                <span className="d-sm-none">{esEdicion ? "Actualizar" : "Crear"}</span>
               </Button>
             </div>
           </ModalFooter>
@@ -1492,39 +1185,6 @@ const UsersCrudV2 = () => {
         
         .sortable-header:active {
           background-color: rgba(0, 123, 255, 0.15);
-        }
-
-        /* Estilos para el panel de búsqueda de cards */
-        .search-input-group .form-control-lg {
-          border-color: #dee2e6;
-          box-shadow: none;
-          transition: all 0.2s ease;
-        }
-        
-        .search-input-group .form-control-lg:focus {
-          border-color: #007bff;
-          box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-        }
-        
-        .search-input-group .input-group-text {
-          transition: all 0.2s ease;
-        }
-        
-        .search-input-group .cursor-pointer {
-          cursor: pointer;
-        }
-        
-        .search-input-group .cursor-pointer:hover {
-          background-color: #e9ecef !important;
-        }
-
-        .avatar-lg {
-          width: 64px;
-          height: 64px;
-        }
-        
-        .mdi-36px {
-          font-size: 36px;
         }
 
         /* Responsive improvements */

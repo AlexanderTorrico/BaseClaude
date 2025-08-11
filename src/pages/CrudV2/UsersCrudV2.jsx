@@ -184,22 +184,6 @@ const UsersCrudV2 = () => {
         </CardBody>
       </Card>
 
-      {/* Vista móvil siempre cards, desktop permite selección */}
-      <div className="d-md-none">
-        <UserCardsView 
-          usuariosFiltradosCards={usuariosFiltradosCards}
-          usuarios={usuarios}
-          cardSearchTerm={cardSearchTerm}
-          cardSorting={cardSorting}
-          onSearchChange={handleCardSearchChange}
-          onSortFieldChange={handleCardSortFieldChange}
-          onSortDirectionChange={handleCardSortDirectionChange}
-          onClearFilters={clearCardFilters}
-          getActiveCardFilters={getActiveCardFilters}
-          onEditUser={manejarEditarUsuario}
-          onDeleteUser={manejarEliminarUsuario}
-        />
-      </div>
       
       <div className="d-none d-md-block">
         {modoVista === 'cards' ? (

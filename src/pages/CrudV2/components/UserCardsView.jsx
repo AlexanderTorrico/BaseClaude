@@ -12,7 +12,6 @@ const UserCardsView = ({
   onSortFieldChange,
   onSortDirectionChange,
   onClearFilters,
-  getActiveCardFilters,
   onEditUser,
   onDeleteUser
 }) => {
@@ -27,7 +26,6 @@ const UserCardsView = ({
         onSortFieldChange={onSortFieldChange}
         onSortDirectionChange={onSortDirectionChange}
         onClearFilters={onClearFilters}
-        getActiveCardFilters={getActiveCardFilters}
       />
       
       <Row>

@@ -3,7 +3,9 @@ import { Row, Col, Card, CardBody, Button, Badge } from "reactstrap";
 import DeleteModal from "../../components/Common/DeleteModal";
 import UserCardsView from "./components/UserCardsView";
 import UserTableView from "./components/UserTableView";
+import MobileCardsView from "./components/MobileCardsView";
 import UserModal from "./components/UserModal";
+import FilterInfoPanel from "./components/FilterInfoPanel";
 import { useUserData } from "./hooks/useUserData.jsx";
 import { useUserFilters } from "./hooks/useUserFilters.jsx";
 import { useUserActions } from "./hooks/useUserActions.jsx";
@@ -21,7 +23,6 @@ const UsersCrudV2 = () => {
     usuariosFiltradosCards,
     handleColumnFilter,
     clearColumnFilter,
-    clearAllFilters,
     handleSort,
     clearSorting,
     clearAll,
@@ -107,80 +108,26 @@ const UsersCrudV2 = () => {
             </Col>
           </Row>
 
-          {/* Resumen de filtros y ordenamiento activos */}
-          {(getActiveFilters().length > 0 || (sorting.column && sorting.direction)) && (
-            <Row className="mt-3">
-              <Col xs={12}>
-                <div className="active-filters-container p-3 bg-light rounded">
-                  <div className="d-flex align-items-start flex-wrap">
-                    <span className="text-muted small me-2 fw-medium mb-2">
-                      <i className="mdi mdi-filter-check me-1"></i>
-                      Filtros y ordenamiento activos:
-                    </span>
-                    
-                    {/* Mostrar ordenamiento activo */}
-                    {sorting.column && sorting.direction && (
-                      <Badge 
-                        color="white" 
-                        className="border border-info me-2 mb-2 d-flex align-items-center shadow-sm"
-                        style={{ fontSize: '0.75rem', padding: '0.5rem 0.75rem' }}
-                      >
-                        <i className={`mdi ${sorting.direction === 'asc' ? 'mdi-sort-ascending' : 'mdi-sort-descending'} me-2 text-info`}></i>
-                        <span className="fw-medium text-dark text-capitalize">{sorting.column}</span>
-                        <span className="text-muted mx-1">{sorting.direction === 'asc' ? 'ascendente' : 'descendente'}</span>
-                        <Button
-                          color="link"
-                          size="sm"
-                          className="p-0 ms-2 text-danger"
-                          onClick={clearSorting}
-                          style={{ fontSize: '0.7rem' }}
-                          title="Quitar ordenamiento"
-                        >
-                          <i className="mdi mdi-close"></i>
-                        </Button>
-                      </Badge>
-                    )}
-                    
-                    {/* Mostrar solo filtros de columna activos (no vacíos) */}
-                    {getActiveFilters().map(([column, value]) => (
-                      <Badge 
-                        key={column}
-                        color="white" 
-                        className="border border-primary me-2 mb-2 d-flex align-items-center shadow-sm"
-                        style={{ fontSize: '0.75rem', padding: '0.5rem 0.75rem' }}
-                      >
-                        <i className="mdi mdi-filter me-2 text-primary"></i>
-                        <span className="fw-medium text-dark text-capitalize">{column}</span>
-                        <span className="text-muted mx-1">contiene</span>
-                        <span className="text-primary fw-medium">"{value}"</span>
-                        <Button
-                          color="link"
-                          size="sm"
-                          className="p-0 ms-2 text-danger"
-                          onClick={() => clearColumnFilter(column)}
-                          style={{ fontSize: '0.7rem' }}
-                          title="Eliminar filtro"
-                        >
-                          <i className="mdi mdi-close"></i>
-                        </Button>
-                      </Badge>
-                    ))}
-                    
-                    <Button 
-                      color="link" 
-                      size="sm" 
-                      className="p-0 text-danger fw-medium"
-                      onClick={clearAll}
-                      title="Limpiar todo"
-                    >
-                      <i className="mdi mdi-close-circle me-1"></i>
-                      Limpiar todo
-                    </Button>
-                  </div>
-                </div>
-              </Col>
-            </Row>
-          )}
+          {/* Resumen de filtros y ordenamiento activos usando FilterInfoPanel */}
+          <FilterInfoPanel
+            filters={getActiveFilters().map(([column, value]) => ({
+              column,
+              value,
+              type: 'column'
+            }))}
+            sorting={sorting.column && sorting.direction ? {
+              column: sorting.column,
+              direction: sorting.direction,
+              isActive: true
+            } : null}
+            onClearFilter={(filter) => clearColumnFilter(filter.column)}
+            onClearSorting={clearSorting}
+            onClearAll={clearAll}
+            totalResults={usuariosFiltrados.length}
+            totalItems={usuarios.length}
+            isIntegrated={true}
+            className="mt-3"
+          />
         </CardBody>
       </Card>
 
@@ -196,7 +143,6 @@ const UsersCrudV2 = () => {
             onSortFieldChange={handleCardSortFieldChange}
             onSortDirectionChange={handleCardSortDirectionChange}
             onClearFilters={clearCardFilters}
-            getActiveCardFilters={getActiveCardFilters}
             onEditUser={manejarEditarUsuario}
             onDeleteUser={manejarEliminarUsuario}
           />
@@ -213,6 +159,23 @@ const UsersCrudV2 = () => {
             onDeleteUser={manejarEliminarUsuario}
           />
         )}
+      </div>
+
+      {/* Vista móvil - Siempre usa cards */}
+      <div className="d-md-none">
+        <MobileCardsView 
+          usuariosFiltrados={usuariosFiltradosCards}
+          usuarios={usuarios}
+          cardSearchTerm={cardSearchTerm}
+          cardSorting={cardSorting}
+          handleCardSearchChange={handleCardSearchChange}
+          handleCardSortFieldChange={handleCardSortFieldChange}
+          handleCardSortDirectionChange={handleCardSortDirectionChange}
+          clearCardFilters={clearCardFilters}
+          getActiveCardFilters={getActiveCardFilters}
+          onEditUser={manejarEditarUsuario}
+          onDeleteUser={manejarEliminarUsuario}
+        />
       </div>
 
       {/* Modal para agregar/editar usuario */}

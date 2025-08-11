@@ -23,7 +23,8 @@ const CustomSelect = ({ value, onChange, options, placeholder, icon, size = "sm"
   return (
     <UncontrolledDropdown>
       <DropdownToggle 
-        tag="button" 
+        tag="button"
+        type="button"
         className="btn btn-light w-100 d-flex justify-content-between align-items-center"
         style={{ 
           textAlign: 'left',

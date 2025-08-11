@@ -1,6 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Row, Col, Card, CardBody, InputGroup, InputGroupText, Input, Button, Badge, Collapse } from "reactstrap";
+import CustomSelect from "./CustomSelect";
+import { opcionesOrdenamiento } from "../utils/constants.js";
 
 const MobileCardSearchPanel = ({ 
   usuariosFiltrados,
@@ -114,20 +116,14 @@ const MobileCardSearchPanel = ({
           <Row className="g-2">
             {/* Ordenamiento por campo */}
             <Col xs={8}>
-              <Input
-                type="select"
-                size="sm"
+              <CustomSelect
                 value={cardSorting.field}
-                onChange={(e) => handleCardSortFieldChange(e.target.value)}
-                title="Campo de ordenamiento"
-              >
-                <option value="nombre">Ordenar por Nombre</option>
-                <option value="rol">Ordenar por Rol</option>
-                <option value="departamento">Ordenar por Departamento</option>
-                <option value="estado">Ordenar por Estado</option>
-                <option value="salario">Ordenar por Salario</option>
-                <option value="email">Ordenar por Email</option>
-              </Input>
+                onChange={handleCardSortFieldChange}
+                options={opcionesOrdenamiento}
+                placeholder="Ordenar por"
+                icon="mdi-sort"
+                size="sm"
+              />
             </Col>
             
             {/* Dirección de ordenamiento */}

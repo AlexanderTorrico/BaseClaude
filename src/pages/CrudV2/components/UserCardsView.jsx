@@ -1,5 +1,5 @@
-import React from "react";
 import { Row, Col, Button } from "reactstrap";
+import PropTypes from "prop-types";
 import CardSearchPanel from "./CardSearchPanel";
 import UserCard from "./UserCard";
 
@@ -13,7 +13,13 @@ const UserCardsView = ({
   onSortDirectionChange,
   onClearFilters,
   onEditUser,
-  onDeleteUser
+  onDeleteUser,
+  // Props para título y acciones
+  onAddUser,
+  onBulkDelete,
+  selectedUsers,
+  onViewModeChange,
+  currentViewMode
 }) => {
   return (
     <>
@@ -26,6 +32,11 @@ const UserCardsView = ({
         onSortFieldChange={onSortFieldChange}
         onSortDirectionChange={onSortDirectionChange}
         onClearFilters={onClearFilters}
+        onAddUser={onAddUser}
+        onBulkDelete={onBulkDelete}
+        selectedUsers={selectedUsers}
+        onViewModeChange={onViewModeChange}
+        currentViewMode={currentViewMode}
       />
       
       <Row>
@@ -64,6 +75,27 @@ const UserCardsView = ({
       </Row>
     </>
   );
+};
+
+UserCardsView.propTypes = {
+  usuariosFiltradosCards: PropTypes.array.isRequired,
+  usuarios: PropTypes.array.isRequired,
+  cardSearchTerm: PropTypes.string.isRequired,
+  cardSorting: PropTypes.shape({
+    field: PropTypes.string.isRequired,
+    direction: PropTypes.string.isRequired,
+  }).isRequired,
+  onSearchChange: PropTypes.func.isRequired,
+  onSortFieldChange: PropTypes.func.isRequired,
+  onSortDirectionChange: PropTypes.func.isRequired,
+  onClearFilters: PropTypes.func.isRequired,
+  onEditUser: PropTypes.func.isRequired,
+  onDeleteUser: PropTypes.func.isRequired,
+  onAddUser: PropTypes.func.isRequired,
+  onBulkDelete: PropTypes.func,
+  selectedUsers: PropTypes.array,
+  onViewModeChange: PropTypes.func.isRequired,
+  currentViewMode: PropTypes.string.isRequired,
 };
 
 export default UserCardsView;

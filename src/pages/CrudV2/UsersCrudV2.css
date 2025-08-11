@@ -162,6 +162,26 @@
 
 .card-filter-panel .card-body {
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 10px !important;
+}
+
+.card-filter-panel h4 {
+  color: #495057;
+  font-weight: 600;
+}
+
+.card-filter-panel .btn-group .btn {
+  border-radius: 4px !important;
+}
+
+.card-filter-panel .btn-group .btn:first-child {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.card-filter-panel .btn-group .btn:last-child {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
 }
 
 .card-informative-section {

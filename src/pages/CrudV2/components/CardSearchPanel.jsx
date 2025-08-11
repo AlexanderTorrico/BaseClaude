@@ -12,34 +12,67 @@ const CardSearchPanel = ({
   onSearchChange,
   onSortFieldChange,
   onSortDirectionChange,
-  onClearFilters
+  onClearFilters,
+  // Props para el título y acciones
+  onAddUser,
+  onBulkDelete,
+  selectedUsers,
+  onViewModeChange,
+  currentViewMode
 }) => {
   // Check if there are active filters or sorting
   const hasActiveFilters = cardSearchTerm || (cardSorting.field && cardSorting.field !== 'nombre') || cardSorting.direction === 'desc';
   return (
     <Card className="border-0 shadow-sm mb-4 card-filter-panel">
       <CardBody className="p-3">
-        {/* Title and Basic Info Row */}
+        {/* Main Title and Actions Row */}
         <Row className="align-items-center mb-3">
-          <Col xs={12}>
-            <div className="d-flex justify-content-between align-items-center flex-wrap">
-              <div className="mb-2 mb-md-0">
-                <h5 className="mb-1">Vista de Tarjetas</h5>
-                <p className="text-muted mb-0 small">
-                  Gestión visual de usuarios
-                  {hasActiveFilters && (
-                    <Badge color="info" className="ms-2" style={{ fontSize: '0.65rem' }}>
-                      <i className="mdi mdi-filter-check me-1"></i>
-                      {usuariosFiltradosCards.length} de {usuarios.length} resultados
-                    </Badge>
-                  )}
-                </p>
-              </div>
-              {!hasActiveFilters && (
-                <div className="text-muted small">
-                  {usuariosFiltradosCards.length} usuario{usuariosFiltradosCards.length !== 1 ? 's' : ''}
-                </div>
+          <Col lg={6} md={12}>
+            <h4 className="mb-0">Gestión de Usuarios V2</h4>
+            <p className="text-muted mb-md-0 mb-3">
+              Sistema moderno de administración de usuarios - Vista de Tarjetas
+              {hasActiveFilters && (
+                <span className="ms-2">
+                  <Badge color="info" style={{ fontSize: '0.65rem' }}>
+                    <i className="mdi mdi-filter-check me-1"></i>
+                    {usuariosFiltradosCards.length} de {usuarios.length} resultados
+                  </Badge>
+                </span>
               )}
+            </p>
+          </Col>
+          <Col lg={6} md={12} className="text-lg-end text-center">
+            <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
+              <Button color="primary" onClick={onAddUser} size="sm">
+                <i className="mdi mdi-plus me-1"></i>
+                Nuevo Usuario
+              </Button>
+              
+              {selectedUsers && selectedUsers.length > 0 && (
+                <Button color="danger" outline onClick={onBulkDelete} size="sm">
+                  <i className="mdi mdi-delete me-1"></i>
+                  Eliminar ({selectedUsers.length})
+                </Button>
+              )}
+
+              <div className="btn-group d-none d-md-flex" role="group">
+                <Button 
+                  color={currentViewMode === 'cards' ? 'primary' : 'light'}
+                  onClick={() => onViewModeChange('cards')}
+                  size="sm"
+                  title="Vista de tarjetas"
+                >
+                  <i className="mdi mdi-view-grid"></i>
+                </Button>
+                <Button 
+                  color={currentViewMode === 'table' ? 'primary' : 'light'}
+                  onClick={() => onViewModeChange('table')}
+                  size="sm"
+                  title="Vista de tabla"
+                >
+                  <i className="mdi mdi-view-list"></i>
+                </Button>
+              </div>
             </div>
           </Col>
         </Row>
@@ -167,6 +200,12 @@ CardSearchPanel.propTypes = {
   onSortFieldChange: PropTypes.func.isRequired,
   onSortDirectionChange: PropTypes.func.isRequired,
   onClearFilters: PropTypes.func.isRequired,
+  // Props para título y acciones
+  onAddUser: PropTypes.func.isRequired,
+  onBulkDelete: PropTypes.func,
+  selectedUsers: PropTypes.array,
+  onViewModeChange: PropTypes.func.isRequired,
+  currentViewMode: PropTypes.string.isRequired,
 };
 
 export default CardSearchPanel;

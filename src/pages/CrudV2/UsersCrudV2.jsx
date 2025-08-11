@@ -7,6 +7,7 @@ import UserModal from "./components/UserModal";
 import { useUserData } from "./hooks/useUserData.jsx";
 import { useUserFilters } from "./hooks/useUserFilters.jsx";
 import { useUserActions } from "./hooks/useUserActions.jsx";
+import "./UsersCrudV2.css";
 
 const UsersCrudV2 = () => {
   // Custom hooks
@@ -71,30 +72,7 @@ const UsersCrudV2 = () => {
             </Col>
             <Col lg={6} md={12} className="text-lg-end text-center">
               <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
-                {getActiveFilters().length > 0 && (
-                  <Button 
-                    color="outline-secondary" 
-                    onClick={clearAllFilters} 
-                    size="sm"
-                    title="Limpiar todos los filtros"
-                  >
-                    <i className="mdi mdi-filter-remove me-1"></i>
-                    Limpiar Filtros
-                  </Button>
-                )}
-                
-                {sorting.column && sorting.direction && (
-                  <Button 
-                    color="outline-info" 
-                    onClick={clearSorting} 
-                    size="sm"
-                    title="Quitar ordenamiento"
-                  >
-                    <i className="mdi mdi-sort-variant-remove me-1"></i>
-                    Quitar Orden
-                  </Button>
-                )}
-
+    
                 <Button color="primary" onClick={manejarAgregarUsuario} size="sm">
                   <i className="mdi mdi-plus me-1"></i>
                   Nuevo Usuario
@@ -270,163 +248,6 @@ const UsersCrudV2 = () => {
         onCloseClick={toggleDeleteModal}
       />
 
-      <style jsx>{`
-        .user-card {
-          transition: all 0.3s ease;
-          border-radius: 12px !important;
-        }
-        
-        .user-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
-        }
-        
-        .progress-sm {
-          height: 8px;
-        }
-        
-        .avatar-xs {
-          width: 32px;
-          height: 32px;
-          font-size: 12px;
-        }
-        
-        .avatar-md {
-          width: 48px;
-          height: 48px;
-          font-size: 16px;
-        }
-
-        .input-group-text {
-          transition: all 0.2s ease;
-        }
-        
-        .input-group-text:hover {
-          background-color: #e9ecef !important;
-          border-color: #ced4da !important;
-        }
-
-        .column-filter-container .input-group {
-          min-width: 120px;
-        }
-        
-        .column-filter-container .form-control {
-          transition: all 0.2s ease;
-        }
-        
-        .column-filter-container .form-control:focus {
-          border-color: #007bff;
-          box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-        }
-
-        .active-filters-container {
-          border-left: 4px solid #007bff;
-          background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
-        }
-
-        .active-filters-container .badge {
-          transition: all 0.2s ease;
-        }
-
-        .active-filters-container .badge:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 2px 8px rgba(0,123,255,0.3);
-        }
-        
-        .table th {
-          vertical-align: top !important;
-          padding-bottom: 1rem !important;
-        }
-        
-        .sortable-header {
-          transition: all 0.2s ease;
-          border-radius: 4px;
-          padding: 4px 8px;
-          margin: -4px -8px;
-        }
-        
-        .sortable-header:hover {
-          background-color: rgba(0, 123, 255, 0.1);
-          color: #007bff;
-        }
-        
-        .sortable-header:active {
-          background-color: rgba(0, 123, 255, 0.15);
-        }
-
-        .search-input-group .form-control-lg {
-          border-color: #dee2e6;
-          box-shadow: none;
-          transition: all 0.2s ease;
-        }
-        
-        .search-input-group .form-control-lg:focus {
-          border-color: #007bff;
-          box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-        }
-        
-        .search-input-group .input-group-text {
-          transition: all 0.2s ease;
-        }
-        
-        .search-input-group .cursor-pointer {
-          cursor: pointer;
-        }
-        
-        .search-input-group .cursor-pointer:hover {
-          background-color: #e9ecef !important;
-        }
-
-        .avatar-lg {
-          width: 64px;
-          height: 64px;
-        }
-        
-        .mdi-36px {
-          font-size: 36px;
-        }
-
-        @media (max-width: 768px) {
-          .user-card {
-            margin-bottom: 1rem !important;
-          }
-          
-          .search-panel {
-            padding: 0 !important;
-          }
-
-          .active-filters-container {
-            padding: 1rem !important;
-          }
-
-          .modal-responsive .modal-dialog {
-            margin: 0.5rem;
-          }
-
-          .table-responsive {
-            font-size: 0.875rem;
-          }
-        }
-
-        @media (max-width: 576px) {
-          .user-card .card-body {
-            padding: 1.5rem !important;
-          }
-          
-          .btn-group {
-            width: 100%;
-          }
-          
-          .btn-group .btn {
-            flex: 1;
-          }
-
-          .active-filters-container .badge {
-            font-size: 0.7rem !important;
-            margin-bottom: 0.5rem;
-          }
-        }
-      `}</style>
     </React.Fragment>
   );
 };

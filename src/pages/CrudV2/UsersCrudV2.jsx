@@ -183,6 +183,11 @@ const UsersCrudV2 = () => {
           getActiveCardFilters={getActiveCardFilters}
           onEditUser={manejarEditarUsuario}
           onDeleteUser={manejarEliminarUsuario}
+          onAddUser={manejarAgregarUsuario}
+          onBulkDelete={manejarEliminarMasivo}
+          selectedUsers={usuariosSeleccionados}
+          onViewModeChange={setModoVista}
+          currentViewMode={modoVista}
         />
       </div>
 

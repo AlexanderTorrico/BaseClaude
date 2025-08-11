@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Row, Col, Card, CardBody, InputGroup, InputGroupText, Input, Button, Badge, Collapse } from "reactstrap";
 
 const MobileCardSearchPanel = ({ 
@@ -10,7 +11,13 @@ const MobileCardSearchPanel = ({
   handleCardSortFieldChange,
   handleCardSortDirectionChange,
   clearCardFilters,
-  getActiveCardFilters
+  getActiveCardFilters,
+  // Props para acciones
+  onAddUser,
+  onBulkDelete, // eslint-disable-line no-unused-vars
+  selectedUsers, // eslint-disable-line no-unused-vars
+  onViewModeChange, // eslint-disable-line no-unused-vars
+  currentViewMode // eslint-disable-line no-unused-vars
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const hasActiveCardFilters = getActiveCardFilters().length > 0 || (cardSorting.field !== 'nombre' || cardSorting.direction !== 'asc');
@@ -20,11 +27,12 @@ const MobileCardSearchPanel = ({
   return (
     <Card className="border-0 shadow-sm mb-3">
       <CardBody className="p-3">
-        {/* Header compacto para móvil */}
-        <div className="d-flex align-items-center justify-content-between mb-3">
-          <div>
-            <h6 className="mb-1 text-dark">Vista de Tarjetas</h6>
-            <div className="d-flex align-items-center">
+        {/* Header principal para móvil */}
+        <div className="mb-3">
+          <h5 className="mb-2 text-dark fw-bold">Gestión de Usuarios V2</h5>
+          <div className="d-flex align-items-center justify-content-between">
+            <div className="d-flex align-items-center flex-wrap">
+              <small className="text-muted me-2">Vista de Tarjetas</small>
               <Badge 
                 color="info" 
                 className="d-flex align-items-center px-2 py-1 me-2"
@@ -45,19 +53,32 @@ const MobileCardSearchPanel = ({
                 </Badge>
               )}
             </div>
+            
+            {/* Botones de acción para móvil */}
+            <div className="d-flex align-items-center gap-2">
+              <Button 
+                color="primary" 
+                size="sm"
+                onClick={onAddUser}
+                className="d-flex align-items-center"
+              >
+                <i className="mdi mdi-plus me-1"></i>
+                Nuevo
+              </Button>
+              
+              {/* Botón para expandir controles */}
+              <Button
+                color="light"
+                size="sm"
+                onClick={() => setIsOpen(!isOpen)}
+                className="d-flex align-items-center"
+                title={isOpen ? "Ocultar filtros" : "Mostrar filtros"}
+              >
+                <i className={`mdi ${isOpen ? 'mdi-chevron-up' : 'mdi-tune'} me-1`}></i>
+                {isOpen ? 'Ocultar' : 'Filtros'}
+              </Button>
+            </div>
           </div>
-          
-          {/* Botón para expandir controles */}
-          <Button
-            color="light"
-            size="sm"
-            onClick={() => setIsOpen(!isOpen)}
-            className="d-flex align-items-center"
-            title={isOpen ? "Ocultar filtros" : "Mostrar filtros"}
-          >
-            <i className={`mdi ${isOpen ? 'mdi-chevron-up' : 'mdi-tune'} me-1`}></i>
-            {isOpen ? 'Ocultar' : 'Filtros'}
-          </Button>
         </div>
 
         {/* Búsqueda rápida - Siempre visible */}
@@ -154,7 +175,7 @@ const MobileCardSearchPanel = ({
                   style={{ fontSize: '0.7rem', padding: '0.4rem 0.6rem' }}
                 >
                   <i className="mdi mdi-magnify me-1 text-primary"></i>
-                  <span className="text-primary fw-medium">"{cardSearchTerm}"</span>
+                  <span className="text-primary fw-medium">&quot;{cardSearchTerm}&quot;</span>
                   <Button
                     color="link"
                     size="sm"
@@ -203,7 +224,7 @@ const MobileCardSearchPanel = ({
                 <strong className="small">Sin resultados</strong>
                 <div className="small text-muted">
                   {cardSearchTerm ? 
-                    `No hay usuarios que coincidan con "${cardSearchTerm}"` :
+                    `No hay usuarios que coincidan con &quot;${cardSearchTerm}&quot;` :
                     'No se encontraron usuarios con los filtros aplicados'
                   }
                 </div>
@@ -214,6 +235,27 @@ const MobileCardSearchPanel = ({
       </CardBody>
     </Card>
   );
+};
+
+MobileCardSearchPanel.propTypes = {
+  usuariosFiltrados: PropTypes.array.isRequired,
+  usuarios: PropTypes.array.isRequired,
+  cardSearchTerm: PropTypes.string.isRequired,
+  cardSorting: PropTypes.shape({
+    field: PropTypes.string.isRequired,
+    direction: PropTypes.string.isRequired,
+  }).isRequired,
+  handleCardSearchChange: PropTypes.func.isRequired,
+  handleCardSortFieldChange: PropTypes.func.isRequired,
+  handleCardSortDirectionChange: PropTypes.func.isRequired,
+  clearCardFilters: PropTypes.func.isRequired,
+  getActiveCardFilters: PropTypes.func.isRequired,
+  // Props para acciones
+  onAddUser: PropTypes.func.isRequired,
+  onBulkDelete: PropTypes.func,
+  selectedUsers: PropTypes.array,
+  onViewModeChange: PropTypes.func,
+  currentViewMode: PropTypes.string,
 };
 
 export default MobileCardSearchPanel;

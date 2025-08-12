@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Row, Col, Card, CardBody, InputGroup, InputGroupText, Input, Button, Badge, Collapse } from "reactstrap";
 import CustomSelect from "./CustomSelect";
+import FilterInfoPanel from "./FilterInfoPanel";
 import { opcionesOrdenamiento } from "../utils/constants.js";
 
 const MobileCardSearchPanel = ({ 
@@ -29,85 +30,88 @@ const MobileCardSearchPanel = ({
   return (
     <Card className="border-0 shadow-sm mb-3">
       <CardBody className="p-3">
-        {/* Header principal para móvil */}
-        <div className="mb-3">
-          <h5 className="mb-2 text-dark fw-bold">Gestión de Usuarios V2</h5>
-          <div className="d-flex align-items-center justify-content-between">
-            <div className="d-flex align-items-center flex-wrap">
-              <small className="text-muted me-2">Vista de Tarjetas</small>
-              <Badge 
-                color="info" 
-                className="d-flex align-items-center px-2 py-1 me-2"
-                style={{ fontSize: '0.7rem' }}
-              >
-                <i className="mdi mdi-account-group me-1"></i>
-                <span className="fw-medium">
-                  {totalResults}
-                  {hasActiveCardFilters && (
-                    <span className="opacity-75">/{totalUsers}</span>
-                  )}
-                </span>
-              </Badge>
-              {hasActiveCardFilters && (
-                <Badge color="warning" style={{ fontSize: '0.65rem' }}>
-                  <i className="mdi mdi-filter-check me-1"></i>
-                  Filtrado
-                </Badge>
-              )}
-            </div>
-            
-            {/* Botones de acción para móvil */}
-            <div className="d-flex align-items-center gap-2">
-              <Button 
-                color="primary" 
-                size="sm"
-                onClick={onAddUser}
-                className="d-flex align-items-center"
-              >
-                <i className="mdi mdi-plus me-1"></i>
-                Nuevo
-              </Button>
-              
-              {/* Botón para expandir controles */}
-              <Button
-                color="light"
-                size="sm"
-                onClick={() => setIsOpen(!isOpen)}
-                className="d-flex align-items-center"
-                title={isOpen ? "Ocultar filtros" : "Mostrar filtros"}
-              >
-                <i className={`mdi ${isOpen ? 'mdi-chevron-up' : 'mdi-tune'} me-1`}></i>
-                {isOpen ? 'Ocultar' : 'Filtros'}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Búsqueda rápida - Siempre visible */}
-        <Row className="mb-2">
+        {/* Header principal para móvil - ESTANDARIZADO */}
+        <Row className="align-items-center mb-3">
           <Col xs={12}>
-            <InputGroup size="sm">
-              <InputGroupText>
+            <div className="d-flex justify-content-between align-items-start flex-wrap">
+              <div className="mb-2 mb-md-0">
+                <h4 className="mb-0">Gestión de Usuarios V2</h4>
+                <p className="text-muted mb-0 small">
+                  Sistema moderno de administración de usuarios con filtros avanzados
+                  {hasActiveCardFilters && (
+                    <span className="ms-2">
+                      <Badge color="info" style={{ fontSize: '0.65rem' }}>
+                        <i className="mdi mdi-filter-check me-1"></i>
+                        {totalResults} de {totalUsers} resultados
+                      </Badge>
+                    </span>
+                  )}
+                </p>
+              </div>
+              
+              <div className="d-flex flex-wrap gap-2 justify-content-end">
+                <Button color="primary" onClick={onAddUser} size="sm">
+                  <i className="mdi mdi-plus me-1"></i>
+                  Nuevo Usuario
+                </Button>
+                
+                {/* Botón para expandir controles - Móvil específico */}
+                <Button
+                  color="light"
+                  size="sm"
+                  onClick={() => setIsOpen(!isOpen)}
+                  className="d-flex align-items-center"
+                  title={isOpen ? "Ocultar filtros" : "Mostrar filtros"}
+                >
+                  <i className={`mdi ${isOpen ? 'mdi-chevron-up' : 'mdi-tune'} me-1`}></i>
+                  {isOpen ? 'Ocultar' : 'Filtros'}
+                </Button>
+              </div>
+            </div>
+          </Col>
+        </Row>
+
+        {/* Search Controls Row - ESTANDARIZADO */}
+        <Row className="g-2 align-items-end mb-3">
+          <Col xs={12} sm={8}>
+            <InputGroup size="sm" className="search-input-group">
+              <InputGroupText className="bg-light">
                 <i className="mdi mdi-magnify text-muted"></i>
               </InputGroupText>
               <Input
                 type="text"
+                placeholder="Buscar usuarios..."
                 value={cardSearchTerm}
                 onChange={(e) => handleCardSearchChange(e.target.value)}
-                placeholder="Buscar usuarios..."
-                className="form-control"
+                className="form-control-sm search-input-enhanced"
               />
               {cardSearchTerm && (
-                <Button
-                  color="outline-secondary"
-                  size="sm"
-                  onClick={() => handleCardSearchChange('')}
+                <InputGroupText 
+                  className="bg-light cursor-pointer"
+                  onClick={() => handleCardSearchChange("")}
                   title="Limpiar búsqueda"
                 >
-                  <i className="mdi mdi-close"></i>
-                </Button>
+                  <i className="mdi mdi-close text-muted"></i>
+                </InputGroupText>
               )}
             </InputGroup>
+          </Col>
+          
+          <Col xs={12} sm={4}>
+            <div className="text-end">
+              {hasActiveCardFilters && (
+                <Button 
+                  color="outline-secondary" 
+                  size="sm"
+                  onClick={clearCardFilters}
+                  className="d-inline-flex align-items-center"
+                  title="Limpiar todos los filtros"
+                >
+                  <i className="mdi mdi-filter-remove me-1"></i>
+                  Limpiar filtros
+                </Button>
+              )}
+            </div>
           </Col>
         </Row>
 
@@ -155,60 +159,33 @@ const MobileCardSearchPanel = ({
             </Col>
           </Row>
 
-          {/* Indicador de filtros activos */}
-          {hasActiveCardFilters && (
-            <div className="mt-2 p-2 bg-light rounded border-start border-primary border-2">
-              <div className="small text-muted mb-1">
-                <i className="mdi mdi-information-outline me-1"></i>
-                Filtros activos:
-              </div>
-              
-              {/* Búsqueda activa */}
-              {cardSearchTerm && (
-                <Badge 
-                  color="white" 
-                  className="border border-primary me-1 mb-1 d-inline-flex align-items-center"
-                  style={{ fontSize: '0.7rem', padding: '0.4rem 0.6rem' }}
-                >
-                  <i className="mdi mdi-magnify me-1 text-primary"></i>
-                  <span className="text-primary fw-medium">&quot;{cardSearchTerm}&quot;</span>
-                  <Button
-                    color="link"
-                    size="sm"
-                    className="p-0 ms-1 text-danger"
-                    onClick={() => handleCardSearchChange('')}
-                    style={{ fontSize: '0.6rem' }}
-                  >
-                    <i className="mdi mdi-close"></i>
-                  </Button>
-                </Badge>
-              )}
-              
-              {/* Ordenamiento no predeterminado */}
-              {(cardSorting.field !== 'nombre' || cardSorting.direction !== 'asc') && (
-                <Badge 
-                  color="white" 
-                  className="border border-info me-1 mb-1 d-inline-flex align-items-center"
-                  style={{ fontSize: '0.7rem', padding: '0.4rem 0.6rem' }}
-                >
-                  <i className={`mdi ${cardSorting.direction === 'asc' ? 'mdi-sort-ascending' : 'mdi-sort-descending'} me-1 text-info`}></i>
-                  <span className="text-dark text-capitalize">{cardSorting.field}</span>
-                  <Button
-                    color="link"
-                    size="sm"
-                    className="p-0 ms-1 text-danger"
-                    onClick={() => {
-                      handleCardSortFieldChange('nombre');
-                      handleCardSortDirectionChange('asc');
-                    }}
-                    style={{ fontSize: '0.6rem' }}
-                  >
-                    <i className="mdi mdi-close"></i>
-                  </Button>
-                </Badge>
-              )}
-            </div>
-          )}
+          {/* FilterInfoPanel integrado - ESTANDARIZADO */}
+          <FilterInfoPanel
+            filters={cardSearchTerm ? [{
+              column: 'búsqueda',
+              value: cardSearchTerm,
+              type: 'search'
+            }] : []}
+            sorting={(cardSorting.field && cardSorting.field !== 'nombre') || cardSorting.direction === 'desc' ? {
+              column: cardSorting.field,
+              direction: cardSorting.direction,
+              isActive: true
+            } : null}
+            onClearFilter={(filter) => {
+              if (filter.type === 'search') {
+                handleCardSearchChange('');
+              }
+            }}
+            onClearSorting={() => {
+              handleCardSortFieldChange('nombre');
+              handleCardSortDirectionChange('asc');
+            }}
+            onClearAll={clearCardFilters}
+            totalResults={totalResults}
+            totalItems={totalUsers}
+            isIntegrated={true}
+            className="mt-2"
+          />
         </Collapse>
 
         {/* Estado cuando no hay resultados */}

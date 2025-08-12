@@ -62,7 +62,7 @@ const UsersCrudV2 = () => {
               <Col lg={6} md={12}>
                 <h4 className="mb-0">Gestión de Usuarios V2</h4>
                 <p className="text-muted mb-md-0 mb-3">
-                  Sistema moderno de administración de usuarios con filtros de columna
+                  Sistema moderno de administración de usuarios con filtros avanzados
                   {(getActiveFilters().length > 0 || (sorting.column && sorting.direction)) && (
                     <span className="ms-2">
                       <Badge color="info" style={{ fontSize: '0.65rem' }}>

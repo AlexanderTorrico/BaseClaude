@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { toast } from "react-toastify";
-import { defaultFormData } from "../utils/constants.js";
+import { defaultFormData } from "../CrudUtils/constants.js";
 
 export const useUserActions = (usuarios, setUsuarios) => {
   const [modalAbierto, setModalAbierto] = useState(false);

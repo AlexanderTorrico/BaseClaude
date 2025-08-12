@@ -5,7 +5,9 @@
       "Bash(touch:*)",
       "Bash(mv:*)",
       "Bash(npm run dev:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(cp:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

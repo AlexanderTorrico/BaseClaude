@@ -2,7 +2,7 @@ import { Row, Col, Card, CardBody, InputGroup, InputGroupText, Input, Button, Ba
 import PropTypes from "prop-types";
 import CustomSelect from "./CustomSelect";
 import FilterInfoPanel from "./FilterInfoPanel";
-import { opcionesOrdenamiento } from "../utils/constants.js";
+import { opcionesOrdenamiento } from "../CrudUtils/constants.js";
 
 const CardSearchPanel = ({ 
   cardSearchTerm,

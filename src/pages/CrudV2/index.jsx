@@ -8,7 +8,7 @@ import {
 import Breadcrumbs from "../../components/Common/Breadcrumb";
 
 //Import UsersCrudV2
-import UsersCrudV2 from "./UsersCrudV2";
+import UsersCrudFacadeExample from "./UsersCrudFacadeExample";
 
 //i18n
 import { withTranslation } from "react-i18next";
@@ -16,17 +16,17 @@ import { withTranslation } from "react-i18next";
 const CrudV1 = (props) => {
 
   //meta title
-  document.title = "CRUD V1 | Skote - Vite React Admin & Dashboard Template";
+  document.title = "CRUD V2 Facade | Skote - Vite React Admin & Dashboard Template";
 
   return (
     <React.Fragment>
       <div className="page-content">
         <Container fluid>
           {/* Render Breadcrumb */}
-          <Breadcrumbs title="CRUD" breadcrumbItem="V1" />
+          <Breadcrumbs title="CRUD" breadcrumbItem="V2 Facade" />
           
-          {/* Render CRUD V1 */}
-          <UsersCrudV2 />
+          {/* Render CRUD V2 with Facade Pattern */}
+          <UsersCrudFacadeExample />
         </Container>
       </div>
 

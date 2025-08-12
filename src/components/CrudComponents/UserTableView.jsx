@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 import { Card, CardBody, Input, Button } from "reactstrap";
-import TableContainer from "../../../components/Common/TableContainer";
+import TableContainer from "../Common/TableContainer";
 import SortableHeader from "./SortableHeader";
-import { obtenerBadgeEstado } from "../utils/userHelpers.jsx";
+import { obtenerBadgeEstado } from "../CrudUtils/userHelpers.jsx";
 
 const UserTableView = ({ 
   usuariosFiltrados,

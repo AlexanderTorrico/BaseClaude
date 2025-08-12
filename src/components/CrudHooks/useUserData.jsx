@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { generateUsers } from "../data/userGenerator.js";
+import { generateUsers } from "../CrudUtils/userGenerator.js";
 
 export const useUserData = () => {
   const [usuarios, setUsuarios] = useState(generateUsers());

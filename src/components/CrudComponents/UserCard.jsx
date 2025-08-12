@@ -8,7 +8,7 @@ import {
   DropdownItem, 
   Progress 
 } from "reactstrap";
-import { obtenerBadgeEstado, obtenerColorRendimiento } from "../utils/userHelpers.jsx";
+import { obtenerBadgeEstado, obtenerColorRendimiento } from "../CrudUtils/userHelpers.jsx";
 
 const UserCard = ({ usuario, onEdit, onDelete }) => {
   return (

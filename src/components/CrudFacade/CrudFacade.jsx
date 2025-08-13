@@ -131,18 +131,35 @@ const CrudFacade = ({
         commonProps={commonProps}
       />
 
-      {slots.Modal && cloneElement(slots.Modal, {
-        isOpen: modalOpen,
-        toggle: toggleModal,
-        isEditing,
-        formData,
-        setFormData,
-        onSave: handleSaveItem,
-        deleteModal,
-        toggleDeleteModal,
-        confirmDelete,
-        ...commonProps
-      })}
+      {slots.Modal && (
+        typeof slots.Modal.props.children === 'function' 
+          ? slots.Modal.props.children({
+              isOpen: modalOpen,
+              toggle: toggleModal,
+              isEditing,
+              formData,
+              setFormData,
+              onSave: handleSaveItem,
+              deleteModal,
+              toggleDeleteModal,
+              confirmDelete,
+              modalOpen,
+              ...commonProps
+            })
+          : cloneElement(slots.Modal, {
+              isOpen: modalOpen,
+              toggle: toggleModal,
+              isEditing,
+              formData,
+              setFormData,
+              onSave: handleSaveItem,
+              deleteModal,
+              toggleDeleteModal,
+              confirmDelete,
+              modalOpen,
+              ...commonProps
+            })
+      )}
 
     </React.Fragment>
   );

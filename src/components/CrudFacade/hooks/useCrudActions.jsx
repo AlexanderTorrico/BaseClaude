@@ -11,13 +11,22 @@ export const useCrudActions = (data, setData, fields) => {
   const getDefaultFormData = () => {
     const defaults = {};
     Object.entries(fields).forEach(([key, field]) => {
-      defaults[key] = field.defaultValue || (field.type === 'number' ? 0 : '');
+      if (field.defaultValue !== undefined) {
+        defaults[key] = field.defaultValue;
+      } else if (field.type === 'number') {
+        defaults[key] = 0;
+      } else if (field.type === 'select' && field.options && field.options.length > 0) {
+        defaults[key] = field.options[0].value;
+      } else {
+        defaults[key] = '';
+      }
     });
     return defaults;
   };
 
   const handleAddItem = () => {
-    setFormData(getDefaultFormData());
+    const defaultData = getDefaultFormData();
+    setFormData(defaultData);
     setIsEditing(false);
     setModalOpen(true);
   };

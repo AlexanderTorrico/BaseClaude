@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "reactstrap";
 import { CrudFacade } from "../../components/CrudFacade";
 import DeleteModal from "../../components/Common/DeleteModal";
+import UserModal from "../../components/CrudComponents/UserModal";
 import { generateUsers } from "../../components/CrudUtils/userGenerator";
 import { opcionesFormulario } from "../../components/CrudUtils/constants";
 
@@ -11,21 +12,24 @@ const userFields = {
     type: 'text',
     required: true,
     sortable: true,
-    filterable: true
+    filterable: true,
+    defaultValue: ''
   },
   email: {
     label: 'Correo Electrónico',
     type: 'email',
     required: true,
     sortable: true,
-    filterable: true
+    filterable: true,
+    defaultValue: ''
   },
   telefono: {
     label: 'Teléfono',
     type: 'text',
     required: false,
     sortable: false,
-    filterable: true
+    filterable: true,
+    defaultValue: ''
   },
   rol: {
     label: 'Rol',
@@ -33,7 +37,8 @@ const userFields = {
     required: true,
     sortable: true,
     filterable: true,
-    options: opcionesFormulario.rol
+    options: opcionesFormulario.rol,
+    defaultValue: 'Usuario'
   },
   departamento: {
     label: 'Departamento',
@@ -41,7 +46,8 @@ const userFields = {
     required: true,
     sortable: true,
     filterable: true,
-    options: opcionesFormulario.departamento
+    options: opcionesFormulario.departamento,
+    defaultValue: 'Administración'
   },
   estado: {
     label: 'Estado',
@@ -49,21 +55,24 @@ const userFields = {
     required: true,
     sortable: true,
     filterable: true,
-    options: opcionesFormulario.estado
+    options: opcionesFormulario.estado,
+    defaultValue: 'Activo'
   },
   ciudad: {
     label: 'Ciudad',
     type: 'text',
     required: false,
     sortable: true,
-    filterable: true
+    filterable: true,
+    defaultValue: 'Madrid'
   },
   empresa: {
     label: 'Empresa',
     type: 'text',
     required: false,
     sortable: true,
-    filterable: true
+    filterable: true,
+    defaultValue: 'TechSoft'
   },
   salario: {
     label: 'Salario',
@@ -71,14 +80,16 @@ const userFields = {
     required: false,
     sortable: true,
     filterable: true,
-    format: 'currency'
+    format: 'currency',
+    defaultValue: 30000
   },
   experiencia: {
     label: 'Años de Experiencia',
     type: 'number',
     required: false,
     sortable: true,
-    filterable: true
+    filterable: true,
+    defaultValue: 1
   }
 };
 
@@ -94,12 +105,32 @@ const UsersCrudFacadeExample = () => {
     >
       {/* Header usa botones por defecto del facade */}
 
-      {/* Modal usando el sistema de slots */}
+      {/* Modales usando el sistema de slots */}
       <CrudFacade.Modal>
-        {({ isOpen, toggle, deleteModal, toggleDeleteModal, confirmDelete, ...props }) => (
+        {({ 
+          isOpen, 
+          toggle, 
+          deleteModal, 
+          toggleDeleteModal, 
+          confirmDelete, 
+          isEditing,
+          formData,
+          setFormData,
+          onSave,
+          ...props 
+        }) => (
           <>
-            {/* Aquí se puede agregar modal personalizado para usuarios */}
-            {/* Por ahora usamos el modal de eliminación existente */}
+            {/* Modal para crear/editar usuario */}
+            <UserModal 
+              isOpen={isOpen}
+              toggle={toggle}
+              esEdicion={isEditing}
+              datosFormulario={formData || {}}
+              setDatosFormulario={setFormData}
+              onSave={onSave}
+            />
+
+            {/* Modal de eliminación */}
             <DeleteModal
               show={deleteModal}
               onDeleteClick={confirmDelete}

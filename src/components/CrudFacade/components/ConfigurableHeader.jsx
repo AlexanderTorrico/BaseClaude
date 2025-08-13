@@ -25,7 +25,7 @@ const ConfigurableHeader = ({
     <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
       <Button color="primary" onClick={onAddItem} size="sm">
         <i className="mdi mdi-plus me-1"></i>
-        Nuevo
+        Nuevo Usuario
       </Button>
       
       {selectedItems.length > 0 && (
@@ -58,54 +58,55 @@ const ConfigurableHeader = ({
 
   return (
     <>
-      {viewMode === 'table' && (
-        <Card className="border-0 shadow-sm mb-4">
-          <CardBody>
-            <Row className="align-items-center">
-              <Col lg={6} md={12}>
-                <h4 className="mb-0">{title}</h4>
-                <p className="text-muted mb-md-0 mb-3">
-                  {description}
-                  {(getActiveFilters().length > 0 || (sorting.column && sorting.direction)) && (
-                    <span className="ms-2">
-                      <Badge color="info" style={{ fontSize: '0.65rem' }}>
-                        <i className="mdi mdi-filter-check me-1"></i>
-                        {filteredData.length} de {data.length} resultados
-                      </Badge>
-                    </span>
-                  )}
-                </p>
-              </Col>
-              <Col lg={6} md={12} className="text-lg-end text-center">
-                {headerActionsSlot 
-                  ? cloneElement(headerActionsSlot, {
-                      viewMode,
-                      setViewMode,
-                      selectedItems,
-                      onAddItem,
-                      onBulkDelete
-                    })
-                  : renderDefaultActions()
-                }
+      {/* Header siempre visible */}
+      <Card className="border-0 shadow-sm mb-4">
+        <CardBody>
+          <Row className="align-items-center">
+            <Col lg={6} md={12}>
+              <h4 className="mb-0">{title}</h4>
+              <p className="text-muted mb-md-0 mb-3">
+                {description}
+                {viewMode === 'table' && (getActiveFilters().length > 0 || (sorting.column && sorting.direction)) && (
+                  <span className="ms-2">
+                    <Badge color="info" style={{ fontSize: '0.65rem' }}>
+                      <i className="mdi mdi-filter-check me-1"></i>
+                      {filteredData.length} de {data.length} resultados
+                    </Badge>
+                  </span>
+                )}
+              </p>
+            </Col>
+            <Col lg={6} md={12} className="text-lg-end text-center">
+              {headerActionsSlot 
+                ? cloneElement(headerActionsSlot, {
+                    viewMode,
+                    setViewMode,
+                    selectedItems,
+                    onAddItem,
+                    onBulkDelete
+                  })
+                : renderDefaultActions()
+              }
+            </Col>
+          </Row>
+
+          {searchComponentSlot && (
+            <Row className="mt-3">
+              <Col xs={12}>
+                {cloneElement(searchComponentSlot, {
+                  filteredData,
+                  data,
+                  getActiveFilters,
+                  sorting,
+                  clearColumnFilter,
+                  clearSorting,
+                  clearAll
+                })}
               </Col>
             </Row>
+          )}
 
-            {searchComponentSlot && (
-              <Row className="mt-3">
-                <Col xs={12}>
-                  {cloneElement(searchComponentSlot, {
-                    filteredData,
-                    data,
-                    getActiveFilters,
-                    sorting,
-                    clearColumnFilter,
-                    clearSorting,
-                    clearAll
-                  })}
-                </Col>
-              </Row>
-            )}
-
+          {viewMode === 'table' && (
             <FilterInfoPanel
               filters={getActiveFilters().map(([column, value]) => ({
                 column,
@@ -125,9 +126,9 @@ const ConfigurableHeader = ({
               isIntegrated={true}
               className="mt-3"
             />
-          </CardBody>
-        </Card>
-      )}
+          )}
+        </CardBody>
+      </Card>
     </>
   );
 };

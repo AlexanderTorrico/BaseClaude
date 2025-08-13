@@ -1,6 +1,6 @@
 import React, { cloneElement } from "react";
 import PropTypes from "prop-types";
-import UserCardsView from "../../CrudComponents/UserCardsView";
+import UserCardsViewSimple from "../../CrudComponents/UserCardsViewSimple";
 import UserTableView from "../../CrudComponents/UserTableView";
 import MobileCardsView from "../../CrudComponents/MobileCardsView";
 
@@ -12,7 +12,7 @@ const ConfigurableContent = ({
   commonProps
 }) => {
   const renderDefaultDesktopCardsView = () => (
-    <UserCardsView 
+    <UserCardsViewSimple 
       usuariosFiltradosCards={commonProps.filteredCardsData}
       usuarios={commonProps.data}
       cardSearchTerm={commonProps.cardSearchTerm}
@@ -23,11 +23,6 @@ const ConfigurableContent = ({
       onClearFilters={commonProps.clearCardFilters}
       onEditUser={commonProps.onEditItem}
       onDeleteUser={commonProps.onDeleteItem}
-      onAddUser={commonProps.onAddItem}
-      onBulkDelete={commonProps.onBulkDelete}
-      selectedUsers={commonProps.selectedItems}
-      onViewModeChange={commonProps.setViewMode}
-      currentViewMode={commonProps.viewMode}
     />
   );
 

@@ -86,59 +86,13 @@ const UsersCrudFacadeExample = () => {
   return (
     <CrudFacade 
       entity="usuarios"
-      title="Gestión de Usuarios con Facade"
-      description="Sistema moderno de administración de usuarios usando el patrón facade"
+      title="Gestión de Usuarios V2"
+      description="Sistema moderno de administración de usuarios con filtros avanzados"
       fields={userFields}
       dataGenerator={generateUsers}
       defaultViewMode="cards"
     >
-      {/* Ejemplo de botones personalizados en el header */}
-      <CrudFacade.HeaderActions>
-        {({ viewMode, setViewMode, selectedItems, onAddItem, onBulkDelete }) => (
-          <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
-            <Button color="success" size="sm">
-              <i className="mdi mdi-upload me-1"></i>
-              Importar CSV
-            </Button>
-            
-            <Button color="info" outline size="sm">
-              <i className="mdi mdi-download me-1"></i>
-              Exportar Excel
-            </Button>
-            
-            <Button color="primary" onClick={onAddItem} size="sm">
-              <i className="mdi mdi-plus me-1"></i>
-              Nuevo Usuario
-            </Button>
-            
-            {selectedItems.length > 0 && (
-              <Button color="danger" outline onClick={onBulkDelete} size="sm">
-                <i className="mdi mdi-delete me-1"></i>
-                Eliminar ({selectedItems.length})
-              </Button>
-            )}
-
-            <div className="btn-group d-none d-md-flex" role="group">
-              <Button 
-                color={viewMode === 'cards' ? 'primary' : 'light'}
-                onClick={() => setViewMode('cards')}
-                size="sm"
-                title="Vista de tarjetas"
-              >
-                <i className="mdi mdi-view-grid"></i>
-              </Button>
-              <Button 
-                color={viewMode === 'table' ? 'primary' : 'light'}
-                onClick={() => setViewMode('table')}
-                size="sm"
-                title="Vista de tabla"
-              >
-                <i className="mdi mdi-view-list"></i>
-              </Button>
-            </div>
-          </div>
-        )}
-      </CrudFacade.HeaderActions>
+      {/* Header usa botones por defecto del facade */}
 
       {/* Modal usando el sistema de slots */}
       <CrudFacade.Modal>

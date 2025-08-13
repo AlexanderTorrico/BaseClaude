@@ -1,7 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Row, Col, Button } from "reactstrap";
-import MobileCardSearchPanel from "./MobileCardSearchPanel";
+import { Row, Col, Button, Card, CardBody } from "reactstrap";
 import UserCard from "./UserCard";
 
 const MobileCardsView = ({ 
@@ -24,25 +23,9 @@ const MobileCardsView = ({
   currentViewMode
 }) => {
   return (
-    <>
-      <MobileCardSearchPanel 
-        usuariosFiltrados={usuariosFiltrados}
-        usuarios={usuarios}
-        cardSearchTerm={cardSearchTerm}
-        cardSorting={cardSorting}
-        handleCardSearchChange={handleCardSearchChange}
-        handleCardSortFieldChange={handleCardSortFieldChange}
-        handleCardSortDirectionChange={handleCardSortDirectionChange}
-        clearCardFilters={clearCardFilters}
-        getActiveCardFilters={getActiveCardFilters}
-        onAddUser={onAddUser}
-        onBulkDelete={onBulkDelete}
-        selectedUsers={selectedUsers}
-        onViewModeChange={onViewModeChange}
-        currentViewMode={currentViewMode}
-      />
-      
-      <Row>
+    <Card className="border-0 shadow-sm">
+      <CardBody>
+        <Row>
         {usuariosFiltrados.map(usuario => (
           <Col xs={12} sm={6} key={usuario.id} className="mb-3">
             <UserCard 
@@ -76,8 +59,9 @@ const MobileCardsView = ({
             </div>
           </Col>
         )}
-      </Row>
-    </>
+        </Row>
+      </CardBody>
+    </Card>
   );
 };
 

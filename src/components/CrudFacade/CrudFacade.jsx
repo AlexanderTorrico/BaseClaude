@@ -121,6 +121,14 @@ const CrudFacade = ({
         onBulkDelete={handleBulkDelete}
         headerActionsSlot={slots.HeaderActions}
         searchComponentSlot={slots.SearchComponent}
+        cardSearchTerm={cardSearchTerm}
+        cardSorting={cardSorting}
+        filteredCardsData={filteredCardsData}
+        handleCardSearchChange={handleCardSearchChange}
+        handleCardSortFieldChange={handleCardSortFieldChange}
+        handleCardSortDirectionChange={handleCardSortDirectionChange}
+        clearCardFilters={clearCardFilters}
+        getActiveCardFilters={getActiveCardFilters}
       />
 
       <ConfigurableContent

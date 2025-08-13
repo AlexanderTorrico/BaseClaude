@@ -1,6 +1,5 @@
-import { Row, Col, Button } from "reactstrap";
+import { Row, Col, Button, Card, CardBody } from "reactstrap";
 import PropTypes from "prop-types";
-import CardSearchPanelSimple from "./CardSearchPanelSimple";
 import UserCard from "./UserCard";
 
 const UserCardsViewSimple = ({ 
@@ -16,19 +15,9 @@ const UserCardsViewSimple = ({
   onDeleteUser
 }) => {
   return (
-    <>
-      <CardSearchPanelSimple 
-        cardSearchTerm={cardSearchTerm}
-        cardSorting={cardSorting}
-        usuariosFiltradosCards={usuariosFiltradosCards}
-        usuarios={usuarios}
-        onSearchChange={onSearchChange}
-        onSortFieldChange={onSortFieldChange}
-        onSortDirectionChange={onSortDirectionChange}
-        onClearFilters={onClearFilters}
-      />
-      
-      <Row>
+    <Card className="border-0 shadow-sm">
+      <CardBody>
+        <Row>
         {usuariosFiltradosCards.map(usuario => (
           <Col xl={4} lg={6} md={6} sm={12} key={usuario.id} className="mb-4">
             <UserCard 
@@ -61,8 +50,9 @@ const UserCardsViewSimple = ({
             </div>
           </Col>
         )}
-      </Row>
-    </>
+        </Row>
+      </CardBody>
+    </Card>
   );
 };
 

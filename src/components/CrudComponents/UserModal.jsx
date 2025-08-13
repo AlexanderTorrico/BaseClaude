@@ -37,10 +37,10 @@ const UserModal = ({
           <p className="text-muted mb-0">Complete la información del usuario</p>
         </div>
       </ModalHeader>
-      <ModalBody className="p-4">
+      <ModalBody className="p-3">
         <Form>
           <Row>
-            <Col xs={12} className="mb-3">
+            <Col xs={12} className="mb-2">
               <FormGroup>
                 <Label htmlFor="nombre">Nombre Completo *</Label>
                 <Input
@@ -52,7 +52,7 @@ const UserModal = ({
                 />
               </FormGroup>
             </Col>
-            <Col xs={12} className="mb-3">
+            <Col xs={12} className="mb-2">
               <FormGroup>
                 <Label htmlFor="email">Correo Electrónico *</Label>
                 <Input
@@ -64,7 +64,7 @@ const UserModal = ({
                 />
               </FormGroup>
             </Col>
-            <Col md={6} xs={12} className="mb-3">
+            <Col md={6} xs={12} className="mb-2">
               <FormGroup>
                 <Label htmlFor="telefono">Teléfono</Label>
                 <Input
@@ -76,7 +76,7 @@ const UserModal = ({
                 />
               </FormGroup>
             </Col>
-            <Col md={6} xs={12} className="mb-3">
+            <Col md={6} xs={12} className="mb-2">
               <FormGroup>
                 <Label htmlFor="ciudad">Ciudad</Label>
                 <Input
@@ -88,7 +88,7 @@ const UserModal = ({
                 />
               </FormGroup>
             </Col>
-            <Col md={6} xs={12} className="mb-3">
+            <Col md={6} xs={12} className="mb-2">
               <FormGroup>
                 <Label htmlFor="rol">Rol</Label>
                 <CustomSelect
@@ -99,7 +99,7 @@ const UserModal = ({
                 />
               </FormGroup>
             </Col>
-            <Col md={6} xs={12} className="mb-3">
+            <Col md={6} xs={12} className="mb-2">
               <FormGroup>
                 <Label htmlFor="departamento">Departamento</Label>
                 <CustomSelect
@@ -110,7 +110,7 @@ const UserModal = ({
                 />
               </FormGroup>
             </Col>
-            <Col md={6} xs={12} className="mb-3">
+            <Col md={6} xs={12} className="mb-2">
               <FormGroup>
                 <Label htmlFor="estado">Estado</Label>
                 <CustomSelect
@@ -121,7 +121,7 @@ const UserModal = ({
                 />
               </FormGroup>
             </Col>
-            <Col md={6} xs={12} className="mb-3">
+            <Col md={6} xs={12} className="mb-2">
               <FormGroup>
                 <Label htmlFor="empresa">Empresa</Label>
                 <Input
@@ -133,7 +133,7 @@ const UserModal = ({
                 />
               </FormGroup>
             </Col>
-            <Col md={6} xs={12} className="mb-3">
+            <Col md={6} xs={12} className="mb-2">
               <FormGroup>
                 <Label htmlFor="salario">Salario (€)</Label>
                 <Input
@@ -144,7 +144,7 @@ const UserModal = ({
                 />
               </FormGroup>
             </Col>
-            <Col md={6} xs={12} className="mb-3">
+            <Col md={6} xs={12} className="mb-2">
               <FormGroup>
                 <Label htmlFor="experiencia">Años de experiencia</Label>
                 <Input

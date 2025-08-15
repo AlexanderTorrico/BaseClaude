@@ -54,7 +54,6 @@ const UsersCrudV2 = () => {
 
   return (
     <React.Fragment>
-      {/* Card de título solo visible en vista table */}
       {modoVista === 'table' && (
         <Card className="border-0 shadow-sm mb-4">
           <CardBody>
@@ -75,7 +74,7 @@ const UsersCrudV2 = () => {
               </Col>
               <Col lg={6} md={12} className="text-lg-end text-center">
                 <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
-      
+        
                   <Button color="primary" onClick={manejarAgregarUsuario} size="sm">
                     <i className="mdi mdi-plus me-1"></i>
                     Nuevo Usuario
@@ -155,17 +154,21 @@ const UsersCrudV2 = () => {
             currentViewMode={modoVista}
           />
         ) : (
-          <UserTableView 
-            usuariosFiltrados={usuariosFiltrados}
-            usuariosSeleccionados={usuariosSeleccionados}
-            setUsuariosSeleccionados={setUsuariosSeleccionados}
-            columnFilters={columnFilters}
-            sorting={sorting}
-            handleColumnFilter={handleColumnFilter}
-            handleSort={handleSort}
-            onEditUser={manejarEditarUsuario}
-            onDeleteUser={manejarEliminarUsuario}
-          />
+          <Card className="border-0 shadow-sm">
+            <CardBody>
+              <UserTableView 
+                usuariosFiltrados={usuariosFiltrados}
+                usuariosSeleccionados={usuariosSeleccionados}
+                setUsuariosSeleccionados={setUsuariosSeleccionados}
+                columnFilters={columnFilters}
+                sorting={sorting}
+                handleColumnFilter={handleColumnFilter}
+                handleSort={handleSort}
+                onEditUser={manejarEditarUsuario}
+                onDeleteUser={manejarEliminarUsuario}
+              />
+            </CardBody>
+          </Card>
         )}
       </div>
 

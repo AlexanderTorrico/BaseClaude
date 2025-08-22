@@ -13,7 +13,7 @@ import {
   Col,
 } from "reactstrap";
 import CustomSelect from "./CustomSelect";
-import { opcionesFormulario } from "../CrudUtils/constants.js";
+import { opcionesFormulario } from "../../pages/CrudV2/config/userConstants.js";
 
 const UserModal = ({
   isOpen,

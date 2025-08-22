@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { opcionesColumnaBusqueda } from "../CrudUtils/constants.js";
+import { opcionesColumnaBusqueda } from "../../pages/CrudV2/config/userConstants.js";
 
 export const useUserFilters = (usuarios) => {
   // Estados para filtros de tabla

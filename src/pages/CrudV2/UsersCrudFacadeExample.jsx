@@ -4,7 +4,7 @@ import { CrudFacade } from "../../components/CrudFacade";
 import DeleteModal from "../../components/Common/DeleteModal";
 import UserModal from "../../components/CrudComponents/UserModal";
 import { generateUsers } from "../../components/CrudUtils/userGenerator";
-import { opcionesFormulario } from "../../components/CrudUtils/constants";
+import { opcionesFormulario } from "./config/userConstants";
 
 const userFields = {
   nombre: {

@@ -2,7 +2,7 @@ import { Row, Col, InputGroup, InputGroupText, Input, Button, Badge } from "reac
 import PropTypes from "prop-types";
 import CustomSelect from "./CustomSelect";
 import FilterInfoPanel from "./FilterInfoPanel";
-import { opcionesOrdenamiento } from "../CrudUtils/constants.js";
+import { opcionesOrdenamiento } from "../../pages/CrudV2/config/userConstants.js";
 
 const CardSearchPanel = ({ 
   cardSearchTerm,

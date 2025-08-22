@@ -3,7 +3,7 @@ import { Row, Col, Card, CardBody, Button, Badge, InputGroup, InputGroupText, In
 import PropTypes from "prop-types";
 import FilterInfoPanel from "../../CrudComponents/FilterInfoPanel";
 import CustomSelect from "../../CrudComponents/CustomSelect";
-import { opcionesOrdenamiento } from "../../CrudUtils/constants.js";
+import { opcionesOrdenamiento } from "../../../pages/CrudV2/config/userConstants.js";
 
 const ConfigurableHeader = ({
   title,

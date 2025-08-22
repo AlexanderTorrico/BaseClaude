@@ -4,96 +4,33 @@ import { CrudFacade } from "../../components/CrudFacade";
 import DeleteModal from "../../components/Common/DeleteModal";
 import UserModal from "../../components/CrudComponents/UserModal";
 import { generateUsers } from "../../components/CrudUtils/userGenerator";
-import { opcionesFormulario } from "./config/userConstants";
-
-const userFields = {
-  nombre: {
-    label: 'Nombre Completo',
-    type: 'text',
-    required: true,
-    sortable: true,
-    filterable: true,
-    defaultValue: ''
-  },
-  email: {
-    label: 'Correo Electrónico',
-    type: 'email',
-    required: true,
-    sortable: true,
-    filterable: true,
-    defaultValue: ''
-  },
-  telefono: {
-    label: 'Teléfono',
-    type: 'text',
-    required: false,
-    sortable: false,
-    filterable: true,
-    defaultValue: ''
-  },
-  rol: {
-    label: 'Rol',
-    type: 'select',
-    required: true,
-    sortable: true,
-    filterable: true,
-    options: opcionesFormulario.rol,
-    defaultValue: 'Usuario'
-  },
-  departamento: {
-    label: 'Departamento',
-    type: 'select',
-    required: true,
-    sortable: true,
-    filterable: true,
-    options: opcionesFormulario.departamento,
-    defaultValue: 'Administración'
-  },
-  estado: {
-    label: 'Estado',
-    type: 'select',
-    required: true,
-    sortable: true,
-    filterable: true,
-    options: opcionesFormulario.estado,
-    defaultValue: 'Activo'
-  },
-  ciudad: {
-    label: 'Ciudad',
-    type: 'text',
-    required: false,
-    sortable: true,
-    filterable: true,
-    defaultValue: 'Madrid'
-  },
-  empresa: {
-    label: 'Empresa',
-    type: 'text',
-    required: false,
-    sortable: true,
-    filterable: true,
-    defaultValue: 'TechSoft'
-  },
-  salario: {
-    label: 'Salario',
-    type: 'number',
-    required: false,
-    sortable: true,
-    filterable: true,
-    format: 'currency',
-    defaultValue: 30000
-  },
-  experiencia: {
-    label: 'Años de Experiencia',
-    type: 'number',
-    required: false,
-    sortable: true,
-    filterable: true,
-    defaultValue: 1
-  }
-};
+import { responsiveConfig, useDeviceType } from "./config/responsiveConfig";
+import { userFields } from "./config/userFieldsConfig";
+import TableContent from "./components/TableContent";
+import CardsContent from "./components/CardsContent";
 
 const UsersCrudFacadeExample = () => {
+  const deviceType = useDeviceType();
+  
+  // Configurar vista por defecto según dispositivo
+  const getDefaultViewMode = () => {
+    return responsiveConfig.defaultViews[deviceType] || 'table';
+  };
+
+  // Configurar si mostrar botones de cambio de vista
+  const showViewToggle = () => {
+    switch (deviceType) {
+      case 'mobile':
+        return responsiveConfig.viewToggle.showOnMobile;
+      case 'tablet':
+        return responsiveConfig.viewToggle.showOnTablet;
+      case 'desktop':
+        return responsiveConfig.viewToggle.showOnDesktop;
+      default:
+        return true;
+    }
+  };
+
   return (
     <CrudFacade 
       entity="usuarios"
@@ -101,9 +38,30 @@ const UsersCrudFacadeExample = () => {
       description="Sistema moderno de administración de usuarios con filtros avanzados"
       fields={userFields}
       dataGenerator={generateUsers}
-      defaultViewMode="cards"
+      defaultViewMode={getDefaultViewMode()}
+      showViewToggle={showViewToggle()}
+      responsiveConfig={responsiveConfig}
     >
-      {/* Header usa botones por defecto del facade */}
+      {/* Contenido de tabla personalizado */}
+      <CrudFacade.TableSlot>
+        {(tableProps) => (
+          <TableContent 
+            {...tableProps}
+            fields={userFields}
+          />
+        )}
+      </CrudFacade.TableSlot>
+
+      {/* Contenido de cards personalizado */}
+      <CrudFacade.CardsSlot>
+        {(cardsProps) => (
+          <CardsContent 
+            {...cardsProps}
+            fields={userFields}
+            cardsPerRow={responsiveConfig.layout[deviceType]?.cardsPerRow || 3}
+          />
+        )}
+      </CrudFacade.CardsSlot>
 
       {/* Modales usando el sistema de slots */}
       <CrudFacade.Modal>

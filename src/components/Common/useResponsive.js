@@ -1,22 +1,19 @@
 import { useState, useEffect } from 'react';
+import { 
+  GLOBAL_BREAKPOINTS, 
+  GLOBAL_DEFAULT_VIEWS, 
+  GLOBAL_VIEW_TOGGLE 
+} from '../CrudFacade/config/responsiveConfig';
 
 /**
- * Configuración por defecto de breakpoints responsivos
+ * @deprecated Use GLOBAL_BREAKPOINTS from config instead
  */
-export const DEFAULT_BREAKPOINTS = {
-  mobile: 768,
-  tablet: 1024,
-  desktop: 1200
-};
+export const DEFAULT_BREAKPOINTS = GLOBAL_BREAKPOINTS;
 
 /**
- * Configuración por defecto de vistas
+ * @deprecated Use GLOBAL_DEFAULT_VIEWS from config instead  
  */
-export const DEFAULT_VIEWS = {
-  mobile: 'cards',
-  tablet: 'table', 
-  desktop: 'table'
-};
+export const DEFAULT_VIEWS = GLOBAL_DEFAULT_VIEWS;
 
 /**
  * Hook genérico para manejo responsivo
@@ -28,13 +25,9 @@ export const DEFAULT_VIEWS = {
  */
 export const useResponsive = (options = {}) => {
   const {
-    breakpoints = DEFAULT_BREAKPOINTS,
-    defaultViews = DEFAULT_VIEWS,
-    viewToggle = {
-      showOnMobile: false,
-      showOnTablet: true,
-      showOnDesktop: true
-    }
+    breakpoints = GLOBAL_BREAKPOINTS,
+    defaultViews = GLOBAL_DEFAULT_VIEWS,
+    viewToggle = GLOBAL_VIEW_TOGGLE
   } = options;
 
   const [deviceType, setDeviceType] = useState('desktop');
@@ -43,9 +36,9 @@ export const useResponsive = (options = {}) => {
     const handleResize = () => {
       const width = window.innerWidth;
       
-      if (width < breakpoints.mobile) {
+      if (width <= breakpoints.mobile) {
         setDeviceType('mobile');
-      } else if (width < breakpoints.tablet) {
+      } else if (width <= breakpoints.tablet) {
         setDeviceType('tablet');
       } else {
         setDeviceType('desktop');

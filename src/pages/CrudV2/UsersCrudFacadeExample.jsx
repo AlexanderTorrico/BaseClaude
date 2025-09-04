@@ -4,33 +4,11 @@ import { CrudFacade } from "../../components/CrudFacade";
 import DeleteModal from "../../components/Common/DeleteModal";
 import UserModal from "../../components/CrudComponents/UserModal";
 import { generateUsers } from "../../components/CrudUtils/userGenerator";
-import { responsiveConfig, useDeviceType } from "./config/responsiveConfig";
 import { userFields } from "./config/userFieldsConfig";
 import TableContent from "./components/TableContent";
 import CardsContent from "./components/CardsContent";
 
 const UsersCrudFacadeExample = () => {
-  const deviceType = useDeviceType();
-  
-  // Configurar vista por defecto según dispositivo
-  const getDefaultViewMode = () => {
-    return responsiveConfig.defaultViews[deviceType] || 'table';
-  };
-
-  // Configurar si mostrar botones de cambio de vista
-  const showViewToggle = () => {
-    switch (deviceType) {
-      case 'mobile':
-        return responsiveConfig.viewToggle.showOnMobile;
-      case 'tablet':
-        return responsiveConfig.viewToggle.showOnTablet;
-      case 'desktop':
-        return responsiveConfig.viewToggle.showOnDesktop;
-      default:
-        return true;
-    }
-  };
-
   return (
     <CrudFacade 
       entity="usuarios"
@@ -38,9 +16,12 @@ const UsersCrudFacadeExample = () => {
       description="Sistema moderno de administración de usuarios con filtros avanzados"
       fields={userFields}
       dataGenerator={generateUsers}
-      defaultViewMode={getDefaultViewMode()}
-      showViewToggle={showViewToggle()}
-      responsiveConfig={responsiveConfig}
+      defaultViewMode="auto"
+      breakpoints={{
+        mobile: 768,
+        tablet: 1024,
+        desktop: 1200
+      }}
     >
       {/* Contenido de tabla personalizado */}
       <CrudFacade.TableSlot>

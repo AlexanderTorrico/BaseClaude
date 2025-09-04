@@ -5,6 +5,8 @@ import ConfigurableContent from "./components/ConfigurableContent";
 import { useCrudData } from "./hooks/useCrudData";
 import { useCrudFilters } from "./hooks/useCrudFilters";
 import { useCrudActions } from "./hooks/useCrudActions";
+import { useResponsive } from "../Common/useResponsive";
+import { createResponsiveConfig } from "./config/responsiveConfig";
 
 const CrudFacade = ({
   entity,
@@ -12,10 +14,25 @@ const CrudFacade = ({
   description,
   fields,
   dataGenerator,
-  defaultViewMode = 'cards',
+  defaultViewMode = 'auto', // 'auto' para detección automática, o 'cards'/'table'
+  breakpoints, // Opcional: {mobile: 768, tablet: 1024, desktop: 1200}
   children
 }) => {
-  const { data, setData, viewMode, setViewMode } = useCrudData(dataGenerator, defaultViewMode);
+  // Crear configuración responsive interna
+  const responsiveConfig = createResponsiveConfig(breakpoints ? { breakpoints } : {});
+  
+  // Hook para detección responsive
+  const responsive = useResponsive({
+    breakpoints: responsiveConfig.breakpoints,
+    defaultViews: responsiveConfig.defaultViews,
+    viewToggle: responsiveConfig.viewToggle
+  });
+
+  // Determinar vista por defecto automáticamente o usar la especificada
+  const resolvedDefaultViewMode = defaultViewMode === 'auto' 
+    ? responsive.getDefaultViewMode()
+    : defaultViewMode;
+  const { data, setData, viewMode, setViewMode } = useCrudData(dataGenerator, resolvedDefaultViewMode);
   
   const {
     columnFilters,
@@ -99,7 +116,14 @@ const CrudFacade = ({
     onEditItem: handleEditItem,
     onDeleteItem: handleDeleteItem,
     onBulkDelete: handleBulkDelete,
-    fields
+    fields,
+    // Añadir configuración responsive a las props comunes
+    responsive: {
+      ...responsive,
+      layout: responsiveConfig.layout[responsive.deviceType],
+      mediaQueries: responsiveConfig.getMediaQueries(),
+      showViewToggle: responsive.shouldShowViewToggle()
+    }
   };
 
   return (
@@ -204,7 +228,12 @@ CrudFacade.propTypes = {
   description: PropTypes.string,
   fields: PropTypes.object.isRequired,
   dataGenerator: PropTypes.func.isRequired,
-  defaultViewMode: PropTypes.oneOf(['cards', 'table']),
+  defaultViewMode: PropTypes.oneOf(['cards', 'table', 'auto']),
+  breakpoints: PropTypes.shape({
+    mobile: PropTypes.number,
+    tablet: PropTypes.number,
+    desktop: PropTypes.number
+  }),
   children: PropTypes.node
 };
 

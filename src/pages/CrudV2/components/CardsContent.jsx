@@ -1,77 +1,66 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { CrudFacade } from '../../../components/CrudFacade';
+import UserCardsViewSimple from '../../../components/CrudComponents/UserCardsViewSimple';
 
 /**
  * Componente de contenido para vista de cards
  * Renderiza los datos en formato de tarjetas usando el CrudFacade genérico
  */
 const CardsContent = ({ 
-  data, 
-  fields, 
-  onEdit, 
-  onDelete, 
-  onBulkDelete,
-  selectedItems,
-  onSelectionChange,
-  loading = false,
+  filteredCardsData,
+  data,
+  cardSearchTerm,
+  cardSorting,
+  handleCardSearchChange,
+  handleCardSortFieldChange,
+  handleCardSortDirectionChange,
+  clearCardFilters,
+  onEditItem,
+  onDeleteItem,
+  fields,
   cardsPerRow = 3,
-  showSelection = true,
   ...cardProps 
 }) => {
   return (
-    <CrudFacade.Cards
-      data={data}
-      fields={fields}
-      onEdit={onEdit}
-      onDelete={onDelete}
-      onBulkDelete={onBulkDelete}
-      selectedItems={selectedItems}
-      onSelectionChange={onSelectionChange}
-      loading={loading}
-      cardsPerRow={cardsPerRow}
-      showSelection={showSelection}
+    <UserCardsViewSimple
+      usuariosFiltradosCards={filteredCardsData}
+      usuarios={data}
+      cardSearchTerm={cardSearchTerm}
+      cardSorting={cardSorting}
+      onSearchChange={handleCardSearchChange}
+      onSortFieldChange={handleCardSortFieldChange}
+      onSortDirectionChange={handleCardSortDirectionChange}
+      onClearFilters={clearCardFilters}
+      onEditUser={onEditItem}
+      onDeleteUser={onDeleteItem}
       {...cardProps}
     />
   );
 };
 
 CardsContent.propTypes = {
-  // Datos a mostrar en las cards
+  // Datos filtrados
+  filteredCardsData: PropTypes.array.isRequired,
   data: PropTypes.array.isRequired,
   
   // Configuración de campos (schema)
   fields: PropTypes.object.isRequired,
   
+  // Props de búsqueda y filtros
+  cardSearchTerm: PropTypes.string.isRequired,
+  cardSorting: PropTypes.object.isRequired,
+  handleCardSearchChange: PropTypes.func.isRequired,
+  handleCardSortFieldChange: PropTypes.func.isRequired,
+  handleCardSortDirectionChange: PropTypes.func.isRequired,
+  clearCardFilters: PropTypes.func.isRequired,
+  
   // Callbacks para acciones
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  onBulkDelete: PropTypes.func,
-  
-  // Selección múltiple
-  selectedItems: PropTypes.array,
-  onSelectionChange: PropTypes.func,
-  
-  // Estados
-  loading: PropTypes.bool,
+  onEditItem: PropTypes.func.isRequired,
+  onDeleteItem: PropTypes.func.isRequired,
   
   // Configuración específica de cards
-  cardsPerRow: PropTypes.number,
-  showSelection: PropTypes.bool,
-  
-  // Props adicionales para el componente de cards
-  cardSize: PropTypes.oneOf(['sm', 'md', 'lg']),
-  showImages: PropTypes.bool,
-  showActions: PropTypes.bool
+  cardsPerRow: PropTypes.number
 };
 
-CardsContent.defaultProps = {
-  selectedItems: [],
-  cardsPerRow: 3,
-  showSelection: true,
-  cardSize: 'md',
-  showImages: true,
-  showActions: true
-};
 
 export default CardsContent;

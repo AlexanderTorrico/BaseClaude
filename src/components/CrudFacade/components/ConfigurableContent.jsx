@@ -6,10 +6,11 @@ import MobileCardsView from "../../CrudComponents/MobileCardsView";
 
 const ConfigurableContent = ({
   viewMode,
-  desktopCardsViewSlot,
-  desktopTableViewSlot,
+  webViewSlot,
+  cardViewSlot,
   mobileViewSlot,
-  commonProps
+  commonProps,
+  availableViews
 }) => {
   const renderDefaultDesktopCardsView = () => (
     <UserCardsViewSimple 
@@ -61,25 +62,46 @@ const ConfigurableContent = ({
     />
   );
 
+  // Lógica para determinar qué componente usar según las vistas disponibles
+  const getDesktopComponent = (currentViewMode) => {
+    if (currentViewMode === 'cards') {
+      // Para vista cards: usar CardView si existe, sino WebView, sino default
+      if (cardViewSlot) {
+        return typeof cardViewSlot.props.children === 'function'
+          ? cardViewSlot.props.children(commonProps)
+          : cloneElement(cardViewSlot, commonProps);
+      } else if (webViewSlot) {
+        return typeof webViewSlot.props.children === 'function'
+          ? webViewSlot.props.children(commonProps)
+          : cloneElement(webViewSlot, commonProps);
+      } else {
+        return renderDefaultDesktopCardsView();
+      }
+    } else {
+      // Para vista table: usar WebView si existe, sino default
+      if (webViewSlot) {
+        return typeof webViewSlot.props.children === 'function'
+          ? webViewSlot.props.children(commonProps)
+          : cloneElement(webViewSlot, commonProps);
+      } else {
+        return renderDefaultDesktopTableView();
+      }
+    }
+  };
+
   return (
     <>
       {/* Vista de escritorio */}
       <div className="d-none d-md-block">
-        {viewMode === 'cards' ? (
-          desktopCardsViewSlot 
-            ? cloneElement(desktopCardsViewSlot, commonProps)
-            : renderDefaultDesktopCardsView()
-        ) : (
-          desktopTableViewSlot 
-            ? cloneElement(desktopTableViewSlot, commonProps)
-            : renderDefaultDesktopTableView()
-        )}
+        {getDesktopComponent(viewMode)}
       </div>
 
       {/* Vista móvil - Siempre usa cards */}
       <div className="d-md-none">
         {mobileViewSlot 
-          ? cloneElement(mobileViewSlot, commonProps)
+          ? (typeof mobileViewSlot.props.children === 'function'
+              ? mobileViewSlot.props.children(commonProps)
+              : cloneElement(mobileViewSlot, commonProps))
           : renderDefaultMobileView()
         }
       </div>
@@ -89,10 +111,15 @@ const ConfigurableContent = ({
 
 ConfigurableContent.propTypes = {
   viewMode: PropTypes.string.isRequired,
-  desktopCardsViewSlot: PropTypes.node,
-  desktopTableViewSlot: PropTypes.node,
+  webViewSlot: PropTypes.node,
+  cardViewSlot: PropTypes.node,
   mobileViewSlot: PropTypes.node,
-  commonProps: PropTypes.object.isRequired
+  commonProps: PropTypes.object.isRequired,
+  availableViews: PropTypes.shape({
+    hasWebView: PropTypes.bool,
+    hasCardView: PropTypes.bool,
+    hasMobileView: PropTypes.bool
+  })
 };
 
 export default ConfigurableContent;

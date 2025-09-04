@@ -30,7 +30,9 @@ const ConfigurableHeader = ({
   handleCardSortFieldChange,
   handleCardSortDirectionChange,
   clearCardFilters,
-  getActiveCardFilters
+  getActiveCardFilters,
+  // Nueva prop para detectar vistas disponibles
+  availableViews
 }) => {
   const renderDefaultActions = () => (
     <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
@@ -46,24 +48,29 @@ const ConfigurableHeader = ({
         </Button>
       )}
 
-      <div className="btn-group d-none d-md-flex" role="group">
-        <Button 
-          color={viewMode === 'cards' ? 'primary' : 'light'}
-          onClick={() => setViewMode('cards')}
-          size="sm"
-          title="Vista de tarjetas"
-        >
-          <i className="mdi mdi-view-grid"></i>
-        </Button>
-        <Button 
-          color={viewMode === 'table' ? 'primary' : 'light'}
-          onClick={() => setViewMode('table')}
-          size="sm"
-          title="Vista de tabla"
-        >
-          <i className="mdi mdi-view-list"></i>
-        </Button>
-      </div>
+      {/* Solo mostrar selector si hay vistas web o card disponibles */}
+      {availableViews && (availableViews.hasWebView || availableViews.hasCardView) && (
+        <div className="btn-group d-none d-md-flex" role="group">
+          <Button 
+            color={viewMode === 'cards' ? 'primary' : 'light'}
+            onClick={() => setViewMode('cards')}
+            size="sm"
+            title="Vista Web"
+          >
+            <i className="mdi mdi-monitor"></i>
+            <span className="d-none d-lg-inline ms-1">Web</span>
+          </Button>
+          <Button 
+            color={viewMode === 'table' ? 'primary' : 'light'}
+            onClick={() => setViewMode('table')}
+            size="sm"
+            title="Vista Móvil"
+          >
+            <i className="mdi mdi-cellphone"></i>
+            <span className="d-none d-lg-inline ms-1">Móvil</span>
+          </Button>
+        </div>
+      )}
     </div>
   );
 
@@ -248,7 +255,13 @@ ConfigurableHeader.propTypes = {
   handleCardSortFieldChange: PropTypes.func.isRequired,
   handleCardSortDirectionChange: PropTypes.func.isRequired,
   clearCardFilters: PropTypes.func.isRequired,
-  getActiveCardFilters: PropTypes.func.isRequired
+  getActiveCardFilters: PropTypes.func.isRequired,
+  // Nueva prop para vistas disponibles
+  availableViews: PropTypes.shape({
+    hasWebView: PropTypes.bool,
+    hasCardView: PropTypes.bool,
+    hasMobileView: PropTypes.bool
+  })
 };
 
 export default ConfigurableHeader;

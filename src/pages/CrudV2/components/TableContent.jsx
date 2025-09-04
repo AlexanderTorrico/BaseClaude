@@ -1,69 +1,61 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { CrudFacade } from '../../../components/CrudFacade';
+import UserTableView from '../../../components/CrudComponents/UserTableView';
 
 /**
  * Componente de contenido para vista de tabla
  * Renderiza los datos en formato de tabla usando el CrudFacade genérico
  */
 const TableContent = ({ 
-  data, 
-  fields, 
-  onEdit, 
-  onDelete, 
-  onBulkDelete,
+  filteredData,
   selectedItems,
-  onSelectionChange,
-  loading = false,
+  setSelectedItems,
+  columnFilters,
+  sorting,
+  handleColumnFilter,
+  handleSort,
+  onEditItem,
+  onDeleteItem,
+  fields,
   ...tableProps 
 }) => {
   return (
-    <CrudFacade.Table
-      data={data}
-      fields={fields}
-      onEdit={onEdit}
-      onDelete={onDelete}
-      onBulkDelete={onBulkDelete}
-      selectedItems={selectedItems}
-      onSelectionChange={onSelectionChange}
-      loading={loading}
+    <UserTableView
+      usuariosFiltrados={filteredData}
+      usuariosSeleccionados={selectedItems}
+      setUsuariosSeleccionados={setSelectedItems}
+      columnFilters={columnFilters}
+      sorting={sorting}
+      handleColumnFilter={handleColumnFilter}
+      handleSort={handleSort}
+      onEditUser={onEditItem}
+      onDeleteUser={onDeleteItem}
       {...tableProps}
     />
   );
 };
 
 TableContent.propTypes = {
-  // Datos a mostrar en la tabla
-  data: PropTypes.array.isRequired,
+  // Datos filtrados
+  filteredData: PropTypes.array.isRequired,
   
   // Configuración de campos (schema)
   fields: PropTypes.object.isRequired,
   
-  // Callbacks para acciones
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  onBulkDelete: PropTypes.func,
-  
   // Selección múltiple
-  selectedItems: PropTypes.array,
-  onSelectionChange: PropTypes.func,
+  selectedItems: PropTypes.array.isRequired,
+  setSelectedItems: PropTypes.func.isRequired,
   
-  // Estados
-  loading: PropTypes.bool,
+  // Filtros y ordenamiento
+  columnFilters: PropTypes.object.isRequired,
+  sorting: PropTypes.object.isRequired,
+  handleColumnFilter: PropTypes.func.isRequired,
+  handleSort: PropTypes.func.isRequired,
   
-  // Props adicionales para el componente de tabla
-  sortable: PropTypes.bool,
-  filterable: PropTypes.bool,
-  pagination: PropTypes.bool,
-  pageSize: PropTypes.number
+  // Callbacks para acciones
+  onEditItem: PropTypes.func.isRequired,
+  onDeleteItem: PropTypes.func.isRequired
 };
 
-TableContent.defaultProps = {
-  selectedItems: [],
-  sortable: true,
-  filterable: true,
-  pagination: true,
-  pageSize: 10
-};
 
 export default TableContent;

@@ -2,6 +2,7 @@ import React, { cloneElement, Children } from "react";
 import PropTypes from "prop-types";
 import ConfigurableHeader from "./components/ConfigurableHeader";
 import ConfigurableContent from "./components/ConfigurableContent";
+import GenericModal from "./components/GenericModal";
 import { useCrudData } from "./hooks/useCrudData";
 import { useCrudFilters } from "./hooks/useCrudFilters";
 import { useCrudActions } from "./hooks/useCrudActions";
@@ -75,17 +76,36 @@ const CrudFacade = ({
   const slots = {
     HeaderActions: null,
     SearchComponent: null,
-    DesktopCardsView: null,
-    DesktopTableView: null,
+    WebView: null,
+    CardView: null,
     MobileView: null,
     Modal: null
   };
 
+  // Mapeo de compatibilidad con nombres anteriores
+  const slotMapping = {
+    'TableSlot': 'WebView',
+    'CardsSlot': 'CardView', 
+    'DesktopCardsView': 'CardView',
+    'DesktopTableView': 'WebView'
+  };
+
   Children.forEach(children, (child) => {
     if (child?.type?.displayName) {
-      slots[child.type.displayName] = child;
+      const slotName = slotMapping[child.type.displayName] || child.type.displayName;
+      slots[slotName] = child;
     }
   });
+
+  // Detectar vistas disponibles
+  const availableViews = {
+    hasWebView: !!slots.WebView,
+    hasCardView: !!slots.CardView,
+    hasMobileView: !!slots.MobileView
+  };
+
+  // Determinar si mostrar selector de vista - mostrar siempre que tengamos al menos una vista personalizada
+  const shouldShowViewToggle = availableViews.hasWebView || availableViews.hasCardView;
 
   const commonProps = {
     entity,
@@ -117,13 +137,14 @@ const CrudFacade = ({
     onDeleteItem: handleDeleteItem,
     onBulkDelete: handleBulkDelete,
     fields,
-    // Añadir configuración responsive a las props comunes
+    // Añadir configuración responsive y de vistas disponibles
     responsive: {
       ...responsive,
       layout: responsiveConfig.layout[responsive.deviceType],
       mediaQueries: responsiveConfig.getMediaQueries(),
-      showViewToggle: responsive.shouldShowViewToggle()
-    }
+      showViewToggle: shouldShowViewToggle
+    },
+    availableViews
   };
 
   return (
@@ -153,45 +174,50 @@ const CrudFacade = ({
         handleCardSortDirectionChange={handleCardSortDirectionChange}
         clearCardFilters={clearCardFilters}
         getActiveCardFilters={getActiveCardFilters}
+        availableViews={availableViews}
       />
 
       <ConfigurableContent
         viewMode={viewMode}
-        desktopCardsViewSlot={slots.DesktopCardsView}
-        desktopTableViewSlot={slots.DesktopTableView}
+        webViewSlot={slots.WebView}
+        cardViewSlot={slots.CardView}
         mobileViewSlot={slots.MobileView}
         commonProps={commonProps}
+        availableViews={availableViews}
       />
 
-      {slots.Modal && (
-        typeof slots.Modal.props.children === 'function' 
-          ? slots.Modal.props.children({
-              isOpen: modalOpen,
-              toggle: toggleModal,
-              isEditing,
-              formData,
-              setFormData,
-              onSave: handleSaveItem,
-              deleteModal,
-              toggleDeleteModal,
-              confirmDelete,
-              modalOpen,
-              ...commonProps
-            })
-          : cloneElement(slots.Modal, {
-              isOpen: modalOpen,
-              toggle: toggleModal,
-              isEditing,
-              formData,
-              setFormData,
-              onSave: handleSaveItem,
-              deleteModal,
-              toggleDeleteModal,
-              confirmDelete,
-              modalOpen,
-              ...commonProps
-            })
-      )}
+      {/* Modal genérico con encapsulación de lógica */}
+      <GenericModal
+        deleteModalProps={{
+          show: deleteModal,
+          onDeleteClick: confirmDelete,
+          onCloseClick: toggleDeleteModal
+        }}
+      >
+        {slots.Modal && (
+          typeof slots.Modal.props.children === 'function' 
+            ? slots.Modal.props.children({
+                isOpen: modalOpen,
+                toggle: toggleModal,
+                isEditing,
+                formData,
+                setFormData,
+                onSave: handleSaveItem,
+                modalOpen,
+                ...commonProps
+              })
+            : cloneElement(slots.Modal, {
+                isOpen: modalOpen,
+                toggle: toggleModal,
+                isEditing,
+                formData,
+                setFormData,
+                onSave: handleSaveItem,
+                modalOpen,
+                ...commonProps
+              })
+        )}
+      </GenericModal>
 
     </React.Fragment>
   );
@@ -202,6 +228,19 @@ HeaderActions.displayName = 'HeaderActions';
 
 const SearchComponent = ({ children }) => children;
 SearchComponent.displayName = 'SearchComponent';
+
+const WebView = ({ children }) => children;
+WebView.displayName = 'WebView';
+
+const CardView = ({ children }) => children;
+CardView.displayName = 'CardView';
+
+// Mantenemos compatibilidad con nombres anteriores
+const TableSlot = ({ children }) => children;
+TableSlot.displayName = 'TableSlot';
+
+const CardsSlot = ({ children }) => children;
+CardsSlot.displayName = 'CardsSlot';
 
 const DesktopCardsView = ({ children }) => children;
 DesktopCardsView.displayName = 'DesktopCardsView';
@@ -215,11 +254,20 @@ MobileView.displayName = 'MobileView';
 const Modal = ({ children }) => children;
 Modal.displayName = 'Modal';
 
-CrudFacade.HeaderActions = HeaderActions;
-CrudFacade.SearchComponent = SearchComponent;
+// Nuevos slots principales
+CrudFacade.WebView = WebView;
+CrudFacade.CardView = CardView;
+CrudFacade.MobileView = MobileView;
+
+// Mantenemos compatibilidad con nombres anteriores
+CrudFacade.TableSlot = TableSlot;
+CrudFacade.CardsSlot = CardsSlot;
 CrudFacade.DesktopCardsView = DesktopCardsView;
 CrudFacade.DesktopTableView = DesktopTableView;
-CrudFacade.MobileView = MobileView;
+
+// Otros slots
+CrudFacade.HeaderActions = HeaderActions;
+CrudFacade.SearchComponent = SearchComponent;
 CrudFacade.Modal = Modal;
 
 CrudFacade.propTypes = {

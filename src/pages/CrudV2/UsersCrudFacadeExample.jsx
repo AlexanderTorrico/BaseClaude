@@ -1,7 +1,6 @@
 import React from "react";
 import { Button } from "reactstrap";
 import { CrudFacade } from "../../components/CrudFacade";
-import DeleteModal from "../../components/Common/DeleteModal";
 import UserModal from "../../components/CrudComponents/UserModal";
 import { generateUsers } from "../../components/CrudUtils/userGenerator";
 import { userFields } from "./config/userFieldsConfig";
@@ -23,59 +22,45 @@ const UsersCrudFacadeExample = () => {
         desktop: 1200
       }}
     >
-      {/* Contenido de tabla personalizado */}
-      <CrudFacade.TableSlot>
-        {(tableProps) => (
+      {/* Vista Web - Se usa para table y card (si no hay CardView específico) */}
+      <CrudFacade.WebView>
+        {(webProps) => (
           <TableContent 
-            {...tableProps}
+            {...webProps}
             fields={userFields}
           />
         )}
-      </CrudFacade.TableSlot>
+      </CrudFacade.WebView>
 
-      {/* Contenido de cards personalizado */}
-      <CrudFacade.CardsSlot>
-        {(cardsProps) => (
+      {/* Vista Card - Override específico para vista de cards */}
+      <CrudFacade.CardView>
+        {(cardProps) => (
           <CardsContent 
-            {...cardsProps}
+            {...cardProps}
             fields={userFields}
-            cardsPerRow={responsiveConfig.layout[deviceType]?.cardsPerRow || 3}
+            cardsPerRow={3}
           />
         )}
-      </CrudFacade.CardsSlot>
+      </CrudFacade.CardView>
 
-      {/* Modales usando el sistema de slots */}
+      {/* Modal personalizado - sólo el modal principal */}
       <CrudFacade.Modal>
         {({ 
           isOpen, 
           toggle, 
-          deleteModal, 
-          toggleDeleteModal, 
-          confirmDelete, 
           isEditing,
           formData,
           setFormData,
-          onSave,
-          ...props 
+          onSave
         }) => (
-          <>
-            {/* Modal para crear/editar usuario */}
-            <UserModal 
-              isOpen={isOpen}
-              toggle={toggle}
-              esEdicion={isEditing}
-              datosFormulario={formData || {}}
-              setDatosFormulario={setFormData}
-              onSave={onSave}
-            />
-
-            {/* Modal de eliminación */}
-            <DeleteModal
-              show={deleteModal}
-              onDeleteClick={confirmDelete}
-              onCloseClick={toggleDeleteModal}
-            />
-          </>
+          <UserModal 
+            isOpen={isOpen}
+            toggle={toggle}
+            esEdicion={isEditing}
+            datosFormulario={formData || {}}
+            setDatosFormulario={setFormData}
+            onSave={onSave}
+          />
         )}
       </CrudFacade.Modal>
     </CrudFacade>

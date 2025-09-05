@@ -120,7 +120,7 @@ const ConfigurableHeader = ({
           {viewMode === 'cards' && (
             <Row className="mt-3">
               <Col lg={6} md={12}>
-                <InputGroup>
+                <InputGroup size="sm">
                   <InputGroupText>
                     <i className="mdi mdi-magnify"></i>
                   </InputGroupText>

@@ -47,7 +47,7 @@ const UserModal = ({
                 <Input
                   type="text"
                   id="nombre"
-                  value={formData.nombre}
+                  value={formData.nombre || ''}
                   onChange={(e) => setFormData({...formData, nombre: e.target.value})}
                   placeholder="Ingresa el nombre completo"
                   bsSize="sm"
@@ -60,7 +60,7 @@ const UserModal = ({
                 <Input
                   type="email"
                   id="email"
-                  value={formData.email}
+                  value={formData.email || ''}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
                   placeholder="correo@empresa.com"
                   bsSize="sm"
@@ -73,7 +73,7 @@ const UserModal = ({
                 <Input
                   type="text"
                   id="telefono"
-                  value={formData.telefono}
+                  value={formData.telefono || ''}
                   onChange={(e) => setFormData({...formData, telefono: e.target.value})}
                   placeholder="+34 123 456 789"
                   bsSize="sm"
@@ -86,7 +86,7 @@ const UserModal = ({
                 <Input
                   type="text"
                   id="ciudad"
-                  value={formData.ciudad}
+                  value={formData.ciudad || ''}
                   onChange={(e) => setFormData({...formData, ciudad: e.target.value})}
                   placeholder="Madrid"
                   bsSize="sm"
@@ -97,7 +97,7 @@ const UserModal = ({
               <FormGroup>
                 <Label htmlFor="rol">Rol</Label>
                 <CustomSelect
-                  value={formData.rol}
+                  value={formData.rol || 'Usuario'}
                   onChange={(value) => setFormData({...formData, rol: value})}
                   options={opcionesFormulario.rol}
                   placeholder="Selecciona un rol"
@@ -108,7 +108,7 @@ const UserModal = ({
               <FormGroup>
                 <Label htmlFor="departamento">Departamento</Label>
                 <CustomSelect
-                  value={formData.departamento}
+                  value={formData.departamento || 'Administración'}
                   onChange={(value) => setFormData({...formData, departamento: value})}
                   options={opcionesFormulario.departamento}
                   placeholder="Selecciona un departamento"
@@ -119,7 +119,7 @@ const UserModal = ({
               <FormGroup>
                 <Label htmlFor="estado">Estado</Label>
                 <CustomSelect
-                  value={formData.estado}
+                  value={formData.estado || 'Activo'}
                   onChange={(value) => setFormData({...formData, estado: value})}
                   options={opcionesFormulario.estado}
                   placeholder="Selecciona un estado"
@@ -132,7 +132,7 @@ const UserModal = ({
                 <Input
                   type="text"
                   id="empresa"
-                  value={formData.empresa}
+                  value={formData.empresa || ''}
                   onChange={(e) => setFormData({...formData, empresa: e.target.value})}
                   placeholder="TechSoft"
                   bsSize="sm"
@@ -145,7 +145,7 @@ const UserModal = ({
                 <Input
                   type="number"
                   id="salario"
-                  value={formData.salario}
+                  value={formData.salario || 0}
                   onChange={(e) => setFormData({...formData, salario: parseInt(e.target.value) || 0})}
                   bsSize="sm"
                 />
@@ -157,7 +157,7 @@ const UserModal = ({
                 <Input
                   type="number"
                   id="experiencia"
-                  value={formData.experiencia}
+                  value={formData.experiencia || 0}
                   onChange={(e) => setFormData({...formData, experiencia: parseInt(e.target.value) || 0})}
                   bsSize="sm"
                 />

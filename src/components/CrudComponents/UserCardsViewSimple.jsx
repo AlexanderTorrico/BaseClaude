@@ -41,6 +41,7 @@ const UserCardsViewSimple = ({
             outline 
             onClick={onClearFilters}
             className="d-inline-flex align-items-center"
+            size="sm"
           >
             <i className="mdi mdi-filter-remove me-2"></i>
             Limpiar filtros

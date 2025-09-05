@@ -7,7 +7,8 @@
       "Bash(npm run dev:*)",
       "Bash(npx eslint:*)",
       "Bash(cp:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "WebSearch"
     ],
     "deny": []
   }

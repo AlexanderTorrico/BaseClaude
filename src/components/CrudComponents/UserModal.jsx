@@ -50,6 +50,7 @@ const UserModal = ({
                   value={formData.nombre}
                   onChange={(e) => setFormData({...formData, nombre: e.target.value})}
                   placeholder="Ingresa el nombre completo"
+                  bsSize="sm"
                 />
               </FormGroup>
             </Col>
@@ -62,6 +63,7 @@ const UserModal = ({
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
                   placeholder="correo@empresa.com"
+                  bsSize="sm"
                 />
               </FormGroup>
             </Col>
@@ -74,6 +76,7 @@ const UserModal = ({
                   value={formData.telefono}
                   onChange={(e) => setFormData({...formData, telefono: e.target.value})}
                   placeholder="+34 123 456 789"
+                  bsSize="sm"
                 />
               </FormGroup>
             </Col>
@@ -86,6 +89,7 @@ const UserModal = ({
                   value={formData.ciudad}
                   onChange={(e) => setFormData({...formData, ciudad: e.target.value})}
                   placeholder="Madrid"
+                  bsSize="sm"
                 />
               </FormGroup>
             </Col>
@@ -131,6 +135,7 @@ const UserModal = ({
                   value={formData.empresa}
                   onChange={(e) => setFormData({...formData, empresa: e.target.value})}
                   placeholder="TechSoft"
+                  bsSize="sm"
                 />
               </FormGroup>
             </Col>
@@ -141,7 +146,8 @@ const UserModal = ({
                   type="number"
                   id="salario"
                   value={formData.salario}
-                  onChange={(e) => setFormData({...formData, salario: parseInt(e.target.value)})}
+                  onChange={(e) => setFormData({...formData, salario: parseInt(e.target.value) || 0})}
+                  bsSize="sm"
                 />
               </FormGroup>
             </Col>
@@ -152,7 +158,8 @@ const UserModal = ({
                   type="number"
                   id="experiencia"
                   value={formData.experiencia}
-                  onChange={(e) => setFormData({...formData, experiencia: parseInt(e.target.value)})}
+                  onChange={(e) => setFormData({...formData, experiencia: parseInt(e.target.value) || 0})}
+                  bsSize="sm"
                 />
               </FormGroup>
             </Col>
@@ -161,10 +168,10 @@ const UserModal = ({
       </ModalBody>
       <ModalFooter className="border-top">
         <div className="d-flex flex-column flex-sm-row gap-2 w-100 justify-content-end">
-          <Button color="light" onClick={toggle} className="order-2 order-sm-1">
+          <Button color="light" onClick={toggle} className="order-2 order-sm-1" size="sm">
             Cancelar
           </Button>
-          <Button color="primary" onClick={onSave} className="order-1 order-sm-2">
+          <Button color="primary" onClick={onSave} className="order-1 order-sm-2" size="sm">
             <i className="mdi mdi-check me-1"></i>
             {isEditing ? "Actualizar Usuario" : "Crear Usuario"}
           </Button>

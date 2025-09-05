@@ -16,7 +16,6 @@ const TableContent = ({
   handleSort,
   onEditItem,
   onDeleteItem,
-  fields,
   ...tableProps 
 }) => {
   return (
@@ -38,9 +37,6 @@ const TableContent = ({
 TableContent.propTypes = {
   // Datos filtrados
   filteredData: PropTypes.array.isRequired,
-  
-  // Configuración de campos (schema)
-  fields: PropTypes.object.isRequired,
   
   // Selección múltiple
   selectedItems: PropTypes.array.isRequired,

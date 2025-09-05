@@ -1,5 +1,4 @@
 import React from "react";
-import { Button } from "reactstrap";
 import { CrudFacade } from "../../components/CrudFacade";
 import UserModal from "../../components/CrudComponents/UserModal";
 import { generateUsers } from "../../components/CrudUtils/userGenerator";
@@ -22,22 +21,18 @@ const UsersCrudFacadeExample = () => {
         desktop: 1200
       }}
     >
-      {/* Vista Web - Se usa para table y card (si no hay CardView específico) */}
+      {/* Vista Web - Se usa para table (vista por defecto en escritorio) */}
       <CrudFacade.WebView>
         {(webProps) => (
-          <TableContent 
-            {...webProps}
-            fields={userFields}
-          />
+          <TableContent {...webProps} />
         )}
       </CrudFacade.WebView>
 
-      {/* Vista Card - Override específico para vista de cards */}
+      {/* Vista Card - Se usa para cards (vista por defecto en móvil) */}
       <CrudFacade.CardView>
         {(cardProps) => (
           <CardsContent 
             {...cardProps}
-            fields={userFields}
             cardsPerRow={3}
           />
         )}

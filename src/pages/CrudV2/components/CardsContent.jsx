@@ -17,7 +17,6 @@ const CardsContent = ({
   clearCardFilters,
   onEditItem,
   onDeleteItem,
-  fields,
   cardsPerRow = 3,
   ...cardProps 
 }) => {
@@ -42,9 +41,6 @@ CardsContent.propTypes = {
   // Datos filtrados
   filteredCardsData: PropTypes.array.isRequired,
   data: PropTypes.array.isRequired,
-  
-  // Configuración de campos (schema)
-  fields: PropTypes.object.isRequired,
   
   // Props de búsqueda y filtros
   cardSearchTerm: PropTypes.string.isRequired,

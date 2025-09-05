@@ -118,8 +118,9 @@ const ConfigurableHeader = ({
 
           {/* Card search controls - only in card view */}
           {viewMode === 'cards' && (
-            <Row className="mt-3">
-              <Col lg={6} md={12}>
+            <Row className="mt-3 g-2">
+              {/* Campo de búsqueda - full width en móvil, 50% en desktop */}
+              <Col lg={6} xs={12}>
                 <InputGroup size="sm">
                   <InputGroupText>
                     <i className="mdi mdi-magnify"></i>
@@ -133,31 +134,39 @@ const ConfigurableHeader = ({
                 </InputGroup>
               </Col>
               
-              <Col lg={6} md={12} className="mt-3 mt-lg-0">
-                <Row>
-                  <Col md={6}>
+              {/* Controles de ordenamiento */}
+              <Col lg={6} xs={12}>
+                <Row className="g-2">
+                  {/* Select de ordenamiento - más ancho */}
+                  <Col xs={8}>
                     <CustomSelect
                       value={cardSorting.field}
                       onChange={handleCardSortFieldChange}
                       options={opcionesOrdenamiento}
                       placeholder="Ordenar por"
+                      size="sm"
                     />
                   </Col>
-                  <Col md={6} className="mt-2 mt-md-0">
+                  {/* Botones de dirección - más compactos */}
+                  <Col xs={4}>
                     <div className="btn-group w-100" role="group">
                       <Button
                         color={cardSorting.direction === 'asc' ? 'primary' : 'light'}
                         onClick={() => handleCardSortDirectionChange('asc')}
                         size="sm"
+                        className="flex-fill"
+                        title="Ascendente"
                       >
-                        <i className="mdi mdi-sort-alphabetical-ascending"></i>
+                        <i className="mdi mdi-sort-ascending"></i>
                       </Button>
                       <Button
                         color={cardSorting.direction === 'desc' ? 'primary' : 'light'}
                         onClick={() => handleCardSortDirectionChange('desc')}
                         size="sm"
+                        className="flex-fill"
+                        title="Descendente"
                       >
-                        <i className="mdi mdi-sort-alphabetical-descending"></i>
+                        <i className="mdi mdi-sort-descending"></i>
                       </Button>
                     </div>
                   </Col>

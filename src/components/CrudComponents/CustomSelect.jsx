@@ -10,11 +10,13 @@ const CustomSelect = ({ value, onChange, options, placeholder, icon, size = "sm"
   const sizeStyles = {
     sm: {
       padding: '0.25rem 0.5rem',
-      fontSize: '0.8125rem'
+      fontSize: '0.8125rem',
+      height: '27.46px'
     },
     default: {
       padding: '0.5rem 0.75rem',
-      fontSize: '0.875rem'
+      fontSize: '0.875rem',
+      height: '27.46px'
     }
   };
 
@@ -34,7 +36,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, icon, size = "sm"
           fontSize: currentSize.fontSize,
           fontWeight: 'normal',
           color: value === 'all' || !value ? '#6c757d' : '#495057',
-          height: '31px'
+          height: currentSize.height
         }}
       >
         <span className="d-flex align-items-center">
@@ -46,7 +48,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, icon, size = "sm"
       <DropdownMenu className="w-100" style={{ minWidth: '100%' }}>
         {options.map((option, index) => (
           <DropdownItem 
-            key={index}
+            key={option.value || index}
             onClick={() => onChange(option.value)}
             className={value === option.value ? 'active' : ''}
           >

@@ -205,7 +205,7 @@ const UserTableView = ({
         </div>
       ),
     },
-  ], [usuariosSeleccionados, usuariosFiltrados, columnFilters, handleColumnFilter, sorting, handleSort, staticHeaders, setUsuariosSeleccionados, onEditUser, onDeleteUser]);
+  ], [usuariosSeleccionados, usuariosFiltrados, columnFilters, handleColumnFilter, sorting, handleSort, setUsuariosSeleccionados, onEditUser, onDeleteUser]);
 
   return (
     <Card className="border-0 shadow-sm">

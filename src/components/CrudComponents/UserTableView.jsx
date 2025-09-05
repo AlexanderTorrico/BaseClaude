@@ -88,16 +88,23 @@ const UserTableView = ({
   const columnas = useMemo(() => [
     {
       header: (
-        <Input
-          type="checkbox"
-          onChange={(e) => {
-            if (e.target.checked) {
-              setUsuariosSeleccionados(usuariosFiltrados.map(u => u.id));
-            } else {
-              setUsuariosSeleccionados([]);
-            }
-          }}
-        />
+        <div>
+          <div className="d-flex align-items-center justify-content-center">
+            <Input
+              type="checkbox"
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setUsuariosSeleccionados(usuariosFiltrados.map(u => u.id));
+                } else {
+                  setUsuariosSeleccionados([]);
+                }
+              }}
+            />
+          </div>
+          <div className="column-filter-container" style={{ marginTop: '8px' }}>
+            <div style={{ height: '30px' }}></div>
+          </div>
+        </div>
       ),
       accessorKey: "select",
       enableSorting: false,
@@ -166,7 +173,16 @@ const UserTableView = ({
       cell: ({ getValue }) => `€${getValue().toLocaleString()}`,
     },
     {
-      header: "Acciones",
+      header: (
+        <div>
+          <div className="d-flex align-items-center justify-content-between fw-medium">
+            <span>Acciones</span>
+          </div>
+          <div className="column-filter-container" style={{ marginTop: '8px' }}>
+            <div style={{ height: '30px' }}></div>
+          </div>
+        </div>
+      ),
       accessorKey: "actions",
       enableSorting: false,
       enableColumnFilter: false,

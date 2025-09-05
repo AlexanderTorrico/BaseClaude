@@ -52,19 +52,19 @@ const ConfigurableHeader = ({
       {availableViews && (availableViews.hasWebView || availableViews.hasCardView) && (
         <div className="btn-group d-none d-md-flex" role="group">
           <Button 
-            color={viewMode === 'cards' ? 'primary' : 'light'}
-            onClick={() => setViewMode('cards')}
+            color={viewMode === 'table' ? 'primary' : 'light'}
+            onClick={() => setViewMode('table')}
             size="sm"
-            title="Vista Web"
+            title="Vista Web (Tabla)"
           >
             <i className="mdi mdi-monitor"></i>
             <span className="d-none d-lg-inline ms-1">Web</span>
           </Button>
           <Button 
-            color={viewMode === 'table' ? 'primary' : 'light'}
-            onClick={() => setViewMode('table')}
+            color={viewMode === 'cards' ? 'primary' : 'light'}
+            onClick={() => setViewMode('cards')}
             size="sm"
-            title="Vista Móvil"
+            title="Vista Móvil (Cards)"
           >
             <i className="mdi mdi-cellphone"></i>
             <span className="d-none d-lg-inline ms-1">Móvil</span>

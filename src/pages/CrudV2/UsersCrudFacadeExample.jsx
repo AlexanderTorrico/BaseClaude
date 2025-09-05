@@ -46,19 +46,19 @@ const UsersCrudFacadeExample = () => {
       {/* Modal personalizado - sólo el modal principal */}
       <CrudFacade.Modal>
         {({ 
-          isOpen, 
-          toggle, 
-          isEditing,
-          formData,
-          setFormData,
-          onSave
+          isOpen,        // Boolean - Controla si el modal está abierto o cerrado
+          toggle,        // Function - Función para alternar el estado del modal (abrir/cerrar)
+          isEditing,     // Boolean - Indica si estamos en modo edición (true) o creación (false)
+          formData,      // Object - Datos del formulario para editar o crear
+          setFormData,   // Function - Función para actualizar los datos del formulario
+          onSave         // Function - Callback que se ejecuta al guardar el formulario
         }) => (
           <UserModal 
             isOpen={isOpen}
             toggle={toggle}
-            esEdicion={isEditing}
-            datosFormulario={formData || {}}
-            setDatosFormulario={setFormData}
+            isEditing={isEditing}
+            formData={formData || {}}
+            setFormData={setFormData}
             onSave={onSave}
           />
         )}

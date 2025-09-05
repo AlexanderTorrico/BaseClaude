@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import {
   Modal,
   ModalHeader,
@@ -16,12 +17,12 @@ import CustomSelect from "./CustomSelect";
 import { opcionesFormulario } from "../../pages/CrudV2/config/userConstants.js";
 
 const UserModal = ({
-  isOpen,
-  toggle,
-  esEdicion,
-  datosFormulario,
-  setDatosFormulario,
-  onSave
+  isOpen,          // Boolean - Controls if the modal is open
+  toggle,          // Function - Function to toggle modal visibility
+  isEditing,       // Boolean - Indicates if we're editing (true) or creating (false)
+  formData,        // Object - Form data for editing or creating
+  setFormData,     // Function - Function to update form data
+  onSave           // Function - Callback executed when saving
 }) => {
   return (
     <Modal 
@@ -33,7 +34,7 @@ const UserModal = ({
     >
       <ModalHeader toggle={toggle} className="border-bottom">
         <div>
-          <h5 className="mb-0">{esEdicion ? "Editar Usuario" : "Nuevo Usuario"}</h5>
+          <h5 className="mb-0">{isEditing ? "Editar Usuario" : "Nuevo Usuario"}</h5>
           <p className="text-muted mb-0">Complete la información del usuario</p>
         </div>
       </ModalHeader>
@@ -46,8 +47,8 @@ const UserModal = ({
                 <Input
                   type="text"
                   id="nombre"
-                  value={datosFormulario.nombre}
-                  onChange={(e) => setDatosFormulario({...datosFormulario, nombre: e.target.value})}
+                  value={formData.nombre}
+                  onChange={(e) => setFormData({...formData, nombre: e.target.value})}
                   placeholder="Ingresa el nombre completo"
                 />
               </FormGroup>
@@ -58,8 +59,8 @@ const UserModal = ({
                 <Input
                   type="email"
                   id="email"
-                  value={datosFormulario.email}
-                  onChange={(e) => setDatosFormulario({...datosFormulario, email: e.target.value})}
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
                   placeholder="correo@empresa.com"
                 />
               </FormGroup>
@@ -70,8 +71,8 @@ const UserModal = ({
                 <Input
                   type="text"
                   id="telefono"
-                  value={datosFormulario.telefono}
-                  onChange={(e) => setDatosFormulario({...datosFormulario, telefono: e.target.value})}
+                  value={formData.telefono}
+                  onChange={(e) => setFormData({...formData, telefono: e.target.value})}
                   placeholder="+34 123 456 789"
                 />
               </FormGroup>
@@ -82,8 +83,8 @@ const UserModal = ({
                 <Input
                   type="text"
                   id="ciudad"
-                  value={datosFormulario.ciudad}
-                  onChange={(e) => setDatosFormulario({...datosFormulario, ciudad: e.target.value})}
+                  value={formData.ciudad}
+                  onChange={(e) => setFormData({...formData, ciudad: e.target.value})}
                   placeholder="Madrid"
                 />
               </FormGroup>
@@ -92,8 +93,8 @@ const UserModal = ({
               <FormGroup>
                 <Label htmlFor="rol">Rol</Label>
                 <CustomSelect
-                  value={datosFormulario.rol}
-                  onChange={(value) => setDatosFormulario({...datosFormulario, rol: value})}
+                  value={formData.rol}
+                  onChange={(value) => setFormData({...formData, rol: value})}
                   options={opcionesFormulario.rol}
                   placeholder="Selecciona un rol"
                 />
@@ -103,8 +104,8 @@ const UserModal = ({
               <FormGroup>
                 <Label htmlFor="departamento">Departamento</Label>
                 <CustomSelect
-                  value={datosFormulario.departamento}
-                  onChange={(value) => setDatosFormulario({...datosFormulario, departamento: value})}
+                  value={formData.departamento}
+                  onChange={(value) => setFormData({...formData, departamento: value})}
                   options={opcionesFormulario.departamento}
                   placeholder="Selecciona un departamento"
                 />
@@ -114,8 +115,8 @@ const UserModal = ({
               <FormGroup>
                 <Label htmlFor="estado">Estado</Label>
                 <CustomSelect
-                  value={datosFormulario.estado}
-                  onChange={(value) => setDatosFormulario({...datosFormulario, estado: value})}
+                  value={formData.estado}
+                  onChange={(value) => setFormData({...formData, estado: value})}
                   options={opcionesFormulario.estado}
                   placeholder="Selecciona un estado"
                 />
@@ -127,8 +128,8 @@ const UserModal = ({
                 <Input
                   type="text"
                   id="empresa"
-                  value={datosFormulario.empresa}
-                  onChange={(e) => setDatosFormulario({...datosFormulario, empresa: e.target.value})}
+                  value={formData.empresa}
+                  onChange={(e) => setFormData({...formData, empresa: e.target.value})}
                   placeholder="TechSoft"
                 />
               </FormGroup>
@@ -139,8 +140,8 @@ const UserModal = ({
                 <Input
                   type="number"
                   id="salario"
-                  value={datosFormulario.salario}
-                  onChange={(e) => setDatosFormulario({...datosFormulario, salario: parseInt(e.target.value)})}
+                  value={formData.salario}
+                  onChange={(e) => setFormData({...formData, salario: parseInt(e.target.value)})}
                 />
               </FormGroup>
             </Col>
@@ -150,8 +151,8 @@ const UserModal = ({
                 <Input
                   type="number"
                   id="experiencia"
-                  value={datosFormulario.experiencia}
-                  onChange={(e) => setDatosFormulario({...datosFormulario, experiencia: parseInt(e.target.value)})}
+                  value={formData.experiencia}
+                  onChange={(e) => setFormData({...formData, experiencia: parseInt(e.target.value)})}
                 />
               </FormGroup>
             </Col>
@@ -165,12 +166,44 @@ const UserModal = ({
           </Button>
           <Button color="primary" onClick={onSave} className="order-1 order-sm-2">
             <i className="mdi mdi-check me-1"></i>
-            {esEdicion ? "Actualizar Usuario" : "Crear Usuario"}
+            {isEditing ? "Actualizar Usuario" : "Crear Usuario"}
           </Button>
         </div>
       </ModalFooter>
     </Modal>
   );
+};
+
+// PropTypes documentation
+UserModal.propTypes = {
+  // Boolean - Controls if the modal is open
+  isOpen: PropTypes.bool.isRequired,
+  
+  // Function - Function to toggle modal visibility (open/close)
+  toggle: PropTypes.func.isRequired,
+  
+  // Boolean - Indicates if we're editing (true) or creating (false) a user
+  isEditing: PropTypes.bool.isRequired,
+  
+  // Object - Form data containing user information for editing or creating
+  formData: PropTypes.shape({
+    nombre: PropTypes.string,
+    email: PropTypes.string,
+    telefono: PropTypes.string,
+    ciudad: PropTypes.string,
+    rol: PropTypes.string,
+    departamento: PropTypes.string,
+    estado: PropTypes.string,
+    empresa: PropTypes.string,
+    salario: PropTypes.number,
+    experiencia: PropTypes.number
+  }).isRequired,
+  
+  // Function - Function to update form data when inputs change
+  setFormData: PropTypes.func.isRequired,
+  
+  // Function - Callback executed when saving the user (create or update)
+  onSave: PropTypes.func.isRequired
 };
 
 export default UserModal;

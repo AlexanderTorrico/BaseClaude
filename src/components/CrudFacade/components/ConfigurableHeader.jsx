@@ -84,19 +84,11 @@ const ConfigurableHeader = ({
               <h4 className="mb-0">{title}</h4>
               <p className="text-muted mb-md-0 mb-3">
                 {description}
-                {viewMode === 'table' && (getActiveFilters().length > 0 || (sorting.column && sorting.direction)) && (
+                {(getActiveFilters().length > 0 || (sorting.column && sorting.direction) || cardSearchTerm || (cardSorting.field && cardSorting.field !== 'nombre') || cardSorting.direction === 'desc') && (
                   <span className="ms-2">
                     <Badge color="info" style={{ fontSize: '0.65rem' }}>
                       <i className="mdi mdi-filter-check me-1"></i>
                       {filteredData.length} de {data.length} resultados
-                    </Badge>
-                  </span>
-                )}
-                {viewMode === 'cards' && (cardSearchTerm || (cardSorting.field && cardSorting.field !== 'nombre') || cardSorting.direction === 'desc') && (
-                  <span className="ms-2">
-                    <Badge color="info" style={{ fontSize: '0.65rem' }}>
-                      <i className="mdi mdi-filter-check me-1"></i>
-                      {filteredCardsData.length} de {data.length} resultados
                     </Badge>
                   </span>
                 )}
@@ -190,43 +182,49 @@ const ConfigurableHeader = ({
             </Row>
           )}
 
-          {viewMode === 'table' && (
+          {(getActiveFilters().length > 0 || (sorting.column && sorting.direction) || cardSearchTerm || (cardSorting.field && cardSorting.field !== 'nombre') || cardSorting.direction === 'desc') && (
             <FilterInfoPanel
-              filters={getActiveFilters().map(([column, value]) => ({
-                column,
-                value,
-                type: 'column'
-              }))}
-              sorting={sorting.column && sorting.direction ? {
-                column: sorting.column,
-                direction: sorting.direction,
-                isActive: true
-              } : null}
-              onClearFilter={(filter) => clearColumnFilter(filter.column)}
-              onClearSorting={clearSorting}
+              filters={getActiveFilters().length > 0 
+                ? getActiveFilters().map(([column, value]) => ({
+                    column,
+                    value,
+                    type: 'column'
+                  }))
+                : cardSearchTerm 
+                  ? [{ column: 'search', value: cardSearchTerm, type: 'search' }]
+                  : []
+              }
+              sorting={(sorting.column && sorting.direction) 
+                ? {
+                    column: sorting.column,
+                    direction: sorting.direction,
+                    isActive: true
+                  }
+                : (cardSorting.field && cardSorting.direction && cardSorting.field !== 'nombre')
+                  ? {
+                      column: cardSorting.field,
+                      direction: cardSorting.direction,
+                      isActive: true
+                    }
+                  : null
+              }
+              onClearFilter={(filter) => {
+                if (filter.type === 'search') {
+                  handleCardSearchChange('');
+                } else {
+                  clearColumnFilter(filter.column);
+                }
+              }}
+              onClearSorting={() => {
+                if (sorting.column) {
+                  clearSorting();
+                } else {
+                  handleCardSortFieldChange('nombre');
+                  handleCardSortDirectionChange('asc');
+                }
+              }}
               onClearAll={clearAll}
               totalResults={filteredData.length}
-              totalItems={data.length}
-              isIntegrated={true}
-              className="mt-3"
-            />
-          )}
-
-          {viewMode === 'cards' && (cardSearchTerm || (cardSorting.field && cardSorting.field !== 'nombre') || cardSorting.direction === 'desc') && (
-            <FilterInfoPanel
-              filters={cardSearchTerm ? [['search', cardSearchTerm]] : []}
-              sorting={cardSorting.field && cardSorting.direction ? {
-                column: cardSorting.field,
-                direction: cardSorting.direction,
-                isActive: true
-              } : null}
-              onClearFilter={() => handleCardSearchChange('')}
-              onClearSorting={() => {
-                handleCardSortFieldChange('nombre');
-                handleCardSortDirectionChange('asc');
-              }}
-              onClearAll={clearCardFilters}
-              totalResults={filteredCardsData.length}
               totalItems={data.length}
               isIntegrated={true}
               className="mt-3"

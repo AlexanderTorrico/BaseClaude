@@ -8,25 +8,28 @@ import UserTableView from '../../../components/CrudComponents/UserTableView';
  */
 const TableContent = ({ 
   filteredData,
+  unifiedFilteredData,
   selectedItems,
   setSelectedItems,
   columnFilters,
   sorting,
   handleColumnFilter,
+  handleColumnFilterUnified,
   handleSort,
+  handleSortUnified,
   onEditItem,
   onDeleteItem,
   ...tableProps 
 }) => {
   return (
     <UserTableView
-      usuariosFiltrados={filteredData}
+      usuariosFiltrados={unifiedFilteredData || filteredData}
       usuariosSeleccionados={selectedItems}
       setUsuariosSeleccionados={setSelectedItems}
       columnFilters={columnFilters}
       sorting={sorting}
-      handleColumnFilter={handleColumnFilter}
-      handleSort={handleSort}
+      handleColumnFilter={handleColumnFilterUnified || handleColumnFilter}
+      handleSort={handleSortUnified || handleSort}
       onEditUser={onEditItem}
       onDeleteUser={onDeleteItem}
       {...tableProps}
@@ -37,6 +40,7 @@ const TableContent = ({
 TableContent.propTypes = {
   // Datos filtrados
   filteredData: PropTypes.array.isRequired,
+  unifiedFilteredData: PropTypes.array,
   
   // Selección múltiple
   selectedItems: PropTypes.array.isRequired,
@@ -46,7 +50,9 @@ TableContent.propTypes = {
   columnFilters: PropTypes.object.isRequired,
   sorting: PropTypes.object.isRequired,
   handleColumnFilter: PropTypes.func.isRequired,
+  handleColumnFilterUnified: PropTypes.func,
   handleSort: PropTypes.func.isRequired,
+  handleSortUnified: PropTypes.func,
   
   // Callbacks para acciones
   onEditItem: PropTypes.func.isRequired,

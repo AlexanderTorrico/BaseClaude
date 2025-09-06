@@ -8,6 +8,7 @@ import UserCardsViewSimple from '../../../components/CrudComponents/UserCardsVie
  */
 const CardsContent = ({ 
   filteredCardsData,
+  unifiedFilteredData,
   data,
   cardSearchTerm,
   cardSorting,
@@ -22,7 +23,7 @@ const CardsContent = ({
 }) => {
   return (
     <UserCardsViewSimple
-      usuariosFiltradosCards={filteredCardsData}
+      usuariosFiltradosCards={unifiedFilteredData || filteredCardsData}
       usuarios={data}
       cardSearchTerm={cardSearchTerm}
       cardSorting={cardSorting}
@@ -40,6 +41,7 @@ const CardsContent = ({
 CardsContent.propTypes = {
   // Datos filtrados
   filteredCardsData: PropTypes.array.isRequired,
+  unifiedFilteredData: PropTypes.array,
   data: PropTypes.array.isRequired,
   
   // Props de búsqueda y filtros

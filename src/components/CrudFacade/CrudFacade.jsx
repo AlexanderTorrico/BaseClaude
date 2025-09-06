@@ -52,7 +52,12 @@ const CrudFacade = ({
     handleCardSortDirectionChange,
     clearCardFilters,
     getActiveCardFilters,
-    getActiveFilters
+    getActiveFilters,
+    // Nuevas funciones unificadas
+    handleColumnFilterUnified,
+    handleSortUnified,
+    getActiveUnifiedFilters,
+    unifiedFilteredData
   } = useCrudFilters(data);
   
   const {
@@ -121,6 +126,7 @@ const CrudFacade = ({
     sorting,
     cardSearchTerm,
     cardSorting,
+    // Funciones originales (mantener compatibilidad)
     handleColumnFilter,
     clearColumnFilter,
     handleSort,
@@ -132,6 +138,11 @@ const CrudFacade = ({
     clearCardFilters,
     getActiveCardFilters,
     getActiveFilters,
+    // Nuevas funciones unificadas
+    handleColumnFilterUnified,
+    handleSortUnified,
+    getActiveUnifiedFilters,
+    unifiedFilteredData,
     onAddItem: handleAddItem,
     onEditItem: handleEditItem,
     onDeleteItem: handleDeleteItem,
@@ -155,9 +166,9 @@ const CrudFacade = ({
         viewMode={viewMode}
         setViewMode={setViewMode}
         selectedItems={selectedItems}
-        filteredData={filteredData}
+        filteredData={unifiedFilteredData}
         data={data}
-        getActiveFilters={getActiveFilters}
+        getActiveFilters={getActiveUnifiedFilters}
         sorting={sorting}
         clearColumnFilter={clearColumnFilter}
         clearSorting={clearSorting}
@@ -168,12 +179,12 @@ const CrudFacade = ({
         searchComponentSlot={slots.SearchComponent}
         cardSearchTerm={cardSearchTerm}
         cardSorting={cardSorting}
-        filteredCardsData={filteredCardsData}
+        filteredCardsData={unifiedFilteredData}
         handleCardSearchChange={handleCardSearchChange}
         handleCardSortFieldChange={handleCardSortFieldChange}
         handleCardSortDirectionChange={handleCardSortDirectionChange}
         clearCardFilters={clearCardFilters}
-        getActiveCardFilters={getActiveCardFilters}
+        getActiveCardFilters={getActiveUnifiedFilters}
         availableViews={availableViews}
       />
 

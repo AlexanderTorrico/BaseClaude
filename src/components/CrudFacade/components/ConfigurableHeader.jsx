@@ -118,9 +118,9 @@ const ConfigurableHeader = ({
 
           {/* Card search controls - only in card view */}
           {viewMode === 'cards' && (
-            <Row className="mt-3 g-2">
-              {/* Campo de búsqueda - full width en móvil, 50% en desktop */}
-              <Col lg={6} xs={12}>
+            <Row className="mt-3 g-3">
+              {/* Campo de búsqueda alineado a la izquierda */}
+              <Col xs={12} sm={5} md={6} lg={7}>
                 <InputGroup size="sm">
                   <InputGroupText>
                     <i className="mdi mdi-magnify"></i>
@@ -134,43 +134,42 @@ const ConfigurableHeader = ({
                 </InputGroup>
               </Col>
               
-              {/* Controles de ordenamiento */}
-              <Col lg={6} xs={12}>
-                <Row className="g-2">
-                  {/* Select de ordenamiento - más ancho */}
-                  <Col xs={8}>
+              {/* Controles de ordenamiento alineados a la derecha */}
+              <Col xs={12} sm={7} md={6} lg={5}>
+                <div className="d-flex gap-2 align-items-center justify-content-sm-end">
+                  {/* Select de ordenamiento - adaptativo para textos largos */}
+                  <div className="flex-grow-1" style={{ maxWidth: '180px', minWidth: '130px' }}>
                     <CustomSelect
                       value={cardSorting.field}
                       onChange={handleCardSortFieldChange}
                       options={opcionesOrdenamiento}
-                      placeholder="Ordenar por"
+                      placeholder="Ordenar"
                       size="sm"
+                      className="text-truncate"
                     />
-                  </Col>
+                  </div>
                   {/* Botones de dirección - más compactos */}
-                  <Col xs={4}>
-                    <div className="btn-group w-100" role="group">
-                      <Button
-                        color={cardSorting.direction === 'asc' ? 'primary' : 'light'}
-                        onClick={() => handleCardSortDirectionChange('asc')}
-                        size="sm"
-                        className="flex-fill"
-                        title="Ascendente"
-                      >
-                        <i className="mdi mdi-sort-ascending"></i>
-                      </Button>
-                      <Button
-                        color={cardSorting.direction === 'desc' ? 'primary' : 'light'}
-                        onClick={() => handleCardSortDirectionChange('desc')}
-                        size="sm"
-                        className="flex-fill"
-                        title="Descendente"
-                      >
-                        <i className="mdi mdi-sort-descending"></i>
-                      </Button>
-                    </div>
-                  </Col>
-                </Row>
+                  <div className="btn-group flex-shrink-0" role="group">
+                    <Button
+                      color={cardSorting.direction === 'asc' ? 'primary' : 'light'}
+                      onClick={() => handleCardSortDirectionChange('asc')}
+                      size="sm"
+                      title="Ascendente"
+                      style={{ minWidth: '36px' }}
+                    >
+                      <i className="mdi mdi-sort-ascending"></i>
+                    </Button>
+                    <Button
+                      color={cardSorting.direction === 'desc' ? 'primary' : 'light'}
+                      onClick={() => handleCardSortDirectionChange('desc')}
+                      size="sm"
+                      title="Descendente"
+                      style={{ minWidth: '36px' }}
+                    >
+                      <i className="mdi mdi-sort-descending"></i>
+                    </Button>
+                  </div>
+                </div>
               </Col>
             </Row>
           )}

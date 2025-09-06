@@ -22,8 +22,6 @@ const CrudV1 = (props) => {
     <React.Fragment>
       <div className="page-content">
         <Container fluid>
-          {/* Render Breadcrumb */}
-          <Breadcrumbs title="CRUD" breadcrumbItem="V2 Facade" />
           
           {/* Render CRUD V2 with Facade Pattern */}
           <UsersCrudFacadeExample />

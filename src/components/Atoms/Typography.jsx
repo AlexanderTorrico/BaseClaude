@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 /**
@@ -128,22 +128,27 @@ const Typography = ({
     lg: 'lh-lg'
   };
 
-  const baseClasses = [
-    variant === 'h1' && 'display-4',
-    variant === 'h2' && 'display-5',
-    variant === 'h3' && 'display-6',
-    size && sizeClasses[size],
-    weight && weightClasses[weight],
-    color && colorClasses[color],
-    align && alignClasses[align],
-    transform && transformClasses[transform],
-    decoration && decorationClasses[decoration],
-    lineHeight && lineHeightClasses[lineHeight],
-    truncate && 'text-truncate',
-    className
-  ].filter(Boolean).join(' ');
+  // Optimizar clases con useMemo
+  const baseClasses = useMemo(() => {
+    const classes = [
+      variant === 'h1' && 'display-4',
+      variant === 'h2' && 'display-5',
+      variant === 'h3' && 'display-6',
+      size && sizeClasses[size],
+      weight && weightClasses[weight],
+      color && colorClasses[color],
+      align && alignClasses[align],
+      transform && transformClasses[transform],
+      decoration && decorationClasses[decoration],
+      lineHeight && lineHeightClasses[lineHeight],
+      truncate && 'text-truncate',
+      className
+    ];
+    return classes.filter(Boolean).join(' ');
+  }, [variant, size, weight, color, align, transform, decoration, lineHeight, truncate, className]);
 
-  const Component = variantTags[variant] || 'p';
+  // Memoizar componente para evitar recreaciones
+  const Component = useMemo(() => variantTags[variant] || 'p', [variant]);
 
   return (
     <Component 
@@ -183,4 +188,16 @@ Typography.propTypes = {
   children: PropTypes.node
 };
 
-export default Typography;
+// Optimizar con React.memo
+const MemoizedTypography = React.memo(Typography, (prevProps, nextProps) => {
+  // Comparación optimizada para Typography
+  const criticalProps = [
+    'variant', 'size', 'weight', 'color', 'align', 'transform',
+    'decoration', 'lineHeight', 'truncate', 'children', 'className'
+  ];
+  
+  return criticalProps.every(prop => prevProps[prop] === nextProps[prop]);
+});
+
+MemoizedTypography.displayName = 'Typography';
+export default MemoizedTypography;

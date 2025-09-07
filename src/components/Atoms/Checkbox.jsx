@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 /**
@@ -41,7 +41,9 @@ const Checkbox = forwardRef(({
   ...props 
 }, ref) => {
   
-  const checkboxId = id || name || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+  // Generar ID único solo una vez usando useRef para mantener estabilidad
+  const stableId = React.useRef(id || name || `checkbox-${Math.random().toString(36).substr(2, 9)}`);
+  const checkboxId = stableId.current;
   
   // Tamaños disponibles: 'xs', 'sm', 'md', 'lg', 'xl'
   // Palabras alternativas: 'tiny', 'small', 'medium', 'large', 'extra-large'
@@ -63,28 +65,34 @@ const Checkbox = forwardRef(({
     info: 'accent-info dark:accent-info-400'
   };
 
-  // Clases base con soporte dark/light mode
-  const baseCheckboxClasses = [
-    'form-check-input',
-    'border-2',
-    'cursor-pointer',
-    'transition-all',
-    'duration-200',
-    sizeClasses[size],
-    variantClasses[variant],
-    disabled ? 'cursor-not-allowed opacity-50' : 'hover:border-opacity-75',
-    error ? 'border-danger dark:border-red-500' : 'border-gray-300 dark:border-gray-600',
-    'dark:bg-gray-800 dark:checked:bg-primary-600',
-    className
-  ].filter(Boolean).join(' ');
+  // Optimizar clases con useMemo
+  const baseCheckboxClasses = useMemo(() => {
+    const classes = [
+      'form-check-input',
+      'border-2',
+      'cursor-pointer',
+      'transition-all',
+      'duration-200',
+      sizeClasses[size],
+      variantClasses[variant],
+      disabled ? 'cursor-not-allowed opacity-50' : 'hover:border-opacity-75',
+      error ? 'border-danger dark:border-red-500' : 'border-gray-300 dark:border-gray-600',
+      'dark:bg-gray-800 dark:checked:bg-primary-600',
+      className
+    ];
+    return classes.filter(Boolean).join(' ');
+  }, [size, variant, disabled, error, className]);
 
-  const labelClasses = [
-    'form-check-label',
-    'cursor-pointer',
-    'select-none',
-    disabled ? 'cursor-not-allowed opacity-50' : '',
-    size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-lg' : 'text-base'
-  ].filter(Boolean).join(' ');
+  const labelClasses = useMemo(() => {
+    const classes = [
+      'form-check-label',
+      'cursor-pointer',
+      'select-none',
+      disabled ? 'cursor-not-allowed opacity-50' : '',
+      size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-lg' : 'text-base'
+    ];
+    return classes.filter(Boolean).join(' ');
+  }, [disabled, size]);
 
   React.useEffect(() => {
     if (ref?.current) {
@@ -164,4 +172,16 @@ Checkbox.propTypes = {
   onChange: PropTypes.func
 };
 
-export default Checkbox;
+// Optimizar con React.memo
+const MemoizedCheckbox = React.memo(Checkbox, (prevProps, nextProps) => {
+  // Comparación optimizada para Checkbox
+  const criticalProps = [
+    'checked', 'indeterminate', 'disabled', 'readOnly', 'size', 'variant',
+    'label', 'error', 'description', 'className', 'onChange'
+  ];
+  
+  return criticalProps.every(prop => prevProps[prop] === nextProps[prop]);
+});
+
+MemoizedCheckbox.displayName = 'Checkbox';
+export default MemoizedCheckbox;

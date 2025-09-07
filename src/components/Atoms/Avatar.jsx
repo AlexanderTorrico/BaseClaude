@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 /**
@@ -93,20 +93,25 @@ const Avatar = ({
     '2xl': { width: '16px', height: '16px' }
   };
 
-  const baseClasses = [
-    'd-inline-flex',
-    'align-items-center', 
-    'justify-content-center',
-    'position-relative',
-    'overflow-hidden',
-    'user-select-none',
-    'flex-shrink-0',
-    shapeClasses[shape],
-    onClick ? 'cursor-pointer' : '',
-    className
-  ].filter(Boolean).join(' ');
+  // Optimizar clases con useMemo
+  const baseClasses = useMemo(() => {
+    const classes = [
+      'd-inline-flex',
+      'align-items-center', 
+      'justify-content-center',
+      'position-relative',
+      'overflow-hidden',
+      'user-select-none',
+      'flex-shrink-0',
+      shapeClasses[shape],
+      onClick ? 'cursor-pointer' : '',
+      className
+    ];
+    return classes.filter(Boolean).join(' ');
+  }, [shape, onClick, className]);
 
-  const getInitials = () => {
+  // Optimizar cálculo de iniciales con useMemo
+  const initials = useMemo(() => {
     if (initial) return initial.toUpperCase();
     if (name) {
       return name
@@ -117,31 +122,35 @@ const Avatar = ({
         .slice(0, 2);
     }
     return '?';
-  };
+  }, [initial, name]);
 
-  const avatarContent = () => {
+  // Optimizar manejo de errores de imagen con useCallback
+  const handleImageError = useCallback((e) => {
+    e.target.style.display = 'none';
+    if (e.target.nextSibling) {
+      e.target.nextSibling.style.display = 'flex';
+    }
+  }, []);
+
+  // Optimizar contenido con useMemo
+  const avatarContent = useMemo(() => {
     if (src) {
       return (
         <img
           src={src}
           alt={alt || name || 'Avatar'}
           className="w-100 h-100 object-fit-cover"
-          onError={(e) => {
-            e.target.style.display = 'none';
-            if (e.target.nextSibling) {
-              e.target.nextSibling.style.display = 'flex';
-            }
-          }}
+          onError={handleImageError}
         />
       );
     }
     
     return (
       <div className={`w-100 h-100 d-flex align-items-center justify-content-center fw-medium ${variantClasses[variant]}`}>
-        {getInitials()}
+        {initials}
       </div>
     );
-  };
+  }, [src, alt, name, variant, initials, handleImageError]);
 
   const statusIndicator = () => {
     if (!showStatus || !status) return null;
@@ -176,13 +185,13 @@ const Avatar = ({
       onKeyDown={onClick ? (e) => e.key === 'Enter' && onClick(e) : undefined}
       {...props}
     >
-      {avatarContent()}
+      {avatarContent}
       {!src && (
         <div 
           className={`w-100 h-100 d-flex align-items-center justify-content-center fw-medium ${variantClasses[variant]}`}
           style={{ display: 'none' }}
         >
-          {getInitials()}
+          {initials}
         </div>
       )}
       {statusIndicator()}
@@ -215,4 +224,16 @@ Avatar.propTypes = {
   onClick: PropTypes.func
 };
 
-export default Avatar;
+// Optimizar con React.memo
+const MemoizedAvatar = React.memo(Avatar, (prevProps, nextProps) => {
+  // Comparación optimizada para Avatar
+  const criticalProps = [
+    'src', 'alt', 'initial', 'name', 'size', 'shape', 'variant',
+    'status', 'showStatus', 'className'
+  ];
+  
+  return criticalProps.every(prop => prevProps[prop] === nextProps[prop]);
+});
+
+MemoizedAvatar.displayName = 'Avatar';
+export default MemoizedAvatar;

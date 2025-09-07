@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 /**
@@ -42,7 +42,10 @@ const Badge = ({
     draft: 'light'
   };
 
-  const effectiveVariant = status ? statusVariants[status] || 'secondary' : variant;
+  // Memoizar variant efectivo
+  const effectiveVariant = useMemo(() => {
+    return status ? statusVariants[status] || 'secondary' : variant;
+  }, [status, variant]);
   
   const baseClasses = 'badge d-inline-flex align-items-center gap-1 fw-medium text-decoration-none';
   
@@ -74,17 +77,18 @@ const Badge = ({
     xl: 'px-4 py-2.5 text-lg'       // Extra grande - para landing pages
   };
   
-  const pillClass = pill ? 'rounded-pill' : 'rounded';
-  const dotClass = dot ? 'p-0 border-2 border-white' : '';
-  
-  const badgeClasses = [
-    baseClasses,
-    variantClasses[effectiveVariant] || variantClasses.primary,
-    sizeClasses[size],
-    pillClass,
-    dotClass,
-    className
-  ].filter(Boolean).join(' ');
+  // Optimizar clases con useMemo
+  const badgeClasses = useMemo(() => {
+    const classes = [
+      baseClasses,
+      variantClasses[effectiveVariant] || variantClasses.primary,
+      sizeClasses[size],
+      pill ? 'rounded-pill' : 'rounded',
+      dot ? 'p-0 border-2 border-white' : '',
+      className
+    ];
+    return classes.filter(Boolean).join(' ');
+  }, [effectiveVariant, size, pill, dot, className]);
 
   const statusIcons = {
     active: '●',
@@ -150,4 +154,15 @@ Badge.propTypes = {
   className: PropTypes.string
 };
 
-export default Badge;
+// Optimizar con React.memo
+const MemoizedBadge = React.memo(Badge, (prevProps, nextProps) => {
+  // Comparación optimizada para Badge
+  const criticalProps = [
+    'variant', 'status', 'size', 'pill', 'dot', 'children', 'className'
+  ];
+  
+  return criticalProps.every(prop => prevProps[prop] === nextProps[prop]);
+});
+
+MemoizedBadge.displayName = 'Badge';
+export default MemoizedBadge;

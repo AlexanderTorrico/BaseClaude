@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 /**
@@ -33,6 +33,7 @@ const Button = ({
   size = 'sm', // Cambiado por defecto a 'sm'
   disabled = false, 
   loading = false,
+  fontWeight = 'light',
   icon,
   iconPosition = 'left',
   fullWidth = false,
@@ -42,8 +43,17 @@ const Button = ({
   type = 'button',
   ...props 
 }) => {
-  // Clases base con soporte automático para dark/light mode
-  const baseClasses = 'btn d-inline-flex align-items-center justify-content-center gap-2 border-0 fw-medium text-decoration-none transition-all duration-200';
+  // Mapeo de pesos de fuente
+  const fontWeightClasses = {
+    normal: 'fw-normal',
+    medium: 'fw-medium', 
+    bold: 'fw-bold',
+    light: 'fw-light',
+    semibold: 'fw-semibold'
+  };
+
+  // Clases base con soporte automático para dark/light mode (sin fontWeight, se maneja en estilos inline)
+  const baseClasses = `btn d-inline-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none transition-all duration-200`;
   
   // Variantes de color con efectos hover mejorados
   const variantClasses = {
@@ -85,57 +95,61 @@ const Button = ({
     }
   };
 
-  // Estilos de hover dinámicos
-  const getHoverStyles = () => ({
-    onMouseEnter: (e) => {
-      if (!disabled && !loading) {
-        e.target.style.transform = 'translateY(-1px)';
-        e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
-        e.target.style.filter = 'brightness(1.1)';
-      }
-    },
-    onMouseLeave: (e) => {
-      if (!disabled && !loading) {
-        e.target.style.transform = 'translateY(0)';
-        e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-        e.target.style.filter = 'brightness(1)';
-      }
-    },
-    onMouseDown: (e) => {
-      if (!disabled && !loading) {
-        e.target.style.transform = 'translateY(0)';
-        e.target.style.boxShadow = '0 1px 2px rgba(0,0,0,0.2)';
-      }
-    },
-    onMouseUp: (e) => {
-      if (!disabled && !loading) {
-        e.target.style.transform = 'translateY(-1px)';
-        e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
-      }
+  // Estilos de hover optimizados con useCallback
+  const handleMouseEnter = useCallback((e) => {
+    if (!disabled && !loading) {
+      e.target.style.transform = 'translateY(-1px)';
+      e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+      e.target.style.filter = 'brightness(1.1)';
     }
-  });
-  
-  const disabledClasses = 'opacity-60 cursor-not-allowed pointer-events-none';
-  const fullWidthClass = fullWidth ? 'w-100' : '';
-  
-  const buttonClasses = [
-    baseClasses,
-    variantClasses[variant] || variantClasses.primary,
-    sizeClasses[size],
-    disabled ? disabledClasses : '',
-    fullWidthClass,
-    className
-  ].filter(Boolean).join(' ');
+  }, [disabled, loading]);
 
-  const renderIcon = () => {
+  const handleMouseLeave = useCallback((e) => {
+    if (!disabled && !loading) {
+      e.target.style.transform = 'translateY(0)';
+      e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+      e.target.style.filter = 'brightness(1)';
+    }
+  }, [disabled, loading]);
+
+  const handleMouseDown = useCallback((e) => {
+    if (!disabled && !loading) {
+      e.target.style.transform = 'translateY(0)';
+      e.target.style.boxShadow = '0 1px 2px rgba(0,0,0,0.2)';
+    }
+  }, [disabled, loading]);
+
+  const handleMouseUp = useCallback((e) => {
+    if (!disabled && !loading) {
+      e.target.style.transform = 'translateY(-1px)';
+      e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+    }
+  }, [disabled, loading]);
+  
+  // Optimizar clases con useMemo
+  const buttonClasses = useMemo(() => {
+    const classes = [
+      baseClasses,
+      variantClasses[variant] || variantClasses.primary,
+      sizeClasses[size],
+      disabled ? 'opacity-60 cursor-not-allowed pointer-events-none' : '',
+      fullWidth ? 'w-100' : '',
+      className
+    ];
+    return classes.filter(Boolean).join(' ');
+  }, [baseClasses, variant, size, disabled, fullWidth, className]);
+
+  // Optimizar renderizado de ícono con useMemo
+  const renderedIcon = useMemo(() => {
     if (!icon) return null;
     
     return React.cloneElement(icon, {
       className: `${icon.props.className || ''} ${size === 'sm' ? 'w-4 h-4' : size === 'lg' ? 'w-6 h-6' : 'w-5 h-5'}`
     });
-  };
+  }, [icon, size]);
 
-  const renderContent = () => {
+  // Optimizar contenido con useMemo
+  const content = useMemo(() => {
     if (loading) {
       return (
         <>
@@ -150,34 +164,43 @@ const Button = ({
     return iconPosition === 'right' ? (
       <>
         <span>{children}</span>
-        {renderIcon()}
+        {renderedIcon}
       </>
     ) : (
       <>
-        {renderIcon()}
+        {renderedIcon}
         <span>{children}</span>
       </>
     );
-  };
+  }, [loading, children, icon, iconPosition, renderedIcon]);
 
-  const hoverHandlers = getHoverStyles();
+  // Optimizar estilos inline con useMemo
+  const buttonStyle = useMemo(() => ({
+    ...(size === 'sm' ? customSizeStyles.sm : {}),
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    fontWeight: (fontWeight === 'light' ? '300' : 
+                fontWeight === 'normal' ? '400' : 
+                fontWeight === 'medium' ? '500' : 
+                fontWeight === 'semibold' ? '600' : 
+                fontWeight === 'bold' ? '700' : '400') + ' !important',
+    ...props.style
+  }), [size, fontWeight, props.style]);
 
   return (
     <button
       className={buttonClasses}
-      style={{
-        ...(size === 'sm' ? customSizeStyles.sm : {}),
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)', // Sombra inicial
-        ...props.style
-      }}
+      style={buttonStyle}
       disabled={disabled || loading}
       onClick={onClick}
       type={type}
       aria-disabled={disabled || loading}
-      {...hoverHandlers}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
       {...props}
     >
-      {renderContent()}
+      {content}
     </button>
   );
 };
@@ -194,6 +217,8 @@ Button.propTypes = {
   disabled: PropTypes.bool,
   /** Si muestra estado de carga con spinner */
   loading: PropTypes.bool,
+  /** Peso de la fuente del texto */
+  fontWeight: PropTypes.oneOf(['normal', 'medium', 'bold', 'light', 'semibold']),
   /** Elemento de ícono React */
   icon: PropTypes.element,
   /** Posición del ícono respecto al texto */
@@ -210,4 +235,16 @@ Button.propTypes = {
   type: PropTypes.oneOf(['button', 'submit', 'reset'])
 };
 
-export default Button;
+// Optimizar con React.memo para evitar re-renders innecesarios
+const MemoizedButton = React.memo(Button, (prevProps, nextProps) => {
+  // Comparación optimizada - solo comparar props que afectan la renderización
+  const criticalProps = [
+    'variant', 'size', 'disabled', 'loading', 'fontWeight',
+    'children', 'icon', 'iconPosition', 'fullWidth', 'className'
+  ];
+  
+  return criticalProps.every(prop => prevProps[prop] === nextProps[prop]);
+});
+
+MemoizedButton.displayName = 'Button';
+export default MemoizedButton;

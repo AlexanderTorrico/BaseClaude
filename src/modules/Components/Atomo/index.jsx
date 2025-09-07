@@ -71,16 +71,16 @@ const Atomo = (props) => {
                     <div className="mb-4 p-3 bg-light rounded">
                       <Typography variant="h6" className="mb-2">⭐ Botones Estándar (size="sm" = 27.46px alto exacto):</Typography>
                       <div className="d-flex flex-wrap gap-2">
-                        <Button onClick={()=> alert("Hola mundo")} variant="primary">Crear Usuario</Button>
-                        <Button variant="primary">
+                        <Button onClick={()=> alert("Hola mundo")} variant="primary" fontWeight="normal">Crear Usuario</Button>
+                        <Button variant="primary" fontWeight="normal">
                           <i className="mdi mdi-pencil me-1"></i>
                           Editar
                         </Button>
-                        <Button variant="danger">
+                        <Button variant="danger" fontWeight="normal">
                           <i className="mdi mdi-delete me-1"></i>
                           Eliminar
                         </Button>
-                        <Button variant="success">
+                        <Button variant="success" fontWeight="normal">
                           <i className="mdi mdi-check me-1"></i>
                           Guardar
                         </Button>
@@ -94,25 +94,25 @@ const Atomo = (props) => {
 
                     {/* Variantes outline */}
                     <div className="d-flex flex-wrap gap-2 mb-3">
-                      <Button variant="outline-primary">Outline Primary</Button>
-                      <Button variant="outline-secondary">Outline Secondary</Button>
-                      <Button variant="outline-danger">Outline Danger</Button>
+                      <Button variant="outline-primary" fontWeight="normal">Outline Primary</Button>
+                      <Button variant="outline-secondary" fontWeight="normal">Outline Secondary</Button>
+                      <Button variant="outline-danger" fontWeight="normal">Outline Danger</Button>
                     </div>
 
                     {/* Tamaños */}
                     <div className="d-flex flex-wrap gap-2 mb-3">
-                      <Button size="xs" variant="primary">Extra Small</Button>
-                      <Button size="sm" variant="primary">Small (Estándar)</Button>
-                      <Button size="md" variant="primary">Medium</Button>
-                      <Button size="lg" variant="primary">Large</Button>
-                      <Button size="xl" variant="primary">Extra Large</Button>
+                      <Button size="xs" variant="primary" fontWeight="normal">Extra Small</Button>
+                      <Button size="sm" variant="primary" fontWeight="normal">Small (Estándar)</Button>
+                      <Button size="md" variant="primary" fontWeight="normal">Medium</Button>
+                      <Button size="lg" variant="primary" fontWeight="normal">Large</Button>
+                      <Button size="xl" variant="primary" fontWeight="normal">Extra Large</Button>
                     </div>
 
                     {/* Estados especiales */}
                     <div className="d-flex flex-wrap gap-2">
-                      <Button disabled variant="primary">Disabled</Button>
-                      <Button loading variant="success">Loading</Button>
-                      <Button fullWidth variant="info">Full Width</Button>
+                      <Button disabled variant="primary" fontWeight="normal">Disabled</Button>
+                      <Button loading variant="success" fontWeight="normal">Loading</Button>
+                      <Button fullWidth variant="info" fontWeight="normal">Full Width</Button>
                     </div>
                   </div>
 

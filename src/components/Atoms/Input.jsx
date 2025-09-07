@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 
 /**
@@ -74,32 +74,26 @@ const Input = forwardRef(({
     readonly: 'bg-light dark:bg-gray-700 dark:text-gray-300'
   };
 
-  const getInputClasses = () => {
-    let classes = [
+  // Optimizar clases de input con useMemo
+  const inputClasses = useMemo(() => {
+    const classes = [
       baseInputClasses,
       sizeClasses[size],
-      variantClasses[variant]
+      variantClasses[variant],
+      error && stateClasses.error,
+      disabled && stateClasses.disabled,
+      readonly && stateClasses.readonly,
+      icon && (iconPosition === 'left' ? 'ps-5' : 'pe-5'),
+      className
     ];
-
-    if (error) {
-      classes.push(stateClasses.error);
-    }
-    if (disabled) {
-      classes.push(stateClasses.disabled);
-    }
-    if (readonly) {
-      classes.push(stateClasses.readonly);
-    }
-    if (icon) {
-      classes.push(iconPosition === 'left' ? 'ps-5' : 'pe-5');
-    }
-    
-    classes.push(className);
     
     return classes.filter(Boolean).join(' ');
-  };
+  }, [size, variant, error, disabled, readonly, icon, iconPosition, className]);
 
-  const inputId = id || name || `input-${Math.random().toString(36).substr(2, 9)}`;
+  // Generar ID único solo una vez
+  const [inputId] = React.useState(() => {
+    return id || name || `input-${Math.random().toString(36).substr(2, 9)}`;
+  });
 
   return (
     <div className="mb-3">
@@ -124,7 +118,7 @@ const Input = forwardRef(({
           type={type}
           id={inputId}
           name={name}
-          className={getInputClasses()}
+          className={inputClasses}
           placeholder={placeholder}
           value={value}
           defaultValue={defaultValue}
@@ -208,4 +202,16 @@ Input.propTypes = {
   onBlur: PropTypes.func
 };
 
-export default Input;
+// Optimizar con React.memo
+const MemoizedInput = React.memo(Input, (prevProps, nextProps) => {
+  // Comparación optimizada para Input
+  const criticalProps = [
+    'type', 'value', 'defaultValue', 'placeholder', 'disabled', 'readonly',
+    'error', 'size', 'variant', 'className', 'onChange'
+  ];
+  
+  return criticalProps.every(prop => prevProps[prop] === nextProps[prop]);
+});
+
+MemoizedInput.displayName = 'Input';
+export default MemoizedInput;

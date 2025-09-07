@@ -20,7 +20,12 @@ import {
   Badge, 
   Avatar, 
   Typography, 
-  Icon 
+  Icon,
+  // Typography shortcuts para escritura rápida
+  H1, H2, H3, H4, H5, H6,
+  P, Small, Strong,
+  Title, Subtitle, Lead, Caption,
+  TextPrimary, TextSuccess, TextDanger, TextMuted
 } from "../../components/Atoms";
 
 //Import Icon Examples
@@ -49,6 +54,9 @@ const Atomo = (props) => {
                   <Typography variant="h4" weight="bold">
                     Sistema de Átomos - Atomic Design
                   </Typography>
+                  <H4 weight="bold">
+                    Sistema de Átomos - Atomic Design
+                  </H4>
                   <Typography variant="p" color="muted">
                     Componentes base reutilizables para el sistema de gestión de usuarios
                   </Typography>
@@ -294,37 +302,74 @@ const Atomo = (props) => {
 
                   {/* Typography Section */}
                   <div className="mb-5">
-                    <Typography variant="h5" className="mb-3">📝 Typography</Typography>
-                    <div className="mb-4">
-                      <Typography variant="h1">Heading 1</Typography>
-                      <Typography variant="h2">Heading 2</Typography>
-                      <Typography variant="h3">Heading 3</Typography>
-                      <Typography variant="h4">Heading 4</Typography>
-                      <Typography variant="h5">Heading 5</Typography>
-                      <Typography variant="h6">Heading 6</Typography>
+                    <Typography variant="h5" className="mb-3">📝 Typography - Dos enfoques</Typography>
+                    
+                    {/* Enfoque tradicional */}
+                    <div className="mb-4 p-3 bg-light rounded">
+                      <Typography variant="h6" className="mb-2">🔧 Enfoque Completo (Typography):</Typography>
+                      <div className="mb-3">
+                        <Typography variant="h1">Heading 1 (completo)</Typography>
+                        <Typography variant="h2" color="primary" weight="bold">Heading 2 personalizado</Typography>
+                        <Typography variant="p" size="lg" color="muted" truncate className="w-75">
+                          Párrafo con múltiples props: tamaño grande, color silenciado y truncado
+                        </Typography>
+                      </div>
+                      <Small color="muted">💡 Mejor para casos complejos con múltiples props</Small>
                     </div>
-                    <div className="mb-4">
-                      <Typography variant="p">
-                        Este es un párrafo normal con texto de ejemplo para mostrar cómo se ve el componente Typography.
-                      </Typography>
-                      <Typography variant="p" size="lg" weight="bold">
-                        Párrafo grande y en negrita
-                      </Typography>
-                      <Typography variant="small" color="muted">
-                        Texto pequeño y silenciado
-                      </Typography>
+
+                    {/* Enfoque de shortcuts */}
+                    <div className="mb-4 p-3 bg-primary bg-opacity-10 rounded">
+                      <Typography variant="h6" className="mb-2">⚡ Enfoque Rápido (Shortcuts):</Typography>
+                      <div className="mb-3">
+                        <H1>Heading 1 (rápido)</H1>
+                        <H2 color="primary">Heading 2 rápido</H2>
+                        <Title>Título predefinido</Title>
+                        <Subtitle>Subtítulo predefinido</Subtitle>
+                        <P>Párrafo normal rápido</P>
+                        <Lead>Texto destacado (Lead)</Lead>
+                        <Caption>Texto de caption</Caption>
+                      </div>
+                      <Small color="muted">💡 Mejor para escritura rápida y casos comunes</Small>
                     </div>
-                    <div className="mb-4">
-                      <Typography variant="p" color="primary">Texto primario</Typography>
-                      <Typography variant="p" color="success">Texto de éxito</Typography>
-                      <Typography variant="p" color="danger">Texto de peligro</Typography>
-                      <Typography variant="p" color="warning">Texto de advertencia</Typography>
+
+                    {/* Comparación de código */}
+                    <div className="mb-4 p-3 bg-warning bg-opacity-10 rounded">
+                      <Typography variant="h6" className="mb-2">📊 Comparación de código:</Typography>
+                      <div className="row">
+                        <div className="col-md-6">
+                          <Small color="muted" className="d-block mb-2">Enfoque completo:</Small>
+                          <Typography variant="code" className="d-block bg-white p-2 rounded">
+                            {"<Typography variant=\"h2\" color=\"primary\">"}
+                          </Typography>
+                        </div>
+                        <div className="col-md-6">
+                          <Small color="muted" className="d-block mb-2">Enfoque rápido:</Small>
+                          <Typography variant="code" className="d-block bg-white p-2 rounded">
+                            {"<H2 color=\"primary\">"}
+                          </Typography>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Shortcuts de colores */}
+                    <div className="mb-4">
+                      <Typography variant="h6" className="mb-2">🎨 Shortcuts de colores:</Typography>
+                      <div className="mb-3">
+                        <TextPrimary>Texto primario (shortcut)</TextPrimary>
+                        <TextSuccess>Texto de éxito (shortcut)</TextSuccess>
+                        <TextDanger>Texto de peligro (shortcut)</TextDanger>
+                        <TextMuted>Texto silenciado (shortcut)</TextMuted>
+                      </div>
+                    </div>
+
+                    {/* Casos de uso tradicional */}
                     <div>
-                      <Typography variant="p" transform="uppercase">Texto en mayúsculas</Typography>
-                      <Typography variant="p" decoration="underline">Texto subrayado</Typography>
+                      <Typography variant="h6" className="mb-2">🔧 Casos complejos (usar Typography completo):</Typography>
+                      <Typography variant="p" transform="uppercase" decoration="underline" weight="bold">
+                        Texto en mayúsculas, subrayado y negrita
+                      </Typography>
                       <Typography variant="p" truncate className="w-50">
-                        Este es un texto muy largo que se truncará cuando llegue al límite del contenedor
+                        Este texto se truncará con puntos suspensivos cuando sea muy largo
                       </Typography>
                     </div>
                   </div>

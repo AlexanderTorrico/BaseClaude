@@ -183,6 +183,23 @@ const SidebarContent = (props) => {
               </ul>
             </li>
 
+            <li className="menu-title">Az Component</li>
+            <li>
+              <Link to="/#" className="has-arrow">
+                <i className="bx bx-home-circle"></i>
+                <span>Tutoria</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/crud_v2">CRUD V2</Link>
+                </li>
+                <li>
+                  <Link to="/atomo">Atomo</Link>
+                </li>
+
+              </ul>
+            </li>
+
             <li className="menu-title">{props.t("Apps")}</li>
 
             <li>

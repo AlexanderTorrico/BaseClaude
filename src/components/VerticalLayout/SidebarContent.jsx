@@ -188,24 +188,23 @@ const SidebarContent = (props) => {
                 <li>
                   <Link to="/crud_v2">CRUD V2</Link>
                 </li>
-                <li>
-                  <Link to="/atomo">Atomo</Link>
-                </li>
+                
               
               </ul>
             </li>
 
-            <li className="menu-title">{props.t("Apps")}</li>
-
             <li>
-              <Link to="#" className=" ">
+              <Link to="/atomo" className=" ">
                 <i className="bx bx-calendar"></i>
-                <span>{props.t("Calendar")}</span>
+                <span>Atomos</span>
               </Link>
             </li>
-       
+
+
+
 
             <li className="menu-title">{props.t("Components")}</li>
+
 
             <li>
               <Link to="/#" className="">

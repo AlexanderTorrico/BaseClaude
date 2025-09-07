@@ -13,6 +13,7 @@ import CrudBasic from "../pages/CrudBasic/index";
 import CrudModern from "../pages/CrudModern/index";
 import CrudV1 from "../pages/CrudV1/index";
 import CrudV2 from "../pages/CrudV2/index";
+import Atomo from "../pages/Atomo/index";
 
 import User from "../pages/security/user/index";
 
@@ -22,6 +23,7 @@ const authProtectedRoutes = [
   { path: "/crud_modern", component: <CrudModern /> },
   { path: "/crud_v1", component: <CrudV1 /> },
   { path: "/crud_v2", component: <CrudV2 /> },
+  { path: "/atomo", component: <Atomo /> },
 
   //Security
   { path: "/security-user", component: <User /> },

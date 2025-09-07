@@ -161,6 +161,7 @@ const CrudFacade = ({
   return (
     <React.Fragment>
       <ConfigurableHeader
+        entity={entity}
         title={title}
         description={description}
         viewMode={viewMode}

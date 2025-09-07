@@ -176,6 +176,9 @@ const SidebarContent = (props) => {
                 <li>
                   <Link to="/crud_v2">CRUD V2</Link>
                 </li>
+                <li>
+                  <Link to="/atomo">Atomo</Link>
+                </li>
 
               </ul>
             </li>

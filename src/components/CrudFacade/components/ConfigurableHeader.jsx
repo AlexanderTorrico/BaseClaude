@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import FilterInfoPanel from "../../CrudComponents/FilterInfoPanel";
 import CustomSelect from "../../CrudComponents/CustomSelect";
 import { opcionesOrdenamiento } from "../../../pages/CrudV2/config/userConstants.js";
+import { opcionesOrdenamientoAtomo } from "../../../pages/Atomo/config/atomoConstants.js";
 
 const ConfigurableHeader = ({
   title,
@@ -32,8 +33,13 @@ const ConfigurableHeader = ({
   clearCardFilters,
   getActiveCardFilters,
   // Nueva prop para detectar vistas disponibles
-  availableViews
+  availableViews,
+  // Nueva prop para opciones de ordenamiento
+  entity = "usuarios"
 }) => {
+  
+  // Determinar opciones de ordenamiento según la entidad
+  const sortingOptions = entity === "atomos" ? opcionesOrdenamientoAtomo : opcionesOrdenamiento;
   const renderDefaultActions = () => (
     <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
       <Button color="primary" onClick={onAddItem} size="sm">
@@ -134,7 +140,7 @@ const ConfigurableHeader = ({
                     <CustomSelect
                       value={cardSorting.field}
                       onChange={handleCardSortFieldChange}
-                      options={opcionesOrdenamiento}
+                      options={sortingOptions}
                       placeholder="Ordenar"
                       size="sm"
                       className="text-truncate"
@@ -237,6 +243,7 @@ const ConfigurableHeader = ({
 };
 
 ConfigurableHeader.propTypes = {
+  entity: PropTypes.string,
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
   viewMode: PropTypes.string.isRequired,

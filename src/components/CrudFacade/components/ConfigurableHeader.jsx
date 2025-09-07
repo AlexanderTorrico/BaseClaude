@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import FilterInfoPanel from "../../CrudComponents/FilterInfoPanel";
 import CustomSelect from "../../CrudComponents/CustomSelect";
 import { opcionesOrdenamiento } from "../../../pages/CrudV2/config/userConstants.js";
-import { opcionesOrdenamientoAtomo } from "../../../pages/Atomo/config/atomoConstants.js";
+import { opcionesOrdenamientoAtomo } from "../../../modules/Components/Atomo/config/atomoConstants.js";
 
 const ConfigurableHeader = ({
   title,

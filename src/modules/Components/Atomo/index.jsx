@@ -10,7 +10,7 @@ import {
 } from "reactstrap";
 
 //Import Breadcrumb
-import Breadcrumbs from "../../components/Common/Breadcrumb";
+import Breadcrumbs from "../../../components/Common/Breadcrumb";
 
 //Import Atoms
 import { 
@@ -26,10 +26,10 @@ import {
   P, Small, Strong,
   Title, Subtitle, Lead, Caption,
   TextPrimary, TextSuccess, TextDanger, TextMuted
-} from "../../components/Atoms";
+} from "../../../components/Atoms";
 
 //Import Icon Examples
-import IconExamples, { getSimplifiedName, TextIcon } from "../../components/Atoms/IconExample";
+import IconExamples, { getSimplifiedName, TextIcon } from "../../../components/Atoms/IconExample";
 
 //i18n
 import { withTranslation } from "react-i18next";
@@ -152,6 +152,7 @@ const Atomo = (props) => {
                           label="Campo con error"
                           error="Este campo es requerido"
                           value="Valor inválido"
+                          readonly
                         />
                       </Col>
                       <Col md={6}>
@@ -159,6 +160,7 @@ const Atomo = (props) => {
                           label="Campo deshabilitado"
                           value="Campo deshabilitado"
                           disabled
+                          readonly
                           helperText="Este campo no se puede editar"
                         />
                       </Col>
@@ -181,6 +183,7 @@ const Atomo = (props) => {
                           label="Checkbox deshabilitado"
                           disabled
                           checked={true}
+                          readOnly
                         />
                       </Col>
                       <Col md={3}>
@@ -188,6 +191,7 @@ const Atomo = (props) => {
                           label="Con error"
                           error="Debes aceptar los términos"
                           variant="danger"
+                          readOnly
                         />
                       </Col>
                       <Col md={3}>
@@ -195,15 +199,16 @@ const Atomo = (props) => {
                           label="Con descripción"
                           description="Texto de ayuda adicional"
                           variant="success"
+                          readOnly
                         />
                       </Col>
                     </Row>
                     <div className="mt-3">
                       <Typography variant="h6" className="mb-2">Tamaños:</Typography>
                       <div className="d-flex gap-3">
-                        <Checkbox label="Pequeño" size="sm" />
-                        <Checkbox label="Mediano" size="md" />
-                        <Checkbox label="Grande" size="lg" />
+                        <Checkbox label="Pequeño" size="sm" readOnly />
+                        <Checkbox label="Mediano" size="md" readOnly />
+                        <Checkbox label="Grande" size="lg" readOnly />
                       </div>
                     </div>
                   </div>
@@ -241,7 +246,7 @@ const Atomo = (props) => {
                         <Badge pill>Píldora</Badge>
                         <Badge dot status="active" />
                         <Badge dot status="inactive" />
-                        <Badge dot status="danger" />
+                        <Badge dot status="suspended" />
                       </div>
                     </div>
                   </div>

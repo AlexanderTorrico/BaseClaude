@@ -13,7 +13,7 @@ import CrudBasic from "../pages/CrudBasic/index";
 import CrudModern from "../pages/CrudModern/index";
 import CrudV1 from "../pages/CrudV1/index";
 import CrudV2 from "../pages/CrudV2/index";
-import Atomo from "../pages/Atomo/index";
+import Atomo from "../modules/Components/Atomo/index";
 
 import User from "../pages/security/user/index";
 

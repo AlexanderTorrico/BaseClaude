@@ -128,7 +128,9 @@ const Avatar = ({
           className="w-100 h-100 object-fit-cover"
           onError={(e) => {
             e.target.style.display = 'none';
-            e.target.nextSibling.style.display = 'flex';
+            if (e.target.nextSibling) {
+              e.target.nextSibling.style.display = 'flex';
+            }
           }}
         />
       );

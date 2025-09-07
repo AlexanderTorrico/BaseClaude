@@ -28,6 +28,7 @@ const Checkbox = forwardRef(({
   checked = false,
   indeterminate = false,
   disabled = false,
+  readOnly = false,
   size = 'md',
   variant = 'primary',
   description,
@@ -102,6 +103,7 @@ const Checkbox = forwardRef(({
         className={baseCheckboxClasses}
         checked={checked}
         disabled={disabled}
+        readOnly={readOnly}
         onChange={onChange}
         aria-invalid={error ? 'true' : 'false'}
         aria-describedby={error ? `${checkboxId}-error` : description ? `${checkboxId}-desc` : undefined}
@@ -140,6 +142,8 @@ Checkbox.propTypes = {
   indeterminate: PropTypes.bool,
   /** Si el checkbox está deshabilitado */
   disabled: PropTypes.bool,
+  /** Si el checkbox es de solo lectura */
+  readOnly: PropTypes.bool,
   /** Tamaño del checkbox: xs=muy pequeño, sm=pequeño, md=mediano(defecto), lg=grande, xl=muy grande */
   size: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl']),
   /** Variante de color del checkbox */

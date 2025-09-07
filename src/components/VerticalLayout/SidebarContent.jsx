@@ -167,6 +167,18 @@ const SidebarContent = (props) => {
                 <li>
                   <Link to="/crud_basic">Crud Basic</Link>
                 </li>
+                
+
+              </ul>
+            </li>
+            <li className="menu-title">Az Component</li>
+
+            <li>
+              <Link to="/#" className="has-arrow ">
+                <i className="bx bx-user-circle"></i>
+                <span>Tutoria</span>
+              </Link>
+              <ul className="sub-menu">
                 <li>
                   <Link to="/crud_modern">Crud Moderno</Link>
                 </li>
@@ -179,24 +191,7 @@ const SidebarContent = (props) => {
                 <li>
                   <Link to="/atomo">Atomo</Link>
                 </li>
-
-              </ul>
-            </li>
-
-            <li className="menu-title">Az Component</li>
-            <li>
-              <Link to="/#" className="has-arrow">
-                <i className="bx bx-home-circle"></i>
-                <span>Tutoria</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/crud_v2">CRUD V2</Link>
-                </li>
-                <li>
-                  <Link to="/atomo">Atomo</Link>
-                </li>
-
+              
               </ul>
             </li>
 
@@ -224,38 +219,7 @@ const SidebarContent = (props) => {
               
               </ul>
             </li>
-            <li>
-              <Link to="/#" className="has-arrow ">
-                <i className="bx bx-file"></i>
-                <span>{props.t("Utility")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="#">{props.t("Starter Page")}</Link>
-                </li>
-                <li>
-                  <Link to="#">{props.t("Maintenance")}</Link>
-                </li>
-                <li>
-                  <Link to="#">{props.t("Coming Soon")}</Link>
-                </li>
-                <li>
-                  <Link to="#">{props.t("Timeline")}</Link>
-                </li>
-                <li>
-                  <Link to="#">{props.t("FAQs")}</Link>
-                </li>
-                <li>
-                  <Link to="#">{props.t("Pricing")}</Link>
-                </li>
-                <li>
-                  <Link to="#">{props.t("Error 404")}</Link>
-                </li>
-                <li>
-                  <Link to="#">{props.t("Error 500")}</Link>
-                </li>
-              </ul>
-            </li>
+       
 
             <li className="menu-title">{props.t("Components")}</li>
 

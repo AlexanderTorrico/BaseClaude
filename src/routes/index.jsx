@@ -16,6 +16,8 @@ import CrudV2 from "../pages/CrudV2/index";
 import Atomo from "../modules/Components/Atomo/index";
 
 import User from "../pages/security/user/index";
+import HeaderViewType from "../modules/Components/Molecules/HeaderViewType/index";
+
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
@@ -25,6 +27,9 @@ const authProtectedRoutes = [
   { path: "/crud_v2", component: <CrudV2 /> },
   { path: "/atomo", component: <Atomo /> },
 
+
+  // Molecules
+  { path: "/header_view_type", component: <HeaderViewType /> },
   //Security
   { path: "/security-user", component: <User /> },
 

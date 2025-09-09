@@ -188,7 +188,6 @@ const SidebarContent = (props) => {
                 <li>
                   <Link to="/crud_v2">CRUD V2</Link>
                 </li>
-                
               
               </ul>
             </li>
@@ -198,6 +197,21 @@ const SidebarContent = (props) => {
                 <i className="bx bx-calendar"></i>
                 <span>Atomos</span>
               </Link>
+            </li>
+
+
+            <li>
+              <Link to="/#" className="has-arrow ">
+                <i className="bx bx-user-circle"></i>
+                <span>Moleculas</span>
+              </Link>
+              <ul className="sub-menu">
+                <li>
+                  <Link to="/header_view_type">Headers</Link>
+                </li>
+                
+              
+              </ul>
             </li>
 
 

@@ -224,10 +224,10 @@ const HeaderViewTypePage = () => {
             }
           />
 
-          <H4 className="mb-3 mt-5 text-warning">HeaderViewCard (Integrado con Contenido)</H4>
+          <H4 className="mb-3 mt-5 text-warning">HeaderCardViewResponsive (Integrado con Contenido)</H4>
 
-          {/* Ejemplo 7: HeaderViewCard con configuración responsiva */}
-          <HeaderViewCard
+          {/* Ejemplo 7: HeaderCardViewResponsive con configuración responsiva */}
+          <HeaderCardViewResponsive
             title="Sistema Responsivo Completo"
             description="Header con contenido que cambia automáticamente según el tamaño de pantalla"
             badge={{ count: 25, total: 100 }}
@@ -516,8 +516,8 @@ const HeaderViewTypePage = () => {
 />`}</code></pre>
               </div>
               <div className="col-lg-4">
-                <h6 className="text-warning">HeaderViewCard (Responsivo)</h6>
-                <pre className="small"><code>{`<HeaderViewCard
+                <h6 className="text-warning">HeaderCardViewResponsive</h6>
+                <pre className="small"><code>{`<HeaderCardViewResponsive
   title="Dashboard"
   badge={{count: 25, total: 100}}
   views={['table', 'cards', 'grid']}
@@ -771,7 +771,7 @@ const useResponsiveView = (views = ["table", "cards", "table"], breakpoints = { 
 };
 
 /**
- * HeaderViewCard con configuración responsiva inteligente
+ * HeaderCardViewResponsive con configuración responsiva inteligente
  * Componente completo que incluye header y contenido que cambia automáticamente según el tamaño de pantalla
  * 
  * @param {string} title - Título principal del header
@@ -789,7 +789,7 @@ const useResponsiveView = (views = ["table", "cards", "table"], breakpoints = { 
  * @param {string} [contentClassName] - Clases CSS adicionales para el área de contenido
  * @param {boolean} [enableTransitions=true] - Habilita transiciones suaves entre vistas
  */
-const HeaderViewCard = React.memo(({
+const HeaderCardViewResponsive = React.memo(({
   title,
   description,
   badge,
@@ -872,7 +872,7 @@ const HeaderViewCard = React.memo(({
   );
 });
 
-HeaderViewCard.propTypes = {
+HeaderCardViewResponsive.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
   badge: PropTypes.oneOfType([
@@ -902,5 +902,5 @@ HeaderViewCard.propTypes = {
 };
 
 // Exportar todos los componentes
-export { HeaderCard, HeaderCardViews, HeaderViewCard };
+export { HeaderCard, HeaderCardViews, HeaderCardViewResponsive };
 export default withTranslation()(HeaderViewTypePage);

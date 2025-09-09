@@ -245,16 +245,10 @@ const HeaderViewTypePage = (props) => {
             breakpoints={{ mobile: 768, tablet: 1024, desktop: 1200 }}
             enableTransitions={true}
             content={
-              <>
-                <Button color="primary" size="sm">
-                  <i className="mdi mdi-plus me-1"></i>
-                  Nuevo
-                </Button>
-                <Button color="success" outline size="sm">
-                  <i className="mdi mdi-resize"></i>
-                  Responsivo
-                </Button>
-              </>
+              <Button color="primary" size="sm">
+                <i className="mdi mdi-plus me-1"></i>
+                Nuevo
+              </Button>
             }
             contentBottomLeft={
               <InputGroup size="sm">
@@ -666,20 +660,6 @@ const HeaderCardViews = ({
             >
               <i className={`mdi ${config.icon}`}></i>
               <span className="d-none d-lg-inline ms-1">{config.label}</span>
-              
-              {/* Indicador de vista responsiva */}
-              {responsiveMode && isResponsiveMatch && !isManualOverride && (
-                <i className="mdi mdi-auto-fix ms-1 text-success" 
-                   title="Vista automática por tamaño de pantalla"
-                   style={{ fontSize: '0.75rem' }}></i>
-              )}
-              
-              {/* Indicador de override manual */}
-              {responsiveMode && isActive && isManualOverride && !isResponsiveMatch && (
-                <i className="mdi mdi-hand-pointing-up ms-1 text-warning" 
-                   title="Vista seleccionada manualmente"
-                   style={{ fontSize: '0.75rem' }}></i>
-              )}
             </Button>
           );
         })}

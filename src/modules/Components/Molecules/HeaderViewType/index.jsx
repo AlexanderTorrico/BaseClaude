@@ -5,8 +5,8 @@ import { Container, Button, InputGroup, InputGroupText, Input } from "reactstrap
 import { Row, Col, Card, CardBody } from "reactstrap";
 import { H4, P, Badge } from "../../../../components/Atoms";
 
-// Componente genérico HeaderCard
-const HeaderCard = ({
+// Componente genérico HeaderCard optimizado
+const HeaderCard = React.memo(({
   title,
   description,
   showBadge = false,
@@ -19,12 +19,7 @@ const HeaderCard = ({
   bottomLeftSlot,
   bottomRightSlot,
   className = "",
-  cardClassName = "",
-  breakpoints = {
-    mobile: 768,
-    tablet: 1024,
-    desktop: 1200
-  }
+  cardClassName = ""
 }) => {
   return (
     <Card className={`border-0 shadow-sm mb-4 ${cardClassName}`}>
@@ -75,7 +70,7 @@ const HeaderCard = ({
       </CardBody>
     </Card>
   );
-};
+});
 
 HeaderCard.propTypes = {
   title: PropTypes.string.isRequired,
@@ -90,16 +85,11 @@ HeaderCard.propTypes = {
   bottomLeftSlot: PropTypes.node,
   bottomRightSlot: PropTypes.node,
   className: PropTypes.string,
-  cardClassName: PropTypes.string,
-  breakpoints: PropTypes.shape({
-    mobile: PropTypes.number,
-    tablet: PropTypes.number,
-    desktop: PropTypes.number
-  })
+  cardClassName: PropTypes.string
 };
 
 // Componente de demostración que se renderiza en la página
-const HeaderViewTypePage = (props) => {
+const HeaderViewTypePage = () => {
   //meta title
   document.title = "HeaderCard & HeaderCardViews | Moléculas - Skote React";
 
@@ -582,9 +572,7 @@ const HeaderViewTypePage = (props) => {
   );
 };
 
-HeaderViewTypePage.propTypes = {
-  t: PropTypes.any,
-};
+HeaderViewTypePage.propTypes = {};
 
 /**
  * HeaderCardViews optimizado con soporte responsivo
@@ -603,7 +591,14 @@ HeaderViewTypePage.propTypes = {
  * @param {boolean} [hideViewButtons=false] - Oculta los botones de cambio de vista
  * @param {boolean} [responsiveMode=false] - Indica si está en modo responsivo (solo lectura)
  */
-const HeaderCardViews = ({
+// Configuración estática de vistas (fuera del componente para evitar re-creación)
+const VIEWS_CONFIG = {
+  table: { icon: "mdi-monitor", label: "Web", title: "Vista Tabla" },
+  cards: { icon: "mdi-cellphone", label: "Móvil", title: "Vista Cards" },
+  grid: { icon: "mdi-view-grid", label: "Grid", title: "Vista Grid" }
+};
+
+const HeaderCardViews = React.memo(({
   title,
   description,
   // Badge simplificado
@@ -624,12 +619,6 @@ const HeaderCardViews = ({
   // Estilos opcionales
   className
 }) => {
-  // Mapear views a configuración interna
-  const viewsConfig = {
-    table: { icon: "mdi-monitor", label: "Web", title: "Vista Tabla" },
-    cards: { icon: "mdi-cellphone", label: "Móvil", title: "Vista Cards" },
-    grid: { icon: "mdi-view-grid", label: "Grid", title: "Vista Grid" }
-  };
 
   const renderViewButtons = () => {
     // Ocultar botones si está configurado o si hay menos de 2 vistas
@@ -638,7 +627,7 @@ const HeaderCardViews = ({
     return (
       <div className="btn-group d-none d-md-flex me-2" role="group">
         {views.map((view) => {
-          const config = viewsConfig[view];
+          const config = VIEWS_CONFIG[view];
           if (!config) return null;
           
           const isActive = currentView === view;
@@ -667,11 +656,14 @@ const HeaderCardViews = ({
     );
   };
 
-  // Determinar badge props
-  const badgeProps = badge ? {
-    showBadge: true,
-    ...(typeof badge === 'string' ? { badgeText: badge } : badge)
-  } : {};
+  // Determinar badge props (memoizado para rendimiento)
+  const badgeProps = React.useMemo(() => {
+    if (!badge) return {};
+    return {
+      showBadge: true,
+      ...(typeof badge === 'string' ? { badgeText: badge } : badge)
+    };
+  }, [badge]);
 
   return (
     <HeaderCard
@@ -690,7 +682,7 @@ const HeaderCardViews = ({
       className={className}
     />
   );
-};
+});
 
 HeaderCardViews.propTypes = {
   title: PropTypes.string.isRequired,
@@ -773,8 +765,6 @@ const useResponsiveView = (views = ["table", "cards", "table"], breakpoints = { 
     currentView,
     responsiveView: getResponsiveView(),
     isMobile: currentBreakpoint === 'mobile',
-    currentBreakpoint,
-    windowWidth,
     isManualOverride: !!manualView,
     setManualView
   };
@@ -799,7 +789,7 @@ const useResponsiveView = (views = ["table", "cards", "table"], breakpoints = { 
  * @param {string} [contentClassName] - Clases CSS adicionales para el área de contenido
  * @param {boolean} [enableTransitions=true] - Habilita transiciones suaves entre vistas
  */
-const HeaderViewCard = ({
+const HeaderViewCard = React.memo(({
   title,
   description,
   badge,
@@ -825,7 +815,7 @@ const HeaderViewCard = ({
     setManualView(view);
   }, [setManualView]);
 
-  const renderContent = () => {
+  const renderContent = React.useCallback(() => {
     const viewContent = {
       table: tableView,
       cards: cardsView,
@@ -847,7 +837,7 @@ const HeaderViewCard = ({
     }
 
     return selectedContent;
-  };
+  }, [currentView, tableView, cardsView, gridView]);
 
   return (
     <React.Fragment>
@@ -880,7 +870,7 @@ const HeaderViewCard = ({
       </div>
     </React.Fragment>
   );
-};
+});
 
 HeaderViewCard.propTypes = {
   title: PropTypes.string.isRequired,

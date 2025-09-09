@@ -15,7 +15,7 @@ const HeaderCard = ({
   badgeColor = "info",
   badgeText,
   showBottomRow = false,
-  topRightSlot,
+  content,
   bottomLeftSlot,
   bottomRightSlot,
   className = "",
@@ -52,8 +52,10 @@ const HeaderCard = ({
               </P>
             )}
           </Col>
-          <Col lg={6} md={12} className="d-flex justify-content-lg-end justify-content-center">
-            {topRightSlot}
+          <Col lg={6} md={12}>
+            <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
+              {content}
+            </div>
           </Col>
         </Row>
 
@@ -84,7 +86,7 @@ HeaderCard.propTypes = {
   badgeColor: PropTypes.string,
   badgeText: PropTypes.string,
   showBottomRow: PropTypes.bool,
-  topRightSlot: PropTypes.node,
+  content: PropTypes.node,
   bottomLeftSlot: PropTypes.node,
   bottomRightSlot: PropTypes.node,
   className: PropTypes.string,
@@ -137,7 +139,7 @@ const HeaderViewTypePage = (props) => {
             showBadge={true}
             badgeText="🔥 Activo"
             badgeColor="warning"
-            topRightSlot={
+            content={
               <div className="d-flex flex-wrap gap-2">
                 <Button color="primary" size="sm">
                   <i className="mdi mdi-plus me-1"></i>
@@ -160,7 +162,7 @@ const HeaderViewTypePage = (props) => {
             badge={{ count: 156, total: 500 }}
             currentView={view1}
             onViewChange={setView1}
-            contentTopRight={
+            content={
               <Button color="primary" size="sm">
                 <i className="mdi mdi-plus me-1"></i>
                 Nuevo Usuario
@@ -176,7 +178,7 @@ const HeaderViewTypePage = (props) => {
             currentView={view2}
             onViewChange={setView2}
             views={['table', 'cards', 'grid']}
-            contentTopRight={
+            content={
               <>
                 <Button color="primary" size="sm">
                   <i className="mdi mdi-plus me-1"></i>
@@ -196,7 +198,7 @@ const HeaderViewTypePage = (props) => {
             badge={{ count: 89, total: 200 }}
             currentView={view3}
             onViewChange={setView3}
-            contentTopRight={
+            content={
               <>
                 <Button color="primary" size="sm">
                   <i className="mdi mdi-refresh me-1"></i>
@@ -234,17 +236,23 @@ const HeaderViewTypePage = (props) => {
 
           <H4 className="mb-3 mt-5 text-warning">HeaderViewCard (Integrado con Contenido)</H4>
 
-          {/* Ejemplo 7: HeaderViewCard optimizado */}
+          {/* Ejemplo 7: HeaderViewCard con configuración responsiva */}
           <HeaderViewCard
-            title="Sistema de Gestión Completo"
-            description="Ejemplo con header y contenido que cambia según la vista"
+            title="Sistema Responsivo Completo"
+            description="Header con contenido que cambia automáticamente según el tamaño de pantalla"
             badge={{ count: 25, total: 100 }}
-            views={['table', 'cards', 'grid']}
-            contentTopRight={
+            views={['table', 'cards', 'grid']} // [desktop, tablet, mobile]
+            breakpoints={{ mobile: 768, tablet: 1024, desktop: 1200 }}
+            enableTransitions={true}
+            content={
               <>
                 <Button color="primary" size="sm">
                   <i className="mdi mdi-plus me-1"></i>
                   Nuevo
+                </Button>
+                <Button color="success" outline size="sm">
+                  <i className="mdi mdi-resize"></i>
+                  Responsivo
                 </Button>
               </>
             }
@@ -507,7 +515,7 @@ const HeaderViewTypePage = (props) => {
                 <pre className="small"><code>{`<HeaderCard
   title="Mi Título"
   description="Descripción"
-  topRightSlot={<Button>Acción</Button>}
+  content={<Button>Acción</Button>}
 />`}</code></pre>
               </div>
               <div className="col-lg-4">
@@ -518,21 +526,23 @@ const HeaderViewTypePage = (props) => {
   currentView={view}
   onViewChange={setView}
   views={['table', 'cards']}
-  contentTopRight={<Button>Nuevo</Button>}
+  content={<Button>Nuevo</Button>}
   contentBottomLeft={<Input />}
   contentBottomRight={<Button>Filtros</Button>}
 />`}</code></pre>
               </div>
               <div className="col-lg-4">
-                <h6 className="text-warning">HeaderViewCard (Completo)</h6>
+                <h6 className="text-warning">HeaderViewCard (Responsivo)</h6>
                 <pre className="small"><code>{`<HeaderViewCard
   title="Dashboard"
   badge={{count: 25, total: 100}}
-  views={['table', 'cards']}
+  views={['table', 'cards', 'grid']}
+  breakpoints={{mobile: 768, tablet: 1024}}
   tableView={<MiTabla />}
   cardsView={<MisCards />}
-  contentTopRight={<Button>Acción</Button>}
-  contentBottomLeft={<DatePicker />}
+  gridView={<MiGrid />}
+  content={<Button>Acción</Button>}
+  enableTransitions={true}
 />`}</code></pre>
               </div>
             </div>
@@ -542,11 +552,34 @@ const HeaderViewTypePage = (props) => {
               <ul className="small">
                 <li><strong>Badge simplificado:</strong> String directo o objeto {`{count, total, color}`}</li>
                 <li><strong>Props reducidas:</strong> Eliminadas props redundantes y complejas</li>
-                <li><strong>Nomenclatura consistente:</strong> `contentTopRight`, `contentBottomLeft`, `contentBottomRight`</li>
-                <li><strong>Valores por defecto:</strong> `views={["table", "cards"]}` por defecto</li>
-                <li><strong>Responsivo automático:</strong> Breakpoints y comportamiento adaptativo integrado</li>
+                <li><strong>Nomenclatura unificada:</strong> `content` para área superior derecha en todos los componentes</li>
+                <li><strong>Posicionamiento estandarizado:</strong> Mismo contenedor flex con `d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center`</li>
+                <li><strong>Responsivo inteligente:</strong> Hook `useResponsiveView` con detección automática de breakpoints</li>
+                <li><strong>Transiciones suaves:</strong> Animaciones CSS configurables para cambios de vista</li>
                 <li><strong>Configuración encapsulada:</strong> Iconos y etiquetas de vistas automáticas</li>
               </ul>
+              
+              <div className="mt-3 p-3 bg-success bg-opacity-10 rounded">
+                <h6 className="text-success mb-2">📱 Funcionalidad Responsiva:</h6>
+                <ul className="small mb-0">
+                  <li><strong>Array de vistas:</strong> `views={['desktop', 'tablet', 'mobile']}` - automático según breakpoint</li>
+                  <li><strong>Breakpoints personalizables:</strong> `{`{mobile: 768, tablet: 1024, desktop: 1200}`}`</li>
+                  <li><strong>Prioridad responsiva:</strong> El tamaño de pantalla siempre define la vista activa</li>
+                  <li><strong>Botones ocultos en móvil:</strong> UI limpia en dispositivos pequeños</li>
+                  <li><strong>Fallback inteligente:</strong> Si no hay vista definida para tablet/mobile → usa desktop</li>
+                  <li><strong>Indicadores visuales:</strong> Los botones muestran qué vista está activa automáticamente</li>
+                </ul>
+              </div>
+              
+              <div className="mt-3 p-3 bg-warning bg-opacity-10 rounded">
+                <h6 className="text-warning mb-2">🎯 Estándar Unificado:</h6>
+                <ul className="small mb-0">
+                  <li><strong>Atributo único:</strong> Todos los componentes usan `content` (no más topRightSlot/contentTopRight)</li>
+                  <li><strong>Posicionamiento consistente:</strong> Mismo comportamiento responsivo en desktop y móvil</li>
+                  <li><strong>API simplificada:</strong> Una sola prop para el área superior derecha</li>
+                  <li><strong>JSDoc completo:</strong> Documentación integrada para VSCode IntelliSense</li>
+                </ul>
+              </div>
             </div>
           </div>
         </Container>
@@ -559,7 +592,23 @@ HeaderViewTypePage.propTypes = {
   t: PropTypes.any,
 };
 
-// Componente HeaderCardViews optimizado - Fácil de usar
+/**
+ * HeaderCardViews optimizado con soporte responsivo
+ * Componente de header con cambio de vistas y botones de navegación
+ * 
+ * @param {string} title - Título principal del header
+ * @param {string} [description] - Descripción opcional del header  
+ * @param {string|Object} [badge] - Badge simple (string) o complejo {count, total, color, text}
+ * @param {string} [currentView="table"] - Vista actualmente seleccionada
+ * @param {function} [onViewChange] - Función callback para cambio de vista
+ * @param {string[]} [views=["table", "cards"]] - Array de vistas disponibles
+ * @param {React.ReactNode} [content] - Contenido del área superior derecha (botones de acción)
+ * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (filtros, inputs)
+ * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha (controles, ordenamiento)
+ * @param {string} [className] - Clases CSS adicionales
+ * @param {boolean} [hideViewButtons=false] - Oculta los botones de cambio de vista
+ * @param {boolean} [responsiveMode=false] - Indica si está en modo responsivo (solo lectura)
+ */
 const HeaderCardViews = ({
   title,
   description,
@@ -570,9 +619,14 @@ const HeaderCardViews = ({
   onViewChange,
   views = ["table", "cards"],
   // Slots con nomenclatura consistente
-  contentTopRight,    // Área superior derecha: botones de acción, controles principales
+  content,    // Área superior derecha: botones de acción, controles principales
   contentBottomLeft,  // Área inferior izquierda: inputs, selects, filtros, etc.
   contentBottomRight, // Área inferior derecha: botones, controles, ordenamiento, etc.
+  // Configuración responsiva
+  hideViewButtons = false,
+  responsiveMode = false,
+  isManualOverride = false,
+  responsiveView,
   // Estilos opcionales
   className
 }) => {
@@ -584,7 +638,8 @@ const HeaderCardViews = ({
   };
 
   const renderViewButtons = () => {
-    if (views.length < 2) return null;
+    // Ocultar botones si está configurado o si hay menos de 2 vistas
+    if (hideViewButtons || views.length < 2) return null;
     
     return (
       <div className="btn-group d-none d-md-flex me-2" role="group">
@@ -592,16 +647,39 @@ const HeaderCardViews = ({
           const config = viewsConfig[view];
           if (!config) return null;
           
+          const isActive = currentView === view;
+          const isResponsiveMatch = responsiveView === view;
+          
           return (
             <Button 
               key={view}
-              color={currentView === view ? 'primary' : 'light'}
+              color={isActive ? 'primary' : 'light'}
               onClick={() => onViewChange && onViewChange(view)}
               size="sm"
-              title={config.title}
+              title={responsiveMode ? 
+                `${config.title} ${isResponsiveMatch ? '(Vista responsiva)' : '(Override manual)'}` : 
+                config.title
+              }
+              style={{
+                position: 'relative'
+              }}
             >
               <i className={`mdi ${config.icon}`}></i>
               <span className="d-none d-lg-inline ms-1">{config.label}</span>
+              
+              {/* Indicador de vista responsiva */}
+              {responsiveMode && isResponsiveMatch && !isManualOverride && (
+                <i className="mdi mdi-auto-fix ms-1 text-success" 
+                   title="Vista automática por tamaño de pantalla"
+                   style={{ fontSize: '0.75rem' }}></i>
+              )}
+              
+              {/* Indicador de override manual */}
+              {responsiveMode && isActive && isManualOverride && !isResponsiveMatch && (
+                <i className="mdi mdi-hand-pointing-up ms-1 text-warning" 
+                   title="Vista seleccionada manualmente"
+                   style={{ fontSize: '0.75rem' }}></i>
+              )}
             </Button>
           );
         })}
@@ -621,10 +699,10 @@ const HeaderCardViews = ({
       description={description}
       {...badgeProps}
       showBottomRow={!!(contentBottomLeft || contentBottomRight)}
-      topRightSlot={
+      content={
         <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
           {renderViewButtons()}
-          {contentTopRight}
+          {content}
         </div>
       }
       bottomLeftSlot={contentBottomLeft}
@@ -647,34 +725,125 @@ HeaderCardViews.propTypes = {
     })
   ]),
   currentView: PropTypes.oneOf(['table', 'cards', 'grid']),
-  onViewChange: PropTypes.func.isRequired,
+  onViewChange: PropTypes.func,
   views: PropTypes.arrayOf(PropTypes.oneOf(['table', 'cards', 'grid'])),
-  contentTopRight: PropTypes.node,    // Área superior derecha
+  content: PropTypes.node,    // Área superior derecha
   contentBottomLeft: PropTypes.node,  // Área inferior izquierda
   contentBottomRight: PropTypes.node, // Área inferior derecha
+  hideViewButtons: PropTypes.bool,    // Oculta botones de vista
+  responsiveMode: PropTypes.bool,     // Modo responsivo automático
+  isManualOverride: PropTypes.bool,   // Indica si está en override manual
+  responsiveView: PropTypes.oneOf(['table', 'cards', 'grid']), // Vista que correspondería por responsivo
   className: PropTypes.string
 };
 
-// Componente HeaderViewCard optimizado - Completo con contenido
+/**
+ * Hook personalizado para manejo responsivo automático de vistas
+ * @param {string[]} views - Array de vistas [desktop, tablet, mobile]
+ * @param {Object} breakpoints - Puntos de quiebre {mobile: 768, tablet: 1024, desktop: 1200}
+ * @returns {Object} {currentView, isMobile, currentBreakpoint}
+ */
+const useResponsiveView = (views = ["table", "cards", "table"], breakpoints = { mobile: 768, tablet: 1024, desktop: 1200 }) => {
+  const [windowWidth, setWindowWidth] = React.useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const [manualView, setManualView] = React.useState(null); // Vista seleccionada manualmente
+  const [lastBreakpoint, setLastBreakpoint] = React.useState(null);
+  
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  const getCurrentBreakpoint = React.useCallback(() => {
+    if (windowWidth <= breakpoints.mobile) return 'mobile';
+    if (windowWidth <= breakpoints.tablet) return 'tablet';
+    return 'desktop';
+  }, [windowWidth, breakpoints]);
+  
+  const currentBreakpoint = getCurrentBreakpoint();
+  
+  // Reset manual selection when breakpoint changes (responsive priority)
+  React.useEffect(() => {
+    if (lastBreakpoint && lastBreakpoint !== currentBreakpoint) {
+      setManualView(null); // Reset override when breakpoint changes
+    }
+    setLastBreakpoint(currentBreakpoint);
+  }, [currentBreakpoint, lastBreakpoint]);
+  
+  const getResponsiveView = React.useCallback(() => {
+    const breakpointIndex = {
+      desktop: 0,
+      tablet: 1, 
+      mobile: 2
+    };
+    
+    const viewIndex = breakpointIndex[currentBreakpoint];
+    // Fallback a desktop (índice 0) si no hay vista definida para tablet/mobile
+    return views[viewIndex] || views[0] || 'table';
+  }, [views, currentBreakpoint]);
+  
+  const currentView = manualView || getResponsiveView();
+  
+  return {
+    currentView,
+    responsiveView: getResponsiveView(),
+    isMobile: currentBreakpoint === 'mobile',
+    currentBreakpoint,
+    windowWidth,
+    isManualOverride: !!manualView,
+    setManualView
+  };
+};
+
+/**
+ * HeaderViewCard con configuración responsiva inteligente
+ * Componente completo que incluye header y contenido que cambia automáticamente según el tamaño de pantalla
+ * 
+ * @param {string} title - Título principal del header
+ * @param {string} [description] - Descripción opcional del header
+ * @param {string|Object} [badge] - Badge simple (string) o complejo {count, total, color, text}
+ * @param {string[]} [views=['table', 'cards', 'table']] - Vistas responsivas [desktop, tablet, mobile]
+ * @param {Object} [breakpoints] - Puntos de quiebre personalizados {mobile: 768, tablet: 1024, desktop: 1200}
+ * @param {React.ReactNode} [tableView] - Contenido para vista de tabla
+ * @param {React.ReactNode} [cardsView] - Contenido para vista de cards  
+ * @param {React.ReactNode} [gridView] - Contenido para vista de grid
+ * @param {React.ReactNode} [content] - Contenido del área superior derecha (botones de acción)
+ * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (filtros, inputs)
+ * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha (controles, ordenamiento)
+ * @param {string} [className] - Clases CSS adicionales para el header
+ * @param {string} [contentClassName] - Clases CSS adicionales para el área de contenido
+ * @param {boolean} [enableTransitions=true] - Habilita transiciones suaves entre vistas
+ */
 const HeaderViewCard = ({
   title,
   description,
   badge,
-  // Vista y contenido
-  initialView = "table",
-  views = ["table", "cards"],
+  // Vista y contenido con configuración responsiva
+  views = ["table", "cards", "table"], // [desktop, tablet, mobile]
+  breakpoints = { mobile: 768, tablet: 1024, desktop: 1200 },
   tableView,
   cardsView,
   gridView,
   // Slots con nomenclatura consistente
-  contentTopRight,    // Área superior derecha: botones de acción, controles principales
+  content,    // Área superior derecha: botones de acción, controles principales
   contentBottomLeft,  // Área inferior izquierda: inputs, selects, filtros, etc.
   contentBottomRight, // Área inferior derecha: botones, controles, ordenamiento, etc.
   // Estilos
   className,
-  contentClassName
+  contentClassName,
+  enableTransitions = true
 }) => {
-  const [currentView, setCurrentView] = React.useState(initialView);
+  const { currentView, responsiveView, isMobile, isManualOverride, setManualView } = useResponsiveView(views, breakpoints);
+
+  const handleViewChange = React.useCallback((view) => {
+    // Si view es null, resetear a modo responsivo automático
+    setManualView(view);
+  }, [setManualView]);
 
   const renderContent = () => {
     const viewContent = {
@@ -683,9 +852,9 @@ const HeaderViewCard = ({
       grid: gridView
     };
 
-    const content = viewContent[currentView];
+    const selectedContent = viewContent[currentView];
     
-    if (!content) {
+    if (!selectedContent) {
       return (
         <div className="card">
           <div className="card-body text-center text-muted p-5">
@@ -697,7 +866,7 @@ const HeaderViewCard = ({
       );
     }
 
-    return content;
+    return selectedContent;
   };
 
   return (
@@ -707,15 +876,26 @@ const HeaderViewCard = ({
         description={description}
         badge={badge}
         currentView={currentView}
-        onViewChange={setCurrentView}
+        onViewChange={handleViewChange} // Permitir cambio manual
         views={views}
-        contentTopRight={contentTopRight}
+        content={content}
         contentBottomLeft={contentBottomLeft}
         contentBottomRight={contentBottomRight}
         className={className}
+        hideViewButtons={isMobile} // Nueva prop para ocultar botones en móvil
+        responsiveMode={true} // Indica que está en modo responsivo
+        isManualOverride={isManualOverride} // Indica si está en override manual
+        responsiveView={responsiveView} // Vista que correspondería por responsivo
       />
       
-      <div className={`view-content ${contentClassName || ''}`}>
+      <div 
+        className={`view-content ${contentClassName || ''}`}
+        style={enableTransitions ? {
+          transition: 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out',
+          opacity: 1,
+          transform: 'translateX(0)'
+        } : {}}
+      >
         {renderContent()}
       </div>
     </React.Fragment>
@@ -734,16 +914,21 @@ HeaderViewCard.propTypes = {
       color: PropTypes.string
     })
   ]),
-  initialView: PropTypes.oneOf(['table', 'cards', 'grid']),
   views: PropTypes.arrayOf(PropTypes.oneOf(['table', 'cards', 'grid'])),
+  breakpoints: PropTypes.shape({
+    mobile: PropTypes.number,
+    tablet: PropTypes.number,
+    desktop: PropTypes.number
+  }),
   tableView: PropTypes.node,
   cardsView: PropTypes.node,
   gridView: PropTypes.node,
-  contentTopRight: PropTypes.node,    // Área superior derecha
+  content: PropTypes.node,    // Área superior derecha
   contentBottomLeft: PropTypes.node,  // Área inferior izquierda  
   contentBottomRight: PropTypes.node, // Área inferior derecha
   className: PropTypes.string,
-  contentClassName: PropTypes.string
+  contentClassName: PropTypes.string,
+  enableTransitions: PropTypes.bool
 };
 
 // Exportar todos los componentes

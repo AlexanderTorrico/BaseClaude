@@ -246,9 +246,6 @@ const HeaderViewTypePage = (props) => {
                   <i className="mdi mdi-plus me-1"></i>
                   Nuevo
                 </Button>
-                <Button color="secondary" outline size="sm">
-                  <i className="mdi mdi-settings"></i>
-                </Button>
               </>
             }
             contentBottomLeft={
@@ -263,7 +260,7 @@ const HeaderViewTypePage = (props) => {
               </InputGroup>
             }
             contentBottomRight={
-              <Button color="light" outline size="sm">
+              <Button color="primary" outline size="sm">
                 <i className="mdi mdi-filter"></i>
                 Filtrar
               </Button>

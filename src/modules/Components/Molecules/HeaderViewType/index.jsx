@@ -257,7 +257,7 @@ const HeaderViewTypePage = () => {
                 Filtrar
               </Button>
             }
-            tableView={
+            viewWeb={
               <div className="card">
                 <div className="card-body">
                   <div className="table-responsive">
@@ -320,7 +320,7 @@ const HeaderViewTypePage = () => {
                 </div>
               </div>
             }
-            cardsView={
+            viewTable={
               <div className="row">
                 <div className="col-xl-4 col-md-6">
                   <div className="card">
@@ -402,7 +402,7 @@ const HeaderViewTypePage = () => {
                 </div>
               </div>
             }
-            gridView={
+            viewMovil={
               <div className="row">
                 <div className="col-lg-3 col-md-4 col-sm-6">
                   <div className="card text-center">
@@ -522,9 +522,9 @@ const HeaderViewTypePage = () => {
   badge={{count: 25, total: 100}}
   views={['table', 'cards', 'grid']}
   breakpoints={{mobile: 768, tablet: 1024}}
-  tableView={<MiTabla />}
-  cardsView={<MisCards />}
-  gridView={<MiGrid />}
+  viewWeb={<MiTablaWeb />}
+  viewTable={<MisCardsTablet />}
+  viewMovil={<MiGridMovil />}
   content={<Button>Acción</Button>}
   enableTransitions={true}
 />`}</code></pre>
@@ -779,9 +779,9 @@ const useResponsiveView = (views = ["table", "cards", "table"], breakpoints = { 
  * @param {string|Object} [badge] - Badge simple (string) o complejo {count, total, color, text}
  * @param {string[]} [views=['table', 'cards', 'table']] - Vistas responsivas [desktop, tablet, mobile]
  * @param {Object} [breakpoints] - Puntos de quiebre personalizados {mobile: 768, tablet: 1024, desktop: 1200}
- * @param {React.ReactNode} [tableView] - Contenido para vista de tabla
- * @param {React.ReactNode} [cardsView] - Contenido para vista de cards  
- * @param {React.ReactNode} [gridView] - Contenido para vista de grid
+ * @param {React.ReactNode} [viewWeb] - Contenido para vista web (desktop)
+ * @param {React.ReactNode} [viewTable] - Contenido para vista tablet
+ * @param {React.ReactNode} [viewMovil] - Contenido para vista móvil
  * @param {React.ReactNode} [content] - Contenido del área superior derecha (botones de acción)
  * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (filtros, inputs)
  * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha (controles, ordenamiento)
@@ -796,9 +796,9 @@ const HeaderCardViewResponsive = React.memo(({
   // Vista y contenido con configuración responsiva
   views = ["table", "cards", "table"], // [desktop, tablet, mobile]
   breakpoints = { mobile: 768, tablet: 1024, desktop: 1200 },
-  tableView,
-  cardsView,
-  gridView,
+  viewWeb,
+  viewTable,
+  viewMovil,
   // Slots con nomenclatura consistente
   content,    // Área superior derecha: botones de acción, controles principales
   contentBottomLeft,  // Área inferior izquierda: inputs, selects, filtros, etc.
@@ -817,9 +817,9 @@ const HeaderCardViewResponsive = React.memo(({
 
   const renderContent = React.useCallback(() => {
     const viewContent = {
-      table: tableView,
-      cards: cardsView,
-      grid: gridView
+      table: viewWeb,
+      cards: viewTable,
+      grid: viewMovil
     };
 
     const selectedContent = viewContent[currentView];
@@ -837,7 +837,7 @@ const HeaderCardViewResponsive = React.memo(({
     }
 
     return selectedContent;
-  }, [currentView, tableView, cardsView, gridView]);
+  }, [currentView, viewWeb, viewTable, viewMovil]);
 
   return (
     <React.Fragment>
@@ -890,9 +890,9 @@ HeaderCardViewResponsive.propTypes = {
     tablet: PropTypes.number,
     desktop: PropTypes.number
   }),
-  tableView: PropTypes.node,
-  cardsView: PropTypes.node,
-  gridView: PropTypes.node,
+  viewWeb: PropTypes.node,
+  viewTable: PropTypes.node,
+  viewMovil: PropTypes.node,
   content: PropTypes.node,    // Área superior derecha
   contentBottomLeft: PropTypes.node,  // Área inferior izquierda  
   contentBottomRight: PropTypes.node, // Área inferior derecha

@@ -167,7 +167,7 @@ const HeaderViewTypePage = () => {
             badge="🛒 En línea"
             currentView={view2}
             onViewChange={setView2}
-            views={['table', 'cards', 'grid']}
+            views={['web', 'table', 'movil']}
             content={
               <>
                 <Button color="primary" size="sm">
@@ -224,6 +224,24 @@ const HeaderViewTypePage = () => {
             }
           />
 
+          <H4 className="mb-3 mt-5 text-info">HeaderCardViews con Iconos Personalizados</H4>
+
+          {/* Ejemplo 6.5: HeaderCardViews con iconos personalizados */}
+          <HeaderCardViews
+            title="Sistema con Vistas Personalizadas"
+            description={`Ejemplo con iconos personalizados - Vista: ${view3}`}
+            badge={{ count: 15, total: 30, color: "info" }}
+            currentView={view3}
+            onViewChange={setView3}
+            views={['admin:mdi-shield-account', 'reportes:mdi-chart-line', 'config:mdi-cog']} // Formato: nombre:icono
+            content={
+              <Button color="info" size="sm">
+                <i className="mdi mdi-settings me-1"></i>
+                Configurar
+              </Button>
+            }
+          />
+
           <H4 className="mb-3 mt-5 text-warning">HeaderCardViewResponsive (Integrado con Contenido)</H4>
 
           {/* Ejemplo 7: HeaderCardViewResponsive con configuración responsiva */}
@@ -231,7 +249,7 @@ const HeaderViewTypePage = () => {
             title="Sistema Responsivo Completo"
             description="Header con contenido que cambia automáticamente según el tamaño de pantalla"
             badge={{ count: 25, total: 100 }}
-            views={['table', 'cards', 'grid']} // [desktop, tablet, mobile]
+            views={['web', 'table', 'movil']} // [desktop, tablet, mobile]
             breakpoints={{ mobile: 768, tablet: 1024, desktop: 1200 }}
             enableTransitions={true}
             content={
@@ -509,7 +527,9 @@ const HeaderViewTypePage = () => {
   badge="Activo"
   currentView={view}
   onViewChange={setView}
-  views={['table', 'cards']}
+  views={['web', 'table', 'movil']}
+  // O con iconos personalizados:
+  // views={['admin:mdi-shield', 'ventas:mdi-cart']}
   content={<Button>Nuevo</Button>}
   contentBottomLeft={<Input />}
   contentBottomRight={<Button>Filtros</Button>}
@@ -520,7 +540,8 @@ const HeaderViewTypePage = () => {
                 <pre className="small"><code>{`<HeaderCardViewResponsive
   title="Dashboard"
   badge={{count: 25, total: 100}}
-  views={['table', 'cards', 'grid']}
+  views={['web', 'table', 'movil']}
+  // O personalizado: views={['datos:mdi-database']}
   breakpoints={{mobile: 768, tablet: 1024}}
   viewWeb={<MiTablaWeb />}
   viewTable={<MisCardsTablet />}
@@ -540,13 +561,14 @@ const HeaderViewTypePage = () => {
                 <li><strong>Posicionamiento estandarizado:</strong> Mismo contenedor flex con `d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center`</li>
                 <li><strong>Responsivo inteligente:</strong> Hook `useResponsiveView` con detección automática de breakpoints</li>
                 <li><strong>Transiciones suaves:</strong> Animaciones CSS configurables para cambios de vista</li>
-                <li><strong>Configuración encapsulada:</strong> Iconos y etiquetas de vistas automáticas</li>
+                <li><strong>Iconos personalizados:</strong> Soporte para vistas con formato "nombre:mdi-icon" (ej: "admin:mdi-shield")</li>
+                <li><strong>Vistas predefinidas:</strong> web, table, movil, cards, grid, list con iconos automáticos</li>
               </ul>
               
               <div className="mt-3 p-3 bg-success bg-opacity-10 rounded">
                 <h6 className="text-success mb-2">📱 Funcionalidad Responsiva:</h6>
                 <ul className="small mb-0">
-                  <li><strong>Array de vistas:</strong> `views={['desktop', 'tablet', 'mobile']}` - automático según breakpoint</li>
+                  <li><strong>Array de vistas:</strong> `views={['web', 'table', 'movil']}` - automático según breakpoint</li>
                   <li><strong>Breakpoints personalizables:</strong> `{`{mobile: 768, tablet: 1024, desktop: 1200}`}`</li>
                   <li><strong>Prioridad responsiva:</strong> El tamaño de pantalla siempre define la vista activa</li>
                   <li><strong>Botones ocultos en móvil:</strong> UI limpia en dispositivos pequeños</li>
@@ -555,6 +577,16 @@ const HeaderViewTypePage = () => {
                 </ul>
               </div>
               
+              <div className="mt-3 p-3 bg-info bg-opacity-10 rounded">
+                <h6 className="text-info mb-2">🎨 Sistema de Iconos Personalizados:</h6>
+                <ul className="small mb-0">
+                  <li><strong>Vistas predefinidas:</strong> web, table, movil, cards, grid, list (iconos automáticos)</li>
+                  <li><strong>Iconos personalizados:</strong> Formato "nombre:mdi-icon" → "admin:mdi-shield-account"</li>
+                  <li><strong>Fallback inteligente:</strong> Vistas sin formato específico usan icono genérico "mdi-eye"</li>
+                  <li><strong>Ejemplos:</strong> ['admin:mdi-shield', 'ventas:mdi-cart', 'reportes:mdi-chart-line']</li>
+                </ul>
+              </div>
+
               <div className="mt-3 p-3 bg-warning bg-opacity-10 rounded">
                 <h6 className="text-warning mb-2">🎯 Estándar Unificado:</h6>
                 <ul className="small mb-0">
@@ -583,7 +615,7 @@ HeaderViewTypePage.propTypes = {};
  * @param {string|Object} [badge] - Badge simple (string) o complejo {count, total, color, text}
  * @param {string} [currentView="table"] - Vista actualmente seleccionada
  * @param {function} [onViewChange] - Función callback para cambio de vista
- * @param {string[]} [views=["table", "cards"]] - Array de vistas disponibles
+ * @param {string[]} [views=["table", "cards"]] - Array de vistas disponibles (soporta: web, table, movil, cards, grid, list, o formato personalizado "nombre:mdi-icon")
  * @param {React.ReactNode} [content] - Contenido del área superior derecha (botones de acción)
  * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (filtros, inputs)
  * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha (controles, ordenamiento)
@@ -593,9 +625,37 @@ HeaderViewTypePage.propTypes = {};
  */
 // Configuración estática de vistas (fuera del componente para evitar re-creación)
 const VIEWS_CONFIG = {
-  table: { icon: "mdi-monitor", label: "Web", title: "Vista Tabla" },
-  cards: { icon: "mdi-cellphone", label: "Móvil", title: "Vista Cards" },
-  grid: { icon: "mdi-view-grid", label: "Grid", title: "Vista Grid" }
+  // Vistas predeterminadas con iconos automáticos
+  web: { icon: "mdi-monitor", label: "Web", title: "Vista Web" },
+  table: { icon: "mdi-table", label: "Tabla", title: "Vista Tabla" },
+  movil: { icon: "mdi-cellphone", label: "Móvil", title: "Vista Móvil" },
+  cards: { icon: "mdi-card-multiple", label: "Cards", title: "Vista Cards" },
+  grid: { icon: "mdi-view-grid", label: "Grid", title: "Vista Grid" },
+  list: { icon: "mdi-view-list", label: "Lista", title: "Vista Lista" },
+  // Función helper para obtener configuración de vista (permite iconos personalizados)
+  getViewConfig: (viewName) => {
+    // Si es una configuración predeterminada, devolverla
+    if (VIEWS_CONFIG[viewName]) {
+      return VIEWS_CONFIG[viewName];
+    }
+    
+    // Si contiene un icono personalizado (formato: "nombre:mdi-icon-name")
+    if (typeof viewName === 'string' && viewName.includes(':')) {
+      const [name, icon] = viewName.split(':');
+      return {
+        icon: icon.startsWith('mdi-') ? icon : `mdi-${icon}`,
+        label: name.charAt(0).toUpperCase() + name.slice(1),
+        title: `Vista ${name.charAt(0).toUpperCase() + name.slice(1)}`
+      };
+    }
+    
+    // Vista personalizada sin icono específico (usar icono genérico)
+    return {
+      icon: "mdi-eye",
+      label: typeof viewName === 'string' ? viewName.charAt(0).toUpperCase() + viewName.slice(1) : "Vista",
+      title: `Vista ${typeof viewName === 'string' ? viewName.charAt(0).toUpperCase() + viewName.slice(1) : "Personalizada"}`
+    };
+  }
 };
 
 const HeaderCardViews = React.memo(({
@@ -626,16 +686,15 @@ const HeaderCardViews = React.memo(({
     
     return (
       <div className="btn-group d-none d-md-flex me-2" role="group">
-        {views.map((view) => {
-          const config = VIEWS_CONFIG[view];
-          if (!config) return null;
+        {views.map((view, index) => {
+          const config = VIEWS_CONFIG.getViewConfig(view);
           
           const isActive = currentView === view;
           const isResponsiveMatch = responsiveView === view;
           
           return (
             <Button 
-              key={view}
+              key={`${view}-${index}`}
               color={isActive ? 'primary' : 'light'}
               onClick={() => onViewChange && onViewChange(view)}
               size="sm"
@@ -696,16 +755,16 @@ HeaderCardViews.propTypes = {
       color: PropTypes.string
     })
   ]),
-  currentView: PropTypes.oneOf(['table', 'cards', 'grid']),
+  currentView: PropTypes.string,
   onViewChange: PropTypes.func,
-  views: PropTypes.arrayOf(PropTypes.oneOf(['table', 'cards', 'grid'])),
+  views: PropTypes.arrayOf(PropTypes.string), // Acepta cualquier string para permitir vistas personalizadas
   content: PropTypes.node,    // Área superior derecha
   contentBottomLeft: PropTypes.node,  // Área inferior izquierda
   contentBottomRight: PropTypes.node, // Área inferior derecha
   hideViewButtons: PropTypes.bool,    // Oculta botones de vista
   responsiveMode: PropTypes.bool,     // Modo responsivo automático
   isManualOverride: PropTypes.bool,   // Indica si está en override manual
-  responsiveView: PropTypes.oneOf(['table', 'cards', 'grid']), // Vista que correspondería por responsivo
+  responsiveView: PropTypes.string, // Vista que correspondería por responsivo
   className: PropTypes.string
 };
 
@@ -715,7 +774,7 @@ HeaderCardViews.propTypes = {
  * @param {Object} breakpoints - Puntos de quiebre {mobile: 768, tablet: 1024, desktop: 1200}
  * @returns {Object} {currentView, isMobile, currentBreakpoint}
  */
-const useResponsiveView = (views = ["table", "cards", "table"], breakpoints = { mobile: 768, tablet: 1024, desktop: 1200 }) => {
+const useResponsiveView = (views = ["web", "table", "movil"], breakpoints = { mobile: 768, tablet: 1024, desktop: 1200 }) => {
   const [windowWidth, setWindowWidth] = React.useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   const [manualView, setManualView] = React.useState(null); // Vista seleccionada manualmente
   const [lastBreakpoint, setLastBreakpoint] = React.useState(null);
@@ -756,7 +815,7 @@ const useResponsiveView = (views = ["table", "cards", "table"], breakpoints = { 
     
     const viewIndex = breakpointIndex[currentBreakpoint];
     // Fallback a desktop (índice 0) si no hay vista definida para tablet/mobile
-    return views[viewIndex] || views[0] || 'table';
+    return views[viewIndex] || views[0] || 'web';
   }, [views, currentBreakpoint]);
   
   const currentView = manualView || getResponsiveView();
@@ -777,11 +836,11 @@ const useResponsiveView = (views = ["table", "cards", "table"], breakpoints = { 
  * @param {string} title - Título principal del header
  * @param {string} [description] - Descripción opcional del header
  * @param {string|Object} [badge] - Badge simple (string) o complejo {count, total, color, text}
- * @param {string[]} [views=['table', 'cards', 'table']] - Vistas responsivas [desktop, tablet, mobile]
+ * @param {string[]} [views=['web', 'table', 'movil']] - Vistas responsivas [desktop, tablet, mobile]. Soporta: web, table, movil, cards, grid, list, o formato personalizado "nombre:mdi-icon"
  * @param {Object} [breakpoints] - Puntos de quiebre personalizados {mobile: 768, tablet: 1024, desktop: 1200}
- * @param {React.ReactNode} [viewWeb] - Contenido para vista web (desktop)
- * @param {React.ReactNode} [viewTable] - Contenido para vista tablet
- * @param {React.ReactNode} [viewMovil] - Contenido para vista móvil
+ * @param {React.ReactNode} [viewWeb] - Contenido para vista web (desktop). Fallback por defecto para todas las vistas
+ * @param {React.ReactNode} [viewTable] - Contenido para vista tablet (fallback a viewWeb si no se proporciona)
+ * @param {React.ReactNode} [viewMovil] - Contenido para vista móvil (fallback a viewTable → viewWeb si no se proporciona)
  * @param {React.ReactNode} [content] - Contenido del área superior derecha (botones de acción)
  * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (filtros, inputs)
  * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha (controles, ordenamiento)
@@ -794,7 +853,7 @@ const HeaderCardViewResponsive = React.memo(({
   description,
   badge,
   // Vista y contenido con configuración responsiva
-  views = ["table", "cards", "table"], // [desktop, tablet, mobile]
+  views = ["web", "table", "movil"], // [desktop, tablet, mobile]
   breakpoints = { mobile: 768, tablet: 1024, desktop: 1200 },
   viewWeb,
   viewTable,
@@ -816,13 +875,35 @@ const HeaderCardViewResponsive = React.memo(({
   }, [setManualView]);
 
   const renderContent = React.useCallback(() => {
-    const viewContent = {
-      table: viewWeb,
-      cards: viewTable,
-      grid: viewMovil
+    // Lógica de fallback inteligente según los requisitos
+    const getViewContent = (viewType) => {
+      switch (viewType) {
+        case 'web':
+          return viewWeb; // Siempre mostrar viewWeb si está disponible
+        
+        case 'table':
+          // Si no hay viewTable, usar viewWeb como fallback
+          return viewTable || viewWeb;
+        
+        case 'movil':
+          // Si no hay viewMovil, usar viewTable (si existe) o viewWeb
+          return viewMovil || viewTable || viewWeb;
+        
+        case 'cards':
+          // Compatibilidad: cards = table con misma lógica de fallback
+          return viewTable || viewWeb;
+        
+        case 'grid':
+          // Compatibilidad: grid = movil con misma lógica de fallback
+          return viewMovil || viewTable || viewWeb;
+        
+        default:
+          // Para vistas personalizadas, usar viewWeb por defecto
+          return viewWeb;
+      }
     };
 
-    const selectedContent = viewContent[currentView];
+    const selectedContent = getViewContent(currentView);
     
     if (!selectedContent) {
       return (
@@ -884,7 +965,7 @@ HeaderCardViewResponsive.propTypes = {
       color: PropTypes.string
     })
   ]),
-  views: PropTypes.arrayOf(PropTypes.oneOf(['table', 'cards', 'grid'])),
+  views: PropTypes.arrayOf(PropTypes.string), // Acepta cualquier string para permitir vistas personalizadas
   breakpoints: PropTypes.shape({
     mobile: PropTypes.number,
     tablet: PropTypes.number,

@@ -15,7 +15,7 @@ const HeaderCard = React.memo(({
   badgeColor = "info",
   badgeText,
   showBottomRow = false,
-  content,
+  contentTopRight,
   bottomLeftSlot,
   bottomRightSlot,
   className = "",
@@ -49,7 +49,7 @@ const HeaderCard = React.memo(({
           </Col>
           <Col lg={6} md={12}>
             <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
-              {content}
+              {contentTopRight}
             </div>
           </Col>
         </Row>
@@ -81,7 +81,7 @@ HeaderCard.propTypes = {
   badgeColor: PropTypes.string,
   badgeText: PropTypes.string,
   showBottomRow: PropTypes.bool,
-  content: PropTypes.node,
+  contentTopRight: PropTypes.node,
   bottomLeftSlot: PropTypes.node,
   bottomRightSlot: PropTypes.node,
   className: PropTypes.string,
@@ -129,7 +129,7 @@ const HeaderViewTypePage = () => {
             showBadge={true}
             badgeText="🔥 Activo"
             badgeColor="warning"
-            content={
+            contentTopRight={
               <div className="d-flex flex-wrap gap-2">
                 <Button color="primary" size="sm">
                   <i className="mdi mdi-plus me-1"></i>
@@ -152,7 +152,7 @@ const HeaderViewTypePage = () => {
             badge={{ count: 156, total: 500 }}
             currentView={view1}
             onViewChange={setView1}
-            content={
+            contentTopRight={
               <Button color="primary" size="sm">
                 <i className="mdi mdi-plus me-1"></i>
                 Nuevo Usuario
@@ -168,7 +168,7 @@ const HeaderViewTypePage = () => {
             currentView={view2}
             onViewChange={setView2}
             views={['web', 'table', 'movil']}
-            content={
+            contentTopRight={
               <>
                 <Button color="primary" size="sm">
                   <i className="mdi mdi-plus me-1"></i>
@@ -188,7 +188,7 @@ const HeaderViewTypePage = () => {
             badge={{ count: 89, total: 200 }}
             currentView={view3}
             onViewChange={setView3}
-            content={
+            contentTopRight={
               <>
                 <Button color="primary" size="sm">
                   <i className="mdi mdi-refresh me-1"></i>
@@ -234,7 +234,7 @@ const HeaderViewTypePage = () => {
             currentView={view3}
             onViewChange={setView3}
             views={['admin:mdi-shield-account', 'reportes:mdi-chart-line', 'config:mdi-cog']} // Formato: nombre:icono
-            content={
+            contentTopRight={
               <Button color="info" size="sm">
                 <i className="mdi mdi-settings me-1"></i>
                 Configurar
@@ -252,7 +252,7 @@ const HeaderViewTypePage = () => {
             views={['web', 'table', 'movil']} // [desktop, tablet, mobile]
             breakpoints={{ mobile: 768, tablet: 1024, desktop: 1200 }}
             enableTransitions={true}
-            content={
+            contentTopRight={
               <Button color="primary" size="sm">
                 <i className="mdi mdi-plus me-1"></i>
                 Nuevo
@@ -517,7 +517,7 @@ const HeaderViewTypePage = () => {
                 <pre className="small"><code>{`<HeaderCard
   title="Mi Título"
   description="Descripción"
-  content={<Button>Acción</Button>}
+  contentTopRight={<Button>Acción</Button>}
 />`}</code></pre>
               </div>
               <div className="col-lg-4">
@@ -530,7 +530,7 @@ const HeaderViewTypePage = () => {
   views={['web', 'table', 'movil']}
   // O con iconos personalizados:
   // views={['admin:mdi-shield', 'ventas:mdi-cart']}
-  content={<Button>Nuevo</Button>}
+  contentTopRight={<Button>Nuevo</Button>}
   contentBottomLeft={<Input />}
   contentBottomRight={<Button>Filtros</Button>}
 />`}</code></pre>
@@ -546,7 +546,7 @@ const HeaderViewTypePage = () => {
   viewWeb={<MiTablaWeb />}
   viewTable={<MisCardsTablet />}
   viewMovil={<MiGridMovil />}
-  content={<Button>Acción</Button>}
+  contentTopRight={<Button>Acción</Button>}
   enableTransitions={true}
 />`}</code></pre>
               </div>
@@ -557,7 +557,7 @@ const HeaderViewTypePage = () => {
               <ul className="small">
                 <li><strong>Badge simplificado:</strong> String directo o objeto {`{count, total, color}`}</li>
                 <li><strong>Props reducidas:</strong> Eliminadas props redundantes y complejas</li>
-                <li><strong>Nomenclatura unificada:</strong> `content` para área superior derecha en todos los componentes</li>
+                <li><strong>Nomenclatura estandarizada:</strong> `contentTopRight` para área superior derecha en todos los componentes</li>
                 <li><strong>Posicionamiento estandarizado:</strong> Mismo contenedor flex con `d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center`</li>
                 <li><strong>Responsivo inteligente:</strong> Hook `useResponsiveView` con detección automática de breakpoints</li>
                 <li><strong>Transiciones suaves:</strong> Animaciones CSS configurables para cambios de vista</li>
@@ -590,7 +590,7 @@ const HeaderViewTypePage = () => {
               <div className="mt-3 p-3 bg-warning bg-opacity-10 rounded">
                 <h6 className="text-warning mb-2">🎯 Estándar Unificado:</h6>
                 <ul className="small mb-0">
-                  <li><strong>Atributo único:</strong> Todos los componentes usan `content` (no más topRightSlot/contentTopRight)</li>
+                  <li><strong>Atributo estandarizado:</strong> Todos los componentes usan `contentTopRight` con nomenclatura consistente</li>
                   <li><strong>Posicionamiento consistente:</strong> Mismo comportamiento responsivo en desktop y móvil</li>
                   <li><strong>API simplificada:</strong> Una sola prop para el área superior derecha</li>
                   <li><strong>JSDoc completo:</strong> Documentación integrada para VSCode IntelliSense</li>
@@ -616,7 +616,7 @@ HeaderViewTypePage.propTypes = {};
  * @param {string} [currentView="table"] - Vista actualmente seleccionada
  * @param {function} [onViewChange] - Función callback para cambio de vista
  * @param {string[]} [views=["table", "cards"]] - Array de vistas disponibles (soporta: web, table, movil, cards, grid, list, o formato personalizado "nombre:mdi-icon")
- * @param {React.ReactNode} [content] - Contenido del área superior derecha (botones de acción)
+ * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha (botones de acción)
  * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (filtros, inputs)
  * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha (controles, ordenamiento)
  * @param {string} [className] - Clases CSS adicionales
@@ -668,7 +668,7 @@ const HeaderCardViews = React.memo(({
   onViewChange,
   views = ["table", "cards"],
   // Slots con nomenclatura consistente
-  content,    // Área superior derecha: botones de acción, controles principales
+  contentTopRight,    // Área superior derecha: botones de acción, controles principales
   contentBottomLeft,  // Área inferior izquierda: inputs, selects, filtros, etc.
   contentBottomRight, // Área inferior derecha: botones, controles, ordenamiento, etc.
   // Configuración responsiva
@@ -730,10 +730,10 @@ const HeaderCardViews = React.memo(({
       description={description}
       {...badgeProps}
       showBottomRow={!!(contentBottomLeft || contentBottomRight)}
-      content={
+      contentTopRight={
         <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
           {renderViewButtons()}
-          {content}
+          {contentTopRight}
         </div>
       }
       bottomLeftSlot={contentBottomLeft}
@@ -758,7 +758,7 @@ HeaderCardViews.propTypes = {
   currentView: PropTypes.string,
   onViewChange: PropTypes.func,
   views: PropTypes.arrayOf(PropTypes.string), // Acepta cualquier string para permitir vistas personalizadas
-  content: PropTypes.node,    // Área superior derecha
+  contentTopRight: PropTypes.node,    // Área superior derecha
   contentBottomLeft: PropTypes.node,  // Área inferior izquierda
   contentBottomRight: PropTypes.node, // Área inferior derecha
   hideViewButtons: PropTypes.bool,    // Oculta botones de vista
@@ -841,7 +841,7 @@ const useResponsiveView = (views = ["web", "table", "movil"], breakpoints = { mo
  * @param {React.ReactNode} [viewWeb] - Contenido para vista web (desktop). Fallback por defecto para todas las vistas
  * @param {React.ReactNode} [viewTable] - Contenido para vista tablet (fallback a viewWeb si no se proporciona)
  * @param {React.ReactNode} [viewMovil] - Contenido para vista móvil (fallback a viewTable → viewWeb si no se proporciona)
- * @param {React.ReactNode} [content] - Contenido del área superior derecha (botones de acción)
+ * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha (botones de acción)
  * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (filtros, inputs)
  * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha (controles, ordenamiento)
  * @param {string} [className] - Clases CSS adicionales para el header
@@ -859,7 +859,7 @@ const HeaderCardViewResponsive = React.memo(({
   viewTable,
   viewMovil,
   // Slots con nomenclatura consistente
-  content,    // Área superior derecha: botones de acción, controles principales
+  contentTopRight,    // Área superior derecha: botones de acción, controles principales
   contentBottomLeft,  // Área inferior izquierda: inputs, selects, filtros, etc.
   contentBottomRight, // Área inferior derecha: botones, controles, ordenamiento, etc.
   // Estilos
@@ -929,7 +929,7 @@ const HeaderCardViewResponsive = React.memo(({
         currentView={currentView}
         onViewChange={handleViewChange} // Permitir cambio manual
         views={views}
-        content={content}
+        contentTopRight={contentTopRight}
         contentBottomLeft={contentBottomLeft}
         contentBottomRight={contentBottomRight}
         className={className}
@@ -974,7 +974,7 @@ HeaderCardViewResponsive.propTypes = {
   viewWeb: PropTypes.node,
   viewTable: PropTypes.node,
   viewMovil: PropTypes.node,
-  content: PropTypes.node,    // Área superior derecha
+  contentTopRight: PropTypes.node,    // Área superior derecha
   contentBottomLeft: PropTypes.node,  // Área inferior izquierda  
   contentBottomRight: PropTypes.node, // Área inferior derecha
   className: PropTypes.string,

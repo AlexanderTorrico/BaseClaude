@@ -1,11 +1,10 @@
 import React from "react";
-import { H4 } from "../../../../components/Atoms";
 
 const Footer = () => {
 
     return (
         <div className="mt-5 p-4 bg-light rounded">
-            <H4 className="mb-3">API Simplificada - Fácil de usar:</H4>
+            <h4 className="mb-3">API Simplificada - Fácil de usar:</h4>
             <div className="row">
               <div className="col-lg-4">
                 <h6 className="text-primary">HeaderCard (Base)</h6>

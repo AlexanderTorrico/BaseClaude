@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { H4 } from "../../../../../components/Atoms";
 import HeaderCard from "../../../../../components/HeaderCard";
 import { HeaderCardViews } from "../../../../../components/HeaderCardViews";
 import { 
@@ -44,7 +43,7 @@ const BasicExamples = React.memo(({
 
   return (
     <React.Fragment>
-      <H4 className="mb-3 text-primary">HeaderCard (Componente Base)</H4>
+      <h4 className="mb-3 text-primary">HeaderCard (Componente Base)</h4>
       
       {/* Ejemplo 1: Header básico */}
       <HeaderCard
@@ -77,7 +76,7 @@ const BasicExamples = React.memo(({
         }
       />
 
-      <H4 className="mb-3 mt-5 text-success">HeaderCardViews (Con Cambio de Vista)</H4>
+      <h4 className="mb-3 mt-5 text-success">HeaderCardViews (Con Cambio de Vista)</h4>
 
       {/* Ejemplo 4: HeaderCardViews con contenido dinámico */}
       <HeaderCardViews
@@ -143,7 +142,7 @@ const BasicExamples = React.memo(({
         }
       />
 
-      <H4 className="mb-3 mt-5 text-info">HeaderCardViews con Iconos Personalizados</H4>
+      <h4 className="mb-3 mt-5 text-info">HeaderCardViews con Iconos Personalizados</h4>
 
       {/* Ejemplo 6: HeaderCardViews con sistema completo */}
       <HeaderCardViews

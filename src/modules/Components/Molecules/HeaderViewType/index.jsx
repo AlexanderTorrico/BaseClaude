@@ -1,7 +1,6 @@
 import React from "react";
 import { withTranslation } from "react-i18next";
 import { Container, Button, InputGroup, InputGroupText, Input } from "reactstrap";
-import { H4 } from "../../../../components/Atoms";
 import HeaderCard from "../../../../components/HeaderCard";
 import { HeaderCardViews, HeaderCardViewResponsive } from "../../../../components/HeaderCardViews";
 // Subcomponentes optimizados
@@ -42,9 +41,9 @@ const HeaderViewTypePage = () => {
     <React.Fragment>
       <div className="page-content">
         <Container fluid>
-          <H4 className="mb-4">HeaderCard & HeaderCardViews - Moléculas Genéricas</H4>
+          <h4 className="mb-4">HeaderCard & HeaderCardViews - Moléculas Genéricas</h4>
           
-          <H4 className="mb-3 text-primary">HeaderCard (Componente Base)</H4>
+          <h4 className="mb-3 text-primary">HeaderCard (Componente Base)</h4>
           
           {/* Ejemplo 1: Header básico */}
           <HeaderCard
@@ -83,7 +82,7 @@ const HeaderViewTypePage = () => {
             }
           />
 
-          <H4 className="mb-3 mt-5 text-success">HeaderCardViews (Con Cambio de Vista)</H4>
+          <h4 className="mb-3 mt-5 text-success">HeaderCardViews (Con Cambio de Vista)</h4>
 
           {/* Ejemplo 4: HeaderCardViews con pestañas */}
           <HeaderCardViews
@@ -205,7 +204,7 @@ const HeaderViewTypePage = () => {
             }
           />
 
-          <H4 className="mb-3 mt-5 text-info">HeaderCardViews con Iconos Personalizados</H4>
+          <h4 className="mb-3 mt-5 text-info">HeaderCardViews con Iconos Personalizados</h4>
 
           {/* Ejemplo 6.5: HeaderCardViews con objetos personalizados */}
           <HeaderCardViews
@@ -227,7 +226,7 @@ const HeaderViewTypePage = () => {
             ]}
           />
 
-          <H4 className="mb-3 mt-5 text-warning">HeaderCardViewResponsive (Integrado con Contenido)</H4>
+          <h4 className="mb-3 mt-5 text-warning">HeaderCardViewResponsive (Integrado con Contenido)</h4>
 
           {/* Ejemplo 7: HeaderCardViewResponsive con nuevo formato */}
           <HeaderCardViewResponsive

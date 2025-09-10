@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { H4 } from "../../../../../components/Atoms";
 import { HeaderCardViewResponsive } from "../../../../../components/HeaderCardViews";
 import { ResponsiveViewActions } from "../content/ViewActionButtons";
 import { SearchRecordsInput } from "../content/SearchInputs";
@@ -45,7 +44,7 @@ const ResponsiveExample = React.memo(({
 
   return (
     <React.Fragment>
-      <H4 className="mb-3 mt-5 text-warning">HeaderCardViewResponsive (Integrado con Contenido)</H4>
+      <h4 className="mb-3 mt-5 text-warning">HeaderCardViewResponsive (Integrado con Contenido)</h4>
 
       {/* Ejemplo completo: HeaderCardViewResponsive con nueva estructura de contents */}
       <HeaderCardViewResponsive

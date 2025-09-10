@@ -1,7 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Row, Col, Card, CardBody } from "reactstrap";
-import { H4, P, Badge } from "./Atoms";
+import { Row, Col, Card, CardBody, Badge } from "reactstrap";
 
 /**
  * HeaderCard - Componente genérico de header optimizado
@@ -37,9 +36,9 @@ const HeaderCard = React.memo(({
         {/* Fila superior: Título/Descripción + Slot derecha */}
         <Row className="align-items-center">
           <Col lg={6} md={12}>
-            <H4 className="mb-0">{title}</H4>
+            <h4 className="mb-0">{title}</h4>
             {description && (
-              <P className="text-muted mb-md-0 mb-3">
+              <p className="text-muted mb-md-0 mb-3">
                 {description}
                 {showBadge && badgeText && (
                   <span className="ms-2">
@@ -48,7 +47,7 @@ const HeaderCard = React.memo(({
                     </Badge>
                   </span>
                 )}
-              </P>
+              </p>
             )}
           </Col>
           <Col lg={6} md={12}>

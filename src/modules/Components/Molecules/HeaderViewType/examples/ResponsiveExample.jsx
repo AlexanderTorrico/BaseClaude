@@ -47,27 +47,30 @@ const ResponsiveExample = React.memo(({
     <React.Fragment>
       <H4 className="mb-3 mt-5 text-warning">HeaderCardViewResponsive (Integrado con Contenido)</H4>
 
-      {/* Ejemplo completo: HeaderCardViewResponsive con configuración responsiva */}
+      {/* Ejemplo completo: HeaderCardViewResponsive con nueva estructura de contents */}
       <HeaderCardViewResponsive
         title="Sistema Responsivo Completo"
         description="Header con contenido que cambia automáticamente según el tamaño de pantalla"
         badge={{ count: 25, total: 100 }}
-        views={['web', 'table', 'movil']} // [desktop, tablet, mobile]
+        views={[
+          { name: "Web", icon: "mdi-monitor", key: "web" },
+          { name: "Tabla", icon: "mdi-table", key: "table" },
+          { name: "Móvil", icon: "mdi-cellphone", key: "movil" }
+        ]} // Usando objetos para mayor flexibilidad
         breakpoints={{ mobile: 768, tablet: 1024, desktop: 1200 }}
         enableTransitions={true}
-        contentTopRight={
-          <ResponsiveViewActions onNew={handleNewRecord} />
-        }
-        contentBottomLeft={
+        contents={[
+          // [0] contentTopRight
+          <ResponsiveViewActions onNew={handleNewRecord} />,
+          // [1] contentBottomLeft  
           <SearchRecordsInput
             value={searchValue}
             onChange={(e) => handleSearchChange(e.target.value)}
             onSearch={handleSearch}
-          />
-        }
-        contentBottomRight={
+          />,
+          // [2] contentBottomRight
           <ResponsiveFilterGroup onFilter={handleFilter} />
-        }
+        ]}
         viewWeb={
           <UserDataTable 
             onEdit={handleUserEdit}

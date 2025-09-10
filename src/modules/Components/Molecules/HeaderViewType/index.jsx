@@ -84,19 +84,19 @@ const HeaderViewTypePage = () => {
 
           <H4 className="mb-3 mt-5 text-success">HeaderCardViews (Con Cambio de Vista)</H4>
 
-          {/* Ejemplo 4: HeaderCardViews básico optimizado */}
+          {/* Ejemplo 4: HeaderCardViews con nuevo formato contents */}
           <HeaderCardViews
-            title="Gestión de Usuarios"
+            title="Gestión de Usuarios (Formato Nuevo)"
             description={`Sistema de usuarios - Vista: ${view1}`}
             badge={{ count: 156, total: 500 }}
             currentView={view1}
             onViewChange={setView1}
-            contentTopRight={
+            contents={[
               <Button color="primary" size="sm">
                 <i className="mdi mdi-plus me-1"></i>
                 Nuevo Usuario
               </Button>
-            }
+            ]}
           />
 
           {/* Ejemplo 5: HeaderCardViews con 3 vistas */}
@@ -165,39 +165,47 @@ const HeaderViewTypePage = () => {
 
           <H4 className="mb-3 mt-5 text-info">HeaderCardViews con Iconos Personalizados</H4>
 
-          {/* Ejemplo 6.5: HeaderCardViews con iconos personalizados */}
+          {/* Ejemplo 6.5: HeaderCardViews con objetos personalizados */}
           <HeaderCardViews
-            title="Sistema con Vistas Personalizadas"
-            description={`Ejemplo con iconos personalizados - Vista: ${view3}`}
+            title="Sistema con Objetos Personalizados"
+            description={`Ejemplo con objetos - Vista: ${view3}`}
             badge={{ count: 15, total: 30, color: "info" }}
             currentView={view3}
             onViewChange={setView3}
-            views={['admin:mdi-shield-account', 'reportes:mdi-chart-line', 'config:mdi-cog']} // Formato: nombre:icono
-            contentTopRight={
+            views={[
+              { name: "Admin", icon: "mdi-shield-account", key: "admin" },
+              { name: "Reportes", icon: "mdi-chart-line", key: "reportes" },
+              { name: "Config", icon: "mdi-cog", key: "config" }
+            ]}
+            contents={[
               <Button color="info" size="sm">
                 <i className="mdi mdi-settings me-1"></i>
                 Configurar
               </Button>
-            }
+            ]}
           />
 
           <H4 className="mb-3 mt-5 text-warning">HeaderCardViewResponsive (Integrado con Contenido)</H4>
 
-          {/* Ejemplo 7: HeaderCardViewResponsive con configuración responsiva */}
+          {/* Ejemplo 7: HeaderCardViewResponsive con nuevo formato */}
           <HeaderCardViewResponsive
             title="Sistema Responsivo Completo"
             description="Header con contenido que cambia automáticamente según el tamaño de pantalla"
             badge={{ count: 25, total: 100 }}
-            views={['web', 'table', 'movil']} // [desktop, tablet, mobile]
+            views={[
+              { name: "Web", icon: "mdi-monitor", key: "web" },
+              { name: "Tabla", icon: "mdi-table", key: "table" },
+              { name: "Móvil", icon: "mdi-cellphone", key: "movil" }
+            ]} // Usando objetos
             breakpoints={{ mobile: 768, tablet: 1024, desktop: 1200 }}
             enableTransitions={true}
-            contentTopRight={
+            contents={[
+              // [0] contentTopRight
               <Button color="primary" size="sm">
                 <i className="mdi mdi-plus me-1"></i>
                 Nuevo
-              </Button>
-            }
-            contentBottomLeft={
+              </Button>,
+              // [1] contentBottomLeft
               <InputGroup size="sm">
                 <InputGroupText>
                   <i className="mdi mdi-magnify"></i>
@@ -206,14 +214,13 @@ const HeaderViewTypePage = () => {
                   type="text"
                   placeholder="Buscar registros..."
                 />
-              </InputGroup>
-            }
-            contentBottomRight={
+              </InputGroup>,
+              // [2] contentBottomRight
               <Button color="primary" outline size="sm">
                 <i className="mdi mdi-filter"></i>
                 Filtrar
               </Button>
-            }
+            ]}
             viewWeb={
               <UserDataTable 
                 onEdit={handleUserEdit}
@@ -252,32 +259,47 @@ const HeaderViewTypePage = () => {
 />`}</code></pre>
               </div>
               <div className="col-lg-4">
-                <h6 className="text-success">HeaderCardViews (Optimizado)</h6>
+                <h6 className="text-success">HeaderCardViews (Nuevo Formato)</h6>
                 <pre className="small"><code>{`<HeaderCardViews
   title="Mi Sistema"
   badge="Activo"
   currentView={view}
   onViewChange={setView}
-  views={['web', 'table', 'movil']}
-  // O con iconos personalizados:
-  // views={['admin:mdi-shield', 'ventas:mdi-cart']}
-  contentTopRight={<Button>Nuevo</Button>}
-  contentBottomLeft={<Input />}
-  contentBottomRight={<Button>Filtros</Button>}
+  // Objetos para mayor flexibilidad:
+  views={[
+    { name: "Web", icon: "mdi-monitor", key: "web" },
+    { name: "Admin", icon: "mdi-shield", key: "admin" }
+  ]}
+  // O strings (compatibilidad):
+  // views={['web', 'table', 'admin:mdi-shield']}
+  // Nuevo sistema de contents:
+  contents={[
+    <Button>Nuevo</Button>,    // [0] topRight
+    <Input />,                 // [1] bottomLeft
+    <Button>Filtros</Button>   // [2] bottomRight
+  ]}
 />`}</code></pre>
               </div>
               <div className="col-lg-4">
-                <h6 className="text-warning">HeaderCardViewResponsive</h6>
+                <h6 className="text-warning">HeaderCardViewResponsive (Nuevo)</h6>
                 <pre className="small"><code>{`<HeaderCardViewResponsive
   title="Dashboard"
   badge={{count: 25, total: 100}}
-  views={['web', 'table', 'movil']}
-  // O personalizado: views={['datos:mdi-database']}
+  // Objetos o strings:
+  views={[
+    { name: "Web", icon: "mdi-monitor", key: "web" },
+    { name: "Móvil", icon: "mdi-cellphone", key: "movil" }
+  ]}
   breakpoints={{mobile: 768, tablet: 1024}}
   viewWeb={<MiTablaWeb />}
   viewTable={<MisCardsTablet />}
   viewMovil={<MiGridMovil />}
-  contentTopRight={<Button>Acción</Button>}
+  // Nuevo sistema contents:
+  contents={[
+    <Button>Acción</Button>,  // topRight
+    <Input />,                // bottomLeft
+    <Button>Filtros</Button>  // bottomRight
+  ]}
   enableTransitions={true}
 />`}</code></pre>
               </div>
@@ -286,13 +308,14 @@ const HeaderViewTypePage = () => {
             <div className="mt-4">
               <h6>✨ Mejoras implementadas:</h6>
               <ul className="small">
+                <li><strong>Vistas como objetos:</strong> Soporte para {`{name, icon, key, title}`} además de strings</li>
+                <li><strong>Sistema contents:</strong> Array [topRight, bottomLeft, bottomRight] para posicionamiento</li>
+                <li><strong>Compatibilidad total:</strong> Mantiene soporte para props legacy (contentTopRight, etc.)</li>
                 <li><strong>Badge simplificado:</strong> String directo o objeto {`{count, total, color}`}</li>
-                <li><strong>Props reducidas:</strong> Eliminadas props redundantes y complejas</li>
-                <li><strong>Nomenclatura estandarizada:</strong> `contentTopRight` para área superior derecha en todos los componentes</li>
-                <li><strong>Posicionamiento estandarizado:</strong> Mismo contenedor flex con `d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center`</li>
-                <li><strong>Responsivo inteligente:</strong> Hook `useResponsiveView` con detección automática de breakpoints</li>
+                <li><strong>Nomenclatura estandarizada:</strong> API unificada en todos los componentes</li>
+                <li><strong>Responsivo inteligente:</strong> Hook `useResponsiveView` con detección automática</li>
                 <li><strong>Transiciones suaves:</strong> Animaciones CSS configurables para cambios de vista</li>
-                <li><strong>Iconos personalizados:</strong> Soporte para vistas con formato "nombre:mdi-icon" (ej: "admin:mdi-shield")</li>
+                <li><strong>Iconos flexibles:</strong> MDI automático + formato personalizado "nombre:mdi-icon"</li>
                 <li><strong>Vistas predefinidas:</strong> web, table, movil, cards, grid, list con iconos automáticos</li>
               </ul>
               
@@ -319,12 +342,23 @@ const HeaderViewTypePage = () => {
               </div>
 
               <div className="mt-3 p-3 bg-warning bg-opacity-10 rounded">
-                <h6 className="text-warning mb-2">🎯 Estándar Unificado:</h6>
+                <h6 className="text-warning mb-2">🎯 Sistema de Objetos y Contents:</h6>
                 <ul className="small mb-0">
-                  <li><strong>Atributo estandarizado:</strong> Todos los componentes usan `contentTopRight` con nomenclatura consistente</li>
-                  <li><strong>Posicionamiento consistente:</strong> Mismo comportamiento responsivo en desktop y móvil</li>
-                  <li><strong>API simplificada:</strong> Una sola prop para el área superior derecha</li>
+                  <li><strong>Objetos views:</strong> {`{name: "Admin", icon: "mdi-shield", key: "admin", title: "Panel Admin"}`}</li>
+                  <li><strong>Array contents:</strong> [topRight, bottomLeft, bottomRight] para posicionamiento preciso</li>
+                  <li><strong>Backward compatibility:</strong> Mantiene soporte completo para props legacy</li>
+                  <li><strong>Normalización automática:</strong> Convierte strings a objetos internamente</li>
+                  <li><strong>Flexibilidad máxima:</strong> Combina ambos sistemas según necesidades</li>
+                </ul>
+              </div>
+              
+              <div className="mt-3 p-3 bg-secondary bg-opacity-10 rounded">
+                <h6 className="text-secondary mb-2">📝 API Unificada:</h6>
+                <ul className="small mb-0">
+                  <li><strong>Nomenclatura consistente:</strong> API unificada en HeaderCard, HeaderCardViews y HeaderCardViewResponsive</li>
+                  <li><strong>PropTypes completos:</strong> Validación total con soporte para ambos formatos</li>
                   <li><strong>JSDoc completo:</strong> Documentación integrada para VSCode IntelliSense</li>
+                  <li><strong>Performance optimizada:</strong> React.memo, useCallback, useMemo en todos los componentes</li>
                 </ul>
               </div>
             </div>

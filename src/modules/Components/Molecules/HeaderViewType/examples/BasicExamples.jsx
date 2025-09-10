@@ -87,12 +87,12 @@ const BasicExamples = React.memo(({
         currentView={view1}
         views={['web', 'table', 'movil']}
         onViewChange={setView1}
-        contentTopRight={
+        contents={[
           <NewUserActions 
             onNew={handleNewUser}
             onExport={handleExport}
           />
-        }
+        ]}
       />
 
       {/* Ejemplo 5: HeaderCardViews con 3 vistas */}
@@ -103,27 +103,31 @@ const BasicExamples = React.memo(({
         currentView={view2}
         onViewChange={setView2}
         views={['web', 'table', 'movil']}
-        contentTopRight={
+        contents={[
           <ProductActions 
             onAdd={handleAddProduct}
             onSettings={handleSettings}
           />
-        }
+        ]}
       />
 
       <H4 className="mb-3 mt-5 text-info">HeaderCardViews con Iconos Personalizados</H4>
 
-      {/* Ejemplo 6: HeaderCardViews con iconos personalizados */}
+      {/* Ejemplo 6: HeaderCardViews con iconos personalizados usando objetos */}
       <HeaderCardViews
         title="Sistema con Vistas Personalizadas"
-        description={`Ejemplo con iconos personalizados - Vista: ${view3}`}
+        description={`Ejemplo con objetos personalizados - Vista: ${view3}`}
         badge={{ count: 15, total: 30, color: "info" }}
         currentView={view3}
         onViewChange={setView3}
-        views={['admin:mdi-shield-account', 'reportes:mdi-chart-line', 'config:mdi-cog']}
-        contentTopRight={
+        views={[
+          { name: "Administración", icon: "mdi-shield-account", key: "admin" },
+          { name: "Reportes", icon: "mdi-chart-line", key: "reportes" },
+          { name: "Configuración", icon: "mdi-cog", key: "config" }
+        ]}
+        contents={[
           <CustomViewActions onConfigure={handleConfigure} />
-        }
+        ]}
       />
     </React.Fragment>
   );

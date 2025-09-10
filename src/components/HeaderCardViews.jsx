@@ -3,39 +3,68 @@ import PropTypes from "prop-types";
 import { Button } from "reactstrap";
 import HeaderCard from "./HeaderCard";
 
-// Configuración estática de vistas (fuera del componente para evitar re-creación)
-const VIEWS_CONFIG = {
-  // Vistas predeterminadas con iconos automáticos
-  web: { icon: "mdi-monitor", label: "Web", title: "Vista Web" },
-  table: { icon: "mdi-table", label: "Tabla", title: "Vista Tabla" },
-  movil: { icon: "mdi-cellphone", label: "Móvil", title: "Vista Móvil" },
-  cards: { icon: "mdi-card-multiple", label: "Cards", title: "Vista Cards" },
-  grid: { icon: "mdi-view-grid", label: "Grid", title: "Vista Grid" },
-  list: { icon: "mdi-view-list", label: "Lista", title: "Vista Lista" },
-  // Función helper para obtener configuración de vista (permite iconos personalizados)
-  getViewConfig: (viewName) => {
-    // Si es una configuración predeterminada, devolverla
-    if (VIEWS_CONFIG[viewName]) {
-      return VIEWS_CONFIG[viewName];
-    }
-    
-    // Si contiene un icono personalizado (formato: "nombre:mdi-icon-name")
-    if (typeof viewName === 'string' && viewName.includes(':')) {
-      const [name, icon] = viewName.split(':');
+// Configuración estática de vistas predeterminadas
+const DEFAULT_VIEWS_CONFIG = {
+  web: { name: "Web", icon: "mdi-monitor", title: "Vista Web" },
+  table: { name: "Tabla", icon: "mdi-table", title: "Vista Tabla" },
+  movil: { name: "Móvil", icon: "mdi-cellphone", title: "Vista Móvil" },
+  cards: { name: "Cards", icon: "mdi-card-multiple", title: "Vista Cards" },
+  grid: { name: "Grid", icon: "mdi-view-grid", title: "Vista Grid" },
+  list: { name: "Lista", icon: "mdi-view-list", title: "Vista Lista" }
+};
+
+// Función helper para normalizar configuración de vistas
+const normalizeViewConfig = (view, index) => {
+  // Si es un objeto con name e icon, usarlo directamente
+  if (typeof view === 'object' && view.name && view.icon) {
+    return {
+      key: view.key || view.name.toLowerCase(),
+      name: view.name,
+      icon: view.icon.startsWith('mdi-') ? view.icon : `mdi-${view.icon}`,
+      title: view.title || `Vista ${view.name}`
+    };
+  }
+  
+  // Si es string, verificar si es configuración predeterminada
+  if (typeof view === 'string') {
+    // Formato "nombre:mdi-icon-name" (mantener compatibilidad)
+    if (view.includes(':')) {
+      const [name, icon] = view.split(':');
       return {
+        key: name.toLowerCase(),
+        name: name.charAt(0).toUpperCase() + name.slice(1),
         icon: icon.startsWith('mdi-') ? icon : `mdi-${icon}`,
-        label: name.charAt(0).toUpperCase() + name.slice(1),
         title: `Vista ${name.charAt(0).toUpperCase() + name.slice(1)}`
       };
     }
     
-    // Vista personalizada sin icono específico (usar icono genérico)
+    // String simple, buscar en configuraciones predeterminadas
+    if (DEFAULT_VIEWS_CONFIG[view]) {
+      const config = DEFAULT_VIEWS_CONFIG[view];
+      return {
+        key: view,
+        name: config.name,
+        icon: config.icon,
+        title: config.title
+      };
+    }
+    
+    // String personalizado sin configuración
     return {
+      key: view.toLowerCase(),
+      name: view.charAt(0).toUpperCase() + view.slice(1),
       icon: "mdi-eye",
-      label: typeof viewName === 'string' ? viewName.charAt(0).toUpperCase() + viewName.slice(1) : "Vista",
-      title: `Vista ${typeof viewName === 'string' ? viewName.charAt(0).toUpperCase() + viewName.slice(1) : "Personalizada"}`
+      title: `Vista ${view.charAt(0).toUpperCase() + view.slice(1)}`
     };
   }
+  
+  // Fallback genérico
+  return {
+    key: `view-${index}`,
+    name: `Vista ${index + 1}`,
+    icon: "mdi-eye",
+    title: `Vista ${index + 1}`
+  };
 };
 
 /**
@@ -45,12 +74,13 @@ const VIEWS_CONFIG = {
  * @param {string} title - Título principal del header
  * @param {string} [description] - Descripción opcional del header  
  * @param {string|Object} [badge] - Badge simple (string) o complejo {count, total, color, text}
- * @param {string} [currentView="table"] - Vista actualmente seleccionada
+ * @param {string} [currentView="table"] - Vista actualmente seleccionada (key de la vista)
  * @param {function} [onViewChange] - Función callback para cambio de vista
- * @param {string[]} [views=["table", "cards"]] - Array de vistas disponibles (soporta: web, table, movil, cards, grid, list, o formato personalizado "nombre:mdi-icon")
- * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha (botones de acción)
- * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (filtros, inputs)
- * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha (controles, ordenamiento)
+ * @param {Array} [views] - Array de vistas: objetos {name, icon, key?} o strings (compatibilidad)
+ * @param {Array} [contents] - Array de contenidos [topRight, bottomLeft, bottomRight]
+ * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha (deprecated, usar contents[0])
+ * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (deprecated, usar contents[1])
+ * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha (deprecated, usar contents[2])
  * @param {string} [className] - Clases CSS adicionales
  * @param {boolean} [hideViewButtons=false] - Oculta los botones de cambio de vista
  * @param {boolean} [responsiveMode=false] - Indica si está en modo responsivo (solo lectura)
@@ -64,10 +94,12 @@ const HeaderCardViews = React.memo(({
   currentView = "table",
   onViewChange,
   views = ["table", "cards"],
-  // Slots con nomenclatura consistente
-  contentTopRight,    // Área superior derecha: botones de acción, controles principales
-  contentBottomLeft,  // Área inferior izquierda: inputs, selects, filtros, etc.
-  contentBottomRight, // Área inferior derecha: botones, controles, ordenamiento, etc.
+  // Nuevo sistema de contenidos
+  contents = [],
+  // Slots legacy (mantener compatibilidad)
+  contentTopRight,
+  contentBottomLeft,
+  contentBottomRight,
   // Configuración responsiva
   hideViewButtons = false,
   responsiveMode = false,
@@ -77,40 +109,52 @@ const HeaderCardViews = React.memo(({
   className
 }) => {
 
-  const renderViewButtons = () => {
+  // Normalizar vistas a objetos consistentes
+  const normalizedViews = React.useMemo(() => {
+    return views.map((view, index) => normalizeViewConfig(view, index));
+  }, [views]);
+
+  // Resolver contenidos (priorizar contents sobre props legacy)
+  const resolvedContents = React.useMemo(() => {
+    return {
+      topRight: contents[0] || contentTopRight,
+      bottomLeft: contents[1] || contentBottomLeft,
+      bottomRight: contents[2] || contentBottomRight
+    };
+  }, [contents, contentTopRight, contentBottomLeft, contentBottomRight]);
+
+  const renderViewButtons = React.useCallback(() => {
     // Ocultar botones si está configurado o si hay menos de 2 vistas
-    if (hideViewButtons || views.length < 2) return null;
+    if (hideViewButtons || normalizedViews.length < 2) return null;
     
     return (
       <div className="btn-group d-none d-md-flex me-2" role="group">
-        {views.map((view, index) => {
-          const config = VIEWS_CONFIG.getViewConfig(view);
-          
-          const isActive = currentView === view;
-          const isResponsiveMatch = responsiveView === view;
+        {normalizedViews.map((viewConfig, index) => {
+          const isActive = currentView === viewConfig.key;
+          const isResponsiveMatch = responsiveView === viewConfig.key;
           
           return (
             <Button 
-              key={`${view}-${index}`}
+              key={`${viewConfig.key}-${index}`}
               color={isActive ? 'primary' : 'light'}
-              onClick={() => onViewChange && onViewChange(view)}
+              onClick={() => onViewChange && onViewChange(viewConfig.key)}
               size="sm"
               title={responsiveMode ? 
-                `${config.title} ${isResponsiveMatch ? '(Vista responsiva)' : '(Override manual)'}` : 
-                config.title
+                `${viewConfig.title} ${isResponsiveMatch ? '(Vista responsiva)' : '(Override manual)'}` : 
+                viewConfig.title
               }
               style={{
                 position: 'relative'
               }}
             >
-              <i className={`mdi ${config.icon}`}></i>
-              <span className="d-none d-lg-inline ms-1">{config.label}</span>
+              <i className={`mdi ${viewConfig.icon}`}></i>
+              <span className="d-none d-lg-inline ms-1">{viewConfig.name}</span>
             </Button>
           );
         })}
       </div>
     );
-  };
+  }, [normalizedViews, currentView, responsiveView, hideViewButtons, onViewChange, responsiveMode]);
 
   // Determinar badge props (memoizado para rendimiento)
   const badgeProps = React.useMemo(() => {
@@ -126,15 +170,15 @@ const HeaderCardViews = React.memo(({
       title={title}
       description={description}
       {...badgeProps}
-      showBottomRow={!!(contentBottomLeft || contentBottomRight)}
+      showBottomRow={!!(resolvedContents.bottomLeft || resolvedContents.bottomRight)}
       contentTopRight={
         <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
           {renderViewButtons()}
-          {contentTopRight}
+          {resolvedContents.topRight}
         </div>
       }
-      bottomLeftSlot={contentBottomLeft}
-      bottomRightSlot={contentBottomRight}
+      bottomLeftSlot={resolvedContents.bottomLeft}
+      bottomRightSlot={resolvedContents.bottomRight}
       className={className}
     />
   );
@@ -154,27 +198,48 @@ HeaderCardViews.propTypes = {
   ]),
   currentView: PropTypes.string,
   onViewChange: PropTypes.func,
-  views: PropTypes.arrayOf(PropTypes.string), // Acepta cualquier string para permitir vistas personalizadas
-  contentTopRight: PropTypes.node,    // Área superior derecha
-  contentBottomLeft: PropTypes.node,  // Área inferior izquierda
-  contentBottomRight: PropTypes.node, // Área inferior derecha
-  hideViewButtons: PropTypes.bool,    // Oculta botones de vista
-  responsiveMode: PropTypes.bool,     // Modo responsivo automático
-  isManualOverride: PropTypes.bool,   // Indica si está en override manual
-  responsiveView: PropTypes.string, // Vista que correspondería por responsivo
+  views: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.string, // Compatibilidad hacia atrás
+      PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        icon: PropTypes.string.isRequired,
+        key: PropTypes.string,
+        title: PropTypes.string
+      })
+    ])
+  ),
+  contents: PropTypes.arrayOf(PropTypes.node), // [topRight, bottomLeft, bottomRight]
+  // Props legacy (deprecated pero mantenidas por compatibilidad)
+  contentTopRight: PropTypes.node,
+  contentBottomLeft: PropTypes.node,
+  contentBottomRight: PropTypes.node,
+  hideViewButtons: PropTypes.bool,
+  responsiveMode: PropTypes.bool,
+  isManualOverride: PropTypes.bool,
+  responsiveView: PropTypes.string,
   className: PropTypes.string
 };
 
 /**
  * Hook personalizado para manejo responsivo automático de vistas
- * @param {string[]} views - Array de vistas [desktop, tablet, mobile]
+ * @param {Array} views - Array de vistas (objetos o strings) [desktop, tablet, mobile]
  * @param {Object} breakpoints - Puntos de quiebre {mobile: 768, tablet: 1024, desktop: 1200}
  * @returns {Object} {currentView, isMobile, currentBreakpoint}
  */
-const useResponsiveView = (views = ["web", "table", "movil"], breakpoints = { mobile: 768, tablet: 1024, desktop: 1200 }) => {
+const useResponsiveView = (views = [
+  { name: "Web", icon: "mdi-monitor" },
+  { name: "Tabla", icon: "mdi-table" }, 
+  { name: "Móvil", icon: "mdi-cellphone" }
+], breakpoints = { mobile: 768, tablet: 1024, desktop: 1200 }) => {
   const [windowWidth, setWindowWidth] = React.useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   const [manualView, setManualView] = React.useState(null); // Vista seleccionada manualmente
   const [lastBreakpoint, setLastBreakpoint] = React.useState(null);
+  
+  // Normalizar vistas en el hook
+  const normalizedViews = React.useMemo(() => {
+    return views.map((view, index) => normalizeViewConfig(view, index));
+  }, [views]);
   
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -211,9 +276,10 @@ const useResponsiveView = (views = ["web", "table", "movil"], breakpoints = { mo
     };
     
     const viewIndex = breakpointIndex[currentBreakpoint];
-    // Fallback a desktop (índice 0) si no hay vista definida para tablet/mobile
-    return views[viewIndex] || views[0] || 'web';
-  }, [views, currentBreakpoint]);
+    // Usar vistas normalizadas y obtener el key
+    const selectedView = normalizedViews[viewIndex] || normalizedViews[0];
+    return selectedView ? selectedView.key : 'web';
+  }, [normalizedViews, currentBreakpoint]);
   
   const currentView = manualView || getResponsiveView();
   
@@ -222,7 +288,8 @@ const useResponsiveView = (views = ["web", "table", "movil"], breakpoints = { mo
     responsiveView: getResponsiveView(),
     isMobile: currentBreakpoint === 'mobile',
     isManualOverride: !!manualView,
-    setManualView
+    setManualView,
+    normalizedViews
   };
 };
 
@@ -233,14 +300,15 @@ const useResponsiveView = (views = ["web", "table", "movil"], breakpoints = { mo
  * @param {string} title - Título principal del header
  * @param {string} [description] - Descripción opcional del header
  * @param {string|Object} [badge] - Badge simple (string) o complejo {count, total, color, text}
- * @param {string[]} [views=['web', 'table', 'movil']] - Vistas responsivas [desktop, tablet, mobile]. Soporta: web, table, movil, cards, grid, list, o formato personalizado "nombre:mdi-icon"
+ * @param {Array} [views=['web', 'table', 'movil']] - Vistas responsivas [desktop, tablet, mobile]. Acepta objetos {name, icon} o strings
+ * @param {Array} [contents] - Array de contenidos [topRight, bottomLeft, bottomRight]
  * @param {Object} [breakpoints] - Puntos de quiebre personalizados {mobile: 768, tablet: 1024, desktop: 1200}
  * @param {React.ReactNode} [viewWeb] - Contenido para vista web (desktop). Fallback por defecto para todas las vistas
  * @param {React.ReactNode} [viewTable] - Contenido para vista tablet (fallback a viewWeb si no se proporciona)
  * @param {React.ReactNode} [viewMovil] - Contenido para vista móvil (fallback a viewTable → viewWeb si no se proporciona)
- * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha (botones de acción)
- * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (filtros, inputs)
- * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha (controles, ordenamiento)
+ * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha (botones de acción) - deprecated, usar contents[0]
+ * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (filtros, inputs) - deprecated, usar contents[1]
+ * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha (controles, ordenamiento) - deprecated, usar contents[2]
  * @param {string} [className] - Clases CSS adicionales para el header
  * @param {string} [contentClassName] - Clases CSS adicionales para el área de contenido
  * @param {boolean} [enableTransitions=true] - Habilita transiciones suaves entre vistas
@@ -251,11 +319,12 @@ const HeaderCardViewResponsive = React.memo(({
   badge,
   // Vista y contenido con configuración responsiva
   views = ["web", "table", "movil"], // [desktop, tablet, mobile]
+  contents = [], // Nuevo sistema de contenidos
   breakpoints = { mobile: 768, tablet: 1024, desktop: 1200 },
   viewWeb,
   viewTable,
   viewMovil,
-  // Slots con nomenclatura consistente
+  // Slots legacy (mantener compatibilidad)
   contentTopRight,    // Área superior derecha: botones de acción, controles principales
   contentBottomLeft,  // Área inferior izquierda: inputs, selects, filtros, etc.
   contentBottomRight, // Área inferior derecha: botones, controles, ordenamiento, etc.
@@ -264,7 +333,7 @@ const HeaderCardViewResponsive = React.memo(({
   contentClassName,
   enableTransitions = true
 }) => {
-  const { currentView, responsiveView, isMobile, isManualOverride, setManualView } = useResponsiveView(views, breakpoints);
+  const { currentView, responsiveView, isMobile, isManualOverride, setManualView, normalizedViews } = useResponsiveView(views, breakpoints);
 
   const handleViewChange = React.useCallback((view) => {
     // Si view es null, resetear a modo responsivo automático
@@ -272,9 +341,9 @@ const HeaderCardViewResponsive = React.memo(({
   }, [setManualView]);
 
   const renderContent = React.useCallback(() => {
-    // Lógica de fallback inteligente según los requisitos
-    const getViewContent = (viewType) => {
-      switch (viewType) {
+    // Lógica de fallback inteligente usando las vistas normalizadas
+    const getViewContent = (viewKey) => {
+      switch (viewKey) {
         case 'web':
           return viewWeb; // Siempre mostrar viewWeb si está disponible
         
@@ -303,11 +372,15 @@ const HeaderCardViewResponsive = React.memo(({
     const selectedContent = getViewContent(currentView);
     
     if (!selectedContent) {
+      // Buscar el nombre de la vista actual para mostrar en el mensaje
+      const currentViewConfig = normalizedViews.find(v => v.key === currentView);
+      const viewDisplayName = currentViewConfig ? currentViewConfig.name : currentView;
+      
       return (
         <div className="card">
           <div className="card-body text-center text-muted p-5">
             <i className="mdi mdi-eye-off fs-1 mb-3 d-block"></i>
-            <h6>Vista {currentView} no configurada</h6>
+            <h6>Vista {viewDisplayName} no configurada</h6>
             <p className="mb-0">Proporciona el contenido para esta vista</p>
           </div>
         </div>
@@ -315,7 +388,7 @@ const HeaderCardViewResponsive = React.memo(({
     }
 
     return selectedContent;
-  }, [currentView, viewWeb, viewTable, viewMovil]);
+  }, [currentView, viewWeb, viewTable, viewMovil, normalizedViews]);
 
   return (
     <React.Fragment>
@@ -326,7 +399,8 @@ const HeaderCardViewResponsive = React.memo(({
         currentView={currentView}
         onViewChange={handleViewChange} // Permitir cambio manual
         views={views}
-        contentTopRight={contentTopRight}
+        contents={contents} // Pasar el nuevo sistema de contenidos
+        contentTopRight={contentTopRight} // Mantener compatibilidad
         contentBottomLeft={contentBottomLeft}
         contentBottomRight={contentBottomRight}
         className={className}
@@ -362,7 +436,18 @@ HeaderCardViewResponsive.propTypes = {
       color: PropTypes.string
     })
   ]),
-  views: PropTypes.arrayOf(PropTypes.string), // Acepta cualquier string para permitir vistas personalizadas
+  views: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.string, // Compatibilidad hacia atrás
+      PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        icon: PropTypes.string.isRequired,
+        key: PropTypes.string,
+        title: PropTypes.string
+      })
+    ])
+  ),
+  contents: PropTypes.arrayOf(PropTypes.node), // [topRight, bottomLeft, bottomRight]
   breakpoints: PropTypes.shape({
     mobile: PropTypes.number,
     tablet: PropTypes.number,
@@ -371,6 +456,7 @@ HeaderCardViewResponsive.propTypes = {
   viewWeb: PropTypes.node,
   viewTable: PropTypes.node,
   viewMovil: PropTypes.node,
+  // Props legacy (deprecated pero mantenidas por compatibilidad)
   contentTopRight: PropTypes.node,    // Área superior derecha
   contentBottomLeft: PropTypes.node,  // Área inferior izquierda  
   contentBottomRight: PropTypes.node, // Área inferior derecha

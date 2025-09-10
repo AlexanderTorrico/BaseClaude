@@ -4,6 +4,11 @@ import { Container, Button, InputGroup, InputGroupText, Input } from "reactstrap
 import { H4 } from "../../../../components/Atoms";
 import HeaderCard from "../../../../components/HeaderCard";
 import { HeaderCardViews, HeaderCardViewResponsive } from "../../../../components/HeaderCardViews";
+// Subcomponentes optimizados
+import UserDataTable from "./components/UserDataTable";
+import UserCardsList from "./components/UserCardsList";
+import UserGridGallery from "./components/UserGridGallery";
+import AddNewUserCard from "./components/AddNewUserCard";
 
 
 // Componente de demostración que se renderiza en la página
@@ -15,6 +20,22 @@ const HeaderViewTypePage = () => {
   const [view1, setView1] = React.useState('table');
   const [view2, setView2] = React.useState('cards');
   const [view3, setView3] = React.useState('table');
+
+  // Handlers optimizados para subcomponentes (memoizados)
+  const handleUserEdit = React.useCallback((user) => {
+    console.log('Editando usuario:', user);
+    // Aquí iría la lógica real de edición
+  }, []);
+
+  const handleUserDelete = React.useCallback((user) => {
+    console.log('Eliminando usuario:', user);
+    // Aquí iría la lógica real de eliminación
+  }, []);
+
+  const handleAddUser = React.useCallback(() => {
+    console.log('Agregando nuevo usuario');
+    // Aquí iría la lógica real de agregar usuario
+  }, []);
 
   return (
     <React.Fragment>
@@ -194,234 +215,26 @@ const HeaderViewTypePage = () => {
               </Button>
             }
             viewWeb={
-              <div className="card">
-                <div className="card-body">
-                  <div className="table-responsive">
-                    <table className="table table-hover mb-0">
-                      <thead className="table-light">
-                        <tr>
-                          <th>ID</th>
-                          <th>Nombre</th>
-                          <th>Email</th>
-                          <th>Estado</th>
-                          <th>Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>001</td>
-                          <td>Juan Pérez</td>
-                          <td>juan@example.com</td>
-                          <td><span className="badge bg-success">Activo</span></td>
-                          <td>
-                            <Button color="primary" size="sm" className="me-1">
-                              <i className="mdi mdi-pencil"></i>
-                            </Button>
-                            <Button color="danger" size="sm">
-                              <i className="mdi mdi-delete"></i>
-                            </Button>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>002</td>
-                          <td>María González</td>
-                          <td>maria@example.com</td>
-                          <td><span className="badge bg-warning">Pendiente</span></td>
-                          <td>
-                            <Button color="primary" size="sm" className="me-1">
-                              <i className="mdi mdi-pencil"></i>
-                            </Button>
-                            <Button color="danger" size="sm">
-                              <i className="mdi mdi-delete"></i>
-                            </Button>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>003</td>
-                          <td>Carlos López</td>
-                          <td>carlos@example.com</td>
-                          <td><span className="badge bg-success">Activo</span></td>
-                          <td>
-                            <Button color="primary" size="sm" className="me-1">
-                              <i className="mdi mdi-pencil"></i>
-                            </Button>
-                            <Button color="danger" size="sm">
-                              <i className="mdi mdi-delete"></i>
-                            </Button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+              <UserDataTable 
+                onEdit={handleUserEdit}
+                onDelete={handleUserDelete}
+              />
             }
             viewTable={
-              <div className="row">
-                <div className="col-xl-4 col-md-6">
-                  <div className="card">
-                    <div className="card-body">
-                      <div className="d-flex align-items-center">
-                        <div className="flex-shrink-0 me-3">
-                          <div className="avatar-sm rounded-circle bg-primary d-flex align-items-center justify-content-center">
-                            <span className="text-white">JP</span>
-                          </div>
-                        </div>
-                        <div className="flex-grow-1">
-                          <h6 className="mb-1">Juan Pérez</h6>
-                          <p className="text-muted mb-2">juan@example.com</p>
-                          <span className="badge bg-success">Activo</span>
-                        </div>
-                        <div className="flex-shrink-0">
-                          <Button color="primary" size="sm" className="me-1">
-                            <i className="mdi mdi-pencil"></i>
-                          </Button>
-                          <Button color="danger" size="sm">
-                            <i className="mdi mdi-delete"></i>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-xl-4 col-md-6">
-                  <div className="card">
-                    <div className="card-body">
-                      <div className="d-flex align-items-center">
-                        <div className="flex-shrink-0 me-3">
-                          <div className="avatar-sm rounded-circle bg-success d-flex align-items-center justify-content-center">
-                            <span className="text-white">MG</span>
-                          </div>
-                        </div>
-                        <div className="flex-grow-1">
-                          <h6 className="mb-1">María González</h6>
-                          <p className="text-muted mb-2">maria@example.com</p>
-                          <span className="badge bg-warning">Pendiente</span>
-                        </div>
-                        <div className="flex-shrink-0">
-                          <Button color="primary" size="sm" className="me-1">
-                            <i className="mdi mdi-pencil"></i>
-                          </Button>
-                          <Button color="danger" size="sm">
-                            <i className="mdi mdi-delete"></i>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-xl-4 col-md-6">
-                  <div className="card">
-                    <div className="card-body">
-                      <div className="d-flex align-items-center">
-                        <div className="flex-shrink-0 me-3">
-                          <div className="avatar-sm rounded-circle bg-info d-flex align-items-center justify-content-center">
-                            <span className="text-white">CL</span>
-                          </div>
-                        </div>
-                        <div className="flex-grow-1">
-                          <h6 className="mb-1">Carlos López</h6>
-                          <p className="text-muted mb-2">carlos@example.com</p>
-                          <span className="badge bg-success">Activo</span>
-                        </div>
-                        <div className="flex-shrink-0">
-                          <Button color="primary" size="sm" className="me-1">
-                            <i className="mdi mdi-pencil"></i>
-                          </Button>
-                          <Button color="danger" size="sm">
-                            <i className="mdi mdi-delete"></i>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <UserCardsList 
+                onEdit={handleUserEdit}
+                onDelete={handleUserDelete}
+              />
             }
             viewMovil={
               <div className="row">
-                <div className="col-lg-3 col-md-4 col-sm-6">
-                  <div className="card text-center">
-                    <div className="card-body">
-                      <div className="avatar-lg mx-auto mb-3">
-                        <div className="avatar-lg rounded bg-primary d-flex align-items-center justify-content-center">
-                          <span className="text-white fs-4">JP</span>
-                        </div>
-                      </div>
-                      <h6>Juan Pérez</h6>
-                      <p className="text-muted">juan@example.com</p>
-                      <span className="badge bg-success mb-3">Activo</span>
-                      <div className="d-flex justify-content-center gap-1">
-                        <Button color="primary" size="sm">
-                          <i className="mdi mdi-pencil"></i>
-                        </Button>
-                        <Button color="danger" size="sm">
-                          <i className="mdi mdi-delete"></i>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-3 col-md-4 col-sm-6">
-                  <div className="card text-center">
-                    <div className="card-body">
-                      <div className="avatar-lg mx-auto mb-3">
-                        <div className="avatar-lg rounded bg-success d-flex align-items-center justify-content-center">
-                          <span className="text-white fs-4">MG</span>
-                        </div>
-                      </div>
-                      <h6>María González</h6>
-                      <p className="text-muted">maria@example.com</p>
-                      <span className="badge bg-warning mb-3">Pendiente</span>
-                      <div className="d-flex justify-content-center gap-1">
-                        <Button color="primary" size="sm">
-                          <i className="mdi mdi-pencil"></i>
-                        </Button>
-                        <Button color="danger" size="sm">
-                          <i className="mdi mdi-delete"></i>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-3 col-md-4 col-sm-6">
-                  <div className="card text-center">
-                    <div className="card-body">
-                      <div className="avatar-lg mx-auto mb-3">
-                        <div className="avatar-lg rounded bg-info d-flex align-items-center justify-content-center">
-                          <span className="text-white fs-4">CL</span>
-                        </div>
-                      </div>
-                      <h6>Carlos López</h6>
-                      <p className="text-muted">carlos@example.com</p>
-                      <span className="badge bg-success mb-3">Activo</span>
-                      <div className="d-flex justify-content-center gap-1">
-                        <Button color="primary" size="sm">
-                          <i className="mdi mdi-pencil"></i>
-                        </Button>
-                        <Button color="danger" size="sm">
-                          <i className="mdi mdi-delete"></i>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-3 col-md-4 col-sm-6">
-                  <div className="card text-center">
-                    <div className="card-body">
-                      <div className="text-center p-4">
-                        <div className="avatar-lg mx-auto mb-3 border border-dashed rounded d-flex align-items-center justify-content-center">
-                          <i className="mdi mdi-plus text-muted fs-2"></i>
-                        </div>
-                        <p className="text-muted">Agregar nuevo registro</p>
-                        <Button color="primary" outline size="sm">
-                          <i className="mdi mdi-plus me-1"></i>
-                          Agregar
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <UserGridGallery 
+                  onEdit={handleUserEdit}
+                  onDelete={handleUserDelete}
+                />
+                <AddNewUserCard 
+                  onAdd={handleAddUser}
+                />
               </div>
             }
           />

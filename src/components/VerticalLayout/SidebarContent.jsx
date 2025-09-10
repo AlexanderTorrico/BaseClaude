@@ -214,6 +214,13 @@ const SidebarContent = (props) => {
               </ul>
             </li>
 
+            <li>
+              <Link to="/page-api" className=" ">
+                <i className="bx bx-calendar"></i>
+                <span>Page Api</span>
+              </Link>
+            </li>
+
 
 
 

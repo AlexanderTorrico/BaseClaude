@@ -17,6 +17,7 @@ import Atomo from "../modules/Components/Atomo/index";
 
 import User from "../pages/security/user/index";
 import HeaderViewType from "../modules/Components/Molecules/HeaderViewType/index";
+import PageApi from "../modules/Components/PageApi/index";
 
 
 const authProtectedRoutes = [
@@ -30,6 +31,8 @@ const authProtectedRoutes = [
 
   // Molecules
   { path: "/header_view_type", component: <HeaderViewType /> },
+
+  { path: "/page-api", component: <PageApi /> },
   //Security
   { path: "/security-user", component: <User /> },
 

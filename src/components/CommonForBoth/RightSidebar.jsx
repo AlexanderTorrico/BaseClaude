@@ -13,7 +13,7 @@ import {
   changePreloader,
   changeTopbarTheme,
   showRightSidebarAction,
-} from "/src/store/actions";
+} from "/src/store/layoutSlice";
 
 //SimpleBar
 import SimpleBar from "simplebar-react";
@@ -623,7 +623,7 @@ RightSidebar.propTypes = {
 };
 
 const mapStateToProps = state => {
-  return { ...state.Layout };
+  return { ...state.layout };
 };
 
 export default connect(mapStateToProps, {

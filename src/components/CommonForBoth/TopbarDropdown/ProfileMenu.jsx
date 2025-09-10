@@ -95,8 +95,8 @@ ProfileMenu.propTypes = {
 };
 
 const mapStatetoProps = (state) => {
-  const { error, success } = state.Profile;
-  return { error, success };
+  const { profileError, profileSuccess } = state.auth || {};
+  return { error: profileError, success: profileSuccess };
 };
 
 export default withRouter(

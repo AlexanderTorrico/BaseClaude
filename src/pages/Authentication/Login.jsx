@@ -25,7 +25,7 @@ import {
 } from "reactstrap";
 
 // actions
-import { loginUser, socialLogin } from "/src/store/actions";
+import { loginUser, socialLogin } from "/src/store/authSlice";
 
 // import images
 import profile from "../../assets/images/profile-img.png";
@@ -50,14 +50,14 @@ const Login = (props) => {
       password: Yup.string().required("Please Enter Your Password"),
     }),
     onSubmit: (values) => {
-      dispatch(loginUser(values, props.router.navigate));
+      dispatch(loginUser({ user: values, history: props.router.navigate }));
     },
   });
 
   const LoginProperties = createSelector(
-    (state) => state.Login,
-    (login) => ({
-      error: login.error
+    (state) => state.auth,
+    (auth) => ({
+      error: auth.error
     })
   );
 
@@ -66,7 +66,7 @@ const Login = (props) => {
   } = useSelector(LoginProperties);
 
   const signIn = type => {
-    dispatch(socialLogin(type, props.router.navigate));
+    dispatch(socialLogin({ type, history: props.router.navigate }));
   };
 
   //for facebook and google authentication
@@ -135,7 +135,7 @@ const Login = (props) => {
                         return false;
                       }}
                     >
-                      {error ? <Alert color="danger">{error}</Alert> : null}
+                      {error ? <Alert color="danger" fade={false}>{error}</Alert> : null}
 
                       <div className="mb-3">
                         <Label className="form-label">Email</Label>

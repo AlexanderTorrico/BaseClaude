@@ -28,7 +28,7 @@ import Breadcrumb from "../../components/Common/Breadcrumb";
 
 import avatar from "../../assets/images/users/avatar-1.jpg";
 // actions
-import { editProfile, resetProfileFlag } from "/src/store/actions";
+import { updateProfile, clearMessages } from "/src/store/authSlice";
 
 const UserProfile = (props) => {
 
@@ -42,10 +42,10 @@ const UserProfile = (props) => {
   const [idx, setidx] = useState(1);
 
     const ProfileProperties = createSelector(
-      (state) => state.Profile,
-        (profile) => ({
-          error: profile.error,
-          success: profile.success,
+      (state) => state.auth,
+        (auth) => ({
+          error: auth.profileError,
+          success: auth.profileSuccess,
         })
     );
 
@@ -70,7 +70,7 @@ const UserProfile = (props) => {
         setidx(obj.uid);
       }
       setTimeout(() => {
-        dispatch(resetProfileFlag());
+        dispatch(clearMessages());
       }, 3000);
     }
   }, [dispatch, success]);
@@ -87,7 +87,7 @@ const UserProfile = (props) => {
       username: Yup.string().required("Please Enter Your UserName"),
     }),
     onSubmit: (values) => {
-      dispatch(editProfile(values));
+      dispatch(updateProfile({ user: values }));
     }
   });
 
@@ -100,8 +100,8 @@ const UserProfile = (props) => {
 
           <Row>
             <Col lg="12">
-              {error && error ? <Alert color="danger">{error}</Alert> : null}
-              {success ? <Alert color="success">{success}</Alert> : null}
+              {error && error ? <Alert color="danger" fade={false}>{error}</Alert> : null}
+              {success ? <Alert color="success" fade={false}>{success}</Alert> : null}
 
               <Card>
                 <CardBody>

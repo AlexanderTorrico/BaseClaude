@@ -1,16 +1,30 @@
-import { createStore, applyMiddleware, compose } from "redux";
-import createSagaMiddleware from "redux-saga";
+import { configureStore } from '@reduxjs/toolkit';
 
-import rootReducer from "./reducers";
-import rootSaga from "./sagas";
+import authReducer from './authSlice';
+import layoutReducer from './layoutSlice';
 
-const sagaMiddleware = createSagaMiddleware();
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-
-const store = createStore(
-  rootReducer,
-  composeEnhancers(applyMiddleware(sagaMiddleware))
-);
-sagaMiddleware.run(rootSaga);
+const store = configureStore({
+  reducer: {
+    auth: authReducer,
+    layout: layoutReducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [
+          'auth/loginUser/pending',
+          'auth/loginUser/rejected', 
+          'auth/logoutUser/pending',
+          'auth/socialLogin/pending',
+          'auth/registerUser/rejected',
+          'auth/forgotPassword/rejected',
+          'auth/updateProfile/rejected'
+        ],
+        ignoredActionPaths: ['meta.arg', 'payload'],
+        ignoredPaths: ['auth.error'],
+      },
+    }),
+  devTools: import.meta.env.MODE !== 'production',
+});
 
 export default store;

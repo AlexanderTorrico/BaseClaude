@@ -46,7 +46,35 @@ const postFakeRegister = data => {
 };
 
 // Login Method
-const postFakeLogin = data => post(url.POST_FAKE_LOGIN, data);
+const postFakeLogin = async (data) => {
+  // Simulate fake login directly instead of using axios
+  console.log('postFakeLogin called with:', data);
+  
+  const users = [
+    {
+      uid: 1,
+      username: "admin",
+      role: "admin",
+      password: "123456",
+      email: "admin@themesbrand.com",
+    },
+  ];
+  
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const validUser = users.find(
+        (usr) => usr.email === data.email && usr.password === data.password
+      );
+      
+      if (validUser) {
+        const { password, ...userWithoutPassword } = validUser;
+        resolve(userWithoutPassword);
+      } else {
+        reject(new Error("Username and password are invalid. Please enter correct username and password"));
+      }
+    }, 500);
+  });
+};
 
 // postForgetPwd
 const postFakeForgetPwd = data => post(url.POST_FAKE_PASSWORD_FORGET, data);

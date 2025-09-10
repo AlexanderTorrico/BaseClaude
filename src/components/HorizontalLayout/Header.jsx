@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
 // Redux Store
-import { showRightSidebarAction, toggleLeftmenu } from "/src/store/actions";
+import { showRightSidebarAction, toggleLeftmenu } from "/src/store/layoutSlice";
 // reactstrap
 import { Row, Col, Dropdown, DropdownToggle, DropdownMenu } from "reactstrap";
 
@@ -399,7 +399,7 @@ Header.propTypes = {
 };
 
 const mapStatetoProps = (state) => {
-  const { layoutType, showRightSidebar, leftMenu } = state.Layout;
+  const { layoutType, showRightSidebar, leftMenu } = state.layout;
   return { layoutType, showRightSidebar, leftMenu };
 };
 

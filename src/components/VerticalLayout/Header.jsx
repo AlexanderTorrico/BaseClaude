@@ -33,7 +33,7 @@ import {
   showRightSidebarAction,
   toggleLeftmenu,
   changeSidebarType,
-} from "/src/store/actions";
+} from "/src/store/layoutSlice";
 
 const Header = props => {
   const [search, setsearch] = useState(false);
@@ -423,7 +423,7 @@ const mapStatetoProps = state => {
     showRightSidebar,
     leftMenu,
     leftSideBarType,
-  } = state.Layout;
+  } = state.layout;
   return { layoutType, showRightSidebar, leftMenu, leftSideBarType };
 };
 

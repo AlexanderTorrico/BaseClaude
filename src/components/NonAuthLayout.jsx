@@ -3,14 +3,14 @@ import PropTypes from "prop-types";
 import withRouter from "./Common/withRouter";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
-import { changeLayoutMode } from "../store/actions";
+import { changeLayoutMode } from "../store/layoutSlice";
 
 const NonAuthLayout = (props) => {
 
   const dispatch = useDispatch();
 
   const selectProperty = createSelector(
-    (state) => state.Layout,
+    (state) => state.layout,
     (layout) => ({
       layoutModeType: layout.layoutModeType,
     })

@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 
 // action
-import { registerUser, apiError } from "/src/store/actions";
+import { registerUser, clearError } from "/src/store/authSlice";
 
 //redux
 import { useSelector, useDispatch } from "react-redux";
@@ -39,16 +39,16 @@ const Register = () => {
       password: Yup.string().required("Please Enter Your Password"),
     }),
     onSubmit: (values) => {
-      dispatch(registerUser(values));
+      dispatch(registerUser({ user: values }));
     }
   });
 
   const AccountProperties = createSelector(
-    (state) => state.Account,
-    (account) => ({
-      user: account.user,
-      registrationError: account.registrationError,
-      // loading: account.loading,
+    (state) => state.auth,
+    (auth) => ({
+      user: auth.user,
+      registrationError: auth.registrationError,
+      // loading: auth.loading,
     })
   );
 
@@ -59,7 +59,7 @@ const Register = () => {
   } = useSelector(AccountProperties);
 
   useEffect(() => {
-    dispatch(apiError(""));
+    dispatch(clearError());
   }, []);
 
   return (
@@ -125,13 +125,13 @@ const Register = () => {
                       }}
                     >
                       {user && user ? (
-                        <Alert color="success">
+                        <Alert color="success" fade={false}>
                           Register User Successfully
                         </Alert>
                       ) : null}
 
                       {registrationError && registrationError ? (
-                        <Alert color="danger">{registrationError}</Alert>
+                        <Alert color="danger" fade={false}>{registrationError}</Alert>
                       ) : null}
 
                       <div className="mb-3">

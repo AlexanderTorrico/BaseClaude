@@ -44,7 +44,7 @@ fakeBackend();
 
 const App = (props) => {
   const LayoutProperties = createSelector(
-    (state) => state.Layout,
+    (state) => state.layout,
     (layout) => ({
       layoutType: layout.layoutType,
     })
@@ -104,7 +104,7 @@ App.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    layout: state.Layout,
+    layout: state.layout,
   };
 };
 

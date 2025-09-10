@@ -10,7 +10,7 @@ import {
   changeTopbarTheme,
   changeLayoutWidth,
   showRightSidebarAction,
-} from "/src/store/actions";
+} from "/src/store/layoutSlice";
 
 // Layout Related Components
 import Header from "./Header";
@@ -26,7 +26,7 @@ const Layout = (props) => {
   const dispatch = useDispatch();
 
   const selectLayoutProperties = createSelector(
-    (state) => state.Layout,
+    (state) => state.layout,
     (layout) => ({
       isPreloader: layout.isPreloader,
       layoutModeType: layout.layoutModeType,

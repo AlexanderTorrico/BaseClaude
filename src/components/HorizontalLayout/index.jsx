@@ -9,7 +9,7 @@ import {
   changeLayoutWidth,
   showRightSidebarAction,
   changeLayoutMode,
-} from "/src/store/actions";
+} from "/src/store/layoutSlice";
 
 //redux
 import { useSelector, useDispatch } from "react-redux";
@@ -26,7 +26,7 @@ const Layout = (props) => {
   const dispatch = useDispatch();
 
   const selectLayoutProperties = createSelector(
-    (state) => state.Layout,
+    (state) => state.layout,
     (layout) => ({
       topbarTheme: layout.topbarTheme,
       layoutWidth: layout.layoutWidth,

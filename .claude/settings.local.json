@@ -9,7 +9,9 @@
       "Bash(cp:*)",
       "Bash(rm:*)",
       "WebSearch",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(find:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }

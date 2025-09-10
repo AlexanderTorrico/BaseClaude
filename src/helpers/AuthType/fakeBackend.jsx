@@ -3,6 +3,12 @@ import MockAdapter from "axios-mock-adapter";
 import * as url from "../url_helper";
 import accessToken from "../jwt-token-access/accessToken";
 
+// Add request interceptor for debugging
+axios.interceptors.request.use((config) => {
+  console.log('Axios request intercepted:', config.url, config.method);
+  return config;
+});
+
 let users = [
   {
     uid: 1,
@@ -14,8 +20,20 @@ let users = [
 ];
 
 const fakeBackend = () => {
+  // Reset axios adapters first
+  if (axios.defaults.adapter) {
+    console.log('Resetting axios adapter');
+  }
+  
   // This sets the mock adapter on the default instance
-  const mock = new MockAdapter(axios, { onNoMatch: "passthrough" });
+  const mock = new MockAdapter(axios, { 
+    onNoMatch: "passthrough",
+    delayResponse: 200 
+  });
+  
+  console.log('Fake backend initialized');
+  console.log('POST_FAKE_LOGIN URL:', url.POST_FAKE_LOGIN);
+  console.log('Available users:', users);
 
   mock.onPost(url.POST_FAKE_REGISTER).reply((config) => {
     const user = JSON.parse(config["data"]);
@@ -27,7 +45,8 @@ const fakeBackend = () => {
     });
   });
 
-  mock.onPost("/post-fake-login").reply((config) => {
+  mock.onPost(url.POST_FAKE_LOGIN).reply((config) => {
+    console.log('Mock intercepted POST_FAKE_LOGIN request');
     const user = JSON.parse(config["data"]);
     const validUser = users.filter(
       (usr) => usr.email === user.email && usr.password === user.password
@@ -46,7 +65,7 @@ const fakeBackend = () => {
     });
   });
 
-  mock.onPost("/fake-forget-pwd").reply((config) => {
+  mock.onPost(url.POST_FAKE_PASSWORD_FORGET).reply((config) => {
     // User needs to check that user is eXist or not and send mail for Reset New password
 
     return new Promise((resolve, reject) => {
@@ -56,7 +75,7 @@ const fakeBackend = () => {
     });
   });
 
-  mock.onPost("/post-jwt-register").reply((config) => {
+  mock.onPost(url.POST_FAKE_REGISTER).reply((config) => {
     const user = JSON.parse(config["data"]);
     users.push(user);
 
@@ -67,7 +86,7 @@ const fakeBackend = () => {
     });
   });
 
-  mock.onPost("/post-jwt-login").reply((config) => {
+  mock.onPost(url.POST_FAKE_JWT_LOGIN).reply((config) => {
     const user = JSON.parse(config["data"]);
     const validUser = users.filter(
       (usr) => usr.email === user.email && usr.password === user.password
@@ -95,7 +114,7 @@ const fakeBackend = () => {
     });
   });
 
-  mock.onPost("/post-jwt-profile").reply((config) => {
+  mock.onPost(url.POST_EDIT_JWT_PROFILE).reply((config) => {
     const user = JSON.parse(config["data"]);
 
     const one = config.headers;
@@ -132,7 +151,7 @@ const fakeBackend = () => {
     });
   });
 
-  mock.onPost("/post-fake-profile").reply((config) => {
+  mock.onPost(url.POST_EDIT_PROFILE).reply((config) => {
     const user = JSON.parse(config["data"]);
 
     const validUser = users.filter((usr) => usr.uid === user.idx);
@@ -160,7 +179,7 @@ const fakeBackend = () => {
     });
   });
 
-  mock.onPost("/jwt-forget-pwd").reply((config) => {
+  mock.onPost(url.POST_FAKE_JWT_PASSWORD_FORGET).reply((config) => {
     // User needs to check that user is eXist or not and send mail for Reset New password
 
     return new Promise((resolve, reject) => {
@@ -170,7 +189,7 @@ const fakeBackend = () => {
     });
   });
 
-  mock.onPost("/social-login").reply((config) => {
+  mock.onPost(url.SOCIAL_LOGIN).reply((config) => {
     const user = JSON.parse(config["data"]);
 
     return new Promise((resolve, reject) => {
@@ -195,6 +214,7 @@ const fakeBackend = () => {
     });
   });
 
+  return mock;
 };
 
 export default fakeBackend;

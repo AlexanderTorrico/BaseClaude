@@ -24,7 +24,7 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 
 // action
-import { userForgetPassword } from "/src/store/actions";
+import { forgotPassword } from "/src/store/authSlice";
 
 // import images
 import profile from "../../assets/images/profile-img.png";
@@ -48,15 +48,15 @@ const ForgetPasswordPage = (props) => {
       email: Yup.string().required("Please Enter Your Email"),
     }),
     onSubmit: (values) => {
-      dispatch(userForgetPassword(values, props.history));
+      dispatch(forgotPassword({ user: values }));
     },
   });
 
   const ForgotPasswordProperties = createSelector(
-    (state) => state.ForgetPassword,
-    (forgetPassword) => ({
-      forgetError: forgetPassword.forgetError,
-      forgetSuccessMsg: forgetPassword.forgetSuccessMsg,
+    (state) => state.auth,
+    (auth) => ({
+      forgetError: auth.forgetError,
+      forgetSuccessMsg: auth.forgetSuccessMsg,
     })
   );
 

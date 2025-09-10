@@ -14,11 +14,11 @@ import {
  * Componente que demuestra los casos de uso fundamentales
  */
 const BasicExamples = React.memo(({
-  view1,
+  view1 = "0",
   setView1,
-  view2,
+  view2 = "0",
   setView2,
-  view3,
+  view3 = "0",
   setView3
 }) => {
   // Handlers optimizados para los ejemplos básicos
@@ -79,14 +79,30 @@ const BasicExamples = React.memo(({
 
       <H4 className="mb-3 mt-5 text-success">HeaderCardViews (Con Cambio de Vista)</H4>
 
-      {/* Ejemplo 4: HeaderCardViews básico optimizado */}
+      {/* Ejemplo 4: HeaderCardViews con contenido dinámico */}
       <HeaderCardViews
         title="Gestión de Usuarios"
-        description={`Sistema de usuarios - Vista: ${view1}`}
-        badge={{ count: 156, total: 500 }}
+        description="Sistema de usuarios con pestañas"
+        badge="156 usuarios"
         currentView={view1}
-        views={['web', 'table', 'movil']}
         onViewChange={setView1}
+        views={[
+          { 
+            name: "Lista", 
+            icon: "mdi-view-list", 
+            content: <div className="p-3 bg-light rounded">Vista de lista de usuarios</div>
+          },
+          { 
+            name: "Cards", 
+            icon: "mdi-card-multiple", 
+            content: <div className="p-3 bg-success bg-opacity-10 rounded">Vista de cards de usuarios</div>
+          },
+          { 
+            name: "Grid", 
+            icon: "mdi-view-grid", 
+            content: <div className="p-3 bg-info bg-opacity-10 rounded">Vista de grid de usuarios</div>
+          }
+        ]}
         contents={[
           <NewUserActions 
             onNew={handleNewUser}
@@ -95,14 +111,30 @@ const BasicExamples = React.memo(({
         ]}
       />
 
-      {/* Ejemplo 5: HeaderCardViews con 3 vistas */}
+      {/* Ejemplo 5: HeaderCardViews con pestañas de productos */}
       <HeaderCardViews
         title="Catálogo de Productos"
-        description={`Gestión de inventario - Vista: ${view2}`}
+        description="Gestión de inventario con vistas"
         badge="🛒 En línea"
         currentView={view2}
         onViewChange={setView2}
-        views={['web', 'table', 'movil']}
+        views={[
+          { 
+            name: "Catálogo", 
+            icon: "mdi-storefront", 
+            content: <div className="p-3 bg-primary bg-opacity-10 rounded">Catálogo completo de productos</div>
+          },
+          { 
+            name: "Inventario", 
+            icon: "mdi-package-variant", 
+            content: <div className="p-3 bg-warning bg-opacity-10 rounded">Control de inventario y stock</div>
+          },
+          { 
+            name: "Reportes", 
+            icon: "mdi-chart-bar", 
+            content: <div className="p-3 bg-secondary bg-opacity-10 rounded">Reportes de ventas y estadísticas</div>
+          }
+        ]}
         contents={[
           <ProductActions 
             onAdd={handleAddProduct}
@@ -113,17 +145,38 @@ const BasicExamples = React.memo(({
 
       <H4 className="mb-3 mt-5 text-info">HeaderCardViews con Iconos Personalizados</H4>
 
-      {/* Ejemplo 6: HeaderCardViews con iconos personalizados usando objetos */}
+      {/* Ejemplo 6: HeaderCardViews con sistema completo */}
       <HeaderCardViews
-        title="Sistema con Vistas Personalizadas"
-        description={`Ejemplo con objetos personalizados - Vista: ${view3}`}
-        badge={{ count: 15, total: 30, color: "info" }}
+        title="Sistema de Administración"
+        description="Panel de control con múltiples secciones"
+        badge="15 activos"
         currentView={view3}
         onViewChange={setView3}
         views={[
-          { name: "Administración", icon: "mdi-shield-account", key: "admin" },
-          { name: "Reportes", icon: "mdi-chart-line", key: "reportes" },
-          { name: "Configuración", icon: "mdi-cog", key: "config" }
+          { 
+            name: "Dashboard", 
+            icon: "mdi-view-dashboard", 
+            content: <div className="p-4 bg-primary bg-opacity-10 rounded">
+              <h6>Panel de Control</h6>
+              <p className="mb-0">Resumen general del sistema</p>
+            </div>
+          },
+          { 
+            name: "Usuarios", 
+            icon: "mdi-account-group", 
+            content: <div className="p-4 bg-success bg-opacity-10 rounded">
+              <h6>Gestión de Usuarios</h6>
+              <p className="mb-0">Administrar cuentas y permisos</p>
+            </div>
+          },
+          { 
+            name: "Configuración", 
+            icon: "mdi-cog", 
+            content: <div className="p-4 bg-info bg-opacity-10 rounded">
+              <h6>Configuración del Sistema</h6>
+              <p className="mb-0">Ajustes generales y parámetros</p>
+            </div>
+          }
         ]}
         contents={[
           <CustomViewActions onConfigure={handleConfigure} />

@@ -17,9 +17,9 @@ const HeaderViewTypePage = () => {
   document.title = "HeaderCard & HeaderCardViews | Moléculas - Skote React";
 
   // Estados para ejemplos funcionales
-  const [view1, setView1] = React.useState('table');
-  const [view2, setView2] = React.useState('cards');
-  const [view3, setView3] = React.useState('table');
+  const [view1, setView1] = React.useState('0');
+  const [view2, setView2] = React.useState('0');
+  const [view3, setView3] = React.useState('0');
 
   // Handlers optimizados para subcomponentes (memoizados)
   const handleUserEdit = React.useCallback((user) => {
@@ -84,30 +84,69 @@ const HeaderViewTypePage = () => {
 
           <H4 className="mb-3 mt-5 text-success">HeaderCardViews (Con Cambio de Vista)</H4>
 
-          {/* Ejemplo 4: HeaderCardViews con nuevo formato contents */}
+          {/* Ejemplo 4: HeaderCardViews con pestañas */}
           <HeaderCardViews
-            title="Gestión de Usuarios (Formato Nuevo)"
-            description={`Sistema de usuarios - Vista: ${view1}`}
-            badge={{ count: 156, total: 500 }}
+            title="Sistema de Gestión"
+            description="Sistema con pestañas y contenido dinámico"
+            badge="🟢 Activo"
             currentView={view1}
             onViewChange={setView1}
+            views={[
+              { 
+                name: "Usuarios", 
+                icon: "mdi-account-group", 
+                content: <div className="p-3 bg-primary bg-opacity-10 rounded">Gestión de usuarios del sistema</div>
+              },
+              { 
+                name: "Productos", 
+                icon: "mdi-package", 
+                content: <div className="p-3 bg-success bg-opacity-10 rounded">Catálogo de productos disponibles</div>
+              }
+            ]}
             contents={[
               <Button color="primary" size="sm">
                 <i className="mdi mdi-plus me-1"></i>
-                Nuevo Usuario
+                Nuevo
               </Button>
             ]}
           />
 
-          {/* Ejemplo 5: HeaderCardViews con 3 vistas */}
+          <br /><br />
+
+          {/* Ejemplo 5: HeaderCardViews con múltiples pestañas */}
           <HeaderCardViews
-            title="Catálogo de Productos"
-            description={`Gestión de inventario - Vista: ${view2}`}
+            title="Dashboard Empresarial"
+            description="Panel de control con varias secciones"
             badge="🛒 En línea"
             currentView={view2}
             onViewChange={setView2}
-            views={['web', 'table', 'movil']}
-            contentTopRight={
+            views={[
+              { 
+                name: "Ventas", 
+                icon: "mdi-chart-line", 
+                content: <div className="p-3 bg-warning bg-opacity-10 rounded">
+                  <h6>Módulo de Ventas</h6>
+                  <p className="mb-0">Reportes y estadísticas de ventas</p>
+                </div>
+              },
+              { 
+                name: "Inventario", 
+                icon: "mdi-package-variant", 
+                content: <div className="p-3 bg-info bg-opacity-10 rounded">
+                  <h6>Control de Inventario</h6>
+                  <p className="mb-0">Stock y gestión de productos</p>
+                </div>
+              },
+              { 
+                name: "Clientes", 
+                icon: "mdi-account-multiple", 
+                content: <div className="p-3 bg-secondary bg-opacity-10 rounded">
+                  <h6>Base de Clientes</h6>
+                  <p className="mb-0">Gestión de clientes y contactos</p>
+                </div>
+              }
+            ]}
+            contents={[
               <>
                 <Button color="primary" size="sm">
                   <i className="mdi mdi-plus me-1"></i>
@@ -117,8 +156,10 @@ const HeaderViewTypePage = () => {
                   <i className="mdi mdi-cog"></i>
                 </Button>
               </>
-            }
+            ]}
           />
+
+          <br /><br />
 
           {/* Ejemplo 6: HeaderCardViews completo optimizado */}
           <HeaderCardViews
@@ -259,24 +300,29 @@ const HeaderViewTypePage = () => {
 />`}</code></pre>
               </div>
               <div className="col-lg-4">
-                <h6 className="text-success">HeaderCardViews (Nuevo Formato)</h6>
+                <h6 className="text-success">HeaderCardViews (Sistema de Pestañas)</h6>
                 <pre className="small"><code>{`<HeaderCardViews
   title="Mi Sistema"
   badge="Activo"
-  currentView={view}
+  currentView="0" // Índice de vista activa
   onViewChange={setView}
-  // Objetos para mayor flexibilidad:
+  // Pestañas con contenido:
   views={[
-    { name: "Web", icon: "mdi-monitor", key: "web" },
-    { name: "Admin", icon: "mdi-shield", key: "admin" }
+    { 
+      name: "Usuarios", 
+      icon: "mdi-account", 
+      content: <MiComponenteUsuarios />
+    },
+    { 
+      name: "Productos", 
+      icon: "mdi-package", 
+      content: <MiComponenteProductos />
+    }
   ]}
   // O strings (compatibilidad):
-  // views={['web', 'table', 'admin:mdi-shield']}
-  // Nuevo sistema de contents:
+  // views={['web', 'table']}
   contents={[
-    <Button>Nuevo</Button>,    // [0] topRight
-    <Input />,                 // [1] bottomLeft
-    <Button>Filtros</Button>   // [2] bottomRight
+    <Button>Nuevo</Button>  // [0] topRight
   ]}
 />`}</code></pre>
               </div>
@@ -306,17 +352,17 @@ const HeaderViewTypePage = () => {
             </div>
 
             <div className="mt-4">
-              <h6>✨ Mejoras implementadas:</h6>
+              <h6>✨ Nuevas funcionalidades implementadas:</h6>
               <ul className="small">
-                <li><strong>Vistas como objetos:</strong> Soporte para {`{name, icon, key, title}`} además de strings</li>
+                <li><strong>Sistema de pestañas:</strong> Cada vista puede tener su propio contenido React</li>
+                <li><strong>Índices automáticos:</strong> Las vistas usan su posición como key (0, 1, 2...)</li>
+                <li><strong>Badge simplificado:</strong> Solo badgeText, eliminados badgeCount y badgeTotal</li>
+                <li><strong>Contenido dinámico:</strong> {`{name, icon, content}`} en objetos views</li>
+                <li><strong>Compatibilidad total:</strong> Mantiene soporte para strings y props legacy</li>
                 <li><strong>Sistema contents:</strong> Array [topRight, bottomLeft, bottomRight] para posicionamiento</li>
-                <li><strong>Compatibilidad total:</strong> Mantiene soporte para props legacy (contentTopRight, etc.)</li>
-                <li><strong>Badge simplificado:</strong> String directo o objeto {`{count, total, color}`}</li>
-                <li><strong>Nomenclatura estandarizada:</strong> API unificada en todos los componentes</li>
                 <li><strong>Responsivo inteligente:</strong> Hook `useResponsiveView` con detección automática</li>
                 <li><strong>Transiciones suaves:</strong> Animaciones CSS configurables para cambios de vista</li>
                 <li><strong>Iconos flexibles:</strong> MDI automático + formato personalizado "nombre:mdi-icon"</li>
-                <li><strong>Vistas predefinidas:</strong> web, table, movil, cards, grid, list con iconos automáticos</li>
               </ul>
               
               <div className="mt-3 p-3 bg-success bg-opacity-10 rounded">
@@ -342,13 +388,13 @@ const HeaderViewTypePage = () => {
               </div>
 
               <div className="mt-3 p-3 bg-warning bg-opacity-10 rounded">
-                <h6 className="text-warning mb-2">🎯 Sistema de Objetos y Contents:</h6>
+                <h6 className="text-warning mb-2">🏷️ Sistema de Pestañas Integrado:</h6>
                 <ul className="small mb-0">
-                  <li><strong>Objetos views:</strong> {`{name: "Admin", icon: "mdi-shield", key: "admin", title: "Panel Admin"}`}</li>
-                  <li><strong>Array contents:</strong> [topRight, bottomLeft, bottomRight] para posicionamiento preciso</li>
-                  <li><strong>Backward compatibility:</strong> Mantiene soporte completo para props legacy</li>
-                  <li><strong>Normalización automática:</strong> Convierte strings a objetos internamente</li>
-                  <li><strong>Flexibilidad máxima:</strong> Combina ambos sistemas según necesidades</li>
+                  <li><strong>Objetos views:</strong> {`{name: "Dashboard", icon: "mdi-view-dashboard", content: <MiComponente />}`}</li>
+                  <li><strong>Contenido dinámico:</strong> Cada pestaña muestra su propio componente React</li>
+                  <li><strong>Índices automáticos:</strong> currentView="0", "1", "2" según posición en array</li>
+                  <li><strong>Cambio automático:</strong> Al hacer clic en pestaña, se muestra su content</li>
+                  <li><strong>Backward compatibility:</strong> Strings siguen funcionando sin content</li>
                 </ul>
               </div>
               

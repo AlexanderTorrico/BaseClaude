@@ -9,10 +9,8 @@ import { H4, P, Badge } from "./Atoms";
  * @param {string} title - Título principal del header
  * @param {string} [description] - Descripción opcional del header
  * @param {boolean} [showBadge=false] - Mostrar badge en la descripción
- * @param {number} [badgeCount] - Número a mostrar en el badge
- * @param {number} [badgeTotal] - Total para mostrar formato "count de total resultados"
  * @param {string} [badgeColor="info"] - Color del badge
- * @param {string} [badgeText] - Texto personalizado del badge
+ * @param {string} [badgeText] - Texto del badge
  * @param {boolean} [showBottomRow=false] - Mostrar fila inferior con slots
  * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha (botones de acción)
  * @param {React.ReactNode} [bottomLeftSlot] - Contenido del área inferior izquierda
@@ -24,8 +22,6 @@ const HeaderCard = React.memo(({
   title,
   description,
   showBadge = false,
-  badgeCount,
-  badgeTotal,
   badgeColor = "info",
   badgeText,
   showBottomRow = false,
@@ -45,16 +41,10 @@ const HeaderCard = React.memo(({
             {description && (
               <P className="text-muted mb-md-0 mb-3">
                 {description}
-                {showBadge && (badgeCount !== undefined || badgeText) && (
+                {showBadge && badgeText && (
                   <span className="ms-2">
                     <Badge color={badgeColor} style={{ fontSize: '0.65rem' }}>
-                      {badgeText || (
-                        <>
-                          {badgeCount}
-                          {badgeTotal !== undefined && ` de ${badgeTotal}`}
-                          {badgeTotal !== undefined && ' resultados'}
-                        </>
-                      )}
+                      {badgeText}
                     </Badge>
                   </span>
                 )}
@@ -90,8 +80,6 @@ HeaderCard.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
   showBadge: PropTypes.bool,
-  badgeCount: PropTypes.number,
-  badgeTotal: PropTypes.number,
   badgeColor: PropTypes.string,
   badgeText: PropTypes.string,
   showBottomRow: PropTypes.bool,

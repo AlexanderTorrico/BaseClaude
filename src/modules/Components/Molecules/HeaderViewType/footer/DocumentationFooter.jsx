@@ -22,14 +22,16 @@ const DocumentationFooter = React.memo(() => {
       <div className="text-info">{'<HeaderCardViews'}</div>
       <div className="ms-2">title="Mi Sistema"</div>
       <div className="ms-2">badge="Activo"</div>
-      <div className="ms-2">currentView={'{view}'}</div>
+      <div className="ms-2">currentView="0"</div>
       <div className="ms-2">onViewChange={'{setView}'}</div>
-      <div className="ms-2">views={'{[\'web\', \'table\', \'movil\']}'}</div>
-      <div className="ms-2 text-muted">// O con iconos personalizados:</div>
-      <div className="ms-2 text-muted">// views={'{[\'admin:mdi-shield\', \'ventas:mdi-cart\']}'}</div>
-      <div className="ms-2">{'contentTopRight={<Button>Nuevo</Button>}'}</div>
-      <div className="ms-2">{'contentBottomLeft={<Input />}'}</div>
-      <div className="ms-2">{'contentBottomRight={<Button>Filtros</Button>}'}</div>
+      <div className="ms-2 text-warning">// Sistema de pestañas:</div>
+      <div className="ms-2">views={'{['}</div>
+      <div className="ms-3">{'{ name: "Users", icon: "mdi-account",'}</div>
+      <div className="ms-3">{'  content: <UsersList /> },'}</div>
+      <div className="ms-3">{'{ name: "Products", icon: "mdi-package",'}</div>
+      <div className="ms-3">{'  content: <ProductsList /> }'}</div>
+      <div className="ms-2">{']}'}</div>
+      <div className="ms-2">{'contents={[<Button>Nuevo</Button>]}'}</div>
       <div className="text-info">{'/>'}</div>
     </div>
   ));
@@ -70,16 +72,17 @@ const DocumentationFooter = React.memo(() => {
       </div>
 
       <div className="mt-4">
-        <h6>✨ Mejoras implementadas:</h6>
+        <h6>✨ Nuevas funcionalidades:</h6>
         <ul className="small">
-          <li><strong>Badge simplificado:</strong> String directo o objeto con count, total, color</li>
-          <li><strong>Props reducidas:</strong> Eliminadas props redundantes y complejas</li>
-          <li><strong>Nomenclatura estandarizada:</strong> contentTopRight para área superior derecha en todos los componentes</li>
-          <li><strong>Posicionamiento estandarizado:</strong> Mismo contenedor flex con clases responsivas</li>
-          <li><strong>Responsivo inteligente:</strong> Hook useResponsiveView con detección automática de breakpoints</li>
+          <li><strong>Sistema de pestañas:</strong> Cada vista puede tener su propio contenido React</li>
+          <li><strong>Badge simplificado:</strong> Solo badgeText, eliminados badgeCount y badgeTotal</li>
+          <li><strong>Índices automáticos:</strong> currentView usa posición en array (0, 1, 2...)</li>
+          <li><strong>Contenido dinámico:</strong> Objetos views con name, icon y content</li>
+          <li><strong>Sistema contents:</strong> Array [topRight, bottomLeft, bottomRight]</li>
+          <li><strong>Compatibilidad total:</strong> Strings y props legacy siguen funcionando</li>
+          <li><strong>Responsivo inteligente:</strong> Hook useResponsiveView con detección automática</li>
           <li><strong>Transiciones suaves:</strong> Animaciones CSS configurables para cambios de vista</li>
-          <li><strong>Iconos personalizados:</strong> Soporte para vistas con formato "nombre:mdi-icon" (ej: "admin:mdi-shield")</li>
-          <li><strong>Vistas predefinidas:</strong> web, table, movil, cards, grid, list con iconos automáticos</li>
+          <li><strong>Iconos personalizados:</strong> Formato "nombre:mdi-icon" (ej: "admin:mdi-shield")</li>
         </ul>
         
         <div className="mt-3 p-3 bg-success bg-opacity-10 rounded">

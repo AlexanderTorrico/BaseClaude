@@ -15,13 +15,14 @@ const DEFAULT_VIEWS_CONFIG = {
 
 // Función helper para normalizar configuración de vistas
 const normalizeViewConfig = (view, index) => {
-  // Si es un objeto con name e icon, usarlo directamente
+  // Si es un objeto con name, icon y content
   if (typeof view === 'object' && view.name && view.icon) {
     return {
-      key: view.key || view.name.toLowerCase(),
+      key: index.toString(), // Usar índice como key
       name: view.name,
       icon: view.icon.startsWith('mdi-') ? view.icon : `mdi-${view.icon}`,
-      title: view.title || `Vista ${view.name}`
+      title: view.title || `Vista ${view.name}`,
+      content: view.content || null
     };
   }
   
@@ -31,10 +32,11 @@ const normalizeViewConfig = (view, index) => {
     if (view.includes(':')) {
       const [name, icon] = view.split(':');
       return {
-        key: name.toLowerCase(),
+        key: index.toString(),
         name: name.charAt(0).toUpperCase() + name.slice(1),
         icon: icon.startsWith('mdi-') ? icon : `mdi-${icon}`,
-        title: `Vista ${name.charAt(0).toUpperCase() + name.slice(1)}`
+        title: `Vista ${name.charAt(0).toUpperCase() + name.slice(1)}`,
+        content: null
       };
     }
     
@@ -42,41 +44,44 @@ const normalizeViewConfig = (view, index) => {
     if (DEFAULT_VIEWS_CONFIG[view]) {
       const config = DEFAULT_VIEWS_CONFIG[view];
       return {
-        key: view,
+        key: index.toString(),
         name: config.name,
         icon: config.icon,
-        title: config.title
+        title: config.title,
+        content: null
       };
     }
     
     // String personalizado sin configuración
     return {
-      key: view.toLowerCase(),
+      key: index.toString(),
       name: view.charAt(0).toUpperCase() + view.slice(1),
       icon: "mdi-eye",
-      title: `Vista ${view.charAt(0).toUpperCase() + view.slice(1)}`
+      title: `Vista ${view.charAt(0).toUpperCase() + view.slice(1)}`,
+      content: null
     };
   }
   
   // Fallback genérico
   return {
-    key: `view-${index}`,
+    key: index.toString(),
     name: `Vista ${index + 1}`,
     icon: "mdi-eye",
-    title: `Vista ${index + 1}`
+    title: `Vista ${index + 1}`,
+    content: null
   };
 };
 
 /**
- * HeaderCardViews optimizado con soporte responsivo
- * Componente de header con cambio de vistas y botones de navegación
+ * HeaderCardViews con sistema de pestañas integrado
+ * Componente de header con cambio de vistas y contenido dinámico
  * 
  * @param {string} title - Título principal del header
  * @param {string} [description] - Descripción opcional del header  
  * @param {string|Object} [badge] - Badge simple (string) o complejo {count, total, color, text}
- * @param {string} [currentView="table"] - Vista actualmente seleccionada (key de la vista)
+ * @param {string} [currentView="0"] - Vista actualmente seleccionada (índice de la vista)
  * @param {function} [onViewChange] - Función callback para cambio de vista
- * @param {Array} [views] - Array de vistas: objetos {name, icon, key?} o strings (compatibilidad)
+ * @param {Array} [views] - Array de vistas: objetos {name, icon, content} o strings (compatibilidad)
  * @param {Array} [contents] - Array de contenidos [topRight, bottomLeft, bottomRight]
  * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha (deprecated, usar contents[0])
  * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (deprecated, usar contents[1])
@@ -91,7 +96,7 @@ const HeaderCardViews = React.memo(({
   // Badge simplificado
   badge,
   // Vista actual y cambio
-  currentView = "table",
+  currentView = "0",
   onViewChange,
   views = ["table", "cards"],
   // Nuevo sistema de contenidos
@@ -165,22 +170,38 @@ const HeaderCardViews = React.memo(({
     };
   }, [badge]);
 
-  return (
-    <HeaderCard
-      title={title}
-      description={description}
-      {...badgeProps}
-      showBottomRow={!!(resolvedContents.bottomLeft || resolvedContents.bottomRight)}
-      contentTopRight={
-        <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
-          {renderViewButtons()}
-          {resolvedContents.topRight}
+  // Renderizar contenido de la vista activa
+  const renderActiveViewContent = React.useCallback(() => {
+    const activeView = normalizedViews.find(view => view.key === currentView);
+    if (activeView && activeView.content) {
+      return (
+        <div className="mt-3">
+          {activeView.content}
         </div>
-      }
-      bottomLeftSlot={resolvedContents.bottomLeft}
-      bottomRightSlot={resolvedContents.bottomRight}
-      className={className}
-    />
+      );
+    }
+    return null;
+  }, [normalizedViews, currentView]);
+
+  return (
+    <React.Fragment>
+      <HeaderCard
+        title={title}
+        description={description}
+        {...badgeProps}
+        showBottomRow={!!(resolvedContents.bottomLeft || resolvedContents.bottomRight)}
+        contentTopRight={
+          <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
+            {renderViewButtons()}
+            {resolvedContents.topRight}
+          </div>
+        }
+        bottomLeftSlot={resolvedContents.bottomLeft}
+        bottomRightSlot={resolvedContents.bottomRight}
+        className={className}
+      />
+      {renderActiveViewContent()}
+    </React.Fragment>
   );
 });
 
@@ -204,8 +225,8 @@ HeaderCardViews.propTypes = {
       PropTypes.shape({
         name: PropTypes.string.isRequired,
         icon: PropTypes.string.isRequired,
-        key: PropTypes.string,
-        title: PropTypes.string
+        title: PropTypes.string,
+        content: PropTypes.node // Contenido a mostrar cuando se selecciona esta vista
       })
     ])
   ),

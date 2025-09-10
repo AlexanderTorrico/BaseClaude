@@ -31,7 +31,7 @@ const DocumentationFooter = React.memo(() => {
       <div className="ms-3">{'{ name: "Products", icon: "mdi-package",'}</div>
       <div className="ms-3">{'  content: <ProductsList /> }'}</div>
       <div className="ms-2">{']}'}</div>
-      <div className="ms-2">{'contents={[<Button>Nuevo</Button>]}'}</div>
+      <div className="ms-2">{'contentTopRight={<Button>Nuevo</Button>}'}</div>
       <div className="text-info">{'/>'}</div>
     </div>
   ));
@@ -78,7 +78,7 @@ const DocumentationFooter = React.memo(() => {
           <li><strong>Badge simplificado:</strong> Solo badgeText, eliminados badgeCount y badgeTotal</li>
           <li><strong>Índices automáticos:</strong> currentView usa posición en array (0, 1, 2...)</li>
           <li><strong>Contenido dinámico:</strong> Objetos views con name, icon y content</li>
-          <li><strong>Sistema contents:</strong> Array [topRight, bottomLeft, bottomRight]</li>
+          <li><strong>Props estándar:</strong> contentTopRight, contentBottomLeft, contentBottomRight</li>
           <li><strong>Compatibilidad total:</strong> Strings y props legacy siguen funcionando</li>
           <li><strong>Responsivo inteligente:</strong> Hook useResponsiveView con detección automática</li>
           <li><strong>Transiciones suaves:</strong> Animaciones CSS configurables para cambios de vista</li>

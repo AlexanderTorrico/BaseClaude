@@ -103,12 +103,12 @@ const BasicExamples = React.memo(({
             content: <div className="p-3 bg-info bg-opacity-10 rounded">Vista de grid de usuarios</div>
           }
         ]}
-        contents={[
+        contentTopRight={
           <NewUserActions 
             onNew={handleNewUser}
             onExport={handleExport}
           />
-        ]}
+        }
       />
 
       {/* Ejemplo 5: HeaderCardViews con pestañas de productos */}
@@ -135,12 +135,12 @@ const BasicExamples = React.memo(({
             content: <div className="p-3 bg-secondary bg-opacity-10 rounded">Reportes de ventas y estadísticas</div>
           }
         ]}
-        contents={[
+        contentTopRight={
           <ProductActions 
             onAdd={handleAddProduct}
             onSettings={handleSettings}
           />
-        ]}
+        }
       />
 
       <H4 className="mb-3 mt-5 text-info">HeaderCardViews con Iconos Personalizados</H4>
@@ -178,9 +178,9 @@ const BasicExamples = React.memo(({
             </div>
           }
         ]}
-        contents={[
+        contentTopRight={
           <CustomViewActions onConfigure={handleConfigure} />
-        ]}
+        }
       />
     </React.Fragment>
   );

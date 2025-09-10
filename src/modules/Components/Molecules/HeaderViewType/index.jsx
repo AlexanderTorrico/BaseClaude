@@ -103,12 +103,12 @@ const HeaderViewTypePage = () => {
                 content: <div className="p-3 bg-success bg-opacity-10 rounded">Catálogo de productos disponibles</div>
               }
             ]}
-            contents={[
+            contentTopRight={
               <Button color="primary" size="sm">
                 <i className="mdi mdi-plus me-1"></i>
                 Nuevo
               </Button>
-            ]}
+            }
           />
 
           <br /><br />
@@ -146,7 +146,7 @@ const HeaderViewTypePage = () => {
                 </div>
               }
             ]}
-            contents={[
+            contentTopRight={
               <>
                 <Button color="primary" size="sm">
                   <i className="mdi mdi-plus me-1"></i>
@@ -156,7 +156,7 @@ const HeaderViewTypePage = () => {
                   <i className="mdi mdi-cog"></i>
                 </Button>
               </>
-            ]}
+            }
           />
 
           <br /><br />
@@ -321,13 +321,13 @@ const HeaderViewTypePage = () => {
   ]}
   // O strings (compatibilidad):
   // views={['web', 'table']}
-  contents={[
-    <Button>Nuevo</Button>  // [0] topRight
-  ]}
+  contentTopRight={<Button>Nuevo</Button>}
+  contentBottomLeft={<Input />}
+  contentBottomRight={<Button>Filtros</Button>}
 />`}</code></pre>
               </div>
               <div className="col-lg-4">
-                <h6 className="text-warning">HeaderCardViewResponsive (Nuevo)</h6>
+                <h6 className="text-warning">HeaderCardViewResponsive</h6>
                 <pre className="small"><code>{`<HeaderCardViewResponsive
   title="Dashboard"
   badge={{count: 25, total: 100}}
@@ -340,12 +340,10 @@ const HeaderViewTypePage = () => {
   viewWeb={<MiTablaWeb />}
   viewTable={<MisCardsTablet />}
   viewMovil={<MiGridMovil />}
-  // Nuevo sistema contents:
-  contents={[
-    <Button>Acción</Button>,  // topRight
-    <Input />,                // bottomLeft
-    <Button>Filtros</Button>  // bottomRight
-  ]}
+  // Props estándar:
+  contentTopRight={<Button>Acción</Button>}
+  contentBottomLeft={<Input />}
+  contentBottomRight={<Button>Filtros</Button>}
   enableTransitions={true}
 />`}</code></pre>
               </div>
@@ -358,8 +356,8 @@ const HeaderViewTypePage = () => {
                 <li><strong>Índices automáticos:</strong> Las vistas usan su posición como key (0, 1, 2...)</li>
                 <li><strong>Badge simplificado:</strong> Solo badgeText, eliminados badgeCount y badgeTotal</li>
                 <li><strong>Contenido dinámico:</strong> {`{name, icon, content}`} en objetos views</li>
-                <li><strong>Compatibilidad total:</strong> Mantiene soporte para strings y props legacy</li>
-                <li><strong>Sistema contents:</strong> Array [topRight, bottomLeft, bottomRight] para posicionamiento</li>
+                <li><strong>Props legacy:</strong> contentTopRight, contentBottomLeft, contentBottomRight</li>
+                <li><strong>Compatibilidad total:</strong> Mantiene soporte para strings en views</li>
                 <li><strong>Responsivo inteligente:</strong> Hook `useResponsiveView` con detección automática</li>
                 <li><strong>Transiciones suaves:</strong> Animaciones CSS configurables para cambios de vista</li>
                 <li><strong>Iconos flexibles:</strong> MDI automático + formato personalizado "nombre:mdi-icon"</li>

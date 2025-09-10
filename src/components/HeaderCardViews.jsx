@@ -82,10 +82,9 @@ const normalizeViewConfig = (view, index) => {
  * @param {string} [currentView="0"] - Vista actualmente seleccionada (índice de la vista)
  * @param {function} [onViewChange] - Función callback para cambio de vista
  * @param {Array} [views] - Array de vistas: objetos {name, icon, content} o strings (compatibilidad)
- * @param {Array} [contents] - Array de contenidos [topRight, bottomLeft, bottomRight]
- * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha (deprecated, usar contents[0])
- * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (deprecated, usar contents[1])
- * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha (deprecated, usar contents[2])
+ * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha
+ * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda
+ * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha
  * @param {string} [className] - Clases CSS adicionales
  * @param {boolean} [hideViewButtons=false] - Oculta los botones de cambio de vista
  * @param {boolean} [responsiveMode=false] - Indica si está en modo responsivo (solo lectura)
@@ -99,9 +98,7 @@ const HeaderCardViews = React.memo(({
   currentView = "0",
   onViewChange,
   views = ["table", "cards"],
-  // Nuevo sistema de contenidos
-  contents = [],
-  // Slots legacy (mantener compatibilidad)
+  // Slots de contenido
   contentTopRight,
   contentBottomLeft,
   contentBottomRight,
@@ -119,14 +116,6 @@ const HeaderCardViews = React.memo(({
     return views.map((view, index) => normalizeViewConfig(view, index));
   }, [views]);
 
-  // Resolver contenidos (priorizar contents sobre props legacy)
-  const resolvedContents = React.useMemo(() => {
-    return {
-      topRight: contents[0] || contentTopRight,
-      bottomLeft: contents[1] || contentBottomLeft,
-      bottomRight: contents[2] || contentBottomRight
-    };
-  }, [contents, contentTopRight, contentBottomLeft, contentBottomRight]);
 
   const renderViewButtons = React.useCallback(() => {
     // Ocultar botones si está configurado o si hay menos de 2 vistas
@@ -189,15 +178,15 @@ const HeaderCardViews = React.memo(({
         title={title}
         description={description}
         {...badgeProps}
-        showBottomRow={!!(resolvedContents.bottomLeft || resolvedContents.bottomRight)}
+        showBottomRow={!!(contentBottomLeft || contentBottomRight)}
         contentTopRight={
           <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
             {renderViewButtons()}
-            {resolvedContents.topRight}
+            {contentTopRight}
           </div>
         }
-        bottomLeftSlot={resolvedContents.bottomLeft}
-        bottomRightSlot={resolvedContents.bottomRight}
+        bottomLeftSlot={contentBottomLeft}
+        bottomRightSlot={contentBottomRight}
         className={className}
       />
       {renderActiveViewContent()}
@@ -230,8 +219,6 @@ HeaderCardViews.propTypes = {
       })
     ])
   ),
-  contents: PropTypes.arrayOf(PropTypes.node), // [topRight, bottomLeft, bottomRight]
-  // Props legacy (deprecated pero mantenidas por compatibilidad)
   contentTopRight: PropTypes.node,
   contentBottomLeft: PropTypes.node,
   contentBottomRight: PropTypes.node,
@@ -322,14 +309,13 @@ const useResponsiveView = (views = [
  * @param {string} [description] - Descripción opcional del header
  * @param {string|Object} [badge] - Badge simple (string) o complejo {count, total, color, text}
  * @param {Array} [views=['web', 'table', 'movil']] - Vistas responsivas [desktop, tablet, mobile]. Acepta objetos {name, icon} o strings
- * @param {Array} [contents] - Array de contenidos [topRight, bottomLeft, bottomRight]
  * @param {Object} [breakpoints] - Puntos de quiebre personalizados {mobile: 768, tablet: 1024, desktop: 1200}
  * @param {React.ReactNode} [viewWeb] - Contenido para vista web (desktop). Fallback por defecto para todas las vistas
  * @param {React.ReactNode} [viewTable] - Contenido para vista tablet (fallback a viewWeb si no se proporciona)
  * @param {React.ReactNode} [viewMovil] - Contenido para vista móvil (fallback a viewTable → viewWeb si no se proporciona)
- * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha (botones de acción) - deprecated, usar contents[0]
- * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (filtros, inputs) - deprecated, usar contents[1]
- * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha (controles, ordenamiento) - deprecated, usar contents[2]
+ * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha (botones de acción)
+ * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda (filtros, inputs)
+ * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha (controles, ordenamiento)
  * @param {string} [className] - Clases CSS adicionales para el header
  * @param {string} [contentClassName] - Clases CSS adicionales para el área de contenido
  * @param {boolean} [enableTransitions=true] - Habilita transiciones suaves entre vistas
@@ -340,12 +326,11 @@ const HeaderCardViewResponsive = React.memo(({
   badge,
   // Vista y contenido con configuración responsiva
   views = ["web", "table", "movil"], // [desktop, tablet, mobile]
-  contents = [], // Nuevo sistema de contenidos
   breakpoints = { mobile: 768, tablet: 1024, desktop: 1200 },
   viewWeb,
   viewTable,
   viewMovil,
-  // Slots legacy (mantener compatibilidad)
+  // Slots de contenido
   contentTopRight,    // Área superior derecha: botones de acción, controles principales
   contentBottomLeft,  // Área inferior izquierda: inputs, selects, filtros, etc.
   contentBottomRight, // Área inferior derecha: botones, controles, ordenamiento, etc.
@@ -420,8 +405,7 @@ const HeaderCardViewResponsive = React.memo(({
         currentView={currentView}
         onViewChange={handleViewChange} // Permitir cambio manual
         views={views}
-        contents={contents} // Pasar el nuevo sistema de contenidos
-        contentTopRight={contentTopRight} // Mantener compatibilidad
+        contentTopRight={contentTopRight}
         contentBottomLeft={contentBottomLeft}
         contentBottomRight={contentBottomRight}
         className={className}
@@ -468,7 +452,6 @@ HeaderCardViewResponsive.propTypes = {
       })
     ])
   ),
-  contents: PropTypes.arrayOf(PropTypes.node), // [topRight, bottomLeft, bottomRight]
   breakpoints: PropTypes.shape({
     mobile: PropTypes.number,
     tablet: PropTypes.number,

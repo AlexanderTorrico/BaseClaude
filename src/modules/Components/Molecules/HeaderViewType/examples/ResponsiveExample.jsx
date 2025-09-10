@@ -59,18 +59,19 @@ const ResponsiveExample = React.memo(({
         ]} // Usando objetos para mayor flexibilidad
         breakpoints={{ mobile: 768, tablet: 1024, desktop: 1200 }}
         enableTransitions={true}
-        contents={[
-          // [0] contentTopRight
-          <ResponsiveViewActions onNew={handleNewRecord} />,
-          // [1] contentBottomLeft  
+        contentTopRight={
+          <ResponsiveViewActions onNew={handleNewRecord} />
+        }
+        contentBottomLeft={
           <SearchRecordsInput
             value={searchValue}
             onChange={(e) => handleSearchChange(e.target.value)}
             onSearch={handleSearch}
-          />,
-          // [2] contentBottomRight
+          />
+        }
+        contentBottomRight={
           <ResponsiveFilterGroup onFilter={handleFilter} />
-        ]}
+        }
         viewWeb={
           <UserDataTable 
             onEdit={handleUserEdit}

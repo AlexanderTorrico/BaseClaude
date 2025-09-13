@@ -123,6 +123,7 @@ const AzTable = ({
         accessorKey: "actions",
         enableSorting: false,
         enableColumnFilter: false,
+        getCanFilter: () => false,
         cell: ({ row }) => {
           const actionsProps = {
             row: row.original,
@@ -151,6 +152,7 @@ const AzTable = ({
         accessorKey: "actions",
         enableSorting: false,
         enableColumnFilter: false,
+        getCanFilter: () => false,
         cell: ({ row }) => (
           <div className="d-flex gap-2 py-2 justify-content-center">
             {React.Children.map(components, (child) => {
@@ -201,6 +203,7 @@ const AzTable = ({
         accessorKey: "select",
         enableSorting: false,
         enableColumnFilter: false,
+        getCanFilter: () => false,
         cell: ({ row }) => (
           <Input
             type="checkbox"
@@ -227,6 +230,9 @@ const AzTable = ({
         ...column
       };
 
+      // Disable TanStack Table's built-in filtering for all columns
+      processedColumn.getCanFilter = () => false;
+
       // Create header with sorting and filtering
       if (column.header || column.sortable || column.filterable) {
         processedColumn.header = (
@@ -239,6 +245,8 @@ const AzTable = ({
             filters={internalFilters}
             onSort={handleInternalSort}
             onFilter={handleInternalFilter}
+            filterType={column.filterType || "text"}
+            filterOptions={column.filterOptions || []}
           />
         );
       }
@@ -297,10 +305,13 @@ const AzTableHeader = ({
   sorting = { field: "", direction: "" },
   filters = {},
   onSort,
-  onFilter
+  onFilter,
+  filterType = "text",
+  filterOptions = []
 }) => {
   const currentSortDirection = sorting.field === column ? sorting.direction : "";
   const currentFilter = filters[column] || "";
+
 
   const handleSort = () => {
     if (!sortable || !onSort) return;
@@ -351,14 +362,63 @@ const AzTableHeader = ({
       </div>
       {filterable && (
         <div className="column-filter-container" style={{ marginTop: '8px' }}>
-          <Input
-            type="text"
-            bsSize="sm"
-            placeholder={`Filtrar ${title}...`}
-            value={currentFilter}
-            onChange={handleFilter}
-            style={{ fontSize: '12px', height: '30px' }}
-          />
+          {filterType === "select" ? (
+            <Input
+              type="select"
+              bsSize="sm"
+              value={currentFilter}
+              onChange={handleFilter}
+              style={{
+                fontSize: '12px',
+                height: '30px',
+                border: '1px solid #e3ebf6',
+                borderRadius: '4px',
+                boxShadow: 'none',
+                outline: 'none',
+                transition: 'border-color 0.15s ease-in-out'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#74b9ff';
+                e.target.style.boxShadow = '0 0 0 0.2rem rgba(116, 185, 255, 0.25)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e3ebf6';
+                e.target.style.boxShadow = 'none';
+              }}
+            >
+              <option value="">Todos</option>
+              {filterOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </Input>
+          ) : (
+            <Input
+              type="text"
+              bsSize="sm"
+              placeholder={`Filtrar ${title}...`}
+              value={currentFilter}
+              onChange={handleFilter}
+              style={{
+                fontSize: '12px',
+                height: '30px',
+                border: '1px solid #e3ebf6',
+                borderRadius: '4px',
+                boxShadow: 'none',
+                outline: 'none',
+                transition: 'border-color 0.15s ease-in-out'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#74b9ff';
+                e.target.style.boxShadow = '0 0 0 0.2rem rgba(116, 185, 255, 0.25)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e3ebf6';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
+          )}
         </div>
       )}
       {!filterable && (
@@ -438,7 +498,9 @@ AzTableHeader.propTypes = {
   }),
   filters: PropTypes.object,
   onSort: PropTypes.func,
-  onFilter: PropTypes.func
+  onFilter: PropTypes.func,
+  filterType: PropTypes.oneOf(['text', 'select']),
+  filterOptions: PropTypes.array
 };
 
 // Asignar subcomponentes

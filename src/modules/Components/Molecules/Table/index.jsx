@@ -134,6 +134,8 @@ const Table = (props) => {
         header: "Estado",
         sortable: true,
         filterable: true,
+        filterType: "select",
+        filterOptions: ["Activo", "Inactivo", "Pendiente"],
         cell: AzTableColumns.Badge({
           colorMap: {
             "Activo": "success",
@@ -178,7 +180,9 @@ const Table = (props) => {
         key: "activo",
         header: "Activo",
         sortable: true,
-        filterable: false,
+        filterable: true,
+        filterType: "select",
+        filterOptions: ["Sí", "No"],
         cell: AzTableColumns.Boolean({
           trueText: "Sí",
           falseText: "No",

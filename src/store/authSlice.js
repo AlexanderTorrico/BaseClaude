@@ -12,6 +12,13 @@ import {
   postFakeProfile,
   postJwtProfile,
 } from '../helpers/fakebackend_helper'
+import {
+  postApiLogin,
+  postApiRegister,
+  postApiForgotPassword,
+  postApiProfile,
+  postApiLogout,
+} from '../helpers/realBackendAuth'
 
 const fireBaseBackend = getFirebaseBackend()
 
@@ -50,6 +57,11 @@ export const loginUser = createAsyncThunk(
           password: user.password,
         })
         localStorage.setItem('authUser', JSON.stringify(response))
+      } else if (import.meta.env.VITE_APP_DEFAULTAUTH === 'api') {
+        response = await postApiLogin({
+          email: user.email,
+          password: user.password,
+        })
       } else if (import.meta.env.VITE_APP_DEFAULTAUTH === 'fake') {
         response = await postFakeLogin({
           email: user.email,
@@ -70,12 +82,13 @@ export const logoutUser = createAsyncThunk(
   'auth/logoutUser',
   async ({ history }, { rejectWithValue }) => {
     try {
-      localStorage.removeItem('authUser')
-
       if (import.meta.env.VITE_APP_DEFAULTAUTH === 'firebase') {
         await fireBaseBackend.logout()
+      } else if (import.meta.env.VITE_APP_DEFAULTAUTH === 'api') {
+        await postApiLogout()
       }
 
+      localStorage.removeItem('authUser')
       history('/login')
       return true
     } catch (error) {
@@ -116,6 +129,8 @@ export const registerUser = createAsyncThunk(
         response = await fireBaseBackend.registerUser(user.email, user.password)
       } else if (import.meta.env.VITE_APP_DEFAULTAUTH === 'jwt') {
         response = await postJwtRegister('/post-jwt-register', user)
+      } else if (import.meta.env.VITE_APP_DEFAULTAUTH === 'api') {
+        response = await postApiRegister(user)
       } else if (import.meta.env.VITE_APP_DEFAULTAUTH === 'fake') {
         response = await postFakeRegister(user)
       }
@@ -138,6 +153,10 @@ export const forgotPassword = createAsyncThunk(
         response = await fireBaseBackend.forgetPassword(user.email)
       } else if (import.meta.env.VITE_APP_DEFAULTAUTH === 'jwt') {
         response = await postJwtForgetPwd('/jwt-forget-pwd', {
+          email: user.email,
+        })
+      } else if (import.meta.env.VITE_APP_DEFAULTAUTH === 'api') {
+        response = await postApiForgotPassword({
           email: user.email,
         })
       } else {
@@ -163,6 +182,11 @@ export const updateProfile = createAsyncThunk(
         response = await fireBaseBackend.editProfileAPI(user.username, user.idx)
       } else if (import.meta.env.VITE_APP_DEFAULTAUTH === 'jwt') {
         response = await postJwtProfile('/post-jwt-profile', {
+          username: user.username,
+          idx: user.idx,
+        })
+      } else if (import.meta.env.VITE_APP_DEFAULTAUTH === 'api') {
+        response = await postApiProfile({
           username: user.username,
           idx: user.idx,
         })

@@ -11,9 +11,10 @@ import {
 import { withTranslation } from "react-i18next";
 
 // Redux
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import withRouter from "../../Common/withRouter";
+import { logoutUser } from "../../../store/authSlice";
 
 // users
 import user1 from "../../../assets/images/users/avatar-1.jpg";
@@ -21,6 +22,7 @@ import user1 from "../../../assets/images/users/avatar-1.jpg";
 const ProfileMenu = (props) => {
   // Declare a new state variable, which we'll call "menu"
   const [menu, setMenu] = useState(false);
+  const dispatch = useDispatch();
 
   const [username, setusername] = useState("Admin");
 
@@ -31,13 +33,18 @@ const ProfileMenu = (props) => {
         setusername(obj.email);
       } else if (
         import.meta.env.VITE_APP_DEFAULTAUTH === "fake" ||
-        import.meta.env.VITE_APP_DEFAULTAUTH === "jwt"
+        import.meta.env.VITE_APP_DEFAULTAUTH === "jwt" ||
+        import.meta.env.VITE_APP_DEFAULTAUTH === "api"
       ) {
         const obj = JSON.parse(localStorage.getItem("authUser"));
         setusername(obj.username);
       }
     }
   }, [props.success]);
+
+  const handleLogout = () => {
+    dispatch(logoutUser({ history: props.router.navigate }));
+  };
 
   return (
     <React.Fragment>
@@ -79,10 +86,10 @@ const ProfileMenu = (props) => {
             {props.t("Lock screen")}
           </DropdownItem>
           <div className="dropdown-divider" />
-          <Link to="/logout" className="dropdown-item">
+          <DropdownItem onClick={handleLogout}>
             <i className="bx bx-power-off font-size-16 align-middle me-1 text-danger" />
             <span>{props.t("Logout")}</span>
-          </Link>
+          </DropdownItem>
         </DropdownMenu>
       </Dropdown>
     </React.Fragment>

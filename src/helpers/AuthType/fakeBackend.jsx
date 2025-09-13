@@ -21,9 +21,6 @@ let users = [
 
 const fakeBackend = () => {
   // Reset axios adapters first
-  if (axios.defaults.adapter) {
-    console.log('Resetting axios adapter');
-  }
   
   // This sets the mock adapter on the default instance
   const mock = new MockAdapter(axios, { 
@@ -31,9 +28,6 @@ const fakeBackend = () => {
     delayResponse: 200 
   });
   
-  console.log('Fake backend initialized');
-  console.log('POST_FAKE_LOGIN URL:', url.POST_FAKE_LOGIN);
-  console.log('Available users:', users);
 
   mock.onPost(url.POST_FAKE_REGISTER).reply((config) => {
     const user = JSON.parse(config["data"]);

@@ -25,8 +25,11 @@ import "./assets/scss/theme.scss";
 // import { initFirebaseBackend } from "./helpers/firebase_helper"
 
 import fakeBackend from "./helpers/AuthType/fakeBackend"
-// Activating fake backend
-fakeBackend();
+
+// Conditionally activate fake backend only if not using real API
+if (import.meta.env.VITE_APP_DEFAULTAUTH === 'fake') {
+  fakeBackend();
+}
 
 // const firebaseConfig = {
 //   apiKey: import.meta.env.VITE_APP_APIKEY,

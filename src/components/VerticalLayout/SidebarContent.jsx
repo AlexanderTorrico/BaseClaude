@@ -209,6 +209,9 @@ const SidebarContent = (props) => {
                 <li>
                   <Link to="/header_view_type">Headers</Link>
                 </li>
+                <li>
+                  <Link to="/table">Table</Link>
+                </li>
                 
               
               </ul>

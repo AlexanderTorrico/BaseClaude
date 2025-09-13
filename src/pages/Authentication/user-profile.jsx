@@ -63,7 +63,8 @@ const UserProfile = (props) => {
         setidx(obj.uid);
       } else if (
         import.meta.env.VITE_APP_DEFAULTAUTH === "fake" ||
-        import.meta.env.VITE_APP_DEFAULTAUTH === "jwt"
+        import.meta.env.VITE_APP_DEFAULTAUTH === "jwt" ||
+        import.meta.env.VITE_APP_DEFAULTAUTH === "api"
       ) {
         setname(obj.username);
         setemail(obj.email);

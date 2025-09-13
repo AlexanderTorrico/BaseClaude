@@ -5,6 +5,7 @@ import { Navigate } from "react-router-dom";
 import Login from "../pages/Authentication/Login";
 import Register from "../pages/Authentication/Register";
 import ForgetPwd from "../pages/Authentication/ForgetPassword";
+import UserProfile from "../pages/Authentication/user-profile";
 
 // // Dashboard
 import Dashboard from "../pages/Dashboard/index";
@@ -16,11 +17,13 @@ import Atomo from "../modules/Components/Atomo/index";
 
 import User from "../pages/security/user/index";
 import HeaderViewType from "../modules/Components/Molecules/HeaderViewType/index";
+import Table from "../modules/Components/Molecules/Table/index";
 import PageApi from "../modules/Components/PageApi/index";
 
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
+  { path: "/profile", component: <UserProfile /> },
   { path: "/crud_basic", component: <CrudBasic /> },
   { path: "/crud_modern", component: <CrudModern /> },
   { path: "/crud_v1", component: <CrudV1 /> },
@@ -30,6 +33,7 @@ const authProtectedRoutes = [
 
   // Molecules
   { path: "/header_view_type", component: <HeaderViewType /> },
+  { path: "/table", component: <Table /> },
 
   { path: "/page-api", component: <PageApi /> },
   //Security

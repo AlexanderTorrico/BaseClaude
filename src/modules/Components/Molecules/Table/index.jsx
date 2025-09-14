@@ -1,8 +1,6 @@
-import React from "react";
 import PropTypes from "prop-types";
 import { Button } from "reactstrap";
-import AzTable from "../../../../components/Common/AzTable";
-import AzTableColumns from "../../../../components/Common/AzTableColumns";
+import { AzTable, AzTableColumns } from "../../../../components/aziende/AzTable";
 
 const Table = (props) => {
   // Para pruebas - usar datos de ejemplo si no se proporcionan props

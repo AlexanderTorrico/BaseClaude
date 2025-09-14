@@ -18,6 +18,8 @@ import Atomo from "../modules/Components/Atomo/index";
 import User from "../pages/security/user/index";
 import HeaderViewType from "../modules/Components/Molecules/HeaderViewType/index";
 import Table from "../modules/Components/Molecules/Table/index";
+
+import CrudBasicResponsive from "../modules/Components/Pages/CrudBasicResponsive/index";
 import PageApi from "../modules/Components/PageApi/index";
 
 
@@ -34,6 +36,9 @@ const authProtectedRoutes = [
   // Molecules
   { path: "/header_view_type", component: <HeaderViewType /> },
   { path: "/table", component: <Table /> },
+
+  // Pages
+  { path: "/pages/crud-basic-responsive", component: <CrudBasicResponsive /> },
 
   { path: "/page-api", component: <PageApi /> },
   //Security

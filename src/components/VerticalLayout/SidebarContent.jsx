@@ -199,21 +199,6 @@ const SidebarContent = (props) => {
               </Link>
             </li>
 
-
-            <li>
-              <Link to="/#" className="has-arrow ">
-                <i className="bx bx-user-circle"></i>
-                <span>Pages</span>
-              </Link>
-              <ul className="sub-menu">
-                <li>
-                  <Link to="/pages/crud-basic">Crud basic responsive</Link>
-                </li>
-                
-              
-              </ul>
-            </li>
-
             <li>
               <Link to="/#" className="has-arrow ">
                 <i className="bx bx-user-circle"></i>
@@ -230,6 +215,21 @@ const SidebarContent = (props) => {
               
               </ul>
             </li>
+
+                        <li>
+              <Link to="/#" className="has-arrow ">
+                <i className="bx bx-user-circle"></i>
+                <span>Pages</span>
+              </Link>
+              <ul className="sub-menu">
+                <li>
+                  <Link to="/pages/crud-basic-responsive">Crud basic responsive</Link>
+                </li>
+                
+              
+              </ul>
+            </li>
+
 
             <li>
               <Link to="/page-api" className=" ">

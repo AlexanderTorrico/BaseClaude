@@ -85,7 +85,7 @@ const Currency = ({
 
     return (
       <div className="py-2">
-        <span className={`${className} fw-semibold text-success`}>{formattedValue}</span>
+        <span className={className}>{formattedValue}</span>
       </div>
     );
   };

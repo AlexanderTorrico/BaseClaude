@@ -174,7 +174,12 @@ const Table = (props) => {
         header: "Salario",
         sortable: true,
         filterable: true,
-        cell: AzTableColumns.Currency({ locale: "es-ES", currency: "EUR" })
+        cell: AzTableColumns.Currency({ locale: "es-ES", currency: "EUR", className:"fw-bold text-success" })
+        //- fw-bold - Negrilla
+        //- fw-semibold - Semi-negrilla
+        //- fw-medium - Medio
+        //- fw-normal - Normal
+        //- fw-light - Ligero
       },
       {
         key: "activo",

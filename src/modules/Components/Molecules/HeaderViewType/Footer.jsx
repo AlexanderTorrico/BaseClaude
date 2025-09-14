@@ -7,16 +7,16 @@ const Footer = () => {
             <h4 className="mb-3">API Simplificada - Fácil de usar:</h4>
             <div className="row">
               <div className="col-lg-4">
-                <h6 className="text-primary">HeaderCard (Base)</h6>
-                <pre className="small"><code>{`<HeaderCard
+                <h6 className="text-primary">AzHeaderCard (Base)</h6>
+                <pre className="small"><code>{`<AzHeaderCard
   title="Mi Título"
   description="Descripción"
   contentTopRight={<Button>Acción</Button>}
 />`}</code></pre>
               </div>
               <div className="col-lg-4">
-                <h6 className="text-success">HeaderCardViews (Sistema de Pestañas)</h6>
-                <pre className="small"><code>{`<HeaderCardViews
+                <h6 className="text-success">AzAzHeaderCardViews (Sistema de Pestañas)</h6>
+                <pre className="small"><code>{`<AzAzHeaderCardViews
   title="Mi Sistema"
   badge="Activo"
   currentView="0" // Índice de vista activa
@@ -42,8 +42,8 @@ const Footer = () => {
 />`}</code></pre>
               </div>
               <div className="col-lg-4">
-                <h6 className="text-warning">HeaderCardViewResponsive</h6>
-                <pre className="small"><code>{`<HeaderCardViewResponsive
+                <h6 className="text-warning">AzAzHeaderCardViewResponsive</h6>
+                <pre className="small"><code>{`<AzAzHeaderCardViewResponsive
   title="Dashboard"
   badge={{count: 25, total: 100}}
   // Objetos o strings:
@@ -114,7 +114,7 @@ const Footer = () => {
               <div className="mt-3 p-3 bg-secondary bg-opacity-10 rounded">
                 <h6 className="text-secondary mb-2">📝 API Unificada:</h6>
                 <ul className="small mb-0">
-                  <li><strong>Nomenclatura consistente:</strong> API unificada en HeaderCard, HeaderCardViews y HeaderCardViewResponsive</li>
+                  <li><strong>Nomenclatura consistente:</strong> API unificada en AzHeaderCard, AzAzHeaderCardViews y AzAzHeaderCardViewResponsive</li>
                   <li><strong>PropTypes completos:</strong> Validación total con soporte para ambos formatos</li>
                   <li><strong>JSDoc completo:</strong> Documentación integrada para VSCode IntelliSense</li>
                   <li><strong>Performance optimizada:</strong> React.memo, useCallback, useMemo en todos los componentes</li>

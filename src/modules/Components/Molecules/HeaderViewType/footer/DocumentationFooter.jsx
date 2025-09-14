@@ -6,9 +6,9 @@ import React from "react";
  */
 const DocumentationFooter = React.memo(() => {
   // Ejemplos de código como componentes React para evitar strings HTML
-  const HeaderCardExample = React.memo(() => (
+  const AzHeaderCardExample = React.memo(() => (
     <div className="bg-dark text-light p-3 rounded">
-      <div className="text-info">{'<HeaderCard'}</div>
+      <div className="text-info">{'<AzHeaderCard'}</div>
       <div className="ms-2">title="Mi Título"</div>
       <div className="ms-2">description="Descripción"</div>
       <div className="ms-2">{'contentTopRight={<Button>Acción</Button>}'}</div>
@@ -16,9 +16,9 @@ const DocumentationFooter = React.memo(() => {
     </div>
   ));
 
-  const HeaderCardViewsExample = React.memo(() => (
+  const AzAzHeaderCardViewsExample = React.memo(() => (
     <div className="bg-dark text-light p-3 rounded">
-      <div className="text-info">{'<HeaderCardViews'}</div>
+      <div className="text-info">{'<AzAzHeaderCardViews'}</div>
       <div className="ms-2">title="Mi Sistema"</div>
       <div className="ms-2">badge="Activo"</div>
       <div className="ms-2">currentView="0"</div>
@@ -35,9 +35,9 @@ const DocumentationFooter = React.memo(() => {
     </div>
   ));
 
-  const HeaderCardViewResponsiveExample = React.memo(() => (
+  const AzAzHeaderCardViewResponsiveExample = React.memo(() => (
     <div className="bg-dark text-light p-3 rounded">
-      <div className="text-info">{'<HeaderCardViewResponsive'}</div>
+      <div className="text-info">{'<AzAzHeaderCardViewResponsive'}</div>
       <div className="ms-2">title="Dashboard"</div>
       <div className="ms-2">badge={'{count: 25, total: 100}'}</div>
       <div className="ms-2">views={'{[\'web\', \'table\', \'movil\']}'}</div>
@@ -57,16 +57,16 @@ const DocumentationFooter = React.memo(() => {
       <h4 className="mb-3">API Simplificada - Fácil de usar:</h4>
       <div className="row">
         <div className="col-lg-4">
-          <h6 className="text-primary">HeaderCard (Base)</h6>
-          <HeaderCardExample />
+          <h6 className="text-primary">AzHeaderCard (Base)</h6>
+          <AzHeaderCardExample />
         </div>
         <div className="col-lg-4">
-          <h6 className="text-success">HeaderCardViews (Optimizado)</h6>
-          <HeaderCardViewsExample />
+          <h6 className="text-success">AzAzHeaderCardViews (Optimizado)</h6>
+          <AzAzHeaderCardViewsExample />
         </div>
         <div className="col-lg-4">
-          <h6 className="text-warning">HeaderCardViewResponsive</h6>
-          <HeaderCardViewResponsiveExample />
+          <h6 className="text-warning">AzAzHeaderCardViewResponsive</h6>
+          <AzAzHeaderCardViewResponsiveExample />
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { withTranslation } from "react-i18next";
 import { Button, Container } from "reactstrap";
-import HeaderCard from "../../../components/HeaderCard";
+import { AzHeaderCard } from "../../../components/aziende/AzHeader";
 
 
 const PageApi = () =>{
@@ -11,7 +11,7 @@ const PageApi = () =>{
             <div className="page-content">
                 <Container fluid>
                     
-                    <HeaderCard
+                    <AzHeaderCard
                         title="Mi Título"
                         description="Descripción"
                         contentTopRight={<Button>Acción</Button>}

@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { HeaderCardViewResponsive } from "../../../../../components/HeaderCardViews";
+import { AzAzHeaderCardViewResponsive } from "../../../../../components/aziende/AzHeader";
 import { ResponsiveViewActions } from "../content/ViewActionButtons";
 import { SearchRecordsInput } from "../content/SearchInputs";
 import { ResponsiveFilterGroup } from "../content/ViewActionButtons";
@@ -10,7 +10,7 @@ import UserGridGallery from "../components/UserGridGallery";
 import AddNewUserCard from "../components/AddNewUserCard";
 
 /**
- * ResponsiveExample - Ejemplo complejo de HeaderCardViewResponsive
+ * ResponsiveExample - Ejemplo complejo de AzHeaderCardViewResponsive
  * Componente que demuestra el uso completo del sistema responsivo
  */
 const ResponsiveExample = React.memo(({
@@ -44,10 +44,10 @@ const ResponsiveExample = React.memo(({
 
   return (
     <React.Fragment>
-      <h4 className="mb-3 mt-5 text-warning">HeaderCardViewResponsive (Integrado con Contenido)</h4>
+      <h4 className="mb-3 mt-5 text-warning">AzHeaderCardViewResponsive (Integrado con Contenido)</h4>
 
-      {/* Ejemplo completo: HeaderCardViewResponsive con nueva estructura de contents */}
-      <HeaderCardViewResponsive
+      {/* Ejemplo completo: AzHeaderCardViewResponsive con nueva estructura de contents */}
+      <AzHeaderCardViewResponsive
         title="Sistema Responsivo Completo"
         description="Header con contenido que cambia automáticamente según el tamaño de pantalla"
         badge={{ count: 25, total: 100 }}

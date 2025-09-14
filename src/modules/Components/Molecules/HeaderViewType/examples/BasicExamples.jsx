@@ -1,7 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import HeaderCard from "../../../../../components/HeaderCard";
-import { HeaderCardViews } from "../../../../../components/HeaderCardViews";
+import { AzAzHeaderCard, AzAzAzHeaderCardViews } from "../../../../../components/aziende/AzHeader";
 import { 
   NewUserActions, 
   ProductActions, 
@@ -9,7 +8,7 @@ import {
 } from "../content/ActionButtons";
 
 /**
- * BasicExamples - Ejemplos básicos de uso de HeaderCard y HeaderCardViews
+ * BasicExamples - Ejemplos básicos de uso de AzHeaderCard y AzAzHeaderCardViews
  * Componente que demuestra los casos de uso fundamentales
  */
 const BasicExamples = React.memo(({
@@ -43,16 +42,16 @@ const BasicExamples = React.memo(({
 
   return (
     <React.Fragment>
-      <h4 className="mb-3 text-primary">HeaderCard (Componente Base)</h4>
+      <h4 className="mb-3 text-primary">AzHeaderCard (Componente Base)</h4>
       
       {/* Ejemplo 1: Header básico */}
-      <HeaderCard
+      <AzHeaderCard
         title="Header Básico"
         description="Ejemplo simple con solo título y descripción"
       />
 
       {/* Ejemplo 2: Header con badge */}
-      <HeaderCard
+      <AzHeaderCard
         title="Header con Badge"
         description="Ejemplo con contador de resultados"
         showBadge={true}
@@ -62,7 +61,7 @@ const BasicExamples = React.memo(({
       />
 
       {/* Ejemplo 3: Header con acciones personalizadas */}
-      <HeaderCard
+      <AzHeaderCard
         title="Header con Acciones Personalizadas"
         description="Ejemplo con botones personalizados en la parte superior derecha"
         showBadge={true}
@@ -76,10 +75,10 @@ const BasicExamples = React.memo(({
         }
       />
 
-      <h4 className="mb-3 mt-5 text-success">HeaderCardViews (Con Cambio de Vista)</h4>
+      <h4 className="mb-3 mt-5 text-success">AzAzHeaderCardViews (Con Cambio de Vista)</h4>
 
-      {/* Ejemplo 4: HeaderCardViews con contenido dinámico */}
-      <HeaderCardViews
+      {/* Ejemplo 4: AzAzHeaderCardViews con contenido dinámico */}
+      <AzAzHeaderCardViews
         title="Gestión de Usuarios"
         description="Sistema de usuarios con pestañas"
         badge="156 usuarios"
@@ -110,8 +109,8 @@ const BasicExamples = React.memo(({
         }
       />
 
-      {/* Ejemplo 5: HeaderCardViews con pestañas de productos */}
-      <HeaderCardViews
+      {/* Ejemplo 5: AzAzHeaderCardViews con pestañas de productos */}
+      <AzAzHeaderCardViews
         title="Catálogo de Productos"
         description="Gestión de inventario con vistas"
         badge="🛒 En línea"
@@ -142,10 +141,10 @@ const BasicExamples = React.memo(({
         }
       />
 
-      <h4 className="mb-3 mt-5 text-info">HeaderCardViews con Iconos Personalizados</h4>
+      <h4 className="mb-3 mt-5 text-info">AzAzHeaderCardViews con Iconos Personalizados</h4>
 
-      {/* Ejemplo 6: HeaderCardViews con sistema completo */}
-      <HeaderCardViews
+      {/* Ejemplo 6: AzAzHeaderCardViews con sistema completo */}
+      <AzAzHeaderCardViews
         title="Sistema de Administración"
         description="Panel de control con múltiples secciones"
         badge="15 activos"

@@ -342,7 +342,28 @@ const AzTable = ({
         <div className="col-12">
           <Card className={`border-0 shadow-sm ${className}`}>
             <CardBody className="p-4">
-              <div className="table-responsive">
+              <div className="table-responsive az-table-container">
+                <style>{`
+                  .az-table-container .table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
+                  .az-table-container .table.dataTable tbody td.dtr-control:before {
+                    display: none !important;
+                  }
+                  .az-table-container .table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control,
+                  .az-table-container .table.dataTable tbody td.dtr-control {
+                    padding-left: 8px !important;
+                  }
+                  .az-table-container input[type="text"]::-webkit-outer-spin-button,
+                  .az-table-container input[type="text"]::-webkit-inner-spin-button,
+                  .az-table-container input[type="number"]::-webkit-outer-spin-button,
+                  .az-table-container input[type="number"]::-webkit-inner-spin-button {
+                    -webkit-appearance: none !important;
+                    margin: 0 !important;
+                  }
+                  .az-table-container input[type="text"],
+                  .az-table-container input[type="number"] {
+                    -moz-appearance: textfield !important;
+                  }
+                `}</style>
                 <TableContainer
                   columns={processedColumns}
                   data={finalData}

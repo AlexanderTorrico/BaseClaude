@@ -67,10 +67,25 @@ const AzTable = ({
     // Aplicar filtros
     Object.entries(internalFilters).forEach(([column, filterValue]) => {
       if (filterValue && filterValue.trim() !== "") {
+        // Encontrar la configuración de la columna para determinar el tipo de filtro
+        const columnConfig = columns.find(col => col.key === column);
+
         filteredData = filteredData.filter(row => {
           const cellValue = row[column];
           if (cellValue == null) return false;
 
+          // Manejar filtros de tipo booleano especiales
+          if (columnConfig && columnConfig.filterType === "select" &&
+              columnConfig.filterOptions &&
+              columnConfig.filterOptions.includes("Sí") &&
+              columnConfig.filterOptions.includes("No")) {
+
+            // Convertir valores booleanos a texto para comparar
+            const booleanText = cellValue === true ? "Sí" : cellValue === false ? "No" : cellValue.toString();
+            return booleanText === filterValue;
+          }
+
+          // Filtro de texto normal
           return cellValue.toString().toLowerCase().includes(filterValue.toLowerCase());
         });
       }
@@ -100,7 +115,7 @@ const AzTable = ({
     }
 
     return filteredData;
-  }, [data, internalFilters, internalSorting]);
+  }, [data, internalFilters, internalSorting, columns]);
 
   const actionColumn = useMemo(() => {
     // Si se proporciona un children de tipo AzTableActions, usarlo
@@ -311,6 +326,22 @@ const AzTableHeader = ({
 }) => {
   const currentSortDirection = sorting.field === column ? sorting.direction : "";
   const currentFilter = filters[column] || "";
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = React.useRef(null);
+
+  // Cerrar dropdown al hacer click fuera
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
 
   const handleSort = () => {
@@ -363,36 +394,123 @@ const AzTableHeader = ({
       {filterable && (
         <div className="column-filter-container" style={{ marginTop: '8px' }}>
           {filterType === "select" ? (
-            <Input
-              type="select"
-              bsSize="sm"
-              value={currentFilter}
-              onChange={handleFilter}
-              style={{
-                fontSize: '12px',
-                height: '30px',
-                border: '1px solid #e3ebf6',
-                borderRadius: '4px',
-                boxShadow: 'none',
-                outline: 'none',
-                transition: 'border-color 0.15s ease-in-out'
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = '#74b9ff';
-                e.target.style.boxShadow = '0 0 0 0.2rem rgba(116, 185, 255, 0.25)';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = '#e3ebf6';
-                e.target.style.boxShadow = 'none';
-              }}
-            >
-              <option value="">Todos</option>
-              {filterOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </Input>
+            <div ref={dropdownRef} style={{ position: 'relative' }}>
+              <div
+                onClick={() => setIsOpen(!isOpen)}
+                style={{
+                  fontSize: '12px',
+                  height: '30px',
+                  border: '1px solid #e3ebf6',
+                  borderRadius: '4px',
+                  boxShadow: 'none',
+                  outline: 'none',
+                  transition: 'all 0.15s ease-in-out',
+                  backgroundColor: '#ffffff',
+                  color: '#495057',
+                  backgroundImage: 'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 16\'%3e%3cpath fill=\'none\' stroke=\'%23343a40\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M2 5l6 6 6-6\'/%3e%3c/svg%3e")',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 0.75rem center',
+                  backgroundSize: '16px 12px',
+                  paddingRight: '2.25rem',
+                  paddingLeft: '8px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  borderColor: isOpen ? '#74b9ff' : '#e3ebf6',
+                  boxShadow: isOpen ? '0 0 0 0.2rem rgba(116, 185, 255, 0.25)' : 'none',
+                  fontWeight: 'normal'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isOpen) {
+                    e.target.style.borderColor = '#74b9ff';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isOpen) {
+                    e.target.style.borderColor = '#e3ebf6';
+                  }
+                }}
+              >
+                {currentFilter || "Todos"}
+              </div>
+
+              {isOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    right: 0,
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e3ebf6',
+                    borderRadius: '4px',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                    zIndex: 1000,
+                    maxHeight: '200px',
+                    overflowY: 'auto'
+                  }}
+                >
+                  <div
+                    onClick={() => {
+                      if (onFilter) onFilter(column, "");
+                      setIsOpen(false);
+                    }}
+                    style={{
+                      padding: '6px 8px',
+                      fontSize: '12px',
+                      color: !currentFilter ? '#ffffff' : '#495057',
+                      cursor: 'pointer',
+                      borderBottom: '1px solid #e3ebf6',
+                      backgroundColor: !currentFilter ? '#74b9ff' : '#ffffff',
+                      fontWeight: 'normal'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (currentFilter) {
+                        e.target.style.backgroundColor = '#f8f9fa';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (currentFilter) {
+                        e.target.style.backgroundColor = '#ffffff';
+                      }
+                    }}
+                  >
+                    Todos
+                  </div>
+
+                  {filterOptions.map((option) => (
+                    <div
+                      key={option}
+                      onClick={() => {
+                        if (onFilter) onFilter(column, option);
+                        setIsOpen(false);
+                      }}
+                      style={{
+                        padding: '6px 8px',
+                        fontSize: '12px',
+                        color: currentFilter === option ? '#ffffff' : '#495057',
+                        cursor: 'pointer',
+                        borderBottom: '1px solid #e3ebf6',
+                        backgroundColor: currentFilter === option ? '#74b9ff' : '#ffffff',
+                        fontWeight: 'normal'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (currentFilter !== option) {
+                          e.target.style.backgroundColor = '#f8f9fa';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (currentFilter !== option) {
+                          e.target.style.backgroundColor = '#ffffff';
+                        }
+                      }}
+                    >
+                      {option}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           ) : (
             <Input
               type="text"

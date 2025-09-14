@@ -7,6 +7,9 @@ import AzTableColumns from "../../../../components/Common/AzTableColumns";
 const Table = (props) => {
   // Para pruebas - usar datos de ejemplo si no se proporcionan props
   if (Object.keys(props).length === 0) {
+    // Para probar el mensaje de "sin datos", descomenta la línea siguiente y comenta el array de datos
+    // const testData = [];
+
     const testData = [
       {
         id: 1,

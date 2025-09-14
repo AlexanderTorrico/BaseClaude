@@ -1,7 +1,7 @@
-import React, { useMemo, useState, useEffect, Children, useCallback } from "react";
+import React, { useMemo, useState, Children, useCallback } from "react";
 import PropTypes from "prop-types";
-import { Card, CardBody, Input, Badge as BootstrapBadge, Button } from "reactstrap";
-import { Link as RouterLink } from "react-router-dom";
+import { Card, CardBody, Input } from "reactstrap";
+import { useTranslation } from "react-i18next";
 import TableContainer from "./TableContainer";
 
 /**
@@ -23,12 +23,14 @@ const AzTable = ({
   showActions = false,
   components
 }) => {
+  const { t } = useTranslation();
+
   // Estado interno para filtros y ordenamiento
   const [internalFilters, setInternalFilters] = useState(filters || {});
   const [internalSorting, setInternalSorting] = useState(sorting || { field: "", direction: "" });
 
-  // Usar directamente selectedItems sin estado interno para evitar loops
-  const currentSelectedItems = selectedItems || [];
+  // Memoizar selectedItems para evitar re-renders innecesarios
+  const currentSelectedItems = useMemo(() => selectedItems || [], [selectedItems]);
 
   const handleSelectionChange = (newSelectedItems) => {
     if (onSelectedChange) {
@@ -121,6 +123,24 @@ const AzTable = ({
     return filteredData;
   }, [data, internalFilters, internalSorting, columns]);
 
+  // Verificar si hay filtros activos
+  const hasActiveFilters = useMemo(() => {
+    return Object.values(internalFilters).some(filter => filter && filter.trim() !== "");
+  }, [internalFilters]);
+
+  // Datos procesados con fila de "sin datos" si es necesario
+  const finalData = useMemo(() => {
+    if (processedData.length === 0) {
+      // Crear una fila especial para "sin datos"
+      return [{
+        __isNoDataRow: true,
+        __noDataMessage: hasActiveFilters ? t("No results match your filters") : t("No data found"),
+        __noDataSubtitle: hasActiveFilters ? t("Try adjusting your search criteria") : null
+      }];
+    }
+    return processedData;
+  }, [processedData, hasActiveFilters, t]);
+
   const actionColumn = useMemo(() => {
     // Si se proporciona un children de tipo AzTableActions, usarlo
     const actionsChild = Children.toArray(children).find(
@@ -144,6 +164,10 @@ const AzTable = ({
         enableColumnFilter: false,
         getCanFilter: () => false,
         cell: ({ row }) => {
+          // No mostrar acciones para la fila de "sin datos"
+          if (row.original.__isNoDataRow) {
+            return null;
+          }
           const actionsProps = {
             row: row.original,
             index: row.index,
@@ -172,20 +196,26 @@ const AzTable = ({
         enableSorting: false,
         enableColumnFilter: false,
         getCanFilter: () => false,
-        cell: ({ row }) => (
-          <div className="d-flex gap-2 py-2 justify-content-center">
-            {React.Children.map(components, (child) => {
-              if (React.isValidElement(child)) {
-                return React.cloneElement(child, {
-                  ...child.props,
-                  'data-row': JSON.stringify(row.original),
-                  'data-index': row.index,
-                });
-              }
-              return child;
-            })}
-          </div>
-        )
+        cell: ({ row }) => {
+          // No mostrar acciones para la fila de "sin datos"
+          if (row.original.__isNoDataRow) {
+            return null;
+          }
+          return (
+            <div className="d-flex gap-2 py-2 justify-content-center">
+              {React.Children.map(components, (child) => {
+                if (React.isValidElement(child)) {
+                  return React.cloneElement(child, {
+                    ...child.props,
+                    'data-row': JSON.stringify(row.original),
+                    'data-index': row.index,
+                  });
+                }
+                return child;
+              })}
+            </div>
+          );
+        }
       };
     }
 
@@ -205,13 +235,14 @@ const AzTable = ({
                 type="checkbox"
                 onChange={(e) => {
                   if (e.target.checked) {
-                    handleSelectionChange(processedData.map(item => item.id));
+                    const realData = finalData.filter(item => !item.__isNoDataRow);
+                    handleSelectionChange(realData.map(item => item.id));
                   } else {
                     handleSelectionChange([]);
                   }
                 }}
-                checked={processedData.length > 0 && currentSelectedItems.length === processedData.length}
-                indeterminate={currentSelectedItems.length > 0 && currentSelectedItems.length < processedData.length}
+                checked={finalData.filter(item => !item.__isNoDataRow).length > 0 && currentSelectedItems.length === finalData.filter(item => !item.__isNoDataRow).length}
+                indeterminate={currentSelectedItems.length > 0 && currentSelectedItems.length < finalData.filter(item => !item.__isNoDataRow).length}
               />
             </div>
             <div className="column-filter-container" style={{ marginTop: '8px' }}>
@@ -223,25 +254,31 @@ const AzTable = ({
         enableSorting: false,
         enableColumnFilter: false,
         getCanFilter: () => false,
-        cell: ({ row }) => (
-          <Input
-            type="checkbox"
-            checked={currentSelectedItems.includes(row.original.id)}
-            onChange={(e) => {
-              if (e.target.checked) {
-                handleSelectionChange([...currentSelectedItems, row.original.id]);
-              } else {
-                handleSelectionChange(currentSelectedItems.filter(id => id !== row.original.id));
-              }
-            }}
-          />
-        ),
+        cell: ({ row }) => {
+          // No mostrar checkbox para la fila de "sin datos"
+          if (row.original.__isNoDataRow) {
+            return null;
+          }
+          return (
+            <Input
+              type="checkbox"
+              checked={currentSelectedItems.includes(row.original.id)}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  handleSelectionChange([...currentSelectedItems, row.original.id]);
+                } else {
+                  handleSelectionChange(currentSelectedItems.filter(id => id !== row.original.id));
+                }
+              }}
+            />
+          );
+        },
       };
       finalColumns.push(selectionColumn);
     }
 
     // Process user-defined columns
-    const processedUserColumns = columns.map(column => {
+    const processedUserColumns = columns.map((column) => {
       const processedColumn = {
         accessorKey: column.key,
         enableSorting: false,
@@ -270,6 +307,22 @@ const AzTable = ({
         );
       }
 
+      // Override cell rendering for "no data" row
+      const originalCell = processedColumn.cell;
+      processedColumn.cell = ({ row }) => {
+        // Para datos normales, usar el cell original
+        if (!row.original.__isNoDataRow) {
+          if (originalCell) {
+            return originalCell({ row, getValue: () => row.original[column.key] });
+          }
+          return row.original[column.key];
+        }
+
+        // Para fila de "sin datos", retornar null para todas las columnas
+        // El manejo se hará a nivel de fila en TableContainer
+        return null;
+      };
+
       return processedColumn;
     });
 
@@ -281,7 +334,7 @@ const AzTable = ({
     }
 
     return finalColumns;
-  }, [columns, processedData, currentSelectedItems, onSelectedChange, actionColumn, internalSorting, internalFilters, handleInternalSort, handleInternalFilter]);
+  }, [columns, finalData, currentSelectedItems, onSelectedChange, actionColumn, internalSorting, internalFilters, handleInternalSort, handleInternalFilter, handleSelectionChange]);
 
   return (
     <div className="container-fluid">
@@ -292,7 +345,7 @@ const AzTable = ({
               <div className="table-responsive">
                 <TableContainer
                   columns={processedColumns}
-                  data={processedData}
+                  data={finalData}
                   isGlobalFilter={false}
                   isPagination={pagination}
                   isCustomPageSize={false}
@@ -417,7 +470,6 @@ const AzTableHeader = ({
                   height: '30px',
                   border: '1px solid #e3ebf6',
                   borderRadius: '4px',
-                  boxShadow: 'none',
                   outline: 'none',
                   transition: 'all 0.15s ease-in-out',
                   backgroundColor: '#ffffff',

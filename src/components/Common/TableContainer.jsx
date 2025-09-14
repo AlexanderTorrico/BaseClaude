@@ -194,11 +194,11 @@ const TableContainer = ({
                               header.getContext()
                             )}
                             {
-                              {
+                              ({
                                 asc: '',
                                 desc: '',
-                              }
-                              [header.column.getIsSorted()] ?? null}
+                              })[header.column.getIsSorted()] ?? null
+                            }
                           </div>
                           {header.column.getCanFilter() ? (
                             <div>
@@ -216,6 +216,39 @@ const TableContainer = ({
 
           <tbody>
             {getRowModel().rows.map(row => {
+              // Manejar fila especial de "sin datos"
+              if (row.original.__isNoDataRow) {
+                const totalColumns = row.getVisibleCells().length;
+                return (
+                  <tr key={row.id}>
+                    <td colSpan={totalColumns} className="text-center py-5">
+                      <div className="container">
+                        <div className="row justify-content-center align-items-center">
+                          {/* Columna del icono */}
+                          <div className="col-auto">
+                            <i className="mdi mdi-database-search text-muted" style={{ fontSize: '48px' }}></i>
+                          </div>
+                          {/* Columna de los textos */}
+                          <div className="col-auto">
+                            <div className="text-start">
+                              <h5 className="text-muted mb-1">
+                                {row.original.__noDataMessage}
+                              </h5>
+                              {row.original.__noDataSubtitle && (
+                                <p className="text-muted mb-0 small">
+                                  {row.original.__noDataSubtitle}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              }
+
+              // Renderizado normal para filas con datos
               return (
                 <tr key={row.id}>
                   {row.getVisibleCells().map(cell => {

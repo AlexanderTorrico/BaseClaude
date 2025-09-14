@@ -226,7 +226,7 @@ const Table = (props) => {
                 data={testData}
                 columns={columns}
                 selectedItems={[]}
-                pagination={true}
+                pagination={false}
                 showActions={true}
                 components={
                   <>

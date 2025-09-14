@@ -74,18 +74,22 @@ const AzTable = ({
           const cellValue = row[column];
           if (cellValue == null) return false;
 
-          // Manejar filtros de tipo booleano especiales
-          if (columnConfig && columnConfig.filterType === "select" &&
-              columnConfig.filterOptions &&
-              columnConfig.filterOptions.includes("Sí") &&
-              columnConfig.filterOptions.includes("No")) {
+          // Manejar filtros de tipo select (exactos)
+          if (columnConfig && columnConfig.filterType === "select") {
+            // Para filtros booleanos especiales (Sí/No)
+            if (columnConfig.filterOptions &&
+                columnConfig.filterOptions.includes("Sí") &&
+                columnConfig.filterOptions.includes("No")) {
+              // Convertir valores booleanos a texto para comparar
+              const booleanText = cellValue === true ? "Sí" : cellValue === false ? "No" : cellValue.toString();
+              return booleanText === filterValue;
+            }
 
-            // Convertir valores booleanos a texto para comparar
-            const booleanText = cellValue === true ? "Sí" : cellValue === false ? "No" : cellValue.toString();
-            return booleanText === filterValue;
+            // Para otros filtros de select, usar comparación exacta
+            return cellValue.toString() === filterValue;
           }
 
-          // Filtro de texto normal
+          // Filtro de texto normal (para filtros tipo text)
           return cellValue.toString().toLowerCase().includes(filterValue.toLowerCase());
         });
       }

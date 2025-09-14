@@ -50,7 +50,12 @@ const Badge = ({ colorMap = {}, defaultColor = "secondary", pill = true, classNa
 
     return (
       <div className="py-2">
-        <BootstrapBadge color={color} pill={pill} className={`${className} px-3 py-2`}>
+        <BootstrapBadge
+          color={color}
+          pill={pill}
+          className={`${className} px-2 py-1 fw-medium text-uppercase`}
+          style={{ fontSize: '10px', letterSpacing: '0.3px' }}
+        >
           {value}
         </BootstrapBadge>
       </div>

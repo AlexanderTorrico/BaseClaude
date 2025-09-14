@@ -1,8 +1,7 @@
 import React from "react";
 import { withTranslation } from "react-i18next";
 import { Container, Button, InputGroup, InputGroupText, Input } from "reactstrap";
-import HeaderCard from "../../../../components/HeaderCard";
-import { HeaderCardViews, HeaderCardViewResponsive } from "../../../../components/HeaderCardViews";
+import { AzHeaderCard, AzHeaderCardViews, AzHeaderCardViewResponsive } from "../../../../components/aziende/AzHeader";
 // Subcomponentes optimizados
 import UserDataTable from "./components/UserDataTable";
 import UserCardsList from "./components/UserCardsList";
@@ -14,7 +13,7 @@ import Footer from "./footer";
 // Componente de demostración que se renderiza en la página
 const HeaderViewTypePage = () => {
   //meta title
-  document.title = "HeaderCard & HeaderCardViews | Moléculas - Skote React";
+  document.title = "AzHeaderCard & AzHeaderCardViews | Moléculas - Skote React";
 
   // Estados para ejemplos funcionales
   const [view1, setView1] = React.useState('0');
@@ -41,18 +40,18 @@ const HeaderViewTypePage = () => {
     <React.Fragment>
       <div className="page-content">
         <Container fluid>
-          <h4 className="mb-4">HeaderCard & HeaderCardViews - Moléculas Genéricas</h4>
+          <h4 className="mb-4">AzHeaderCard & AzHeaderCardViews - Moléculas Genéricas</h4>
           
-          <h4 className="mb-3 text-primary">HeaderCard (Componente Base)</h4>
-          
+          <h4 className="mb-3 text-primary">AzHeaderCard (Componente Base)</h4>
+
           {/* Ejemplo 1: Header básico */}
-          <HeaderCard
+          <AzHeaderCard
             title="Header Básico"
             description="Ejemplo simple con solo título y descripción"
           />
 
           {/* Ejemplo 2: Header con badge */}
-          <HeaderCard
+          <AzHeaderCard
             title="Header con Badge"
             description="Ejemplo con contador de resultados"
             showBadge={true}
@@ -62,7 +61,7 @@ const HeaderViewTypePage = () => {
           />
 
           {/* Ejemplo 3: Header con acciones personalizadas */}
-          <HeaderCard
+          <AzHeaderCard
             title="Header con Acciones Personalizadas"
             description="Ejemplo con botones personalizados en la parte superior derecha"
             showBadge={true}
@@ -82,24 +81,24 @@ const HeaderViewTypePage = () => {
             }
           />
 
-          <h4 className="mb-3 mt-5 text-success">HeaderCardViews (Con Cambio de Vista)</h4>
+          <h4 className="mb-3 mt-5 text-success">AzHeaderCardViews (Con Cambio de Vista)</h4>
 
-          {/* Ejemplo 4: HeaderCardViews con pestañas */}
-          <HeaderCardViews
+          {/* Ejemplo 4: AzHeaderCardViews con pestañas */}
+          <AzHeaderCardViews
             title="Sistema de Gestión"
             description="Sistema con pestañas y contenido dinámico"
             badge="🟢 Activo"
             currentView={view1}
             onViewChange={setView1}
             views={[
-              { 
-                name: "Usuarios", 
-                icon: "mdi-account-group", 
+              {
+                name: "Usuarios",
+                icon: "mdi-account-group",
                 content: <div className="p-3 bg-primary bg-opacity-10 rounded">Gestión de usuarios del sistema</div>
               },
-              { 
-                name: "Productos", 
-                icon: "mdi-package", 
+              {
+                name: "Productos",
+                icon: "mdi-package",
                 content: <div className="p-3 bg-success bg-opacity-10 rounded">Catálogo de productos disponibles</div>
               }
             ]}
@@ -113,8 +112,8 @@ const HeaderViewTypePage = () => {
 
           <br /><br />
 
-          {/* Ejemplo 5: HeaderCardViews con múltiples pestañas */}
-          <HeaderCardViews
+          {/* Ejemplo 5: AzHeaderCardViews con múltiples pestañas */}
+          <AzHeaderCardViews
             title="Dashboard Empresarial"
             description="Panel de control con varias secciones"
             badge="🛒 En línea"
@@ -161,8 +160,8 @@ const HeaderViewTypePage = () => {
 
           <br /><br />
 
-          {/* Ejemplo 6: HeaderCardViews completo optimizado */}
-          <HeaderCardViews
+          {/* Ejemplo 6: AzHeaderCardViews completo optimizado */}
+          <AzHeaderCardViews
             title="Panel de Control Avanzado"
             description={`Dashboard completo - Vista: ${view3}`}
             badge={{ count: 89, total: 200 }}
@@ -204,10 +203,10 @@ const HeaderViewTypePage = () => {
             }
           />
 
-          <h4 className="mb-3 mt-5 text-info">HeaderCardViews con Iconos Personalizados</h4>
+          <h4 className="mb-3 mt-5 text-info">AzHeaderCardViews con Iconos Personalizados</h4>
 
-          {/* Ejemplo 6.5: HeaderCardViews con objetos personalizados */}
-          <HeaderCardViews
+          {/* Ejemplo 6.5: AzHeaderCardViews con objetos personalizados */}
+          <AzHeaderCardViews
             title="Sistema con Objetos Personalizados"
             description={`Ejemplo con objetos - Vista: ${view3}`}
             badge={{ count: 15, total: 30, color: "info" }}
@@ -226,10 +225,10 @@ const HeaderViewTypePage = () => {
             ]}
           />
 
-          <h4 className="mb-3 mt-5 text-warning">HeaderCardViewResponsive (Integrado con Contenido)</h4>
+          <h4 className="mb-3 mt-5 text-warning">AzHeaderCardViewResponsive (Integrado con Contenido)</h4>
 
-          {/* Ejemplo 7: HeaderCardViewResponsive con nuevo formato */}
-          <HeaderCardViewResponsive
+          {/* Ejemplo 7: AzHeaderCardViewResponsive con nuevo formato */}
+          <AzHeaderCardViewResponsive
             title="Sistema Responsivo Completo"
             description="Header con contenido que cambia automáticamente según el tamaño de pantalla"
             badge={{ count: 25, total: 100 }}

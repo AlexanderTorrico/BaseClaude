@@ -3,13 +3,15 @@ import PropTypes from "prop-types";
 import { Row, Col, Card, CardBody, Badge } from "reactstrap";
 
 /**
- * HeaderCard - Componente genérico de header optimizado
- * 
+ * AzHeaderCard - Componente genérico de header optimizado
+ *
  * @param {string} title - Título principal del header
  * @param {string} [description] - Descripción opcional del header
  * @param {boolean} [showBadge=false] - Mostrar badge en la descripción
  * @param {string} [badgeColor="info"] - Color del badge
  * @param {string} [badgeText] - Texto del badge
+ * @param {number} [badgeCount] - Número para mostrar en el badge
+ * @param {number} [badgeTotal] - Total para mostrar en el badge
  * @param {boolean} [showBottomRow=false] - Mostrar fila inferior con slots
  * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha (botones de acción)
  * @param {React.ReactNode} [bottomLeftSlot] - Contenido del área inferior izquierda
@@ -17,12 +19,14 @@ import { Row, Col, Card, CardBody, Badge } from "reactstrap";
  * @param {string} [className=""] - Clases CSS adicionales para el CardBody
  * @param {string} [cardClassName=""] - Clases CSS adicionales para el Card
  */
-const HeaderCard = React.memo(({
+const AzHeaderCard = React.memo(({
   title,
   description,
   showBadge = false,
   badgeColor = "info",
   badgeText,
+  badgeCount,
+  badgeTotal,
   showBottomRow = false,
   contentTopRight,
   bottomLeftSlot,
@@ -30,6 +34,35 @@ const HeaderCard = React.memo(({
   className = "",
   cardClassName = ""
 }) => {
+  // Función para renderizar el badge
+  const renderBadge = () => {
+    if (!showBadge) return null;
+
+    // Si hay count y total, mostrar formato count/total
+    if (badgeCount !== undefined && badgeTotal !== undefined) {
+      return (
+        <span className="ms-2">
+          <Badge color={badgeColor} style={{ fontSize: '0.65rem' }}>
+            {badgeCount}/{badgeTotal}
+          </Badge>
+        </span>
+      );
+    }
+
+    // Si solo hay texto, mostrarlo
+    if (badgeText) {
+      return (
+        <span className="ms-2">
+          <Badge color={badgeColor} style={{ fontSize: '0.65rem' }}>
+            {badgeText}
+          </Badge>
+        </span>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <Card className={`border-0 shadow-sm mb-4 ${cardClassName}`}>
       <CardBody className={className}>
@@ -40,13 +73,7 @@ const HeaderCard = React.memo(({
             {description && (
               <p className="text-muted mb-md-0 mb-3">
                 {description}
-                {showBadge && badgeText && (
-                  <span className="ms-2">
-                    <Badge color={badgeColor} style={{ fontSize: '0.65rem' }}>
-                      {badgeText}
-                    </Badge>
-                  </span>
-                )}
+                {renderBadge()}
               </p>
             )}
           </Col>
@@ -75,12 +102,14 @@ const HeaderCard = React.memo(({
   );
 });
 
-HeaderCard.propTypes = {
+AzHeaderCard.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
   showBadge: PropTypes.bool,
   badgeColor: PropTypes.string,
   badgeText: PropTypes.string,
+  badgeCount: PropTypes.number,
+  badgeTotal: PropTypes.number,
   showBottomRow: PropTypes.bool,
   contentTopRight: PropTypes.node,
   bottomLeftSlot: PropTypes.node,
@@ -89,6 +118,6 @@ HeaderCard.propTypes = {
   cardClassName: PropTypes.string
 };
 
-HeaderCard.displayName = "HeaderCard";
+AzHeaderCard.displayName = "AzHeaderCard";
 
-export default HeaderCard;
+export default AzHeaderCard;

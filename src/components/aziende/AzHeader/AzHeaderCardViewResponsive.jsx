@@ -1,7 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Button } from "reactstrap";
-import HeaderCard from "./HeaderCard";
+import AzHeaderCardViews from "./AzHeaderCardViews";
 
 // Configuración estática de vistas predeterminadas
 const DEFAULT_VIEWS_CONFIG = {
@@ -18,14 +17,14 @@ const normalizeViewConfig = (view, index) => {
   // Si es un objeto con name, icon y content
   if (typeof view === 'object' && view.name && view.icon) {
     return {
-      key: index.toString(), // Usar índice como key
+      key: view.key || index.toString(), // Usar key si existe, sino índice
       name: view.name,
       icon: view.icon.startsWith('mdi-') ? view.icon : `mdi-${view.icon}`,
       title: view.title || `Vista ${view.name}`,
       content: view.content || null
     };
   }
-  
+
   // Si es string, verificar si es configuración predeterminada
   if (typeof view === 'string') {
     // Formato "nombre:mdi-icon-name" (mantener compatibilidad)
@@ -39,7 +38,7 @@ const normalizeViewConfig = (view, index) => {
         content: null
       };
     }
-    
+
     // String simple, buscar en configuraciones predeterminadas
     if (DEFAULT_VIEWS_CONFIG[view]) {
       const config = DEFAULT_VIEWS_CONFIG[view];
@@ -51,7 +50,7 @@ const normalizeViewConfig = (view, index) => {
         content: null
       };
     }
-    
+
     // String personalizado sin configuración
     return {
       key: index.toString(),
@@ -61,7 +60,7 @@ const normalizeViewConfig = (view, index) => {
       content: null
     };
   }
-  
+
   // Fallback genérico
   return {
     key: index.toString(),
@@ -73,163 +72,6 @@ const normalizeViewConfig = (view, index) => {
 };
 
 /**
- * HeaderCardViews con sistema de pestañas integrado
- * Componente de header con cambio de vistas y contenido dinámico
- * 
- * @param {string} title - Título principal del header
- * @param {string} [description] - Descripción opcional del header  
- * @param {string|Object} [badge] - Badge simple (string) o complejo {count, total, color, text}
- * @param {string} [currentView="0"] - Vista actualmente seleccionada (índice de la vista)
- * @param {function} [onViewChange] - Función callback para cambio de vista
- * @param {Array} [views] - Array de vistas: objetos {name, icon, content} o strings (compatibilidad)
- * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha
- * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda
- * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha
- * @param {string} [className] - Clases CSS adicionales
- * @param {boolean} [hideViewButtons=false] - Oculta los botones de cambio de vista
- * @param {boolean} [responsiveMode=false] - Indica si está en modo responsivo (solo lectura)
- */
-const HeaderCardViews = React.memo(({
-  title,
-  description,
-  // Badge simplificado
-  badge,
-  // Vista actual y cambio
-  currentView = "0",
-  onViewChange,
-  views = ["table", "cards"],
-  // Slots de contenido
-  contentTopRight,
-  contentBottomLeft,
-  contentBottomRight,
-  // Configuración responsiva
-  hideViewButtons = false,
-  responsiveMode = false,
-  isManualOverride = false,
-  responsiveView,
-  // Estilos opcionales
-  className
-}) => {
-
-  // Normalizar vistas a objetos consistentes
-  const normalizedViews = React.useMemo(() => {
-    return views.map((view, index) => normalizeViewConfig(view, index));
-  }, [views]);
-
-
-  const renderViewButtons = React.useCallback(() => {
-    // Ocultar botones si está configurado o si hay menos de 2 vistas
-    if (hideViewButtons || normalizedViews.length < 2) return null;
-    
-    return (
-      <div className="btn-group d-none d-md-flex me-2" role="group">
-        {normalizedViews.map((viewConfig, index) => {
-          const isActive = currentView === viewConfig.key;
-          const isResponsiveMatch = responsiveView === viewConfig.key;
-          
-          return (
-            <Button 
-              key={`${viewConfig.key}-${index}`}
-              color={isActive ? 'primary' : 'light'}
-              onClick={() => onViewChange && onViewChange(viewConfig.key)}
-              size="sm"
-              title={responsiveMode ? 
-                `${viewConfig.title} ${isResponsiveMatch ? '(Vista responsiva)' : '(Override manual)'}` : 
-                viewConfig.title
-              }
-              style={{
-                position: 'relative'
-              }}
-            >
-              <i className={`mdi ${viewConfig.icon}`}></i>
-              <span className="d-none d-lg-inline ms-1">{viewConfig.name}</span>
-            </Button>
-          );
-        })}
-      </div>
-    );
-  }, [normalizedViews, currentView, responsiveView, hideViewButtons, onViewChange, responsiveMode]);
-
-  // Determinar badge props (memoizado para rendimiento)
-  const badgeProps = React.useMemo(() => {
-    if (!badge) return {};
-    return {
-      showBadge: true,
-      ...(typeof badge === 'string' ? { badgeText: badge } : badge)
-    };
-  }, [badge]);
-
-  // Renderizar contenido de la vista activa
-  const renderActiveViewContent = React.useCallback(() => {
-    const activeView = normalizedViews.find(view => view.key === currentView);
-    if (activeView && activeView.content) {
-      return (
-        <div className="mt-3">
-          {activeView.content}
-        </div>
-      );
-    }
-    return null;
-  }, [normalizedViews, currentView]);
-
-  return (
-    <React.Fragment>
-      <HeaderCard
-        title={title}
-        description={description}
-        {...badgeProps}
-        showBottomRow={!!(contentBottomLeft || contentBottomRight)}
-        contentTopRight={
-          <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
-            {renderViewButtons()}
-            {contentTopRight}
-          </div>
-        }
-        bottomLeftSlot={contentBottomLeft}
-        bottomRightSlot={contentBottomRight}
-        className={className}
-      />
-      {renderActiveViewContent()}
-    </React.Fragment>
-  );
-});
-
-HeaderCardViews.propTypes = {
-  title: PropTypes.string.isRequired,
-  description: PropTypes.string,
-  badge: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.shape({
-      text: PropTypes.string,
-      count: PropTypes.number,
-      total: PropTypes.number,
-      color: PropTypes.string
-    })
-  ]),
-  currentView: PropTypes.string,
-  onViewChange: PropTypes.func,
-  views: PropTypes.arrayOf(
-    PropTypes.oneOfType([
-      PropTypes.string, // Compatibilidad hacia atrás
-      PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        icon: PropTypes.string.isRequired,
-        title: PropTypes.string,
-        content: PropTypes.node // Contenido a mostrar cuando se selecciona esta vista
-      })
-    ])
-  ),
-  contentTopRight: PropTypes.node,
-  contentBottomLeft: PropTypes.node,
-  contentBottomRight: PropTypes.node,
-  hideViewButtons: PropTypes.bool,
-  responsiveMode: PropTypes.bool,
-  isManualOverride: PropTypes.bool,
-  responsiveView: PropTypes.string,
-  className: PropTypes.string
-};
-
-/**
  * Hook personalizado para manejo responsivo automático de vistas
  * @param {Array} views - Array de vistas (objetos o strings) [desktop, tablet, mobile]
  * @param {Object} breakpoints - Puntos de quiebre {mobile: 768, tablet: 1024, desktop: 1200}
@@ -237,37 +79,37 @@ HeaderCardViews.propTypes = {
  */
 const useResponsiveView = (views = [
   { name: "Web", icon: "mdi-monitor" },
-  { name: "Tabla", icon: "mdi-table" }, 
+  { name: "Tabla", icon: "mdi-table" },
   { name: "Móvil", icon: "mdi-cellphone" }
 ], breakpoints = { mobile: 768, tablet: 1024, desktop: 1200 }) => {
   const [windowWidth, setWindowWidth] = React.useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   const [manualView, setManualView] = React.useState(null); // Vista seleccionada manualmente
   const [lastBreakpoint, setLastBreakpoint] = React.useState(null);
-  
+
   // Normalizar vistas en el hook
   const normalizedViews = React.useMemo(() => {
     return views.map((view, index) => normalizeViewConfig(view, index));
   }, [views]);
-  
+
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
+
   const getCurrentBreakpoint = React.useCallback(() => {
     if (windowWidth <= breakpoints.mobile) return 'mobile';
     if (windowWidth <= breakpoints.tablet) return 'tablet';
     return 'desktop';
   }, [windowWidth, breakpoints]);
-  
+
   const currentBreakpoint = getCurrentBreakpoint();
-  
+
   // Reset manual selection when breakpoint changes (responsive priority)
   React.useEffect(() => {
     if (lastBreakpoint && lastBreakpoint !== currentBreakpoint) {
@@ -275,22 +117,22 @@ const useResponsiveView = (views = [
     }
     setLastBreakpoint(currentBreakpoint);
   }, [currentBreakpoint, lastBreakpoint]);
-  
+
   const getResponsiveView = React.useCallback(() => {
     const breakpointIndex = {
       desktop: 0,
-      tablet: 1, 
+      tablet: 1,
       mobile: 2
     };
-    
+
     const viewIndex = breakpointIndex[currentBreakpoint];
     // Usar vistas normalizadas y obtener el key
     const selectedView = normalizedViews[viewIndex] || normalizedViews[0];
     return selectedView ? selectedView.key : 'web';
   }, [normalizedViews, currentBreakpoint]);
-  
+
   const currentView = manualView || getResponsiveView();
-  
+
   return {
     currentView,
     responsiveView: getResponsiveView(),
@@ -302,14 +144,15 @@ const useResponsiveView = (views = [
 };
 
 /**
- * HeaderCardViewResponsive con configuración responsiva inteligente
+ * AzHeaderCardViewResponsive con configuración responsiva inteligente
  * Componente completo que incluye header y contenido que cambia automáticamente según el tamaño de pantalla
- * 
+ *
  * @param {string} title - Título principal del header
  * @param {string} [description] - Descripción opcional del header
  * @param {string|Object} [badge] - Badge simple (string) o complejo {count, total, color, text}
  * @param {Array} [views=['web', 'table', 'movil']] - Vistas responsivas [desktop, tablet, mobile]. Acepta objetos {name, icon} o strings
  * @param {Object} [breakpoints] - Puntos de quiebre personalizados {mobile: 768, tablet: 1024, desktop: 1200}
+ * @param {Array} [contents] - Array de contenidos para usar como slots adicionales [contentTopRight, contentBottomLeft, contentBottomRight]
  * @param {React.ReactNode} [viewWeb] - Contenido para vista web (desktop). Fallback por defecto para todas las vistas
  * @param {React.ReactNode} [viewTable] - Contenido para vista tablet (fallback a viewWeb si no se proporciona)
  * @param {React.ReactNode} [viewMovil] - Contenido para vista móvil (fallback a viewTable → viewWeb si no se proporciona)
@@ -320,13 +163,14 @@ const useResponsiveView = (views = [
  * @param {string} [contentClassName] - Clases CSS adicionales para el área de contenido
  * @param {boolean} [enableTransitions=true] - Habilita transiciones suaves entre vistas
  */
-const HeaderCardViewResponsive = React.memo(({
+const AzHeaderCardViewResponsive = React.memo(({
   title,
   description,
   badge,
   // Vista y contenido con configuración responsiva
   views = ["web", "table", "movil"], // [desktop, tablet, mobile]
   breakpoints = { mobile: 768, tablet: 1024, desktop: 1200 },
+  contents = [], // Array de contenidos para usar como slots
   viewWeb,
   viewTable,
   viewMovil,
@@ -350,25 +194,28 @@ const HeaderCardViewResponsive = React.memo(({
     // Lógica de fallback inteligente usando las vistas normalizadas
     const getViewContent = (viewKey) => {
       switch (viewKey) {
+        case '0': // Vista web (desktop)
         case 'web':
           return viewWeb; // Siempre mostrar viewWeb si está disponible
-        
+
+        case '1': // Vista tabla (tablet)
         case 'table':
           // Si no hay viewTable, usar viewWeb como fallback
           return viewTable || viewWeb;
-        
+
+        case '2': // Vista móvil
         case 'movil':
           // Si no hay viewMovil, usar viewTable (si existe) o viewWeb
           return viewMovil || viewTable || viewWeb;
-        
+
         case 'cards':
           // Compatibilidad: cards = table con misma lógica de fallback
           return viewTable || viewWeb;
-        
+
         case 'grid':
           // Compatibilidad: grid = movil con misma lógica de fallback
           return viewMovil || viewTable || viewWeb;
-        
+
         default:
           // Para vistas personalizadas, usar viewWeb por defecto
           return viewWeb;
@@ -376,12 +223,12 @@ const HeaderCardViewResponsive = React.memo(({
     };
 
     const selectedContent = getViewContent(currentView);
-    
+
     if (!selectedContent) {
       // Buscar el nombre de la vista actual para mostrar en el mensaje
       const currentViewConfig = normalizedViews.find(v => v.key === currentView);
       const viewDisplayName = currentViewConfig ? currentViewConfig.name : currentView;
-      
+
       return (
         <div className="card">
           <div className="card-body text-center text-muted p-5">
@@ -398,13 +245,14 @@ const HeaderCardViewResponsive = React.memo(({
 
   return (
     <React.Fragment>
-      <HeaderCardViews
+      <AzHeaderCardViews
         title={title}
         description={description}
         badge={badge}
         currentView={currentView}
         onViewChange={handleViewChange} // Permitir cambio manual
         views={views}
+        contents={contents} // Pasar el array de contents
         contentTopRight={contentTopRight}
         contentBottomLeft={contentBottomLeft}
         contentBottomRight={contentBottomRight}
@@ -414,8 +262,8 @@ const HeaderCardViewResponsive = React.memo(({
         isManualOverride={isManualOverride} // Indica si está en override manual
         responsiveView={responsiveView} // Vista que correspondería por responsivo
       />
-      
-      <div 
+
+      <div
         className={`view-content ${contentClassName || ''}`}
         style={enableTransitions ? {
           transition: 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out',
@@ -429,7 +277,7 @@ const HeaderCardViewResponsive = React.memo(({
   );
 });
 
-HeaderCardViewResponsive.propTypes = {
+AzHeaderCardViewResponsive.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
   badge: PropTypes.oneOfType([
@@ -457,21 +305,21 @@ HeaderCardViewResponsive.propTypes = {
     tablet: PropTypes.number,
     desktop: PropTypes.number
   }),
+  contents: PropTypes.arrayOf(PropTypes.node), // Array de contenidos
   viewWeb: PropTypes.node,
   viewTable: PropTypes.node,
   viewMovil: PropTypes.node,
   // Props legacy (deprecated pero mantenidas por compatibilidad)
   contentTopRight: PropTypes.node,    // Área superior derecha
-  contentBottomLeft: PropTypes.node,  // Área inferior izquierda  
+  contentBottomLeft: PropTypes.node,  // Área inferior izquierda
   contentBottomRight: PropTypes.node, // Área inferior derecha
   className: PropTypes.string,
   contentClassName: PropTypes.string,
   enableTransitions: PropTypes.bool
 };
 
-HeaderCardViews.displayName = "HeaderCardViews";
-HeaderCardViewResponsive.displayName = "HeaderCardViewResponsive";
+AzHeaderCardViewResponsive.displayName = "AzHeaderCardViewResponsive";
 
-// Exportar componentes y hook
-export { HeaderCardViews, HeaderCardViewResponsive, useResponsiveView };
-export default HeaderCardViews;
+// Exportar componente y hook
+export { useResponsiveView };
+export default AzHeaderCardViewResponsive;

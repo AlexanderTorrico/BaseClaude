@@ -369,11 +369,11 @@ const AzTableHeader = ({
     if (!sortable) return null;
 
     if (currentSortDirection === "asc") {
-      return <i className="mdi mdi-arrow-up text-primary ms-1"></i>;
+      return <i className="mdi mdi-arrow-up text-primary"></i>;
     } else if (currentSortDirection === "desc") {
-      return <i className="mdi mdi-arrow-down text-primary ms-1"></i>;
+      return <i className="mdi mdi-arrow-down text-primary"></i>;
     }
-    return <i className="mdi mdi-unfold-more-horizontal text-muted ms-1"></i>;
+    return <i className="mdi mdi-unfold-more-horizontal text-muted"></i>;
   };
 
   return (
@@ -388,8 +388,19 @@ const AzTableHeader = ({
           }}
         >
           {title}
-          {getSortIcon()}
         </span>
+        {sortable && (
+          <span
+            className="cursor-pointer user-select-none"
+            onClick={handleSort}
+            style={{
+              cursor: 'pointer',
+              userSelect: 'none'
+            }}
+          >
+            {getSortIcon()}
+          </span>
+        )}
       </div>
       {filterable && (
         <div className="column-filter-container" style={{ marginTop: '8px' }}>

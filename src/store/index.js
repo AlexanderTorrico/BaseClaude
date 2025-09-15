@@ -3,12 +3,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './authSlice';
 import layoutReducer from './layoutSlice';
 import usersReducer from './usersSlice';
+import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Hooks/crudBasicSlice';
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
     layout: layoutReducer,
     users: usersReducer,
+    crudBasic: crudBasicReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

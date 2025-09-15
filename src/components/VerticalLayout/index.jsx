@@ -160,7 +160,7 @@ const Layout = (props) => {
           isMobile={isMobile}
         />
         <div className="main-content">{props.children}</div>
-        <Footer />
+        
       </div>
       {showRightSidebar ? <RightSidebar /> : null}
     </React.Fragment>

@@ -145,7 +145,7 @@ const Layout = (props) => {
         />
         <Navbar menuOpen={isMenuOpened} />
         <div className="main-content">{props.children}</div>
-        <Footer />
+        
       </div>
 
       {showRightSidebar ? <RightSidebar /> : null}

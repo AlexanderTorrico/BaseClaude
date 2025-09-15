@@ -229,6 +229,7 @@ const Table = (props) => {
                 selectedItems={[]}
                 pagination={false}
                 showActions={true}
+                showFilterSummary={true}
                 components={
                   <>
                     <Button
@@ -275,7 +276,8 @@ Table.propTypes = {
   tableProps: PropTypes.object,
   children: PropTypes.node,
   showActions: PropTypes.bool,
-  components: PropTypes.node
+  components: PropTypes.node,
+  showFilterSummary: PropTypes.bool
 };
 
 // Asignar subcomponentes para compatibilidad

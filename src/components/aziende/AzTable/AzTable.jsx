@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { Card, CardBody, Input } from "reactstrap";
 import { useTranslation } from "react-i18next";
 import TableContainer from "./TableContainer";
+import FilterSummary from "../FilterSummary";
 
 /**
  * AzTable - Componente genérico de tabla con funcionalidades avanzadas
@@ -21,7 +22,8 @@ const AzTable = ({
   tableProps = {},
   children,
   showActions = false,
-  components
+  components,
+  showFilterSummary = false
 }) => {
   const { t } = useTranslation();
 
@@ -61,6 +63,27 @@ const AzTable = ({
       onSortChange(sortConfig);
     }
   }, [onSortChange]);
+
+  // Función para limpiar todos los filtros y ordenamientos
+  const handleClearAll = useCallback(() => {
+    const clearedFilters = {};
+    const clearedSorting = { field: "", direction: "" };
+
+    setInternalFilters(clearedFilters);
+    setInternalSorting(clearedSorting);
+
+    // Notificar cambios externos
+    if (onFilterChange) {
+      // Limpiar todos los filtros
+      Object.keys(internalFilters).forEach(column => {
+        onFilterChange(column, "");
+      });
+    }
+
+    if (onSortChange) {
+      onSortChange(clearedSorting);
+    }
+  }, [internalFilters, onFilterChange, onSortChange]);
 
   // Procesar datos con filtros y ordenamiento aplicados
   const processedData = useMemo(() => {
@@ -342,6 +365,16 @@ const AzTable = ({
         <div className="col-12">
           <Card className={`border-0 shadow-sm ${className}`}>
             <CardBody className="p-4">
+              {/* Mostrar resumen de filtros si está habilitado */}
+              {showFilterSummary && (
+                <FilterSummary
+                  filters={internalFilters}
+                  sorting={internalSorting}
+                  columns={columns}
+                  onClearAll={handleClearAll}
+                  className="mb-3"
+                />
+              )}
               <div className="table-responsive az-table-container">
                 <style>{`
                   .az-table-container .table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
@@ -683,7 +716,8 @@ AzTable.propTypes = {
   tableProps: PropTypes.object,
   children: PropTypes.node,
   showActions: PropTypes.bool,
-  components: PropTypes.node
+  components: PropTypes.node,
+  showFilterSummary: PropTypes.bool
 };
 
 AzTableActions.propTypes = {

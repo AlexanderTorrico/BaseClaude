@@ -259,7 +259,7 @@ const AzTable = (props) => {
                   }
                 }}
                 checked={finalData.filter(item => !item.__isNoDataRow).length > 0 && currentSelectedItems.length === finalData.filter(item => !item.__isNoDataRow).length}
-                indeterminate={currentSelectedItems.length > 0 && currentSelectedItems.length < finalData.filter(item => !item.__isNoDataRow).length}
+                {...(currentSelectedItems.length > 0 && currentSelectedItems.length < finalData.filter(item => !item.__isNoDataRow).length ? { indeterminate: true } : {})}
               />
             </div>
             <div className="column-filter-container" style={{ marginTop: '8px' }}>

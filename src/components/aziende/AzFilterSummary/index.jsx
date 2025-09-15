@@ -10,7 +10,10 @@ const FilterSummary = ({
   data = [],
   columns = [],
   children,
-  className = ""
+  className = "",
+  showCount = "auto", // "always", "never", "auto" (solo cuando hay filtros)
+  countPosition = "top", // "top", "bottom", "both"
+  alwaysVisible = false // true = always show filter summary, false = only when filters are active
 }) => {
   // Estados internos para filtros y ordenamiento
   const [filters, setFilters] = useState({});
@@ -107,6 +110,33 @@ const FilterSummary = ({
 
   const hasActiveItems = hasActiveFilters || hasActiveSorting;
 
+  // Determinar si mostrar el conteo
+  const shouldShowCount = useMemo(() => {
+    switch (showCount) {
+      case "always":
+        return true;
+      case "never":
+        return false;
+      case "auto":
+      default:
+        return hasActiveItems || filteredData.length !== data.length;
+    }
+  }, [showCount, hasActiveItems, filteredData.length, data.length]);
+
+  // Componente para mostrar el conteo
+  const CountDisplay = ({ className: countClassName = "" }) => {
+    if (!shouldShowCount) return null;
+
+    return (
+      <div className={`d-flex justify-content-between align-items-center ${countClassName}`}>
+        <small className="text-muted">
+          <strong>{filteredData.length}</strong> de <strong>{data.length}</strong> elementos
+          {hasActiveItems && <span className="text-primary"> (filtrados)</span>}
+        </small>
+      </div>
+    );
+  };
+
   // Props que se pasan al componente hijo
   const renderProps = {
     // Datos filtrados y procesados
@@ -130,20 +160,31 @@ const FilterSummary = ({
   };
 
   return (
-    <CardBody className="p-4">
-      {/* Mostrar resumen de filtros si hay elementos activos */}
-      {hasActiveItems && (
+    <CardBody className="p-0">
+      {/* Conteo superior */}
+      {(countPosition === "top" || countPosition === "both") && (
+        <CountDisplay className="mb-0" />
+      )}
+
+      {/* Mostrar resumen de filtros si hay elementos activos o si alwaysVisible está habilitado */}
+      {(hasActiveItems || alwaysVisible) && (
         <FilterSummaryDisplay
           filters={filters}
           sorting={sorting}
           columns={columns}
           onClearAll={handleClearAll}
-          className={`mb-3 ${className}`}
+          className={`mb-0 ${className}`}
+          alwaysVisible={alwaysVisible}
         />
       )}
 
       {/* Renderizar componente hijo con render props */}
       {typeof children === 'function' ? children(renderProps) : children}
+
+      {/* Conteo inferior */}
+      {(countPosition === "bottom" || countPosition === "both") && (
+        <CountDisplay className="mt-0" />
+      )}
     </CardBody>
   );
 };
@@ -156,7 +197,8 @@ const FilterSummaryDisplay = ({
   sorting,
   columns,
   onClearAll,
-  className
+  className,
+  alwaysVisible = false
 }) => {
   // Obtener filtros activos
   const activeFilters = Object.entries(filters).filter(([key, value]) =>
@@ -193,7 +235,7 @@ const FilterSummaryDisplay = ({
   };
 
   return (
-    <div className={`d-flex align-items-center justify-content-between p-3 bg-light border-bottom ${className}`}>
+    <div className={`d-flex align-items-center justify-content-between p-2 bg-light border-bottom ${className}`}>
       <div className="d-flex flex-wrap align-items-center gap-2">
         {/* Mostrar filtros activos */}
         {activeFilters.length > 0 && (
@@ -208,6 +250,11 @@ const FilterSummaryDisplay = ({
               </span>
             ))}
           </div>
+        )}
+
+        {/* Mostrar mensaje cuando alwaysVisible es true pero no hay filtros */}
+        {alwaysVisible && activeFilters.length === 0 && !hasActiveSorting && (
+          <span className="text-muted small">Sin filtros aplicados</span>
         )}
 
         {/* Separador si hay tanto filtros como ordenamiento */}
@@ -233,6 +280,7 @@ const FilterSummaryDisplay = ({
         onClick={onClearAll}
         className="d-inline-flex align-items-center"
         size="sm"
+        disabled={activeFilters.length === 0 && !hasActiveSorting}
       >
         <i className="mdi mdi-filter-remove me-2"></i>
         Limpiar todo
@@ -257,7 +305,16 @@ FilterSummary.propTypes = {
   children: PropTypes.func.isRequired,
 
   // Clase CSS adicional para el summary
-  className: PropTypes.string
+  className: PropTypes.string,
+
+  // Control de visualización del conteo: "always", "never", "auto"
+  showCount: PropTypes.oneOf(['always', 'never', 'auto']),
+
+  // Posición del conteo: "top", "bottom", "both"
+  countPosition: PropTypes.oneOf(['top', 'bottom', 'both']),
+
+  // Si true, siempre muestra el summary de filtros, incluso sin filtros activos
+  alwaysVisible: PropTypes.bool
 };
 
 FilterSummaryDisplay.propTypes = {
@@ -265,7 +322,8 @@ FilterSummaryDisplay.propTypes = {
   sorting: PropTypes.object.isRequired,
   columns: PropTypes.array.isRequired,
   onClearAll: PropTypes.func.isRequired,
-  className: PropTypes.string
+  className: PropTypes.string,
+  alwaysVisible: PropTypes.bool
 };
 
 export default FilterSummary;

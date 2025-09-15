@@ -64,7 +64,7 @@ const AzHeaderCard = React.memo(({
   };
 
   return (
-    <Card className={`border-0 shadow-sm mb-4 ${cardClassName}`}>
+    <Card className={`border-0 shadow-sm mb-2 ${cardClassName}`}>
       <CardBody className={className}>
         {/* Fila superior: Título/Descripción + Slot derecha */}
         <Row className="align-items-center">

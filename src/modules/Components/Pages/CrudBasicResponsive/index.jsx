@@ -1,13 +1,10 @@
-import React, { useState } from "react";
-import { Container, Badge, Button, Row, Col, Input } from "reactstrap";
+import { useState } from "react";
+import { Container, Badge, Button, ButtonGroup, Row, Col, Input } from "reactstrap";
 import AzHeaderCardViewResponsive from "../../../../components/aziende/AzHeader/AzHeaderCardViewResponsive";
 import { AzTable, AzTableColumns } from "../../../../components/aziende/AzTable";
 import AzFilterSummary from "../../../../components/aziende/AzFilterSummary";
 
 const CrudBasicResponsive = () => {
-  const [testState, setTestState] = useState("Hello World");
-  const [selectedItems, setSelectedItems] = useState([]);
-
   // Mock data for testing
   const mockProducts = [
     {
@@ -29,15 +26,6 @@ const CrudBasicResponsive = () => {
       createdAt: "2024-01-02"
     }
   ];
-
-  // Handle selection
-  const handleSelectItem = (id) => {
-    setSelectedItems(prev =>
-      prev.includes(id)
-        ? prev.filter(item => item !== id)
-        : [...prev, id]
-    );
-  };
 
   // Define table columns for AzTable
   const columns = [
@@ -113,14 +101,14 @@ const CrudBasicResponsive = () => {
         <ButtonGroup size="sm">
           <Button
             color="primary"
-            onClick={() => setTestState(`Editando: ${row.name}`)}
+            onClick={() => console.log(`Editando: ${row.name}`)}
             title="Editar producto"
           >
             <i className="mdi mdi-pencil"></i>
           </Button>
           <Button
             color="danger"
-            onClick={() => setTestState(`Eliminando: ${row.name}`)}
+            onClick={() => console.log(`Eliminando: ${row.name}`)}
             title="Eliminar producto"
           >
             <i className="mdi mdi-delete"></i>
@@ -146,34 +134,10 @@ const CrudBasicResponsive = () => {
   // Render AzTable view for web (sin controles de filtro, pero usa datos de AzFilterSummary)
   const renderWebViewWithData = (filterState) => (
     <>
-      {/* Results count and bulk actions only */}
-      <div className="mb-3 d-flex justify-content-between align-items-center">
-        <h6 className="text-muted mb-0">
-          Mostrando {filterState.filteredData.length} de {mockProducts.length} productos
-          {filterState.hasActiveItems && <span className="text-primary"> (filtrados)</span>}
-        </h6>
-
-        {selectedItems.length > 0 && (
-          <Button
-            color="danger"
-            size="sm"
-            onClick={() => {
-              setTestState(`Eliminando ${selectedItems.length} productos`);
-              setSelectedItems([]);
-            }}
-          >
-            <i className="mdi mdi-delete me-1"></i>
-            Eliminar seleccionados ({selectedItems.length})
-          </Button>
-        )}
-      </div>
-
       {/* AzTable with filtered data - vinculado con AzFilterSummary */}
       <AzTable
         data={filterState.filteredData}
         columns={columns}
-        selectedItems={selectedItems}
-        onSelectedChange={handleSelectItem}
         pagination={false}
         className="table-responsive"
         // Vinculación con AzFilterSummary
@@ -183,21 +147,6 @@ const CrudBasicResponsive = () => {
         onSortChange={filterState.onSortChange}
         onClearFilters={filterState.onClearAll}
       />
-
-      {/* Empty state */}
-      {filterState.filteredData.length === 0 && (
-        <div className="text-center py-5">
-          <div className="avatar-lg rounded-circle bg-light mx-auto mb-4 d-flex align-items-center justify-content-center">
-            <i className="mdi mdi-package-variant mdi-36px text-muted"></i>
-          </div>
-          <h5 className="mb-3">No se encontraron productos</h5>
-          <p className="text-muted mb-0">
-            {filterState.hasActiveItems
-              ? "No hay productos que coincidan con los filtros aplicados."
-              : "No hay productos registrados en el sistema."}
-          </p>
-        </div>
-      )}
     </>
   );
 
@@ -212,7 +161,7 @@ const CrudBasicResponsive = () => {
           <Col xs={12}>
             <Input
               type="text"
-              size="sm"
+              bsSize="sm"
               placeholder="Buscar productos..."
               value={filterState.filters.name || ""}
               onChange={(e) => filterState.onFilterChange("name", e.target.value)}
@@ -223,7 +172,7 @@ const CrudBasicResponsive = () => {
           <Col xs={8}>
             <Input
               type="select"
-              size="sm"
+              bsSize="sm"
               value={filterState.filters.category || ""}
               onChange={(e) => filterState.onFilterChange("category", e.target.value)}
             >
@@ -248,28 +197,6 @@ const CrudBasicResponsive = () => {
         </Row>
       </div>
 
-      {/* Results count */}
-      <div className="mb-3 d-flex justify-content-between align-items-center">
-        <small className="text-muted">
-          {filterState.filteredData.length} de {mockProducts.length} productos
-          {filterState.hasActiveItems && <span className="text-primary"> (filtrados)</span>}
-        </small>
-
-        {selectedItems.length > 0 && (
-          <Button
-            color="danger"
-            size="sm"
-            onClick={() => {
-              setTestState(`Eliminando ${selectedItems.length} productos`);
-              setSelectedItems([]);
-            }}
-          >
-            <i className="mdi mdi-delete me-1"></i>
-            Eliminar ({selectedItems.length})
-          </Button>
-        )}
-      </div>
-
       {/* Cards Grid */}
       <Row>
         {filterState.filteredData.length > 0 ? (
@@ -279,14 +206,6 @@ const CrudBasicResponsive = () => {
                     <div className="card-body">
                       <div className="d-flex align-items-start justify-content-between mb-3">
                         <div className="d-flex align-items-center">
-                          <div className="form-check me-3">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                              checked={selectedItems.includes(product.id)}
-                              onChange={() => handleSelectItem(product.id)}
-                            />
-                          </div>
                           <div className="avatar-sm rounded bg-light d-flex align-items-center justify-content-center me-3">
                             <i className="mdi mdi-package-variant mdi-18px text-primary"></i>
                           </div>
@@ -335,7 +254,7 @@ const CrudBasicResponsive = () => {
                         <Button
                           color="primary"
                           size="sm"
-                          onClick={() => setTestState(`Editando: ${product.name}`)}
+                          onClick={() => console.log(`Editando: ${product.name}`)}
                           className="flex-fill"
                         >
                           <i className="mdi mdi-pencil me-1"></i>
@@ -344,7 +263,7 @@ const CrudBasicResponsive = () => {
                         <Button
                           color="danger"
                           size="sm"
-                          onClick={() => setTestState(`Eliminando: ${product.name}`)}
+                          onClick={() => console.log(`Eliminando: ${product.name}`)}
                           className="flex-fill"
                         >
                           <i className="mdi mdi-delete me-1"></i>
@@ -376,7 +295,7 @@ const CrudBasicResponsive = () => {
 
   return (
     <div className="page-content">
-      <Container fluid>
+      <Container fluid className="p-0">
         <AzHeaderCardViewResponsive
           title="Gestión de Productos"
           description="Administra tu catálogo de productos de forma eficiente"
@@ -398,24 +317,41 @@ const CrudBasicResponsive = () => {
               </button>
               <button
                 className="btn btn-outline-primary btn-sm"
-                onClick={() => setTestState("Refreshed!")}
+                onClick={() => console.log("Refreshed!")}
               >
                 <i className="mdi mdi-refresh"></i>
               </button>
             </div>
           }
           viewWeb={
-            <AzFilterSummary data={mockProducts} columns={filterColumns}>
+            <AzFilterSummary
+              data={mockProducts}
+              columns={filterColumns}
+              showCount="never"
+              alwaysVisible={true}
+            >
               {(filterState) => renderWebViewWithData(filterState)}
             </AzFilterSummary>
           }
           viewTable={
-            <AzFilterSummary data={mockProducts} columns={filterColumns}>
+            <AzFilterSummary
+              data={mockProducts}
+              columns={filterColumns}
+              showCount="auto"
+              countPosition="top"
+              alwaysVisible={true}
+            >
               {(filterState) => renderWebViewWithData(filterState)}
             </AzFilterSummary>
           }
           viewMovil={
-            <AzFilterSummary data={mockProducts} columns={filterColumns}>
+            <AzFilterSummary
+              data={mockProducts}
+              columns={filterColumns}
+              showCount="always"
+              countPosition="top"
+              alwaysVisible={true}
+            >
               {(filterState) => renderMobileViewWithFilters(filterState)}
             </AzFilterSummary>
           }

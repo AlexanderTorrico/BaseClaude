@@ -1,34 +1,50 @@
-import { useState } from "react";
+import { useMemo, useCallback } from "react";
 import { Container, Badge, Button, ButtonGroup, Row, Col, Input } from "reactstrap";
 import AzHeaderCardViewResponsive from "../../../../components/aziende/AzHeader/AzHeaderCardViewResponsive";
 import { AzTable, AzTableColumns } from "../../../../components/aziende/AzTable";
 import AzFilterSummary from "../../../../components/aziende/AzFilterSummary";
 
-const CrudBasicResponsive = () => {
-  // Mock data for testing
-  const mockProducts = [
-    {
-      id: 1,
-      name: "Producto Test 1",
-      category: "Electrónicos",
-      description: "Descripción de prueba",
-      price: 99.99,
-      stock: 25,
-      createdAt: "2024-01-01"
-    },
-    {
-      id: 2,
-      name: "Producto Test 2",
-      category: "Ropa",
-      description: "Descripción de prueba 2",
-      price: 49.99,
-      stock: 10,
-      createdAt: "2024-01-02"
-    }
-  ];
+// Datos estáticos movidos fuera del componente para evitar recreación
+const MOCK_PRODUCTS = [
+  {
+    id: 1,
+    name: "Producto Test 1",
+    category: "Electrónicos",
+    description: "Descripción de prueba",
+    price: 99.99,
+    stock: 25,
+    createdAt: "2024-01-01"
+  },
+  {
+    id: 2,
+    name: "Producto Test 2",
+    category: "Ropa",
+    description: "Descripción de prueba 2",
+    price: 49.99,
+    stock: 10,
+    createdAt: "2024-01-02"
+  }
+];
 
-  // Define table columns for AzTable
-  const columns = [
+// Opciones de filtro estáticas
+const CATEGORY_OPTIONS = ["Electrónicos", "Ropa", "Hogar", "Deportes"];
+
+const CrudBasicResponsive = () => {
+  // Handlers optimizados con useCallback
+  const handleEdit = useCallback((productName) => {
+    console.log(`Editando: ${productName}`);
+  }, []);
+
+  const handleDelete = useCallback((productName) => {
+    console.log(`Eliminando: ${productName}`);
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    console.log("Refreshed!");
+  }, []);
+
+  // Definición de columnas optimizada con useMemo
+  const columns = useMemo(() => [
     {
       key: "name",
       header: "Producto",
@@ -43,7 +59,7 @@ const CrudBasicResponsive = () => {
       sortable: true,
       filterable: true,
       filterType: "select",
-      filterOptions: ["Electrónicos", "Ropa", "Hogar", "Deportes"],
+      filterOptions: CATEGORY_OPTIONS,
       cell: AzTableColumns.Text({ className: "text-muted" })
     },
     {
@@ -101,14 +117,14 @@ const CrudBasicResponsive = () => {
         <ButtonGroup size="sm">
           <Button
             color="primary"
-            onClick={() => console.log(`Editando: ${row.name}`)}
+            onClick={() => handleEdit(row.name)}
             title="Editar producto"
           >
             <i className="mdi mdi-pencil"></i>
           </Button>
           <Button
             color="danger"
-            onClick={() => console.log(`Eliminando: ${row.name}`)}
+            onClick={() => handleDelete(row.name)}
             title="Eliminar producto"
           >
             <i className="mdi mdi-delete"></i>
@@ -116,23 +132,23 @@ const CrudBasicResponsive = () => {
         </ButtonGroup>
       )
     }
-  ];
+  ], [handleEdit, handleDelete]);
 
-  // Columns configuration for FilterSummary (simplified)
-  const filterColumns = [
+  // Configuración de columnas para FilterSummary optimizada
+  const filterColumns = useMemo(() => [
     { key: "name", header: "Nombre", filterType: "text" },
     {
       key: "category",
       header: "Categoría",
       filterType: "select",
-      filterOptions: ["Electrónicos", "Ropa", "Hogar", "Deportes"]
+      filterOptions: CATEGORY_OPTIONS
     },
     { key: "price", header: "Precio", filterType: "text" },
     { key: "stock", header: "Stock", filterType: "text" }
-  ];
+  ], []);
 
-  // Render AzTable view for web (sin controles de filtro, pero usa datos de AzFilterSummary)
-  const renderWebViewWithData = (filterState) => (
+  // Render functions optimizadas con useCallback
+  const renderWebViewWithData = useCallback((filterState) => (
     <>
       {/* AzTable with filtered data - vinculado con AzFilterSummary */}
       <AzTable
@@ -148,11 +164,9 @@ const CrudBasicResponsive = () => {
         onClearFilters={filterState.onClearAll}
       />
     </>
-  );
+  ), [columns]);
 
-
-  // Render cards view for mobile with AzFilterSummary
-  const renderMobileViewWithFilters = (filterState) => (
+  const renderMobileViewWithFilters = useCallback((filterState) => (
     <>
       {/* Mobile Filter Controls */}
       <div className="mb-4">
@@ -291,7 +305,35 @@ const CrudBasicResponsive = () => {
             )}
           </Row>
       </>
-    );
+    ), [filterColumns, handleEdit, handleDelete]);
+
+  // Configuración optimizada de vistas
+  const viewsConfig = useMemo(() => [
+    { name: "Web", icon: "mdi-monitor" },
+    { name: "Tabla", icon: "mdi-table" },
+    { name: "Móvil", icon: "mdi-cellphone" }
+  ], []);
+
+  const badgeConfig = useMemo(() => ({
+    count: MOCK_PRODUCTS.length,
+    text: "productos",
+    color: "primary"
+  }), []);
+
+  const contentTopRight = useMemo(() => (
+    <div className="d-flex gap-2">
+      <button className="btn btn-primary btn-sm">
+        <i className="mdi mdi-plus me-1"></i>
+        Nuevo Producto
+      </button>
+      <button
+        className="btn btn-outline-primary btn-sm"
+        onClick={handleRefresh}
+      >
+        <i className="mdi mdi-refresh"></i>
+      </button>
+    </div>
+  ), [handleRefresh]);
 
   return (
     <div className="page-content">
@@ -299,60 +341,39 @@ const CrudBasicResponsive = () => {
         <AzHeaderCardViewResponsive
           title="Gestión de Productos"
           description="Administra tu catálogo de productos de forma eficiente"
-          badge={{
-            count: mockProducts.length,
-            text: "productos",
-            color: "primary"
-          }}
-          views={[
-            { name: "Web", icon: "mdi-monitor" },
-            { name: "Tabla", icon: "mdi-table" },
-            { name: "Móvil", icon: "mdi-cellphone" }
-          ]}
-          contentTopRight={
-            <div className="d-flex gap-2">
-              <button className="btn btn-primary btn-sm">
-                <i className="mdi mdi-plus me-1"></i>
-                Nuevo Producto
-              </button>
-              <button
-                className="btn btn-outline-primary btn-sm"
-                onClick={() => console.log("Refreshed!")}
-              >
-                <i className="mdi mdi-refresh"></i>
-              </button>
-            </div>
-          }
+          badge={badgeConfig}
+          views={viewsConfig}
+          contentTopRight={contentTopRight}
           viewWeb={
             <AzFilterSummary
-              data={mockProducts}
+              data={MOCK_PRODUCTS}
               columns={filterColumns}
               showCount="never"
               alwaysVisible={true}
             >
-              {(filterState) => renderWebViewWithData(filterState)}
+              {renderWebViewWithData}
             </AzFilterSummary>
           }
           viewTable={
             <AzFilterSummary
-              data={mockProducts}
+              data={MOCK_PRODUCTS}
               columns={filterColumns}
               showCount="auto"
               countPosition="top"
               alwaysVisible={true}
             >
-              {(filterState) => renderWebViewWithData(filterState)}
+              {renderWebViewWithData}
             </AzFilterSummary>
           }
           viewMovil={
             <AzFilterSummary
-              data={mockProducts}
+              data={MOCK_PRODUCTS}
               columns={filterColumns}
               showCount="always"
               countPosition="top"
               alwaysVisible={true}
             >
-              {(filterState) => renderMobileViewWithFilters(filterState)}
+              {renderMobileViewWithFilters}
             </AzFilterSummary>
           }
         />

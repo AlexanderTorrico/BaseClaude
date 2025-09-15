@@ -232,7 +232,7 @@ const Table = (props) => {
             </div>
           </div>
 
-          {/* Ejemplo 2: Tabla SIN FilterSummary (Gestión Manual) */}
+          {/* Ejemplo 2: Tabla SIN FilterSummary (Uso Independiente) */}
           <div className="row mb-4">
             <div className="col-12">
               <TableWithoutFilter data={testData} columns={columns} />
@@ -261,11 +261,11 @@ const Table = (props) => {
                   <div className="col-md-6">
                     <h6 className="text-success">✅ SIN FilterSummary</h6>
                     <ul className="mb-0">
-                      <li>Control total del estado</li>
-                      <li>Más flexibilidad para casos específicos</li>
-                      <li>Implementación directa</li>
-                      <li>Componente independiente</li>
-                      <li>Sin dependencias adicionales</li>
+                      <li>Estado interno automático</li>
+                      <li>Implementación simple y directa</li>
+                      <li>Componente completamente independiente</li>
+                      <li>Sin gestión externa de estado</li>
+                      <li>Solo pasa data y columns</li>
                     </ul>
                   </div>
                 </div>

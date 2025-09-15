@@ -22,12 +22,16 @@ const AzTable = ({
   children,
   showActions = false,
   components
-}) => {
+) => {
   const { t } = useTranslation();
 
-  // Usar props directamente (sin estado interno cuando se usa con FilterSummary)
-  const currentFilters = filters;
-  const currentSorting = sorting;
+  // Estado interno por defecto (fallback cuando no se reciben props externos)
+  const [internalFilters, setInternalFilters] = useState({});
+  const [internalSorting, setInternalSorting] = useState({ field: "", direction: "" });
+
+  // Prioridad: Props externos > Estado interno
+  const currentFilters = filters || internalFilters;
+  const currentSorting = sorting || internalSorting;
 
   // Memoizar selectedItems para evitar re-renders innecesarios
   const currentSelectedItems = useMemo(() => selectedItems || [], [selectedItems]);
@@ -38,19 +42,39 @@ const AzTable = ({
     }
   };
 
-  // Función para manejar filtros
+  // Callbacks por defecto internos
+  const handleInternalFilterChange = useCallback((column, value) => {
+    setInternalFilters(prev => ({
+      ...prev,
+      [column]: value
+    }));
+  }, []);
+
+  const handleInternalSortChange = useCallback((sortConfig) => {
+    setInternalSorting(sortConfig);
+  }, []);
+
+  // Función para manejar filtros - Prioridad: external > internal
   const handleFilterChange = useCallback((column, value) => {
     if (onFilterChange) {
+      // Si hay callback externo (FilterSummary), usarlo (SIEMPRE SOBRESCRIBE)
       onFilterChange(column, value);
+    } else {
+      // Si no hay callback externo, usar estado interno por defecto
+      handleInternalFilterChange(column, value);
     }
-  }, [onFilterChange]);
+  }, [onFilterChange, handleInternalFilterChange]);
 
-  // Función para manejar ordenamiento
+  // Función para manejar ordenamiento - Prioridad: external > internal
   const handleSortChange = useCallback((sortConfig) => {
     if (onSortChange) {
+      // Si hay callback externo (FilterSummary), usarlo (SIEMPRE SOBRESCRIBE)
       onSortChange(sortConfig);
+    } else {
+      // Si no hay callback externo, usar estado interno por defecto
+      handleInternalSortChange(sortConfig);
     }
-  }, [onSortChange]);
+  }, [onSortChange, handleInternalSortChange]);
 
   // Procesar datos con filtros y ordenamiento aplicados
   const processedData = useMemo(() => {

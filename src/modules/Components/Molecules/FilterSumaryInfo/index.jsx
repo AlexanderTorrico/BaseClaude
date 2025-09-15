@@ -1,25 +1,15 @@
 import React, { useState } from "react";
-import { withTranslation } from "react-i18next";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  CardBody,
-  Badge,
-  CardHeader
-} from "reactstrap";
+import { Container, Row, Col, Card, CardBody, Badge, CardHeader } from "reactstrap";
 import FilterSummary from "../../../../components/aziende/FilterSummary";
 
-// Componente UserCard para mostrar información de usuario
 const UserCard = ({ user }) => {
   const getStatusColor = (status) => {
-    switch (status) {
-      case 'Activo': return 'success';
-      case 'Inactivo': return 'danger';
-      case 'Pendiente': return 'warning';
-      default: return 'secondary';
-    }
+    const colors = {
+      'Activo': 'success',
+      'Inactivo': 'danger',
+      'Pendiente': 'warning'
+    };
+    return colors[status] || 'secondary';
   };
 
   return (
@@ -42,11 +32,7 @@ const UserCard = ({ user }) => {
 
         <div className="mb-2">
           <small className="text-muted">Estado:</small>
-          <div>
-            <Badge color={getStatusColor(user.estado)} className="me-2">
-              {user.estado}
-            </Badge>
-          </div>
+          <Badge color={getStatusColor(user.estado)}>{user.estado}</Badge>
         </div>
 
         <div className="mb-2">
@@ -64,7 +50,6 @@ const UserCard = ({ user }) => {
 };
 
 const FilterSumaryInfo = () => {
-  // Datos de usuarios de ejemplo
   const [users] = useState([
     {
       id: 1,
@@ -140,13 +125,8 @@ const FilterSumaryInfo = () => {
     }
   ]);
 
-  // Definición de columnas para el FilterSummary
   const columns = [
-    {
-      key: "nombre",
-      header: "Nombre",
-      filterType: "text"
-    },
+    { key: "nombre", header: "Nombre", filterType: "text" },
     {
       key: "departamento",
       header: "Departamento",
@@ -159,257 +139,163 @@ const FilterSumaryInfo = () => {
       filterType: "select",
       filterOptions: ["Activo", "Inactivo", "Pendiente"]
     },
-    {
-      key: "edad",
-      header: "Edad",
-      filterType: "text"
-    }
+    { key: "edad", header: "Edad", filterType: "text" }
   ];
 
   return (
-    <React.Fragment>
-      <div className="page-content">
-        <Container fluid>
-          <div className="row">
-            <div className="col-12">
-              <div className="page-title-box d-sm-flex align-items-center justify-content-between mb-4">
-                <h4 className="mb-0">FilterSummary con Lista de Cards</h4>
-                <div className="page-title-right">
-                  <small className="text-muted">Demostración: FilterSummary sin tabla, solo cards</small>
-                </div>
+    <div className="page-content">
+      <Container fluid>
+        <div className="row">
+          <div className="col-12">
+            <div className="page-title-box d-sm-flex align-items-center justify-content-between mb-4">
+              <h4 className="mb-0">FilterSummary con Lista de Cards</h4>
+              <div className="page-title-right">
+                <small className="text-muted">Demostración: FilterSummary sin tabla, solo cards</small>
               </div>
             </div>
           </div>
+        </div>
 
-          {/*
-            IMPLEMENTACIÓN CON FILTERSUMMARY PARA CARDS:
+        <Card>
+          <CardHeader>
+            <h5 className="mb-0">
+              <i className="mdi mdi-filter me-2 text-primary"></i>
+              Lista de Usuarios con FilterSummary
+            </h5>
+            <small className="text-muted">
+              FilterSummary gestiona filtros y ordenamientos automáticamente. Solo pasa data y columns.
+            </small>
+          </CardHeader>
 
-            Estructura: Card > FilterSummary > Lista de Cards
+          <FilterSummary data={users} columns={columns}>
+            {({ filteredData, hasActiveItems, filters, sorting, onFilterChange, onSortChange, onClearAll }) => (
+              <>
+                <div className="mb-4">
+                  <Row className="g-3 align-items-end">
+                    <Col lg={3} md={6}>
+                      <label className="form-label small">Buscar por nombre</label>
+                      <input
+                        type="text"
+                        className="form-control form-control-sm"
+                        placeholder="Escribir nombre..."
+                        value={filters.nombre || ""}
+                        onChange={(e) => onFilterChange("nombre", e.target.value)}
+                      />
+                    </Col>
 
-            1. Card: Wrapper externo (responsabilidad del desarrollador)
-            2. FilterSummary: Maneja CardBody + Summary + render props + lógica de filtros
-            3. Lista de Cards: Recibe datos filtrados automáticamente
+                    <Col lg={3} md={6}>
+                      <label className="form-label small">Departamento</label>
+                      <select
+                        className="form-select form-select-sm"
+                        value={filters.departamento || ""}
+                        onChange={(e) => onFilterChange("departamento", e.target.value)}
+                      >
+                        <option value="">Todos los departamentos</option>
+                        {columns.find(c => c.key === 'departamento')?.filterOptions?.map(option => (
+                          <option key={option} value={option}>{option}</option>
+                        ))}
+                      </select>
+                    </Col>
 
-            Ventajas:
-            - FilterSummary gestiona automáticamente filtros y ordenamientos
-            - Summary aparece/desaparece automáticamente
-            - Reutilizable para cualquier tipo de vista (no solo tablas)
-            - Mínima configuración: solo data y columns
-          */}
-          <Card>
-            <CardHeader>
-              <h5 className="mb-0">
-                <i className="mdi mdi-filter me-2 text-primary"></i>
-                Lista de Usuarios con FilterSummary
-              </h5>
-              <small className="text-muted">
-                FilterSummary gestiona filtros y ordenamientos automáticamente. Solo pasa data y columns.
-              </small>
-            </CardHeader>
+                    <Col lg={2} md={6}>
+                      <label className="form-label small">Estado</label>
+                      <select
+                        className="form-select form-select-sm"
+                        value={filters.estado || ""}
+                        onChange={(e) => onFilterChange("estado", e.target.value)}
+                      >
+                        <option value="">Todos los estados</option>
+                        {columns.find(c => c.key === 'estado')?.filterOptions?.map(option => (
+                          <option key={option} value={option}>{option}</option>
+                        ))}
+                      </select>
+                    </Col>
 
-            <FilterSummary data={users} columns={columns}>
-              {({ filteredData, hasActiveItems, filters, sorting, onFilterChange, onSortChange, onClearAll }) => (
-                <>
-                  {/* Controles de filtrado y ordenamiento */}
-                  <div className="mb-4">
-                    <Row className="g-3 align-items-end">
-                      {/* Filtro por nombre */}
-                      <Col lg={3} md={6}>
-                        <label className="form-label small">Buscar por nombre</label>
-                        <input
-                          type="text"
-                          className="form-control form-control-sm"
-                          placeholder="Escribir nombre..."
-                          value={filters.nombre || ""}
-                          onChange={(e) => onFilterChange("nombre", e.target.value)}
-                        />
-                      </Col>
+                    <Col lg={2} md={4}>
+                      <label className="form-label small">Ordenar por</label>
+                      <select
+                        className="form-select form-select-sm"
+                        value={sorting.field || ""}
+                        onChange={(e) => onSortChange({ field: e.target.value, direction: sorting.direction || "asc" })}
+                      >
+                        <option value="">Sin orden</option>
+                        <option value="nombre">Nombre</option>
+                        <option value="edad">Edad</option>
+                        <option value="fechaIngreso">Fecha Ingreso</option>
+                      </select>
+                    </Col>
 
-                      {/* Filtro por departamento */}
-                      <Col lg={3} md={6}>
-                        <label className="form-label small">Departamento</label>
-                        <select
-                          className="form-select form-select-sm"
-                          value={filters.departamento || ""}
-                          onChange={(e) => onFilterChange("departamento", e.target.value)}
-                        >
-                          <option value="">Todos los departamentos</option>
-                          <option value="Desarrollo">Desarrollo</option>
-                          <option value="Marketing">Marketing</option>
-                          <option value="Ventas">Ventas</option>
-                          <option value="Soporte">Soporte</option>
-                          <option value="Recursos Humanos">Recursos Humanos</option>
-                          <option value="Finanzas">Finanzas</option>
-                        </select>
-                      </Col>
-
-                      {/* Filtro por estado */}
-                      <Col lg={2} md={6}>
-                        <label className="form-label small">Estado</label>
-                        <select
-                          className="form-select form-select-sm"
-                          value={filters.estado || ""}
-                          onChange={(e) => onFilterChange("estado", e.target.value)}
-                        >
-                          <option value="">Todos los estados</option>
-                          <option value="Activo">Activo</option>
-                          <option value="Inactivo">Inactivo</option>
-                          <option value="Pendiente">Pendiente</option>
-                        </select>
-                      </Col>
-
-                      {/* Ordenamiento */}
-                      <Col lg={3} md={6}>
-                        <label className="form-label small">Ordenar por</label>
-                        <select
-                          className="form-select form-select-sm"
-                          value={sorting.field ? `${sorting.field}-${sorting.direction}` : ""}
-                          onChange={(e) => {
-                            if (e.target.value) {
-                              const [field, direction] = e.target.value.split('-');
-                              onSortChange({ field, direction });
-                            } else {
-                              onSortChange({ field: "", direction: "" });
-                            }
-                          }}
-                        >
-                          <option value="">Sin ordenamiento</option>
-                          <option value="nombre-asc">Nombre A-Z</option>
-                          <option value="nombre-desc">Nombre Z-A</option>
-                          <option value="edad-asc">Edad ↑</option>
-                          <option value="edad-desc">Edad ↓</option>
-                          <option value="fechaIngreso-desc">Más recientes</option>
-                          <option value="fechaIngreso-asc">Más antiguos</option>
-                        </select>
-                      </Col>
-
-                      {/* Botón limpiar */}
-                      <Col lg={1} md={6}>
+                    <Col lg={2} md={2}>
+                      <label className="form-label small">Dirección</label>
+                      <div className="btn-group w-100" role="group">
                         <button
                           type="button"
-                          className="btn btn-outline-secondary btn-sm w-100"
-                          onClick={onClearAll}
-                          title="Limpiar filtros y ordenamiento"
+                          className={`btn btn-sm ${sorting.direction === 'asc' ? 'btn-primary' : 'btn-outline-primary'}`}
+                          onClick={() => onSortChange({ field: sorting.field || "", direction: "asc" })}
+                          disabled={!sorting.field}
                         >
-                          <i className="mdi mdi-close"></i>
+                          <i className="mdi mdi-arrow-up"></i>
                         </button>
-                      </Col>
-                    </Row>
-                  </div>
+                        <button
+                          type="button"
+                          className={`btn btn-sm ${sorting.direction === 'desc' ? 'btn-primary' : 'btn-outline-primary'}`}
+                          onClick={() => onSortChange({ field: sorting.field || "", direction: "desc" })}
+                          disabled={!sorting.field}
+                        >
+                          <i className="mdi mdi-arrow-down"></i>
+                        </button>
+                      </div>
+                    </Col>
 
-                  {/* Contador de resultados */}
-                  <div className="mb-3">
-                    <h6 className="text-muted">
-                      Mostrando {filteredData.length} de {users.length} usuarios
-                      {hasActiveItems && <span className="text-primary"> (filtrados)</span>}
-                    </h6>
-                  </div>
-
-                  {/* Lista de cards de usuarios */}
-                  <Row>
-                    {filteredData.map(user => (
-                      <Col xl={4} lg={6} md={6} sm={12} key={user.id} className="mb-4">
-                        <UserCard user={user} />
-                      </Col>
-                    ))}
-
-                    {/* Mensaje cuando no hay resultados */}
-                    {filteredData.length === 0 && (
-                      <Col xs={12}>
-                        <div className="text-center py-5">
-                          <div className="avatar-lg rounded-circle bg-light mx-auto mb-4 d-flex align-items-center justify-content-center">
-                            <i className="mdi mdi-account-search mdi-36px text-muted"></i>
-                          </div>
-                          <h5 className="mb-3">No se encontraron usuarios</h5>
-                          <p className="text-muted mb-0">
-                            No hay usuarios que coincidan con los criterios de búsqueda aplicados.
-                          </p>
-                        </div>
-                      </Col>
-                    )}
+                    <Col lg={1} md={6}>
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary btn-sm w-100"
+                        onClick={onClearAll}
+                        title="Limpiar filtros y ordenamiento"
+                      >
+                        <i className="mdi mdi-close"></i>
+                      </button>
+                    </Col>
                   </Row>
-                </>
-              )}
-            </FilterSummary>
-          </Card>
+                </div>
 
-          {/* Información de implementación */}
-          <div className="row mt-4">
-            <div className="col-12">
-              <div className="alert alert-info">
-                <h6 className="alert-heading">
-                  <i className="mdi mdi-code-tags me-2"></i>
-                  Código de Implementación
-                </h6>
-                <pre className="mb-0 small">
-{`<Card>
-  <CardHeader>Título</CardHeader>
-  <FilterSummary data={users} columns={columns}>
-    {({ filteredData, filters, onFilterChange, onSortChange, onClearAll }) => (
-      <>
-        {/* Controles de filtrado */}
-        <Row className="g-3 align-items-end mb-4">
-          <Col lg={3}>
-            <input
-              type="text"
-              className="form-control form-control-sm"
-              placeholder="Buscar nombre..."
-              value={filters.nombre || ""}
-              onChange={(e) => onFilterChange("nombre", e.target.value)}
-            />
-          </Col>
-          <Col lg={3}>
-            <select
-              className="form-select form-select-sm"
-              value={filters.departamento || ""}
-              onChange={(e) => onFilterChange("departamento", e.target.value)}
-            >
-              <option value="">Todos</option>
-              <option value="Desarrollo">Desarrollo</option>
-              {/* ... más opciones */}
-            </select>
-          </Col>
-          <Col lg={1}>
-            <button onClick={onClearAll} className="btn btn-outline-secondary btn-sm">
-              <i className="mdi mdi-close"></i>
-            </button>
-          </Col>
-        </Row>
+                <div className="mb-3">
+                  <h6 className="text-muted">
+                    Mostrando {filteredData.length} de {users.length} usuarios
+                    {hasActiveItems && <span className="text-primary"> (filtrados)</span>}
+                  </h6>
+                </div>
 
-        {/* Lista de cards */}
-        <Row>
-          {filteredData.map(user => (
-            <Col xl={4} lg={6} key={user.id}>
-              <UserCard user={user} />
-            </Col>
-          ))}
-        </Row>
-      </>
-    )}
-  </FilterSummary>
-</Card>`}
-                </pre>
-                <hr />
-                <p className="mb-0">
-                  <strong>Ventajas de FilterSummary:</strong>
-                </p>
-                <ul className="mb-0 small">
-                  <li>✅ Gestiona automáticamente estado de filtros y ordenamientos</li>
-                  <li>✅ Proporciona datos filtrados a través de render props</li>
-                  <li>✅ Muestra summary automático cuando hay filtros activos</li>
-                  <li>✅ Funciones <code>onFilterChange</code>, <code>onSortChange</code>, <code>onClearAll</code> incluidas</li>
-                  <li>✅ Reutilizable para tablas, cards, listas, cualquier vista</li>
-                  <li>✅ Solo necesitas pasar <code>data</code> y <code>columns</code></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </Container>
-      </div>
-    </React.Fragment>
+                <Row>
+                  {filteredData.map(user => (
+                    <Col xl={4} lg={6} md={6} sm={12} key={user.id} className="mb-4">
+                      <UserCard user={user} />
+                    </Col>
+                  ))}
+
+                  {filteredData.length === 0 && (
+                    <Col xs={12}>
+                      <div className="text-center py-5">
+                        <div className="avatar-lg rounded-circle bg-light mx-auto mb-4 d-flex align-items-center justify-content-center">
+                          <i className="mdi mdi-account-search mdi-36px text-muted"></i>
+                        </div>
+                        <h5 className="mb-3">No se encontraron usuarios</h5>
+                        <p className="text-muted mb-0">
+                          No hay usuarios que coincidan con los criterios de búsqueda aplicados.
+                        </p>
+                      </div>
+                    </Col>
+                  )}
+                </Row>
+              </>
+            )}
+          </FilterSummary>
+        </Card>
+
+      </Container>
+    </div>
   );
 }
 
-FilterSumaryInfo.propTypes = {};
-
-export default withTranslation()(FilterSumaryInfo);
+export default FilterSumaryInfo;

@@ -256,7 +256,7 @@ const CrudBasicResponsive = () => {
         columns={columns}
         selectedItems={selectedItems}
         onSelectedChange={handleSelectItem}
-        pagination={true}
+        pagination={false}
         className="table-responsive"
         // Vinculación con AzFilterSummary
         filters={filterState.filters}

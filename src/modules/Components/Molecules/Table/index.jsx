@@ -1,6 +1,9 @@
 import PropTypes from "prop-types";
 import { Button } from "reactstrap";
 import { AzTable, AzTableColumns } from "../../../../components/aziende/AzTable";
+import FilterSummary from "../../../../components/aziende/FilterSummary";
+import TableWithFilter from "./examples/TableWithFilter";
+import TableWithoutFilter from "./examples/TableWithoutFilter";
 
 const Table = (props) => {
   // Para pruebas - usar datos de ejemplo si no se proporcionan props
@@ -214,43 +217,59 @@ const Table = (props) => {
           <div className="row">
             <div className="col-12">
               <div className="page-title-box d-sm-flex align-items-center justify-content-between mb-4">
-                <h4 className="mb-0">Tabla Genérica AzTable</h4>
+                <h4 className="mb-0">Ejemplos de Implementación - AzTable</h4>
                 <div className="page-title-right">
-                  <small className="text-muted">Componente de tabla reutilizable con funciones avanzadas</small>
+                  <small className="text-muted">Comparación: Con FilterSummary vs Sin FilterSummary</small>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Ejemplo 1: Tabla CON FilterSummary (Container Pattern) */}
+          <div className="row mb-4">
+            <div className="col-12">
+              <TableWithFilter data={testData} columns={columns} />
+            </div>
+          </div>
+
+          {/* Ejemplo 2: Tabla SIN FilterSummary (Gestión Manual) */}
+          <div className="row mb-4">
+            <div className="col-12">
+              <TableWithoutFilter data={testData} columns={columns} />
+            </div>
+          </div>
+
+          {/* Información adicional */}
           <div className="row">
             <div className="col-12">
-              <AzTable
-                data={testData}
-                columns={columns}
-                selectedItems={[]}
-                pagination={false}
-                showActions={true}
-                showFilterSummary={true}
-                components={
-                  <>
-                    <Button
-                      color="primary"
-                      size="sm"
-                      onClick={() => console.log("Edit")}
-                      title="Editar"
-                    >
-                      <i className="mdi mdi-pencil"></i>
-                    </Button>
-                    <Button
-                      color="danger"
-                      size="sm"
-                      onClick={() => console.log("Delete")}
-                      title="Eliminar"
-                    >
-                      <i className="mdi mdi-delete"></i>
-                    </Button>
-                  </>
-                }
-              />
+              <div className="alert alert-info">
+                <h6 className="alert-heading">
+                  <i className="mdi mdi-information me-2"></i>
+                  Diferencias Clave
+                </h6>
+                <div className="row">
+                  <div className="col-md-6">
+                    <h6 className="text-primary">✅ CON FilterSummary</h6>
+                    <ul className="mb-0">
+                      <li>Gestión automática de estado</li>
+                      <li>Summary de filtros automático</li>
+                      <li>Container pattern (render props)</li>
+                      <li>Menos código en implementación</li>
+                      <li>Reutilizable con cualquier vista</li>
+                    </ul>
+                  </div>
+                  <div className="col-md-6">
+                    <h6 className="text-success">✅ SIN FilterSummary</h6>
+                    <ul className="mb-0">
+                      <li>Control total del estado</li>
+                      <li>Más flexibilidad para casos específicos</li>
+                      <li>Implementación directa</li>
+                      <li>Componente independiente</li>
+                      <li>Sin dependencias adicionales</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -258,7 +277,7 @@ const Table = (props) => {
     );
   }
 
-  // Componente real
+  // Componente real - Mantener compatibilidad con uso directo de AzTable
   return <AzTable {...props} />;
 };
 
@@ -276,8 +295,7 @@ Table.propTypes = {
   tableProps: PropTypes.object,
   children: PropTypes.node,
   showActions: PropTypes.bool,
-  components: PropTypes.node,
-  showFilterSummary: PropTypes.bool
+  components: PropTypes.node
 };
 
 // Asignar subcomponentes para compatibilidad

@@ -1,18 +1,162 @@
-import React from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'reactstrap';
 
 /**
- * Componente reutilizable para mostrar un resumen de filtros y ordenamientos activos
- * Basado en el diseño de UserCardsViewSimple (líneas 39-48)
+ * FilterSummary - Container component que gestiona filtros y ordenamientos
+ * Utiliza render props pattern para pasar datos filtrados a componentes hijos
  */
 const FilterSummary = ({
-  filters = {},
-  sorting = { field: "", direction: "" },
+  data = [],
   columns = [],
+  children,
+  className = ""
+}) => {
+  // Estados internos para filtros y ordenamiento
+  const [filters, setFilters] = useState({});
+  const [sorting, setSorting] = useState({ field: "", direction: "" });
+
+  // Función para manejar cambios en filtros
+  const handleFilterChange = useCallback((filterKey, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterKey]: value
+    }));
+  }, []);
+
+  // Función para manejar cambios en ordenamiento
+  const handleSortChange = useCallback((sortConfig) => {
+    setSorting(sortConfig);
+  }, []);
+
+  // Función para limpiar todos los filtros y ordenamientos
+  const handleClearAll = useCallback(() => {
+    setFilters({});
+    setSorting({ field: "", direction: "" });
+  }, []);
+
+  // Procesar datos con filtros y ordenamiento aplicados
+  const filteredData = useMemo(() => {
+    let result = [...data];
+
+    // Aplicar filtros
+    Object.entries(filters).forEach(([filterKey, filterValue]) => {
+      if (filterValue && filterValue.trim() !== "") {
+        // Encontrar la configuración de la columna para determinar el tipo de filtro
+        const columnConfig = columns.find(col => col.key === filterKey);
+
+        result = result.filter(row => {
+          const cellValue = row[filterKey];
+          if (cellValue == null) return false;
+
+          // Manejar filtros de tipo select (exactos)
+          if (columnConfig && columnConfig.filterType === "select") {
+            // Para filtros booleanos especiales (Sí/No)
+            if (columnConfig.filterOptions &&
+                columnConfig.filterOptions.includes("Sí") &&
+                columnConfig.filterOptions.includes("No")) {
+              // Convertir valores booleanos a texto para comparar
+              const booleanText = cellValue === true ? "Sí" : cellValue === false ? "No" : cellValue.toString();
+              return booleanText === filterValue;
+            }
+
+            // Para otros filtros de select, usar comparación exacta
+            return cellValue.toString() === filterValue;
+          }
+
+          // Filtro de texto normal (para filtros tipo text)
+          return cellValue.toString().toLowerCase().includes(filterValue.toLowerCase());
+        });
+      }
+    });
+
+    // Aplicar ordenamiento
+    if (sorting.field && sorting.direction) {
+      result.sort((a, b) => {
+        const aValue = a[sorting.field];
+        const bValue = b[sorting.field];
+
+        // Manejar valores nulos
+        if (aValue == null && bValue == null) return 0;
+        if (aValue == null) return 1;
+        if (bValue == null) return -1;
+
+        // Comparar valores
+        let comparison = 0;
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          comparison = aValue - bValue;
+        } else {
+          comparison = aValue.toString().localeCompare(bValue.toString());
+        }
+
+        return sorting.direction === 'asc' ? comparison : -comparison;
+      });
+    }
+
+    return result;
+  }, [data, filters, sorting, columns]);
+
+  // Verificar si hay filtros o ordenamientos activos
+  const hasActiveFilters = useMemo(() => {
+    return Object.values(filters).some(filter => filter && filter.trim() !== "");
+  }, [filters]);
+
+  const hasActiveSorting = useMemo(() => {
+    return sorting.field && sorting.direction;
+  }, [sorting]);
+
+  const hasActiveItems = hasActiveFilters || hasActiveSorting;
+
+  // Props que se pasan al componente hijo
+  const renderProps = {
+    // Datos filtrados y procesados
+    filteredData,
+    originalData: data,
+
+    // Estados actuales
+    filters,
+    sorting,
+
+    // Funciones para manejar cambios
+    onFilterChange: handleFilterChange,
+    onSortChange: handleSortChange,
+    onClearAll: handleClearAll,
+
+    // Información adicional
+    hasActiveFilters,
+    hasActiveSorting,
+    hasActiveItems,
+    columns
+  };
+
+  return (
+    <>
+      {/* Mostrar resumen de filtros si hay elementos activos */}
+      {hasActiveItems && (
+        <FilterSummaryDisplay
+          filters={filters}
+          sorting={sorting}
+          columns={columns}
+          onClearAll={handleClearAll}
+          className={className}
+        />
+      )}
+
+      {/* Renderizar componente hijo con render props */}
+      {typeof children === 'function' ? children(renderProps) : children}
+    </>
+  );
+};
+
+/**
+ * Componente interno para mostrar el resumen de filtros
+ */
+const FilterSummaryDisplay = ({
+  filters,
+  sorting,
+  columns,
   onClearAll,
-  className = "",
-  showWhenEmpty = false
+  className
 }) => {
   // Obtener filtros activos
   const activeFilters = Object.entries(filters).filter(([key, value]) =>
@@ -21,14 +165,6 @@ const FilterSummary = ({
 
   // Verificar si hay ordenamiento activo
   const hasActiveSorting = sorting.field && sorting.direction;
-
-  // Verificar si hay algún filtro o ordenamiento activo
-  const hasActiveItems = activeFilters.length > 0 || hasActiveSorting;
-
-  // Si no hay elementos activos y no se debe mostrar cuando está vacío, no renderizar
-  if (!hasActiveItems && !showWhenEmpty) {
-    return null;
-  }
 
   // Función para obtener el nombre de la columna
   const getColumnName = (columnKey) => {
@@ -88,56 +224,48 @@ const FilterSummary = ({
             </span>
           </div>
         )}
-
-        {/* Mensaje cuando no hay filtros ni ordenamiento activos */}
-        {!hasActiveItems && showWhenEmpty && (
-          <span className="text-muted small">No hay filtros ni ordenamientos activos</span>
-        )}
       </div>
 
       {/* Botón para limpiar todo */}
-      {hasActiveItems && onClearAll && (
-        <Button
-          color="primary"
-          outline
-          onClick={onClearAll}
-          className="d-inline-flex align-items-center"
-          size="sm"
-        >
-          <i className="mdi mdi-filter-remove me-2"></i>
-          Limpiar todo
-        </Button>
-      )}
+      <Button
+        color="primary"
+        outline
+        onClick={onClearAll}
+        className="d-inline-flex align-items-center"
+        size="sm"
+      >
+        <i className="mdi mdi-filter-remove me-2"></i>
+        Limpiar todo
+      </Button>
     </div>
   );
 };
 
 FilterSummary.propTypes = {
-  // Filtros activos (objeto con clave-valor)
-  filters: PropTypes.object,
+  // Datos originales a filtrar
+  data: PropTypes.array.isRequired,
 
-  // Configuración de ordenamiento
-  sorting: PropTypes.shape({
-    field: PropTypes.string,
-    direction: PropTypes.oneOf(['asc', 'desc', ''])
-  }),
-
-  // Configuración de columnas para obtener nombres y tipos
+  // Configuración de columnas
   columns: PropTypes.arrayOf(PropTypes.shape({
     key: PropTypes.string.isRequired,
     header: PropTypes.string,
-    filterType: PropTypes.string,
+    filterType: PropTypes.oneOf(['text', 'select']),
     filterOptions: PropTypes.array
-  })),
+  })).isRequired,
 
-  // Callback para limpiar todos los filtros y ordenamientos
-  onClearAll: PropTypes.func,
+  // Render props function
+  children: PropTypes.func.isRequired,
 
-  // Clase CSS adicional
-  className: PropTypes.string,
+  // Clase CSS adicional para el summary
+  className: PropTypes.string
+};
 
-  // Mostrar el componente incluso cuando no hay filtros activos
-  showWhenEmpty: PropTypes.bool
+FilterSummaryDisplay.propTypes = {
+  filters: PropTypes.object.isRequired,
+  sorting: PropTypes.object.isRequired,
+  columns: PropTypes.array.isRequired,
+  onClearAll: PropTypes.func.isRequired,
+  className: PropTypes.string
 };
 
 export default FilterSummary;

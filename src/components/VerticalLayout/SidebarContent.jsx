@@ -211,12 +211,15 @@ const SidebarContent = (props) => {
                 <li>
                   <Link to="/table">Table</Link>
                 </li>
+                <li>
+                  <Link to="/molecules/filter-sumary-info">Filter Sumary Info</Link>
+                </li>
                 
               
               </ul>
             </li>
 
-                        <li>
+            <li>
               <Link to="/#" className="has-arrow ">
                 <i className="bx bx-user-circle"></i>
                 <span>Pages</span>

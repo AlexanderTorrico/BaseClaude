@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { Card, CardBody, Input } from "reactstrap";
 import { useTranslation } from "react-i18next";
 import TableContainer from "./TableContainer";
-import FilterSummary from "../FilterSummary";
 
 /**
  * AzTable - Componente genérico de tabla con funcionalidades avanzadas
@@ -22,14 +21,13 @@ const AzTable = ({
   tableProps = {},
   children,
   showActions = false,
-  components,
-  showFilterSummary = false
+  components
 }) => {
   const { t } = useTranslation();
 
-  // Estado interno para filtros y ordenamiento
-  const [internalFilters, setInternalFilters] = useState(filters || {});
-  const [internalSorting, setInternalSorting] = useState(sorting || { field: "", direction: "" });
+  // Usar props directamente (sin estado interno cuando se usa con FilterSummary)
+  const currentFilters = filters;
+  const currentSorting = sorting;
 
   // Memoizar selectedItems para evitar re-renders innecesarios
   const currentSelectedItems = useMemo(() => selectedItems || [], [selectedItems]);
@@ -40,57 +38,26 @@ const AzTable = ({
     }
   };
 
-  // Función para manejar filtros internos
-  const handleInternalFilter = useCallback((column, value) => {
-    const newFilters = {
-      ...internalFilters,
-      [column]: value
-    };
-    setInternalFilters(newFilters);
-
-    // Si hay callback externo, notificar
+  // Función para manejar filtros
+  const handleFilterChange = useCallback((column, value) => {
     if (onFilterChange) {
       onFilterChange(column, value);
     }
-  }, [internalFilters, onFilterChange]);
+  }, [onFilterChange]);
 
-  // Función para manejar ordenamiento interno
-  const handleInternalSort = useCallback((sortConfig) => {
-    setInternalSorting(sortConfig);
-
-    // Si hay callback externo, notificar
+  // Función para manejar ordenamiento
+  const handleSortChange = useCallback((sortConfig) => {
     if (onSortChange) {
       onSortChange(sortConfig);
     }
   }, [onSortChange]);
-
-  // Función para limpiar todos los filtros y ordenamientos
-  const handleClearAll = useCallback(() => {
-    const clearedFilters = {};
-    const clearedSorting = { field: "", direction: "" };
-
-    setInternalFilters(clearedFilters);
-    setInternalSorting(clearedSorting);
-
-    // Notificar cambios externos
-    if (onFilterChange) {
-      // Limpiar todos los filtros
-      Object.keys(internalFilters).forEach(column => {
-        onFilterChange(column, "");
-      });
-    }
-
-    if (onSortChange) {
-      onSortChange(clearedSorting);
-    }
-  }, [internalFilters, onFilterChange, onSortChange]);
 
   // Procesar datos con filtros y ordenamiento aplicados
   const processedData = useMemo(() => {
     let filteredData = [...data];
 
     // Aplicar filtros
-    Object.entries(internalFilters).forEach(([column, filterValue]) => {
+    Object.entries(currentFilters).forEach(([column, filterValue]) => {
       if (filterValue && filterValue.trim() !== "") {
         // Encontrar la configuración de la columna para determinar el tipo de filtro
         const columnConfig = columns.find(col => col.key === column);
@@ -121,10 +88,10 @@ const AzTable = ({
     });
 
     // Aplicar ordenamiento
-    if (internalSorting.field && internalSorting.direction) {
+    if (currentSorting.field && currentSorting.direction) {
       filteredData.sort((a, b) => {
-        const aValue = a[internalSorting.field];
-        const bValue = b[internalSorting.field];
+        const aValue = a[currentSorting.field];
+        const bValue = b[currentSorting.field];
 
         // Manejar valores nulos
         if (aValue == null && bValue == null) return 0;
@@ -139,17 +106,17 @@ const AzTable = ({
           comparison = aValue.toString().localeCompare(bValue.toString());
         }
 
-        return internalSorting.direction === 'asc' ? comparison : -comparison;
+        return currentSorting.direction === 'asc' ? comparison : -comparison;
       });
     }
 
     return filteredData;
-  }, [data, internalFilters, internalSorting, columns]);
+  }, [data, currentFilters, currentSorting, columns]);
 
   // Verificar si hay filtros activos
   const hasActiveFilters = useMemo(() => {
-    return Object.values(internalFilters).some(filter => filter && filter.trim() !== "");
-  }, [internalFilters]);
+    return Object.values(currentFilters).some(filter => filter && filter.trim() !== "");
+  }, [currentFilters]);
 
   // Datos procesados con fila de "sin datos" si es necesario
   const finalData = useMemo(() => {
@@ -320,10 +287,10 @@ const AzTable = ({
             title={column.header || column.key}
             sortable={column.sortable}
             filterable={column.filterable}
-            sorting={internalSorting}
-            filters={internalFilters}
-            onSort={handleInternalSort}
-            onFilter={handleInternalFilter}
+            sorting={currentSorting}
+            filters={currentFilters}
+            onSort={handleSortChange}
+            onFilter={handleFilterChange}
             filterType={column.filterType || "text"}
             filterOptions={column.filterOptions || []}
           />
@@ -357,7 +324,7 @@ const AzTable = ({
     }
 
     return finalColumns;
-  }, [columns, finalData, currentSelectedItems, onSelectedChange, actionColumn, internalSorting, internalFilters, handleInternalSort, handleInternalFilter, handleSelectionChange]);
+  }, [columns, finalData, currentSelectedItems, onSelectedChange, actionColumn, currentSorting, currentFilters, handleSortChange, handleFilterChange, handleSelectionChange]);
 
   return (
     <div className="container-fluid">
@@ -365,16 +332,6 @@ const AzTable = ({
         <div className="col-12">
           <Card className={`border-0 shadow-sm ${className}`}>
             <CardBody className="p-4">
-              {/* Mostrar resumen de filtros si está habilitado */}
-              {showFilterSummary && (
-                <FilterSummary
-                  filters={internalFilters}
-                  sorting={internalSorting}
-                  columns={columns}
-                  onClearAll={handleClearAll}
-                  className="mb-3"
-                />
-              )}
               <div className="table-responsive az-table-container">
                 <style>{`
                   .az-table-container .table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
@@ -716,8 +673,7 @@ AzTable.propTypes = {
   tableProps: PropTypes.object,
   children: PropTypes.node,
   showActions: PropTypes.bool,
-  components: PropTypes.node,
-  showFilterSummary: PropTypes.bool
+  components: PropTypes.node
 };
 
 AzTableActions.propTypes = {

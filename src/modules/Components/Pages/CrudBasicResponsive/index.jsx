@@ -1,15 +1,12 @@
 import React, { useState } from "react";
-import { Container, Badge, ButtonGroup, Button, Row, Col, Input } from "reactstrap";
+import { Container, Badge, Button, Row, Col, Input } from "reactstrap";
 import AzHeaderCardViewResponsive from "../../../../components/aziende/AzHeader/AzHeaderCardViewResponsive";
 import { AzTable, AzTableColumns } from "../../../../components/aziende/AzTable";
 import AzFilterSummary from "../../../../components/aziende/AzFilterSummary";
 
-// Test importing the hook step by step
-// import useCrudBasic from "./Hooks/crudBasicHook";
-
 const CrudBasicResponsive = () => {
-  // Test basic state first
   const [testState, setTestState] = useState("Hello World");
+  const [selectedItems, setSelectedItems] = useState([]);
 
   // Mock data for testing
   const mockProducts = [
@@ -33,16 +30,6 @@ const CrudBasicResponsive = () => {
     }
   ];
 
-  // Try adding the hook gradually
-  // const crudHook = useCrudBasic();
-
-  // Mock selected items for testing
-  const [selectedItems, setSelectedItems] = useState([]);
-
-  // Shared filter state
-  const [sharedFilters, setSharedFilters] = useState({});
-  const [sharedSorting, setSharedSorting] = useState({});
-
   // Handle selection
   const handleSelectItem = (id) => {
     setSelectedItems(prev =>
@@ -50,75 +37,6 @@ const CrudBasicResponsive = () => {
         ? prev.filter(item => item !== id)
         : [...prev, id]
     );
-  };
-
-  // Shared filter handlers
-  const handleSharedFilterChange = (key, value) => {
-    const newFilters = { ...sharedFilters, [key]: value };
-    if (!value || value === '') {
-      delete newFilters[key];
-    }
-    setSharedFilters(newFilters);
-  };
-
-  const handleSharedSortChange = (sortConfig) => {
-    setSharedSorting(sortConfig);
-  };
-
-  const handleSharedClearAll = () => {
-    setSharedFilters({});
-    setSharedSorting({});
-  };
-
-  // Apply filters and sorting to data
-  const getFilteredData = () => {
-    let filtered = [...mockProducts];
-
-    // Apply filters
-    Object.keys(sharedFilters).forEach(key => {
-      const value = sharedFilters[key];
-      if (value) {
-        filtered = filtered.filter(item => {
-          const itemValue = item[key];
-          if (typeof itemValue === 'string') {
-            return itemValue.toLowerCase().includes(value.toLowerCase());
-          }
-          return itemValue?.toString().includes(value);
-        });
-      }
-    });
-
-    // Apply sorting
-    if (sharedSorting.field && sharedSorting.direction) {
-      filtered.sort((a, b) => {
-        const aVal = a[sharedSorting.field];
-        const bVal = b[sharedSorting.field];
-
-        if (typeof aVal === 'string') {
-          const result = aVal.localeCompare(bVal);
-          return sharedSorting.direction === 'asc' ? result : -result;
-        }
-
-        const result = aVal - bVal;
-        return sharedSorting.direction === 'asc' ? result : -result;
-      });
-    }
-
-    return filtered;
-  };
-
-  const filteredData = getFilteredData();
-  const hasActiveItems = Object.keys(sharedFilters).length > 0 || (sharedSorting.field && sharedSorting.direction);
-
-  // Create shared filter state object
-  const sharedFilterState = {
-    filteredData,
-    hasActiveItems,
-    filters: sharedFilters,
-    sorting: sharedSorting,
-    onFilterChange: handleSharedFilterChange,
-    onSortChange: handleSharedSortChange,
-    onClearAll: handleSharedClearAll
   };
 
   // Define table columns for AzTable
@@ -283,141 +201,6 @@ const CrudBasicResponsive = () => {
     </>
   );
 
-  // Render Table view (con controles de filtro externos usando AzFilterSummary)
-  const renderTableViewWithFilters = (filterState) => (
-    <>
-      {/* Filter Controls */}
-      <div className="mb-4">
-        <Row className="g-3 align-items-end">
-          <Col lg={3} md={6}>
-            <label className="form-label small">Buscar producto</label>
-            <Input
-              type="text"
-              size="sm"
-              placeholder="Nombre del producto..."
-              value={filterState.filters.name || ""}
-              onChange={(e) => filterState.onFilterChange("name", e.target.value)}
-            />
-          </Col>
-
-          <Col lg={3} md={6}>
-            <label className="form-label small">Categoría</label>
-            <Input
-              type="select"
-              size="sm"
-              value={filterState.filters.category || ""}
-              onChange={(e) => filterState.onFilterChange("category", e.target.value)}
-            >
-              <option value="">Todas las categorías</option>
-              {filterColumns.find(c => c.key === 'category')?.filterOptions?.map(option => (
-                <option key={option} value={option}>{option}</option>
-              ))}
-            </Input>
-          </Col>
-
-          <Col lg={2} md={4}>
-            <label className="form-label small">Ordenar por</label>
-            <Input
-              type="select"
-              size="sm"
-              value={filterState.sorting.field || ""}
-              onChange={(e) => filterState.onSortChange({ field: e.target.value, direction: filterState.sorting.direction || "asc" })}
-            >
-              <option value="">Sin orden</option>
-              <option value="name">Nombre</option>
-              <option value="price">Precio</option>
-              <option value="stock">Stock</option>
-            </Input>
-          </Col>
-
-          <Col lg={2} md={2}>
-            <label className="form-label small">Dirección</label>
-            <ButtonGroup size="sm" className="w-100">
-              <Button
-                color={filterState.sorting.direction === 'asc' ? 'primary' : 'outline-primary'}
-                onClick={() => filterState.onSortChange({ field: filterState.sorting.field || "", direction: "asc" })}
-                disabled={!filterState.sorting.field}
-              >
-                <i className="mdi mdi-arrow-up"></i>
-              </Button>
-              <Button
-                color={filterState.sorting.direction === 'desc' ? 'primary' : 'outline-primary'}
-                onClick={() => filterState.onSortChange({ field: filterState.sorting.field || "", direction: "desc" })}
-                disabled={!filterState.sorting.field}
-              >
-                <i className="mdi mdi-arrow-down"></i>
-              </Button>
-            </ButtonGroup>
-          </Col>
-
-          <Col lg={2} md={6}>
-            <Button
-              color="outline-secondary"
-              size="sm"
-              onClick={filterState.onClearAll}
-              className="w-100"
-            >
-              <i className="mdi mdi-close me-1"></i>
-              Limpiar
-            </Button>
-          </Col>
-        </Row>
-      </div>
-
-      {/* Results count */}
-      <div className="mb-3 d-flex justify-content-between align-items-center">
-        <h6 className="text-muted mb-0">
-          Mostrando {filterState.filteredData.length} de {mockProducts.length} productos
-          {filterState.hasActiveItems && <span className="text-primary"> (filtrados)</span>}
-        </h6>
-
-        {selectedItems.length > 0 && (
-          <Button
-            color="danger"
-            size="sm"
-            onClick={() => {
-              setTestState(`Eliminando ${selectedItems.length} productos`);
-              setSelectedItems([]);
-            }}
-          >
-            <i className="mdi mdi-delete me-1"></i>
-            Eliminar seleccionados ({selectedItems.length})
-          </Button>
-        )}
-      </div>
-
-      {/* AzTable with filtered data - vinculado con AzFilterSummary */}
-      <AzTable
-        data={filterState.filteredData}
-        columns={columns}
-        selectedItems={selectedItems}
-        onSelectedChange={handleSelectItem}
-        pagination={true}
-        className="table-responsive"
-        // Vinculación con AzFilterSummary
-        filters={filterState.filters}
-        sorting={filterState.sorting}
-        onFilterChange={filterState.onFilterChange}
-        onSortChange={filterState.onSortChange}
-        onClearFilters={filterState.onClearAll}
-      />
-
-      {/* Empty state */}
-      {filterState.filteredData.length === 0 && (
-        <div className="text-center py-5">
-          <div className="avatar-lg rounded-circle bg-light mx-auto mb-4 d-flex align-items-center justify-content-center">
-            <i className="mdi mdi-package-variant mdi-36px text-muted"></i>
-          </div>
-          <h5 className="mb-3">No se encontraron productos</h5>
-          <p className="text-muted mb-0">
-            {filterState.hasActiveItems
-              ? "No hay productos que coincidan con los filtros aplicados."
-              : "No hay productos registrados en el sistema."}
-          </p>
-        </div>
-      )}
-    </>
-  );
 
   // Render cards view for mobile with AzFilterSummary
   const renderMobileViewWithFilters = (filterState) => (

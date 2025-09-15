@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Button, Card, CardBody, CardHeader } from "reactstrap";
 import { AzTable, AzTableColumns } from "../../../../../components/aziende/AzTable";
-import FilterSummary from "../../../../../components/aziende/FilterSummary";
+import FilterSummary from "../../../../../components/aziende/AzFilterSummary";
 
 /**
  * Ejemplo de tabla CON FilterSummary

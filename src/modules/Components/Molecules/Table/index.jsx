@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { Button } from "reactstrap";
 import { AzTable, AzTableColumns } from "../../../../components/aziende/AzTable";
-import FilterSummary from "../../../../components/aziende/FilterSummary";
+import FilterSummary from "../../../../components/aziende/AzFilterSummary";
 import TableWithFilter from "./examples/TableWithFilter";
 import TableWithoutFilter from "./examples/TableWithoutFilter";
 

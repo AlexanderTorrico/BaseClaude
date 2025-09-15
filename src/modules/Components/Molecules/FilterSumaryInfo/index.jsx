@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Card, CardBody, Badge, CardHeader } from "reactstrap";
-import FilterSummary from "../../../../components/aziende/FilterSummary";
+import FilterSummary from "../../../../components/aziende/AzFilterSummary";
 
 const UserCard = ({ user }) => {
   const getStatusColor = (status) => {

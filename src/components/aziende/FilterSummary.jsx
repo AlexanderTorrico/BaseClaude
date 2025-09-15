@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'reactstrap';
+import { Button, CardBody } from 'reactstrap';
 
 /**
  * FilterSummary - Container component que gestiona filtros y ordenamientos
@@ -130,7 +130,7 @@ const FilterSummary = ({
   };
 
   return (
-    <>
+    <CardBody className="p-4">
       {/* Mostrar resumen de filtros si hay elementos activos */}
       {hasActiveItems && (
         <FilterSummaryDisplay
@@ -138,13 +138,13 @@ const FilterSummary = ({
           sorting={sorting}
           columns={columns}
           onClearAll={handleClearAll}
-          className={className}
+          className={`mb-3 ${className}`}
         />
       )}
 
       {/* Renderizar componente hijo con render props */}
       {typeof children === 'function' ? children(renderProps) : children}
-    </>
+    </CardBody>
   );
 };
 

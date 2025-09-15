@@ -25,63 +25,57 @@ const TableWithFilter = ({ data, columns }) => {
           FilterSummary gestiona todo el estado. Solo pasa data y columns.
         </small>
       </CardHeader>
-      <CardBody className="p-0">
-        {/*
-          IMPLEMENTACIÓN CON FILTERSUMMARY:
 
-          1. FilterSummary recibe:
-             - data: Array de datos originales
-             - columns: Configuración de columnas
+      {/*
+        NUEVA ESTRUCTURA: Card > FilterSummary > AzTable
 
-          2. FilterSummary proporciona via render props:
-             - filteredData: Datos ya filtrados y ordenados
-             - filters: Estado actual de filtros
-             - sorting: Estado actual de ordenamiento
-             - onFilterChange: Función para cambiar filtros
-             - onSortChange: Función para cambiar ordenamiento
-             - onClearAll: Función para limpiar todo
+        1. Card: Wrapper externo (responsabilidad del desarrollador)
+        2. FilterSummary: Maneja CardBody + Summary + render props
+        3. AzTable: Solo tabla, sin Card wrapper
 
-          3. El summary aparece automáticamente cuando hay filtros activos
-        */}
-        <FilterSummary data={data} columns={columns}>
-          {({ filteredData, filters, sorting, onFilterChange, onSortChange }) => (
-            <AzTable
-              data={filteredData}  // ✅ Datos ya filtrados
-              columns={columns}
-              selectedItems={[]}
-              pagination={false}
-              showActions={true}
+        FilterSummary ahora incluye internamente:
+        - CardBody con padding
+        - Summary de filtros (si hay filtros activos)
+        - Renderizado del componente hijo
+      */}
+      <FilterSummary data={data} columns={columns}>
+        {({ filteredData, filters, sorting, onFilterChange, onSortChange }) => (
+          <AzTable
+            data={filteredData}  // ✅ Datos ya filtrados
+            columns={columns}
+            selectedItems={[]}
+            pagination={false}
+            showActions={true}
 
-              // Estados controlados por FilterSummary
-              filters={filters}
-              sorting={sorting}
-              onFilterChange={onFilterChange}
-              onSortChange={onSortChange}
+            // Estados controlados por FilterSummary
+            filters={filters}
+            sorting={sorting}
+            onFilterChange={onFilterChange}
+            onSortChange={onSortChange}
 
-              components={
-                <>
-                  <Button
-                    color="primary"
-                    size="sm"
-                    onClick={() => console.log("Edit")}
-                    title="Editar"
-                  >
-                    <i className="mdi mdi-pencil"></i>
-                  </Button>
-                  <Button
-                    color="danger"
-                    size="sm"
-                    onClick={() => console.log("Delete")}
-                    title="Eliminar"
-                  >
-                    <i className="mdi mdi-delete"></i>
-                  </Button>
-                </>
-              }
-            />
-          )}
-        </FilterSummary>
-      </CardBody>
+            components={
+              <>
+                <Button
+                  color="primary"
+                  size="sm"
+                  onClick={() => console.log("Edit")}
+                  title="Editar"
+                >
+                  <i className="mdi mdi-pencil"></i>
+                </Button>
+                <Button
+                  color="danger"
+                  size="sm"
+                  onClick={() => console.log("Delete")}
+                  title="Eliminar"
+                >
+                  <i className="mdi mdi-delete"></i>
+                </Button>
+              </>
+            }
+          />
+        )}
+      </FilterSummary>
     </Card>
   );
 };

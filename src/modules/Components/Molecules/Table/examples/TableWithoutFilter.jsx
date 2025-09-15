@@ -26,26 +26,20 @@ const TableWithoutFilter = ({ data, columns }) => {
           AzTable con estado interno automático. Sin gestión externa.
         </small>
       </CardHeader>
-      <CardBody className="p-0">
+
+      <CardBody className="p-4">
         {/*
-          IMPLEMENTACIÓN SIN FILTERSUMMARY (USO INDEPENDIENTE):
+          ESTRUCTURA SIN FILTERSUMMARY: Card > CardBody > AzTable
 
-          1. AzTable gestiona automáticamente:
-             - Estado interno de filtros
-             - Estado interno de ordenamientos
-             - Callbacks internos por defecto
+          1. Card: Wrapper externo (responsabilidad del desarrollador)
+          2. CardBody: Contenedor con padding
+          3. AzTable: Solo tabla con estado interno
 
-          2. Solo necesitas pasar:
-             - data: Datos originales
-             - columns: Configuración de columnas
-
-          3. AzTable funciona completamente independiente:
-             - Aplica filtros internamente
-             - Aplica ordenamientos internamente
-             - NO hay summary automático de filtros
-             - NO requiere gestión externa de estado
-
-          4. Sin props de estado ni callbacks necesarios
+          AzTable gestiona automáticamente:
+          - Estado interno de filtros
+          - Estado interno de ordenamientos
+          - Callbacks internos por defecto
+          - NO hay summary automático de filtros
         */}
         <AzTable
           data={data}        // ✅ Solo datos originales

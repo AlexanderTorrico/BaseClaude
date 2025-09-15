@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { withTranslation } from "react-i18next";
 import {
   Container,
@@ -6,16 +6,62 @@ import {
   Col,
   Card,
   CardBody,
-  Input,
   Badge,
-  Button,
-  InputGroup,
-  Label
+  CardHeader
 } from "reactstrap";
 import FilterSummary from "../../../../components/aziende/FilterSummary";
 
 // Componente UserCard para mostrar información de usuario
+const UserCard = ({ user }) => {
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Activo': return 'success';
+      case 'Inactivo': return 'danger';
+      case 'Pendiente': return 'warning';
+      default: return 'secondary';
+    }
+  };
 
+  return (
+    <Card className="h-100">
+      <CardBody>
+        <div className="d-flex align-items-center mb-3">
+          <div className="avatar-sm rounded-circle bg-light d-flex align-items-center justify-content-center me-3">
+            <i className="mdi mdi-account mdi-18px text-primary"></i>
+          </div>
+          <div>
+            <h6 className="mb-1">{user.nombre}</h6>
+            <p className="text-muted mb-0 small">{user.email}</p>
+          </div>
+        </div>
+
+        <div className="mb-2">
+          <small className="text-muted">Departamento:</small>
+          <p className="mb-1 fw-medium">{user.departamento}</p>
+        </div>
+
+        <div className="mb-2">
+          <small className="text-muted">Estado:</small>
+          <div>
+            <Badge color={getStatusColor(user.estado)} className="me-2">
+              {user.estado}
+            </Badge>
+          </div>
+        </div>
+
+        <div className="mb-2">
+          <small className="text-muted">Edad:</small>
+          <p className="mb-1">{user.edad} años</p>
+        </div>
+
+        <div className="mb-0">
+          <small className="text-muted">Fecha Ingreso:</small>
+          <p className="mb-0">{new Date(user.fechaIngreso).toLocaleDateString('es-ES')}</p>
+        </div>
+      </CardBody>
+    </Card>
+  );
+};
 
 const FilterSumaryInfo = () => {
   // Datos de usuarios de ejemplo
@@ -73,22 +119,26 @@ const FilterSumaryInfo = () => {
       departamento: "Recursos Humanos",
       edad: 41,
       fechaIngreso: "2019-09-30"
+    },
+    {
+      id: 7,
+      nombre: "Roberto Silva",
+      email: "roberto@test.com",
+      estado: "Activo",
+      departamento: "Finanzas",
+      edad: 30,
+      fechaIngreso: "2022-08-12"
+    },
+    {
+      id: 8,
+      nombre: "Sofia Herrera",
+      email: "sofia@test.com",
+      estado: "Pendiente",
+      departamento: "Marketing",
+      edad: 27,
+      fechaIngreso: "2023-03-05"
     }
   ]);
-
-  // Estados para filtros
-  const [filters, setFilters] = useState({
-    nombre: "",
-    departamento: "",
-    estado: "",
-    edad: ""
-  });
-
-  // Estado para ordenamiento
-  const [sorting, setSorting] = useState({
-    field: "",
-    direction: ""
-  });
 
   // Definición de columnas para el FilterSummary
   const columns = [
@@ -101,7 +151,7 @@ const FilterSumaryInfo = () => {
       key: "departamento",
       header: "Departamento",
       filterType: "select",
-      filterOptions: ["Desarrollo", "Marketing", "Ventas", "Soporte", "Recursos Humanos"]
+      filterOptions: ["Desarrollo", "Marketing", "Ventas", "Soporte", "Recursos Humanos", "Finanzas"]
     },
     {
       key: "estado",
@@ -116,94 +166,6 @@ const FilterSumaryInfo = () => {
     }
   ];
 
-  // Función para manejar cambios en filtros
-  const handleFilterChange = (filterKey, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterKey]: value
-    }));
-  };
-
-  // Función para manejar cambios en ordenamiento
-  const handleSortChange = (field) => {
-    setSorting(prev => {
-      if (prev.field === field) {
-        // Cambiar dirección
-        const newDirection = prev.direction === 'asc' ? 'desc' : prev.direction === 'desc' ? '' : 'asc';
-        return {
-          field: newDirection ? field : '',
-          direction: newDirection
-        };
-      } else {
-        // Nuevo campo
-        return {
-          field,
-          direction: 'asc'
-        };
-      }
-    });
-  };
-
-  // Función para limpiar todos los filtros y ordenamientos
-  const handleClearAll = () => {
-    setFilters({
-      nombre: "",
-      departamento: "",
-      estado: "",
-      edad: ""
-    });
-    setSorting({
-      field: "",
-      direction: ""
-    });
-  };
-
-  // Filtrar y ordenar usuarios
-  const filteredUsers = useMemo(() => {
-    let result = [...users];
-
-    // Aplicar filtros
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value && value.trim() !== "") {
-        result = result.filter(user => {
-          const userValue = user[key];
-          if (userValue == null) return false;
-
-          // Para filtros de texto
-          if (key === "nombre" || key === "edad") {
-            return userValue.toString().toLowerCase().includes(value.toLowerCase());
-          }
-
-          // Para filtros de select (exactos)
-          return userValue.toString() === value;
-        });
-      }
-    });
-
-    // Aplicar ordenamiento
-    if (sorting.field && sorting.direction) {
-      result.sort((a, b) => {
-        const aValue = a[sorting.field];
-        const bValue = b[sorting.field];
-
-        if (aValue == null && bValue == null) return 0;
-        if (aValue == null) return 1;
-        if (bValue == null) return -1;
-
-        let comparison = 0;
-        if (typeof aValue === 'number' && typeof bValue === 'number') {
-          comparison = aValue - bValue;
-        } else {
-          comparison = aValue.toString().localeCompare(bValue.toString());
-        }
-
-        return sorting.direction === 'asc' ? comparison : -comparison;
-      });
-    }
-
-    return result;
-  }, [users, filters, sorting]);
-
   return (
     <React.Fragment>
       <div className="page-content">
@@ -211,162 +173,237 @@ const FilterSumaryInfo = () => {
           <div className="row">
             <div className="col-12">
               <div className="page-title-box d-sm-flex align-items-center justify-content-between mb-4">
-                <h4 className="mb-0">Ejemplo FilterSummary con Cards</h4>
+                <h4 className="mb-0">FilterSummary con Lista de Cards</h4>
                 <div className="page-title-right">
-                  <small className="text-muted">Demostración del componente FilterSummary reutilizable</small>
+                  <small className="text-muted">Demostración: FilterSummary sin tabla, solo cards</small>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Card con filtros y FilterSummary */}
-          <Card className="mb-4">
-            <CardBody>
-              {/* FilterSummary - Muestra filtros y ordenamientos activos */}
-              <FilterSummary
-                filters={filters}
-                sorting={sorting}
-                columns={columns}
-                onClearAll={handleClearAll}
-                className="mb-4"
-              />
+          {/*
+            IMPLEMENTACIÓN CON FILTERSUMMARY PARA CARDS:
 
-              {/* Controles de filtro */}
-              <Row className="mb-4">
-                <Col md={3}>
-                  <Label for="filterNombre">Filtrar por nombre:</Label>
-                  <Input
-                    id="filterNombre"
-                    type="text"
-                    placeholder="Buscar nombre..."
-                    value={filters.nombre}
-                    onChange={(e) => handleFilterChange('nombre', e.target.value)}
-                  />
-                </Col>
-                <Col md={3}>
-                  <Label for="filterDepartamento">Filtrar por departamento:</Label>
-                  <Input
-                    id="filterDepartamento"
-                    type="select"
-                    value={filters.departamento}
-                    onChange={(e) => handleFilterChange('departamento', e.target.value)}
-                  >
-                    <option value="">Todos los departamentos</option>
-                    <option value="Desarrollo">Desarrollo</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Ventas">Ventas</option>
-                    <option value="Soporte">Soporte</option>
-                    <option value="Recursos Humanos">Recursos Humanos</option>
-                  </Input>
-                </Col>
-                <Col md={3}>
-                  <Label for="filterEstado">Filtrar por estado:</Label>
-                  <Input
-                    id="filterEstado"
-                    type="select"
-                    value={filters.estado}
-                    onChange={(e) => handleFilterChange('estado', e.target.value)}
-                  >
-                    <option value="">Todos los estados</option>
-                    <option value="Activo">Activo</option>
-                    <option value="Inactivo">Inactivo</option>
-                    <option value="Pendiente">Pendiente</option>
-                  </Input>
-                </Col>
-                <Col md={3}>
-                  <Label for="filterEdad">Filtrar por edad:</Label>
-                  <Input
-                    id="filterEdad"
-                    type="text"
-                    placeholder="Ej: 30"
-                    value={filters.edad}
-                    onChange={(e) => handleFilterChange('edad', e.target.value)}
-                  />
-                </Col>
-              </Row>
+            Estructura: Card > FilterSummary > Lista de Cards
 
-              {/* Controles de ordenamiento */}
-              <Row className="mb-4">
-                <Col md={12}>
-                  <Label>Ordenar por:</Label>
-                  <div className="d-flex gap-2 flex-wrap">
-                    <Button
-                      outline={sorting.field !== 'nombre'}
-                      color="primary"
-                      size="sm"
-                      onClick={() => handleSortChange('nombre')}
-                    >
-                      Nombre {sorting.field === 'nombre' && (sorting.direction === 'asc' ? '↑' : '↓')}
-                    </Button>
-                    <Button
-                      outline={sorting.field !== 'departamento'}
-                      color="primary"
-                      size="sm"
-                      onClick={() => handleSortChange('departamento')}
-                    >
-                      Departamento {sorting.field === 'departamento' && (sorting.direction === 'asc' ? '↑' : '↓')}
-                    </Button>
-                    <Button
-                      outline={sorting.field !== 'edad'}
-                      color="primary"
-                      size="sm"
-                      onClick={() => handleSortChange('edad')}
-                    >
-                      Edad {sorting.field === 'edad' && (sorting.direction === 'asc' ? '↑' : '↓')}
-                    </Button>
-                    <Button
-                      outline={sorting.field !== 'fechaIngreso'}
-                      color="primary"
-                      size="sm"
-                      onClick={() => handleSortChange('fechaIngreso')}
-                    >
-                      Fecha Ingreso {sorting.field === 'fechaIngreso' && (sorting.direction === 'asc' ? '↑' : '↓')}
-                    </Button>
+            1. Card: Wrapper externo (responsabilidad del desarrollador)
+            2. FilterSummary: Maneja CardBody + Summary + render props + lógica de filtros
+            3. Lista de Cards: Recibe datos filtrados automáticamente
+
+            Ventajas:
+            - FilterSummary gestiona automáticamente filtros y ordenamientos
+            - Summary aparece/desaparece automáticamente
+            - Reutilizable para cualquier tipo de vista (no solo tablas)
+            - Mínima configuración: solo data y columns
+          */}
+          <Card>
+            <CardHeader>
+              <h5 className="mb-0">
+                <i className="mdi mdi-filter me-2 text-primary"></i>
+                Lista de Usuarios con FilterSummary
+              </h5>
+              <small className="text-muted">
+                FilterSummary gestiona filtros y ordenamientos automáticamente. Solo pasa data y columns.
+              </small>
+            </CardHeader>
+
+            <FilterSummary data={users} columns={columns}>
+              {({ filteredData, hasActiveItems, filters, sorting, onFilterChange, onSortChange, onClearAll }) => (
+                <>
+                  {/* Controles de filtrado y ordenamiento */}
+                  <div className="mb-4">
+                    <Row className="g-3 align-items-end">
+                      {/* Filtro por nombre */}
+                      <Col lg={3} md={6}>
+                        <label className="form-label small">Buscar por nombre</label>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          placeholder="Escribir nombre..."
+                          value={filters.nombre || ""}
+                          onChange={(e) => onFilterChange("nombre", e.target.value)}
+                        />
+                      </Col>
+
+                      {/* Filtro por departamento */}
+                      <Col lg={3} md={6}>
+                        <label className="form-label small">Departamento</label>
+                        <select
+                          className="form-select form-select-sm"
+                          value={filters.departamento || ""}
+                          onChange={(e) => onFilterChange("departamento", e.target.value)}
+                        >
+                          <option value="">Todos los departamentos</option>
+                          <option value="Desarrollo">Desarrollo</option>
+                          <option value="Marketing">Marketing</option>
+                          <option value="Ventas">Ventas</option>
+                          <option value="Soporte">Soporte</option>
+                          <option value="Recursos Humanos">Recursos Humanos</option>
+                          <option value="Finanzas">Finanzas</option>
+                        </select>
+                      </Col>
+
+                      {/* Filtro por estado */}
+                      <Col lg={2} md={6}>
+                        <label className="form-label small">Estado</label>
+                        <select
+                          className="form-select form-select-sm"
+                          value={filters.estado || ""}
+                          onChange={(e) => onFilterChange("estado", e.target.value)}
+                        >
+                          <option value="">Todos los estados</option>
+                          <option value="Activo">Activo</option>
+                          <option value="Inactivo">Inactivo</option>
+                          <option value="Pendiente">Pendiente</option>
+                        </select>
+                      </Col>
+
+                      {/* Ordenamiento */}
+                      <Col lg={3} md={6}>
+                        <label className="form-label small">Ordenar por</label>
+                        <select
+                          className="form-select form-select-sm"
+                          value={sorting.field ? `${sorting.field}-${sorting.direction}` : ""}
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              const [field, direction] = e.target.value.split('-');
+                              onSortChange({ field, direction });
+                            } else {
+                              onSortChange({ field: "", direction: "" });
+                            }
+                          }}
+                        >
+                          <option value="">Sin ordenamiento</option>
+                          <option value="nombre-asc">Nombre A-Z</option>
+                          <option value="nombre-desc">Nombre Z-A</option>
+                          <option value="edad-asc">Edad ↑</option>
+                          <option value="edad-desc">Edad ↓</option>
+                          <option value="fechaIngreso-desc">Más recientes</option>
+                          <option value="fechaIngreso-asc">Más antiguos</option>
+                        </select>
+                      </Col>
+
+                      {/* Botón limpiar */}
+                      <Col lg={1} md={6}>
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary btn-sm w-100"
+                          onClick={onClearAll}
+                          title="Limpiar filtros y ordenamiento"
+                        >
+                          <i className="mdi mdi-close"></i>
+                        </button>
+                      </Col>
+                    </Row>
                   </div>
-                </Col>
-              </Row>
-            </CardBody>
+
+                  {/* Contador de resultados */}
+                  <div className="mb-3">
+                    <h6 className="text-muted">
+                      Mostrando {filteredData.length} de {users.length} usuarios
+                      {hasActiveItems && <span className="text-primary"> (filtrados)</span>}
+                    </h6>
+                  </div>
+
+                  {/* Lista de cards de usuarios */}
+                  <Row>
+                    {filteredData.map(user => (
+                      <Col xl={4} lg={6} md={6} sm={12} key={user.id} className="mb-4">
+                        <UserCard user={user} />
+                      </Col>
+                    ))}
+
+                    {/* Mensaje cuando no hay resultados */}
+                    {filteredData.length === 0 && (
+                      <Col xs={12}>
+                        <div className="text-center py-5">
+                          <div className="avatar-lg rounded-circle bg-light mx-auto mb-4 d-flex align-items-center justify-content-center">
+                            <i className="mdi mdi-account-search mdi-36px text-muted"></i>
+                          </div>
+                          <h5 className="mb-3">No se encontraron usuarios</h5>
+                          <p className="text-muted mb-0">
+                            No hay usuarios que coincidan con los criterios de búsqueda aplicados.
+                          </p>
+                        </div>
+                      </Col>
+                    )}
+                  </Row>
+                </>
+              )}
+            </FilterSummary>
           </Card>
 
-          {/* Resultados */}
-          <div className="mb-3">
-            <h5>Usuarios encontrados: {filteredUsers.length}</h5>
+          {/* Información de implementación */}
+          <div className="row mt-4">
+            <div className="col-12">
+              <div className="alert alert-info">
+                <h6 className="alert-heading">
+                  <i className="mdi mdi-code-tags me-2"></i>
+                  Código de Implementación
+                </h6>
+                <pre className="mb-0 small">
+{`<Card>
+  <CardHeader>Título</CardHeader>
+  <FilterSummary data={users} columns={columns}>
+    {({ filteredData, filters, onFilterChange, onSortChange, onClearAll }) => (
+      <>
+        {/* Controles de filtrado */}
+        <Row className="g-3 align-items-end mb-4">
+          <Col lg={3}>
+            <input
+              type="text"
+              className="form-control form-control-sm"
+              placeholder="Buscar nombre..."
+              value={filters.nombre || ""}
+              onChange={(e) => onFilterChange("nombre", e.target.value)}
+            />
+          </Col>
+          <Col lg={3}>
+            <select
+              className="form-select form-select-sm"
+              value={filters.departamento || ""}
+              onChange={(e) => onFilterChange("departamento", e.target.value)}
+            >
+              <option value="">Todos</option>
+              <option value="Desarrollo">Desarrollo</option>
+              {/* ... más opciones */}
+            </select>
+          </Col>
+          <Col lg={1}>
+            <button onClick={onClearAll} className="btn btn-outline-secondary btn-sm">
+              <i className="mdi mdi-close"></i>
+            </button>
+          </Col>
+        </Row>
+
+        {/* Lista de cards */}
+        <Row>
+          {filteredData.map(user => (
+            <Col xl={4} lg={6} key={user.id}>
+              <UserCard user={user} />
+            </Col>
+          ))}
+        </Row>
+      </>
+    )}
+  </FilterSummary>
+</Card>`}
+                </pre>
+                <hr />
+                <p className="mb-0">
+                  <strong>Ventajas de FilterSummary:</strong>
+                </p>
+                <ul className="mb-0 small">
+                  <li>✅ Gestiona automáticamente estado de filtros y ordenamientos</li>
+                  <li>✅ Proporciona datos filtrados a través de render props</li>
+                  <li>✅ Muestra summary automático cuando hay filtros activos</li>
+                  <li>✅ Funciones <code>onFilterChange</code>, <code>onSortChange</code>, <code>onClearAll</code> incluidas</li>
+                  <li>✅ Reutilizable para tablas, cards, listas, cualquier vista</li>
+                  <li>✅ Solo necesitas pasar <code>data</code> y <code>columns</code></li>
+                </ul>
+              </div>
+            </div>
           </div>
-
-          {/* Cards de usuarios */}
-          <Row>
-            {filteredUsers.map(user => (
-              <Col xl={4} lg={6} md={6} sm={12} key={user.id} className="mb-4">
-                <UserCard user={user} />
-              </Col>
-            ))}
-
-            {filteredUsers.length === 0 && (
-              <Col xs={12}>
-                <Card>
-                  <CardBody className="text-center py-5">
-                    <div className="avatar-lg rounded-circle bg-light mx-auto mb-4 d-flex align-items-center justify-content-center">
-                      <i className="mdi mdi-account-search mdi-36px text-muted"></i>
-                    </div>
-                    <h5 className="mb-3">No se encontraron usuarios</h5>
-                    <p className="text-muted mb-4">
-                      No hay usuarios que coincidan con los criterios de búsqueda y filtros aplicados.
-                    </p>
-                    <Button
-                      color="primary"
-                      outline
-                      onClick={handleClearAll}
-                      className="d-inline-flex align-items-center"
-                      size="sm"
-                    >
-                      <i className="mdi mdi-filter-remove me-2"></i>
-                      Limpiar filtros
-                    </Button>
-                  </CardBody>
-                </Card>
-              </Col>
-            )}
-          </Row>
         </Container>
       </div>
     </React.Fragment>
@@ -376,63 +413,3 @@ const FilterSumaryInfo = () => {
 FilterSumaryInfo.propTypes = {};
 
 export default withTranslation()(FilterSumaryInfo);
-
-
-
-
-
-
-
-
-
-
-const UserCard = ({ user }) => {
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Activo': return 'success';
-      case 'Inactivo': return 'danger';
-      case 'Pendiente': return 'warning';
-      default: return 'secondary';
-    }
-  };
-
-  return (
-    <Card className="h-100">
-      <CardBody>
-        <div className="d-flex align-items-center mb-3">
-          <div className="avatar-sm rounded-circle bg-light d-flex align-items-center justify-content-center me-3">
-            <i className="mdi mdi-account mdi-18px text-primary"></i>
-          </div>
-          <div>
-            <h6 className="mb-1">{user.nombre}</h6>
-            <p className="text-muted mb-0 small">{user.email}</p>
-          </div>
-        </div>
-
-        <div className="mb-2">
-          <small className="text-muted">Departamento:</small>
-          <p className="mb-1 fw-medium">{user.departamento}</p>
-        </div>
-
-        <div className="mb-2">
-          <small className="text-muted">Estado:</small>
-          <div>
-            <Badge color={getStatusColor(user.estado)} className="me-2">
-              {user.estado}
-            </Badge>
-          </div>
-        </div>
-
-        <div className="mb-2">
-          <small className="text-muted">Edad:</small>
-          <p className="mb-1">{user.edad} años</p>
-        </div>
-
-        <div className="mb-0">
-          <small className="text-muted">Fecha Ingreso:</small>
-          <p className="mb-0">{new Date(user.fechaIngreso).toLocaleDateString('es-ES')}</p>
-        </div>
-      </CardBody>
-    </Card>
-  );
-};

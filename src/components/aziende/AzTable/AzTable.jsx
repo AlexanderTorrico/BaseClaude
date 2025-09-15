@@ -1,13 +1,14 @@
 import React, { useMemo, useState, Children, useCallback } from "react";
 import PropTypes from "prop-types";
-import { Card, CardBody, Input } from "reactstrap";
+import { Input } from "reactstrap";
 import { useTranslation } from "react-i18next";
 import TableContainer from "./TableContainer";
 
 /**
  * AzTable - Componente genérico de tabla con funcionalidades avanzadas
  */
-const AzTable = ({
+const AzTable = (props) => {
+  const {
   data = [],
   columns = [],
   selectedItems = [],
@@ -21,8 +22,8 @@ const AzTable = ({
   tableProps = {},
   children,
   showActions = false,
-  components
-) => {
+  components = null
+  } = props;
   const { t } = useTranslation();
 
   // Estado interno por defecto (fallback cuando no se reciben props externos)
@@ -30,8 +31,10 @@ const AzTable = ({
   const [internalSorting, setInternalSorting] = useState({ field: "", direction: "" });
 
   // Prioridad: Props externos > Estado interno
-  const currentFilters = filters || internalFilters;
-  const currentSorting = sorting || internalSorting;
+  // Si hay callbacks externos, usar props. Si no, usar estado interno.
+  const isControlledExternally = !!(onFilterChange || onSortChange);
+  const currentFilters = isControlledExternally ? filters : internalFilters;
+  const currentSorting = isControlledExternally ? sorting : internalSorting;
 
   // Memoizar selectedItems para evitar re-renders innecesarios
   const currentSelectedItems = useMemo(() => selectedItems || [], [selectedItems]);
@@ -351,52 +354,42 @@ const AzTable = ({
   }, [columns, finalData, currentSelectedItems, onSelectedChange, actionColumn, currentSorting, currentFilters, handleSortChange, handleFilterChange, handleSelectionChange]);
 
   return (
-    <div className="container-fluid">
-      <div className="row">
-        <div className="col-12">
-          <Card className={`border-0 shadow-sm ${className}`}>
-            <CardBody className="p-4">
-              <div className="table-responsive az-table-container">
-                <style>{`
-                  .az-table-container .table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
-                  .az-table-container .table.dataTable tbody td.dtr-control:before {
-                    display: none !important;
-                  }
-                  .az-table-container .table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control,
-                  .az-table-container .table.dataTable tbody td.dtr-control {
-                    padding-left: 8px !important;
-                  }
-                  .az-table-container input[type="text"]::-webkit-outer-spin-button,
-                  .az-table-container input[type="text"]::-webkit-inner-spin-button,
-                  .az-table-container input[type="number"]::-webkit-outer-spin-button,
-                  .az-table-container input[type="number"]::-webkit-inner-spin-button {
-                    -webkit-appearance: none !important;
-                    margin: 0 !important;
-                  }
-                  .az-table-container input[type="text"],
-                  .az-table-container input[type="number"] {
-                    -moz-appearance: textfield !important;
-                  }
-                `}</style>
-                <TableContainer
-                  columns={processedColumns}
-                  data={finalData}
-                  isGlobalFilter={false}
-                  isPagination={pagination}
-                  isCustomPageSize={false}
-                  SearchPlaceholder="Filtrar..."
-                  divClassName="table-responsive table-card mb-3"
-                  tableClass="align-middle table-nowrap table-striped"
-                  theadClass="table-light text-muted"
-                  paginationWrapper="dataTables_paginate paging_simple_numbers pagination-rounded mt-3"
-                  pagination="pagination"
-                  {...tableProps}
-                />
-              </div>
-            </CardBody>
-          </Card>
-        </div>
-      </div>
+    <div className={`table-responsive az-table-container ${className}`}>
+      <style>{`
+        .az-table-container .table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
+        .az-table-container .table.dataTable tbody td.dtr-control:before {
+          display: none !important;
+        }
+        .az-table-container .table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control,
+        .az-table-container .table.dataTable tbody td.dtr-control {
+          padding-left: 8px !important;
+        }
+        .az-table-container input[type="text"]::-webkit-outer-spin-button,
+        .az-table-container input[type="text"]::-webkit-inner-spin-button,
+        .az-table-container input[type="number"]::-webkit-outer-spin-button,
+        .az-table-container input[type="number"]::-webkit-inner-spin-button {
+          -webkit-appearance: none !important;
+          margin: 0 !important;
+        }
+        .az-table-container input[type="text"],
+        .az-table-container input[type="number"] {
+          -moz-appearance: textfield !important;
+        }
+      `}</style>
+      <TableContainer
+        columns={processedColumns}
+        data={finalData}
+        isGlobalFilter={false}
+        isPagination={pagination}
+        isCustomPageSize={false}
+        SearchPlaceholder="Filtrar..."
+        divClassName="table-responsive table-card mb-3"
+        tableClass="align-middle table-nowrap table-striped"
+        theadClass="table-light text-muted"
+        paginationWrapper="dataTables_paginate paging_simple_numbers pagination-rounded mt-3"
+        pagination="pagination"
+        {...tableProps}
+      />
     </div>
   );
 };

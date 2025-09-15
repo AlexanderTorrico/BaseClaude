@@ -153,6 +153,7 @@ const useResponsiveView = (views = [
  * @param {Array} [views=['web', 'table', 'movil']] - Vistas responsivas [desktop, tablet, mobile]. Acepta objetos {name, icon} o strings
  * @param {Object} [breakpoints] - Puntos de quiebre personalizados {mobile: 768, tablet: 1024, desktop: 1200}
  * @param {Array} [contents] - Array de contenidos para usar como slots adicionales [contentTopRight, contentBottomLeft, contentBottomRight]
+ * @param {React.ReactNode|Function} [children] - Children que puede ser render props que retorna {viewWeb, viewTable, viewMovil}
  * @param {React.ReactNode} [viewWeb] - Contenido para vista web (desktop). Fallback por defecto para todas las vistas
  * @param {React.ReactNode} [viewTable] - Contenido para vista tablet (fallback a viewWeb si no se proporciona)
  * @param {React.ReactNode} [viewMovil] - Contenido para vista móvil (fallback a viewTable → viewWeb si no se proporciona)
@@ -171,6 +172,7 @@ const AzHeaderCardViewResponsive = React.memo(({
   views = ["web", "table", "movil"], // [desktop, tablet, mobile]
   breakpoints = { mobile: 768, tablet: 1024, desktop: 1200 },
   contents = [], // Array de contenidos para usar como slots
+  children, // Nuevo: puede ser render props
   viewWeb,
   viewTable,
   viewMovil,
@@ -190,35 +192,65 @@ const AzHeaderCardViewResponsive = React.memo(({
     setManualView(view);
   }, [setManualView]);
 
+  // Nuevo: Extraer vistas desde children si es una función render props
+  const extractedViews = React.useMemo(() => {
+    if (typeof children === 'function') {
+      // Ejecutar children como render props - pero necesitamos que FilterSummary maneje esto
+      // Por ahora retornamos null, la lógica se maneja en renderContent
+      return null;
+    }
+
+    // Si children es un objeto con las vistas
+    if (children && typeof children === 'object' && (children.viewWeb || children.viewTable || children.viewMovil)) {
+      return {
+        viewWeb: children.viewWeb,
+        viewTable: children.viewTable,
+        viewMovil: children.viewMovil
+      };
+    }
+
+    return null;
+  }, [children]);
+
   const renderContent = React.useCallback(() => {
+    // Si children es una función render props, renderizarla directamente
+    if (typeof children === 'function') {
+      return children();
+    }
+
+    // Usar vistas extraídas si están disponibles, sino usar props directos
+    const finalViewWeb = extractedViews?.viewWeb || viewWeb;
+    const finalViewTable = extractedViews?.viewTable || viewTable;
+    const finalViewMovil = extractedViews?.viewMovil || viewMovil;
+
     // Lógica de fallback inteligente usando las vistas normalizadas
     const getViewContent = (viewKey) => {
       switch (viewKey) {
         case '0': // Vista web (desktop)
         case 'web':
-          return viewWeb; // Siempre mostrar viewWeb si está disponible
+          return finalViewWeb; // Siempre mostrar viewWeb si está disponible
 
         case '1': // Vista tabla (tablet)
         case 'table':
           // Si no hay viewTable, usar viewWeb como fallback
-          return viewTable || viewWeb;
+          return finalViewTable || finalViewWeb;
 
         case '2': // Vista móvil
         case 'movil':
           // Si no hay viewMovil, usar viewTable (si existe) o viewWeb
-          return viewMovil || viewTable || viewWeb;
+          return finalViewMovil || finalViewTable || finalViewWeb;
 
         case 'cards':
           // Compatibilidad: cards = table con misma lógica de fallback
-          return viewTable || viewWeb;
+          return finalViewTable || finalViewWeb;
 
         case 'grid':
           // Compatibilidad: grid = movil con misma lógica de fallback
-          return viewMovil || viewTable || viewWeb;
+          return finalViewMovil || finalViewTable || finalViewWeb;
 
         default:
           // Para vistas personalizadas, usar viewWeb por defecto
-          return viewWeb;
+          return finalViewWeb;
       }
     };
 
@@ -241,7 +273,7 @@ const AzHeaderCardViewResponsive = React.memo(({
     }
 
     return selectedContent;
-  }, [currentView, viewWeb, viewTable, viewMovil, normalizedViews]);
+  }, [currentView, viewWeb, viewTable, viewMovil, normalizedViews, children, extractedViews]);
 
   return (
     <React.Fragment>
@@ -306,6 +338,7 @@ AzHeaderCardViewResponsive.propTypes = {
     desktop: PropTypes.number
   }),
   contents: PropTypes.arrayOf(PropTypes.node), // Array de contenidos
+  children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]), // Children o render props
   viewWeb: PropTypes.node,
   viewTable: PropTypes.node,
   viewMovil: PropTypes.node,

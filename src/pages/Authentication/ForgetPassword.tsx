@@ -14,6 +14,8 @@ import {
 
 //redux
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { createSelector } from "@reduxjs/toolkit";
+import { useSelector } from "react-redux";
 import { ForgotPasswordRequest } from "@/models";
 import { Link } from "react-router-dom";
 import withRouter from "../../components/Common/withRouter";
@@ -58,8 +60,8 @@ const ForgetPasswordPage: React.FC<ForgetPasswordPageProps> = (props) => {
   });
 
   const ForgotPasswordProperties = createSelector(
-    (state) => state.auth,
-    (auth) => ({
+    (state: any) => state.auth,
+    (auth: any) => ({
       forgetError: auth.forgetError,
       forgetSuccessMsg: auth.forgetSuccessMsg,
     })

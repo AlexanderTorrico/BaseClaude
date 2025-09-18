@@ -20,7 +20,8 @@
       "Bash(npx tsc:*)",
       "Bash(npm run build:*)",
       "Bash(timeout 15 npm run dev)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(tree:*)"
     ],
     "deny": []
   }

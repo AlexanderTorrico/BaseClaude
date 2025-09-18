@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import authReducer from './authSlice';
+// Use new Authentication module reducer instead of old authSlice
+import { authReducer } from '@/pages/Authentication';
 import layoutReducer from './layoutSlice';
 import usersReducer from './usersSlice';
 import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Hooks/crudBasicSlice';

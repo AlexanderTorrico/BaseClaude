@@ -6,6 +6,9 @@ import { LayoutType } from "@/models/layout.types";
 import { useAppSelector } from "@/store/hooks";
 import type { RootState } from "@/store";
 
+// Initialize our new Authentication architecture
+import { AuthServiceFactory } from "@/pages/Authentication";
+
 // Import Routes all
 import { authProtectedRoutes, publicRoutes } from "./routes/index";
 
@@ -20,7 +23,7 @@ import NonAuthLayout from "./components/NonAuthLayout";
 // Import scss
 import "./assets/scss/theme.scss";
 
-// Initialize backend service
+// Initialize backend service (for non-auth modules like users, etc.)
 const backendType = import.meta.env.VITE_APP_DEFAULTAUTH === 'fake'
   ? BackendType.FAKE
   : BackendType.REAL;
@@ -30,6 +33,9 @@ BackendServiceFactory.initialize({
   baseURL: import.meta.env.VITE_APP_API_URL,
   timeout: 10000,
 });
+
+// Note: Authentication now uses its own AuthHttpService via AuthServiceFactory
+// No additional initialization needed - it's self-contained
 
 const App: React.FC = () => {
   const LayoutProperties = createSelector(

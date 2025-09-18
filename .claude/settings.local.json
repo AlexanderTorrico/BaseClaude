@@ -11,7 +11,16 @@
       "WebSearch",
       "Bash(npm run lint)",
       "Bash(find:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(npm install:*)",
+      "Bash(while read file)",
+      "Bash(do mv \"$file\" \"$file%.jsx.tsx\")",
+      "Bash(done)",
+      "Bash(powershell:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)",
+      "Bash(timeout 15 npm run dev)",
+      "Bash(npm run lint:*)"
     ],
     "deny": []
   }

@@ -1,3 +1,5 @@
+// Note: ApiResponse interface also exists in src/pages/Authentication/models/AuthInterfaces.ts
+// Consider consolidating these definitions
 export interface ApiResponse<T = any> {
   data: T;
   message?: string;

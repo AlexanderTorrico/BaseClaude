@@ -1,5 +1,6 @@
 // ==========================================
 // AUTHENTICATION HOOKS EXPORTS
+// Internal use only - not exported from main module
 // ==========================================
 
 export { useAuth } from './useAuth';

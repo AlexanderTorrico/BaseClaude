@@ -69,7 +69,7 @@ export const useLogin = () => {
     try {
       const loginUseCase = AuthServiceFactory.createLoginUseCase();
       await loginUseCase.logout();
-      handleSuccess = (user) => {}; // Reset callback
+      // Note: handleSuccess is reset automatically on navigation
       navigate('/login');
     } catch (error: any) {
       handleError(error.message);

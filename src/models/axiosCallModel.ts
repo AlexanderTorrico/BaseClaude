@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 
-export interface AxiosModel<T> {
+export interface AxiosCallModel<T> {
     call: Promise<AxiosResponse<T>>,
     controller?: AbortController
 }

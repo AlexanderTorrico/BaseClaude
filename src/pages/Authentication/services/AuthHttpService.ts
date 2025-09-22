@@ -21,11 +21,9 @@ export class AuthHttpService {
   constructor(config?: AuthHttpConfig) {
     const baseURL = config?.baseURL ||
                    import.meta.env.VITE_APP_API_URL ||
-                   import.meta.env.VITE_API_BASE_URL ||
-                   'http://localhost:8000/api';
+                   import.meta.env.VITE_API_BASE_URL;
 
     this.debug = config?.debug || import.meta.env.VITE_DEBUG_API === 'true';
-
     this.api = axios.create({
       baseURL,
       timeout: config?.timeout || import.meta.env.VITE_API_TIMEOUT || 10000,

@@ -36,6 +36,7 @@ export const useAuth = () => {
 
   // Success callback
   const handleSuccess = useCallback((authenticatedUser: AuthUser) => {
+    console.log("aqio 39");
     setUser(authenticatedUser);
     setError(null);
     setIsLoading(false);

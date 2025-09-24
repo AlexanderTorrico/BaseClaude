@@ -1,5 +1,5 @@
 import React from "react";
-import { withTranslation } from "react-i18next";
+import { withTranslation, WithTranslation } from "react-i18next";
 import { Container, Button, InputGroup, InputGroupText, Input } from "reactstrap";
 import { AzHeaderCard, AzHeaderCardViews, AzHeaderCardViewResponsive } from "../../../../components/aziende/AzHeader";
 // Subcomponentes optimizados
@@ -10,8 +10,15 @@ import AddNewUserCard from "./components/AddNewUserCard";
 import Footer from "./footer";
 
 
+interface User {
+  id?: number;
+  name?: string;
+}
+
+interface HeaderViewTypePageProps extends WithTranslation {}
+
 // Componente de demostración que se renderiza en la página
-const HeaderViewTypePage = () => {
+const HeaderViewTypePage: React.FC<HeaderViewTypePageProps> = () => {
   //meta title
   document.title = "AzHeaderCard & AzHeaderCardViews | Moléculas - Skote React";
 
@@ -21,12 +28,12 @@ const HeaderViewTypePage = () => {
   const [view3, setView3] = React.useState('0');
 
   // Handlers optimizados para subcomponentes (memoizados)
-  const handleUserEdit = React.useCallback((user) => {
+  const handleUserEdit = React.useCallback((user: User) => {
     console.log('Editando usuario:', user);
     // Aquí iría la lógica real de edición
   }, []);
 
-  const handleUserDelete = React.useCallback((user) => {
+  const handleUserDelete = React.useCallback((user: User) => {
     console.log('Eliminando usuario:', user);
     // Aquí iría la lógica real de eliminación
   }, []);

@@ -4,15 +4,12 @@ import {
 } from "reactstrap";
 import { WithTranslation, withTranslation } from "react-i18next";
 
-//Import Breadcrumb
-import Breadcrumbs from "../../components/Common/Breadcrumb";
-
 //Import UsersCrudFacadeExample
 import UsersCrudFacadeExample from "./UsersCrudFacadeExample";
 
 interface CrudV2Props extends WithTranslation {}
 
-const CrudV2: React.FC<CrudV2Props> = (props) => {
+const CrudV2: React.FC<CrudV2Props> = () => {
 
   //meta title
   document.title = "CRUD V2 Facade | Skote - Vite React Admin & Dashboard Template";

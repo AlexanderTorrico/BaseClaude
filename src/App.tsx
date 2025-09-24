@@ -65,25 +65,31 @@ const App: React.FC = () => {
   return (
     <React.Fragment>
       <Routes>
-        {publicRoutes.map((route, idx) => (
-          <Route
-            path={route.path}
-            element={<NonAuthLayout>{route.component}</NonAuthLayout>}
-            key={idx}
-          />
-        ))}
+        {publicRoutes.map((route, idx) => {
+          const Component = route.component;
+          return (
+            <Route
+              path={route.path}
+              element={<NonAuthLayout><Component /></NonAuthLayout>}
+              key={idx}
+            />
+          );
+        })}
 
-        {authProtectedRoutes.map((route, idx) => (
-          <Route
-            path={route.path}
-            element={
-              <Authmiddleware>
-                <Layout>{route.component}</Layout>
-              </Authmiddleware>
-            }
-            key={idx}
-          />
-        ))}
+        {authProtectedRoutes.map((route, idx) => {
+          const Component = route.component;
+          return (
+            <Route
+              path={route.path}
+              element={
+                <Authmiddleware>
+                  <Layout><Component /></Layout>
+                </Authmiddleware>
+              }
+              key={idx}
+            />
+          );
+        })}
       </Routes>
     </React.Fragment>
   );

@@ -1,11 +1,21 @@
-import { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback } from "react";
 import { Container, Badge, Button, ButtonGroup, Row, Col, Input } from "reactstrap";
 import AzHeaderCardViewResponsive from "../../../../components/aziende/AzHeader/AzHeaderCardViewResponsive";
 import { AzTable, AzTableColumns } from "../../../../components/aziende/AzTable";
 import AzFilterSummary from "../../../../components/aziende/AzFilterSummary";
 
+interface Product {
+  id: number;
+  name: string;
+  category: string;
+  description: string;
+  price: number;
+  stock: number;
+  createdAt: string;
+}
+
 // Datos estáticos movidos fuera del componente para evitar recreación
-const MOCK_PRODUCTS = [
+const MOCK_PRODUCTS: Product[] = [
   {
     id: 1,
     name: "Producto Test 1",
@@ -29,7 +39,7 @@ const MOCK_PRODUCTS = [
 // Opciones de filtro estáticas
 const CATEGORY_OPTIONS = ["Electrónicos", "Ropa", "Hogar", "Deportes"];
 
-const CrudBasicResponsive = () => {
+const CrudBasicResponsive: React.FC = () => {
   // Handlers optimizados con useCallback
   const handleEdit = useCallback((productName) => {
     console.log(`Editando: ${productName}`);

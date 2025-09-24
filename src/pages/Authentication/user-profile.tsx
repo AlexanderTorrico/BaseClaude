@@ -16,12 +16,11 @@ import {
 // Formik Validation
 import * as Yup from "yup";
 import { useFormik } from "formik";
+import { withTranslation } from "react-i18next";
 
 //redux
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { User } from "@/models";
 
-import withRouter from "../../components/Common/withRouter";
 
 //Import Breadcrumb
 import Breadcrumb from "../../components/Common/Breadcrumb";
@@ -179,4 +178,5 @@ const UserProfile: React.FC<UserProfileProps> = (props) => {
   );
 };
 
-export default withRouter(UserProfile);
+export default withTranslation()(UserProfile);
+//export default withRouter(UserProfile);

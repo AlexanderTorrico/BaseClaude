@@ -1,11 +1,31 @@
-import PropTypes from "prop-types";
+import React from "react";
 import { Button } from "reactstrap";
 import { AzTable, AzTableColumns } from "../../../../components/aziende/AzTable";
 import FilterSummary from "../../../../components/aziende/AzFilterSummary";
 import TableWithFilter from "./examples/TableWithFilter";
 import TableWithoutFilter from "./examples/TableWithoutFilter";
 
-const Table = (props) => {
+interface TableProps {
+  data?: any[];
+  columns?: any[];
+  selectedItems?: any[];
+  onSelectedChange?: (items: any[]) => void;
+  pagination?: boolean;
+  sorting?: {
+    field?: string;
+    direction?: 'asc' | 'desc';
+  };
+  onSortChange?: (sorting: { field?: string; direction?: 'asc' | 'desc' }) => void;
+  filters?: Record<string, any>;
+  onFilterChange?: (key: string, value: any) => void;
+  className?: string;
+  tableProps?: any;
+  children?: React.ReactNode;
+  showActions?: boolean;
+  components?: React.ReactNode;
+}
+
+const Table: React.FC<TableProps> = (props) => {
   // Para pruebas - usar datos de ejemplo si no se proporcionan props
   if (Object.keys(props).length === 0) {
     // Para probar el mensaje de "sin datos", descomenta la línea siguiente y comenta el array de datos
@@ -281,22 +301,7 @@ const Table = (props) => {
   return <AzTable {...props} />;
 };
 
-Table.propTypes = {
-  data: PropTypes.array,
-  columns: PropTypes.array,
-  selectedItems: PropTypes.array,
-  onSelectedChange: PropTypes.func,
-  pagination: PropTypes.bool,
-  sorting: PropTypes.object,
-  onSortChange: PropTypes.func,
-  filters: PropTypes.object,
-  onFilterChange: PropTypes.func,
-  className: PropTypes.string,
-  tableProps: PropTypes.object,
-  children: PropTypes.node,
-  showActions: PropTypes.bool,
-  components: PropTypes.node
-};
+// TypeScript interfaces replace PropTypes
 
 // Asignar subcomponentes para compatibilidad
 Table.Actions = AzTable.Actions;

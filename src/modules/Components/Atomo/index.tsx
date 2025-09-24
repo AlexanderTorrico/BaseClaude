@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import React, { useState } from "react";
 import {
   Container,
@@ -32,9 +31,11 @@ import {
 import IconExamples, { getSimplifiedName, TextIcon } from "../../../components/Atoms/IconExample";
 
 //i18n
-import { withTranslation } from "react-i18next";
+import { withTranslation, WithTranslation } from "react-i18next";
 
-const Atomo = (props) => {
+interface AtomoProps extends WithTranslation {}
+
+const Atomo: React.FC<AtomoProps> = (props) => {
   const [inputValue, setInputValue] = useState('');
   const [checkboxValue, setCheckboxValue] = useState(false);
 
@@ -491,8 +492,6 @@ const Atomo = (props) => {
   );
 };
 
-Atomo.propTypes = {
-  t: PropTypes.any,
-};
+// TypeScript interfaces replace PropTypes
 
 export default withTranslation()(Atomo);

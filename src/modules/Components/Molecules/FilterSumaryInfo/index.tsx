@@ -2,7 +2,21 @@ import React, { useState } from "react";
 import { Container, Row, Col, Card, CardBody, Badge, CardHeader } from "reactstrap";
 import FilterSummary from "../../../../components/aziende/AzFilterSummary";
 
-const UserCard = ({ user }) => {
+interface User {
+  id: number;
+  nombre: string;
+  email: string;
+  estado: string;
+  departamento: string;
+  edad: number;
+  fechaIngreso: string;
+}
+
+interface UserCardProps {
+  user: User;
+}
+
+const UserCard: React.FC<UserCardProps> = ({ user }) => {
   const getStatusColor = (status) => {
     const colors = {
       'Activo': 'success',
@@ -49,7 +63,7 @@ const UserCard = ({ user }) => {
   );
 };
 
-const FilterSumaryInfo = () => {
+const FilterSumaryInfo: React.FC = () => {
   const [users] = useState([
     {
       id: 1,

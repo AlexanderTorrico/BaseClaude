@@ -1,4 +1,3 @@
-import React from "react";
 import { Navigate } from "react-router-dom";
 
 // // Authentication related pages
@@ -25,36 +24,35 @@ import PageApi from "../modules/Components/PageApi/index";
 
 
 const authProtectedRoutes = [
-  { path: "/dashboard", component: <Dashboard /> },
-  { path: "/profile", component: <UserProfile /> },
-  { path: "/crud_basic", component: <CrudBasic /> },
-  { path: "/crud_modern", component: <CrudModern /> },
-  { path: "/crud_v1", component: <CrudV1 /> },
-  { path: "/crud_v2", component: <CrudV2 /> },
-  { path: "/atomo", component: <Atomo /> },
-
+  { path: "/dashboard", component: Dashboard },
+  { path: "/profile", component: UserProfile },
+  { path: "/crud_basic", component: CrudBasic },
+  { path: "/crud_modern", component: CrudModern },
+  { path: "/crud_v1", component: CrudV1 },
+  { path: "/crud_v2", component: CrudV2 },
+  { path: "/atomo", component: Atomo },
 
   // Molecules
-  { path: "/header_view_type", component: <HeaderViewType /> },
-  { path: "/table", component: <Table /> },
-  { path: "/molecules/filter-sumary-info", component: <FilterSumaryInfo /> },
+  { path: "/header_view_type", component: HeaderViewType },
+  { path: "/table", component: Table },
+  { path: "/molecules/filter-sumary-info", component: FilterSumaryInfo },
 
   // Pages
-  { path: "/pages/crud-basic-responsive", component: <CrudBasicResponsive /> },
+  { path: "/pages/crud-basic-responsive", component: CrudBasicResponsive },
 
-  { path: "/page-api", component: <PageApi /> },
+  { path: "/page-api", component: PageApi },
   //Security
-  { path: "/security-user", component: <User /> },
+  { path: "/security-user", component: User },
 
   //   // this route should be at the end of all other routes
   //   // eslint-disable-next-line react/display-name
-  { path: "/", exact: true, component: <Navigate to="/dashboard" /> },
+  { path: "/", exact: true, component: () => <Navigate to="/dashboard" /> },
 ];
 
 const publicRoutes = [
-  { path: "/login", component: <Login /> },
-  { path: "/forgot-password", component: <ForgetPwd /> },
-  { path: "/register", component: <Register /> },
+  { path: "/login", component: Login },
+  { path: "/forgot-password", component: ForgetPwd },
+  { path: "/register", component: Register },
 ];
 
 // export { authProtectedRoutes, publicRoutes };

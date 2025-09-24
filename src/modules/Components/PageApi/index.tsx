@@ -1,10 +1,11 @@
 import React from "react";
-import { withTranslation } from "react-i18next";
+import { withTranslation, WithTranslation } from "react-i18next";
 import { Button, Container } from "reactstrap";
 import { AzHeaderCard } from "../../../components/aziende/AzHeader";
 
+interface PageApiProps extends WithTranslation {}
 
-const PageApi = () =>{
+const PageApi: React.FC<PageApiProps> = () => {
 
     return (
         <React.Fragment>

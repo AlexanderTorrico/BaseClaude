@@ -22,7 +22,9 @@
       "Bash(timeout 15 npm run dev)",
       "Bash(npm run lint:*)",
       "Bash(tree:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run:*)"
     ],
     "deny": []
   }

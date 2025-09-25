@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+// ==========================================
+// LOGIN FORM WITH REDUX - EXAMPLE IMPLEMENTATION
+// ==========================================
+
+import React from 'react';
 import { Form } from 'reactstrap';
-import { useNavigate } from 'react-router-dom';
 import { EmailField } from './EmailField';
 import { PasswordField } from './PasswordField';
 import { RememberMeCheckbox } from './RememberMeCheckbox';
@@ -10,33 +13,33 @@ import { useLoginForm } from '../hooks/useLoginForm';
 import { useUserAuth } from '../hooks/useUserAuth';
 import type { LoginCredentials } from '../models';
 
-interface LoginFormProps {
+interface LoginFormWithReduxProps {
   onSuccess?: () => void;
   onError?: (error: string) => void;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({
+export const LoginFormWithRedux: React.FC<LoginFormWithReduxProps> = ({
   onSuccess,
   onError
 }) => {
-  const [generalError, setGeneralError] = useState<string>('');
   const {
     formData,
     setField,
     validateForm,
-    resetForm,
-    setSubmitting,
-    getFormValues
+    resetForm
   } = useLoginForm();
 
-  // Use Redux auth hook
-  const { login, isLoading: reduxLoading, error: reduxError, clearAuthError } = useUserAuth();
+  const {
+    login,
+    isLoading,
+    error,
+    clearAuthError
+  } = useUserAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Clear previous errors
-    setGeneralError('');
+    // Clear previous Redux error
     clearAuthError();
 
     // Validate form
@@ -45,12 +48,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     }
 
     try {
-      setSubmitting(true);
-
       // Get sanitized form values
-      const credentials = getFormValues();
+      const credentials: LoginCredentials = {
+        email: formData.email,
+        password: formData.password,
+        rememberMe: formData.rememberMe
+      };
 
-      // Execute login with Redux
+      // Execute login using Redux
       const result = await login(credentials);
 
       if (result.success) {
@@ -58,50 +63,32 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         onSuccess?.();
         // Reset form
         resetForm();
-        // Navigation is handled by useUserAuth hook
       } else {
         // Handle login error
-        const errorMsg = result.error || 'Error al iniciar sesión';
-        setGeneralError(errorMsg);
-        onError?.(errorMsg);
+        onError?.(result.error || 'Error al iniciar sesión');
       }
     } catch (error: any) {
       const errorMessage = error.message || 'Error inesperado al iniciar sesión';
-      setGeneralError(errorMessage);
       onError?.(errorMessage);
-    } finally {
-      setSubmitting(false);
     }
   };
 
   const handleFieldChange = (field: keyof LoginCredentials) => (value: any) => {
-    // Clear errors when user starts typing
-    if (generalError) {
-      setGeneralError('');
-    }
-    if (reduxError) {
+    // Clear Redux error when user starts typing
+    if (error) {
       clearAuthError();
     }
     setField(field, value);
   };
 
-  // Combine loading states
-  const isSubmitting = formData.isSubmitting || reduxLoading;
-
-  // Combine errors - prioritize form validation errors, then Redux errors, then general errors
-  const displayError = generalError || reduxError;
-
   return (
     <div className="p-2">
       <Form className="form-horizontal" onSubmit={handleSubmit}>
-        {/* Combined Error Alert */}
+        {/* Redux Error Alert */}
         <LoginAlert
-          message={displayError || ''}
+          message={error || ''}
           type="error"
-          onDismiss={() => {
-            setGeneralError('');
-            clearAuthError();
-          }}
+          onDismiss={clearAuthError}
         />
 
         {/* Email Field */}
@@ -109,7 +96,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           value={formData.email}
           onChange={handleFieldChange('email')}
           error={formData.errors.email}
-          disabled={isSubmitting}
+          disabled={isLoading}
         />
 
         {/* Password Field */}
@@ -117,7 +104,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           value={formData.password}
           onChange={handleFieldChange('password')}
           error={formData.errors.password}
-          disabled={isSubmitting}
+          disabled={isLoading}
         />
 
         {/* Remember Me Checkbox */}
@@ -125,7 +112,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           <RememberMeCheckbox
             checked={formData.rememberMe || false}
             onChange={handleFieldChange('rememberMe')}
-            disabled={isSubmitting}
+            disabled={isLoading}
           />
         </div>
 
@@ -141,8 +128,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         {/* Submit Button */}
         <div className="mt-3 d-grid">
           <LoginButton
-            loading={isSubmitting}
-            disabled={isSubmitting}
+            loading={isLoading}
+            disabled={isLoading}
           />
         </div>
 

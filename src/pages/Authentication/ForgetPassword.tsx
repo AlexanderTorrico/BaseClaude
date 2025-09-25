@@ -24,8 +24,8 @@ import withRouter from "../../components/Common/withRouter";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 
-// action
-import { forgotPassword } from "/src/store/authSlice";
+// action - Use modern Authentication module
+import { forgotPassword } from "@/pages/Authentication";
 
 // import images
 import profile from "../../assets/images/profile-img.png";

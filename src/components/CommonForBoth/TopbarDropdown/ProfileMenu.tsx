@@ -13,7 +13,7 @@ import { withTranslation } from "react-i18next";
 import { connect, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import withRouter from "../../Common/withRouter";
-import { logoutUser } from "../../../store/authSlice";
+import { logoutUser } from "@/pages/Authentication";
 
 // users
 import user1 from "../../../assets/images/users/avatar-1.jpg";

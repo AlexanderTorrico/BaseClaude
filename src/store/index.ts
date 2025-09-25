@@ -1,25 +1,29 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-// Use new Authentication module reducer instead of old authSlice
+// Import modern modular reducers
 import { authReducer } from '@/pages/Authentication';
-// Use new Login module user reducer for authenticated user state
-import userReducer from '../pages/Login/slices/userSlice';
+import { userReducer } from '@/pages/Login';
 import layoutReducer from './layoutSlice';
 import usersReducer from './usersSlice';
 import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Hooks/crudBasicSlice';
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
-    user: userReducer,
-    layout: layoutReducer,
-    users: usersReducer,
-    crudBasic: crudBasicReducer,
+    // Authentication modules
+    auth: authReducer,           // Registration, forgot password, etc.
+    user: userReducer,           // Current logged user state
+
+    // Application modules
+    layout: layoutReducer,       // UI layout state
+    users: usersReducer,         // Users CRUD operations
+    crudBasic: crudBasicReducer, // Basic CRUD functionality
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
+        // Ignore non-serializable values in these actions
         ignoredActions: [
+          // Auth module actions
           'auth/loginUser/pending',
           'auth/loginUser/rejected',
           'auth/logoutUser/pending',
@@ -27,6 +31,7 @@ export const store = configureStore({
           'auth/registerUser/rejected',
           'auth/forgotPassword/rejected',
           'auth/updateProfile/rejected',
+          // User module actions
           'user/loginStart',
           'user/loginSuccess',
           'user/loginFailure',

@@ -7,8 +7,8 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 
-// action
-import { registerUser, clearError } from "/src/store/authSlice";
+// action - Use modern Authentication module
+import { registerUser, clearError } from "@/pages/Authentication";
 
 import { Link } from "react-router-dom";
 

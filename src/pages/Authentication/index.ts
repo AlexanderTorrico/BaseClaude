@@ -2,8 +2,21 @@
 // AUTHENTICATION MODULE EXPORTS
 // ==========================================
 
-// Redux Slice (used by store)
+// Redux Slice and Actions (used by store and components)
 export { default as authReducer } from './slices/authSlice';
+export {
+  loginUser,
+  registerUser,
+  forgotPassword,
+  logoutUser,
+  socialLogin,
+  updateProfile,
+  apiError,
+  clearError,
+  clearMessages,
+  setAuthenticated,
+  setUser
+} from './slices/authSlice';
 
 // Service Factory (used by App.tsx)
 export { AuthServiceFactory } from './services/AuthServiceFactory';

@@ -26,8 +26,8 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import Breadcrumb from "../../components/Common/Breadcrumb";
 
 import avatar from "../../assets/images/users/avatar-1.jpg";
-// actions
-import { updateProfile, clearMessages } from "/src/store/authSlice";
+// actions - Use modern Authentication module
+import { updateProfile, clearMessages } from "@/pages/Authentication";
 
 interface UserProfileProps {
   router: {

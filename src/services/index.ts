@@ -1,6 +1,5 @@
 export { BackendServiceFactory } from './backendService';
-export { FakeBackendService } from './fakeBackendService';
-export { RealBackendService } from './realBackendService';
+export { SimpleBackendService } from './simpleBackendService';
 export type { IBackendService } from './backendService';
 export { BackendType } from '@/models/api.types';
 export { createApiInstance, handleRequest } from './httpService';

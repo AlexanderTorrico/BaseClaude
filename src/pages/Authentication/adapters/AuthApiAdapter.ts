@@ -10,20 +10,10 @@ import {
   ForgotPasswordEntity,
   IAuthRepository
 } from '../models';
-import { AuthHttpService } from '../services/AuthHttpService';
+import * as AuthHttpService from '../services/AuthHttpService';
 
 // Adapter Pattern - Translates between domain and external API
 export class AuthApiAdapter implements IAuthRepository {
-  private authHttpService: AuthHttpService;
-
-  constructor() {
-    // Initialize dedicated auth HTTP service
-    this.authHttpService = new AuthHttpService({
-      baseURL: import.meta.env.VITE_APP_API_URL || import.meta.env.VITE_API_BASE_URL,
-      timeout: import.meta.env.VITE_API_TIMEOUT,
-      debug: import.meta.env.VITE_DEBUG_API === 'true'
-    });
-  }
 
   // ==========================================
   // AUTHENTICATION METHODS
@@ -38,7 +28,7 @@ export class AuthApiAdapter implements IAuthRepository {
       }
 
       // Call dedicated auth HTTP service
-      const response = await this.authHttpService.login(login.toRequest());
+      const response = await AuthHttpService.login(login.toRequest());
 
       if (response.status === 200 && response.data) {
         // Adapt external response to domain entity
@@ -61,7 +51,7 @@ export class AuthApiAdapter implements IAuthRepository {
       }
 
       // Call dedicated auth HTTP service
-      const response = await this.authHttpService.register(register.toRequest());
+      const response = await AuthHttpService.register(register.toRequest());
 
       if (response.status === 200 && response.data) {
         // Adapt external response to domain entity
@@ -84,7 +74,7 @@ export class AuthApiAdapter implements IAuthRepository {
       }
 
       // Call dedicated auth HTTP service
-      const response = await this.authHttpService.forgotPassword(forgotPassword.email);
+      const response = await AuthHttpService.forgotPassword(forgotPassword.email);
 
       return {
         success: response.status === 200,
@@ -134,7 +124,7 @@ export class AuthApiAdapter implements IAuthRepository {
 
   async updateProfile(userId: string | number, data: Partial<AuthUser>): Promise<AuthUser> {
     try {
-      const response = await this.authHttpService.updateProfile(data);
+      const response = await AuthHttpService.updateProfile(data);
 
       if (response.status === 200 && response.data) {
         // Update local storage

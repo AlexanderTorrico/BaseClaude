@@ -4,4 +4,4 @@
 // ==========================================
 
 export { AuthServiceFactory } from './AuthServiceFactory';
-export { AuthHttpService } from './AuthHttpService';
+export * as AuthHttpService from './AuthHttpService';

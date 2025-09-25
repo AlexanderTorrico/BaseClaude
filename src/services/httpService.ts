@@ -42,3 +42,10 @@ export const handleRequest = async <T>(
     };
   }
 };
+
+/**
+ * Creates AbortController for request cancellation
+ */
+export const loadAbort = (): AbortController => {
+  return new AbortController();
+};

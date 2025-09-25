@@ -27,16 +27,17 @@ export class AuthApiAdapter implements IAuthRepository {
         return LoginResult.failure(errors.join(', '));
       }
 
-      // Call dedicated auth HTTP service
-      const response = await AuthHttpService.login(login.toRequest());
+      // Call dedicated auth HTTP service - now returns AxiosCallModel
+      const axiosCall = AuthHttpService.login(login.toRequest());
+      const response = await axiosCall.call;
 
-      if (response.status === 200 && response.data) {
+      if (response.data.status === 200 && response.data.data) {
         // Adapt external response to domain entity
-        const authUser = this.adaptResponseToAuthUser(response.data);
+        const authUser = this.adaptResponseToAuthUser(response.data.data);
         return LoginResult.success(authUser);
       }
 
-      return LoginResult.failure(response.message || 'Login failed');
+      return LoginResult.failure(response.data.message || 'Login failed');
     } catch (error: any) {
       return LoginResult.failure(this.adaptErrorMessage(error));
     }
@@ -50,16 +51,17 @@ export class AuthApiAdapter implements IAuthRepository {
         return LoginResult.failure(errors.join(', '));
       }
 
-      // Call dedicated auth HTTP service
-      const response = await AuthHttpService.register(register.toRequest());
+      // Call dedicated auth HTTP service - now returns AxiosCallModel
+      const axiosCall = AuthHttpService.register(register.toRequest());
+      const response = await axiosCall.call;
 
-      if (response.status === 200 && response.data) {
+      if (response.data.status === 200 && response.data.data) {
         // Adapt external response to domain entity
-        const authUser = this.adaptResponseToAuthUser(response.data);
+        const authUser = this.adaptResponseToAuthUser(response.data.data);
         return LoginResult.success(authUser);
       }
 
-      return LoginResult.failure(response.message || 'Registration failed');
+      return LoginResult.failure(response.data.message || 'Registration failed');
     } catch (error: any) {
       return LoginResult.failure(this.adaptErrorMessage(error));
     }
@@ -73,12 +75,13 @@ export class AuthApiAdapter implements IAuthRepository {
         return { success: false, message: validationError };
       }
 
-      // Call dedicated auth HTTP service
-      const response = await AuthHttpService.forgotPassword(forgotPassword.email);
+      // Call dedicated auth HTTP service - now returns AxiosCallModel
+      const axiosCall = AuthHttpService.forgotPassword(forgotPassword.email);
+      const response = await axiosCall.call;
 
       return {
-        success: response.status === 200,
-        message: response.message || 'Reset link sent to your mailbox'
+        success: response.data.status === 200,
+        message: response.data.message || 'Reset link sent to your mailbox'
       };
     } catch (error: any) {
       return {
@@ -124,9 +127,11 @@ export class AuthApiAdapter implements IAuthRepository {
 
   async updateProfile(userId: string | number, data: Partial<AuthUser>): Promise<AuthUser> {
     try {
-      const response = await AuthHttpService.updateProfile(data);
+      // Call dedicated auth HTTP service - now returns AxiosCallModel
+      const axiosCall = AuthHttpService.updateProfile(data);
+      const response = await axiosCall.call;
 
-      if (response.status === 200 && response.data) {
+      if (response.data.status === 200 && response.data.data) {
         // Update local storage
         const currentUser = await this.getCurrentUser();
         if (currentUser) {
@@ -151,7 +156,7 @@ export class AuthApiAdapter implements IAuthRepository {
         }
       }
 
-      throw new Error(response.message || 'Profile update failed');
+      throw new Error(response.data.message || 'Profile update failed');
     } catch (error: any) {
       throw new Error(this.adaptErrorMessage(error));
     }

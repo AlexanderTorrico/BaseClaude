@@ -5,7 +5,7 @@ interface EmailFieldProps {
   value: string;
   onChange: (value: string) => void;
   onBlur?: () => void;
-  error?: string;
+  error?: string | undefined;
   disabled?: boolean;
   placeholder?: string;
   label?: string;

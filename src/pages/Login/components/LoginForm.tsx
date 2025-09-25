@@ -8,6 +8,7 @@ import { LoginButton } from './LoginButton';
 import { LoginAlert } from './LoginAlert';
 import { useLoginForm } from '../hooks/useLoginForm';
 import { loginUseCase } from '../usecases/loginUseCase';
+import type { LoginCredentials } from '../models';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -73,7 +74,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     }
   };
 
-  const handleFieldChange = (field: keyof typeof formData) => (value: any) => {
+  const handleFieldChange = (field: keyof LoginCredentials) => (value: any) => {
     // Clear general error when user starts typing
     if (generalError) {
       setGeneralError('');

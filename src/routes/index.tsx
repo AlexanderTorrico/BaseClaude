@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 
 // // Authentication related pages
-import Login from "../pages/Authentication/Login";
+import { LoginPage } from "../pages/Login";
 import Register from "../pages/Authentication/Register";
 import ForgetPwd from "../pages/Authentication/ForgetPassword";
 import UserProfile from "../pages/Authentication/user-profile";
@@ -54,7 +54,7 @@ const authProtectedRoutes = [
 ];
 
 const publicRoutes = [
-  { path: "/login", component: Login },
+  { path: "/login", component: LoginPage },
   { path: "/forgot-password", component: ForgetPwd },
   { path: "/register", component: Register },
 ];

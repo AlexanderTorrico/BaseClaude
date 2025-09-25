@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 // Import modern modular reducers
 import { authReducer } from '@/pages/Authentication';
 import { userReducer } from '@/pages/Login';
+import { registerReducer } from '@/pages/Register';
 import layoutReducer from './layoutSlice';
 import usersReducer from './usersSlice';
 import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Hooks/crudBasicSlice';
@@ -12,6 +13,7 @@ export const store = configureStore({
     // Authentication modules
     auth: authReducer,           // Registration, forgot password, etc.
     user: userReducer,           // Current logged user state
+    register: registerReducer,   // User registration state
 
     // Application modules
     layout: layoutReducer,       // UI layout state
@@ -37,7 +39,11 @@ export const store = configureStore({
           'user/loginFailure',
           'user/logoutStart',
           'user/logoutSuccess',
-          'user/logoutFailure'
+          'user/logoutFailure',
+          // Register module actions
+          'register/registerStart',
+          'register/registerSuccess',
+          'register/registerFailure',
         ],
         ignoredActionPaths: ['meta.arg', 'payload'],
         ignoredPaths: ['auth.error', 'user.error', 'user.user'],

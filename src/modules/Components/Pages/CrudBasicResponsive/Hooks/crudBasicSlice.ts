@@ -1,14 +1,90 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { get, post, put, del } from '../../../../../helpers/api_helper';
+
+// Types
+interface Product {
+  id: string | number;
+  name?: string;
+  [key: string]: any;
+}
+
+interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+interface Sorting {
+  field: string;
+  direction: string;
+}
+
+interface Filters {
+  [key: string]: any;
+}
+
+interface FetchProductsParams {
+  page?: number;
+  limit?: number;
+  filters?: Filters;
+  sorting?: Sorting;
+}
+
+interface ApiResponse<T> {
+  data?: T[];
+  products?: T[];
+  pagination?: Partial<Pagination>;
+  [key: string]: any;
+}
+
+interface UpdateProductParams {
+  id: string | number;
+  productData: Partial<Product>;
+}
+
+interface CrudBasicState {
+  // Data
+  products: Product[];
+  currentProduct: Product | null;
+
+  // Pagination
+  pagination: Pagination;
+
+  // Filters and sorting
+  filters: Filters;
+  sorting: Sorting;
+
+  // UI states
+  loading: boolean;
+  creating: boolean;
+  updating: boolean;
+  deleting: boolean;
+
+  // Error handling
+  error: string | null;
+
+  // Success messages
+  successMessage: string | null;
+
+  // Selected items for bulk operations
+  selectedItems: (string | number)[];
+}
 
 // API endpoints
 const API_ENDPOINTS = {
   products: '/api/products',
-  product: (id) => `/api/products/${id}`,
+  product: (id: string | number) => `/api/products/${id}`,
 };
 
 // Async thunks for API calls
-export const fetchProducts = createAsyncThunk(
+export const fetchProducts = createAsyncThunk<
+  ApiResponse<Product>,
+  FetchProductsParams,
+  { rejectValue: { message: string } }
+>(
   'crudBasic/fetchProducts',
   async ({ page = 1, limit = 10, filters = {}, sorting = {} }, { rejectWithValue }) => {
     try {
@@ -21,62 +97,78 @@ export const fetchProducts = createAsyncThunk(
 
       const response = await get(`${API_ENDPOINTS.products}?${params}`);
       return response;
-    } catch (error) {
+    } catch (error: any) {
       return rejectWithValue(error.response?.data || { message: 'Error al obtener productos' });
     }
   }
 );
 
-export const createProduct = createAsyncThunk(
+export const createProduct = createAsyncThunk<
+  Product,
+  Partial<Product>,
+  { rejectValue: { message: string } }
+>(
   'crudBasic/createProduct',
   async (productData, { rejectWithValue }) => {
     try {
       const response = await post(API_ENDPOINTS.products, productData);
       return response;
-    } catch (error) {
+    } catch (error: any) {
       return rejectWithValue(error.response?.data || { message: 'Error al crear producto' });
     }
   }
 );
 
-export const updateProduct = createAsyncThunk(
+export const updateProduct = createAsyncThunk<
+  Product,
+  UpdateProductParams,
+  { rejectValue: { message: string } }
+>(
   'crudBasic/updateProduct',
   async ({ id, productData }, { rejectWithValue }) => {
     try {
       const response = await put(API_ENDPOINTS.product(id), productData);
       return response;
-    } catch (error) {
+    } catch (error: any) {
       return rejectWithValue(error.response?.data || { message: 'Error al actualizar producto' });
     }
   }
 );
 
-export const deleteProduct = createAsyncThunk(
+export const deleteProduct = createAsyncThunk<
+  string | number,
+  string | number,
+  { rejectValue: { message: string } }
+>(
   'crudBasic/deleteProduct',
   async (id, { rejectWithValue }) => {
     try {
       await del(API_ENDPOINTS.product(id));
       return id;
-    } catch (error) {
+    } catch (error: any) {
       return rejectWithValue(error.response?.data || { message: 'Error al eliminar producto' });
     }
   }
 );
 
-export const getProduct = createAsyncThunk(
+export const getProduct = createAsyncThunk<
+  Product,
+  string | number,
+  { rejectValue: { message: string } }
+>(
   'crudBasic/getProduct',
   async (id, { rejectWithValue }) => {
     try {
       const response = await get(API_ENDPOINTS.product(id));
       return response;
-    } catch (error) {
+    } catch (error: any) {
       return rejectWithValue(error.response?.data || { message: 'Error al obtener producto' });
     }
   }
 );
 
 // Initial state
-const initialState = {
+const initialState: CrudBasicState = {
   // Data
   products: [],
   currentProduct: null,
@@ -129,11 +221,11 @@ const crudBasicSlice = createSlice({
     },
 
     // Filters and sorting
-    setFilters: (state, action) => {
+    setFilters: (state, action: PayloadAction<Filters>) => {
       state.filters = action.payload;
     },
 
-    setSorting: (state, action) => {
+    setSorting: (state, action: PayloadAction<Sorting>) => {
       state.sorting = action.payload;
     },
 
@@ -143,21 +235,21 @@ const crudBasicSlice = createSlice({
     },
 
     // Pagination
-    setCurrentPage: (state, action) => {
+    setCurrentPage: (state, action: PayloadAction<number>) => {
       state.pagination.currentPage = action.payload;
     },
 
-    setItemsPerPage: (state, action) => {
+    setItemsPerPage: (state, action: PayloadAction<number>) => {
       state.pagination.itemsPerPage = action.payload;
       state.pagination.currentPage = 1; // Reset to first page
     },
 
     // Selection management
-    setSelectedItems: (state, action) => {
+    setSelectedItems: (state, action: PayloadAction<(string | number)[]>) => {
       state.selectedItems = action.payload;
     },
 
-    toggleSelectItem: (state, action) => {
+    toggleSelectItem: (state, action: PayloadAction<string | number>) => {
       const itemId = action.payload;
       const index = state.selectedItems.indexOf(itemId);
       if (index > -1) {
@@ -176,19 +268,19 @@ const crudBasicSlice = createSlice({
     },
 
     // Local data manipulation (optimistic updates)
-    addProductLocal: (state, action) => {
+    addProductLocal: (state, action: PayloadAction<Product>) => {
       state.products.unshift(action.payload);
       state.pagination.totalItems += 1;
     },
 
-    updateProductLocal: (state, action) => {
+    updateProductLocal: (state, action: PayloadAction<Product>) => {
       const index = state.products.findIndex(p => p.id === action.payload.id);
       if (index > -1) {
         state.products[index] = action.payload;
       }
     },
 
-    removeProductLocal: (state, action) => {
+    removeProductLocal: (state, action: PayloadAction<string | number>) => {
       const id = action.payload;
       state.products = state.products.filter(p => p.id !== id);
       state.selectedItems = state.selectedItems.filter(itemId => itemId !== id);
@@ -211,10 +303,10 @@ const crudBasicSlice = createSlice({
         const { pagination } = action.payload;
         if (pagination) {
           state.pagination = {
-            currentPage: pagination.currentPage || pagination.page || 1,
-            totalPages: pagination.totalPages || pagination.pages || 0,
-            totalItems: pagination.totalItems || pagination.total || 0,
-            itemsPerPage: pagination.itemsPerPage || pagination.limit || 10,
+            currentPage: pagination.currentPage || 1,
+            totalPages: pagination.totalPages || 0,
+            totalItems: pagination.totalItems || 0,
+            itemsPerPage: pagination.itemsPerPage || 10,
             hasNextPage: pagination.hasNextPage || false,
             hasPrevPage: pagination.hasPrevPage || false
           };
@@ -235,7 +327,7 @@ const crudBasicSlice = createSlice({
         state.creating = true;
         state.error = null;
       })
-      .addCase(createProduct.fulfilled, (state, action) => {
+      .addCase(createProduct.fulfilled, (state) => {
         state.creating = false;
         // Note: We might need to refetch data instead of adding locally
         // depending on pagination and filters
@@ -330,31 +422,31 @@ export const {
   removeProductLocal
 } = crudBasicSlice.actions;
 
-// Selectors
-export const selectProducts = (state) => state.crudBasic.products;
-export const selectCurrentProduct = (state) => state.crudBasic.currentProduct;
-export const selectPagination = (state) => state.crudBasic.pagination;
-export const selectFilters = (state) => state.crudBasic.filters;
-export const selectSorting = (state) => state.crudBasic.sorting;
-export const selectLoading = (state) => state.crudBasic.loading;
-export const selectCreating = (state) => state.crudBasic.creating;
-export const selectUpdating = (state) => state.crudBasic.updating;
-export const selectDeleting = (state) => state.crudBasic.deleting;
-export const selectError = (state) => state.crudBasic.error;
-export const selectSuccessMessage = (state) => state.crudBasic.successMessage;
-export const selectSelectedItems = (state) => state.crudBasic.selectedItems;
+// Selectors - using any for now to maintain compatibility
+export const selectProducts = (state: any) => state.crudBasic.products;
+export const selectCurrentProduct = (state: any) => state.crudBasic.currentProduct;
+export const selectPagination = (state: any) => state.crudBasic.pagination;
+export const selectFilters = (state: any) => state.crudBasic.filters;
+export const selectSorting = (state: any) => state.crudBasic.sorting;
+export const selectLoading = (state: any) => state.crudBasic.loading;
+export const selectCreating = (state: any) => state.crudBasic.creating;
+export const selectUpdating = (state: any) => state.crudBasic.updating;
+export const selectDeleting = (state: any) => state.crudBasic.deleting;
+export const selectError = (state: any) => state.crudBasic.error;
+export const selectSuccessMessage = (state: any) => state.crudBasic.successMessage;
+export const selectSelectedItems = (state: any) => state.crudBasic.selectedItems;
 
 // Compound selectors
-export const selectIsLoading = (state) =>
+export const selectIsLoading = (state: any) =>
   state.crudBasic.loading ||
   state.crudBasic.creating ||
   state.crudBasic.updating ||
   state.crudBasic.deleting;
 
-export const selectHasProducts = (state) => state.crudBasic.products.length > 0;
+export const selectHasProducts = (state: any) => state.crudBasic.products.length > 0;
 
-export const selectTotalPages = (state) => state.crudBasic.pagination.totalPages;
+export const selectTotalPages = (state: any) => state.crudBasic.pagination.totalPages;
 
-export const selectCanLoadMore = (state) => state.crudBasic.pagination.hasNextPage;
+export const selectCanLoadMore = (state: any) => state.crudBasic.pagination.hasNextPage;
 
 export default crudBasicSlice.reducer;

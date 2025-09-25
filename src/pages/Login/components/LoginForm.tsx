@@ -133,14 +133,44 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           />
         </div>
 
-        {/* Register Link */}
+        {/* Social Login Section */}
         <div className="mt-4 text-center">
-          <p className="mb-0">
-            ¿No tienes una cuenta?{' '}
-            <a href="/register" className="text-primary fw-semibold">
-              Regístrate
-            </a>
-          </p>
+          <h5 className="font-size-14 mb-3">Sign in with</h5>
+
+          <ul className="list-inline">
+            <li className="list-inline-item">
+              <a
+                href="#"
+                className="social-list-item bg-primary text-white border-primary"
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log('Facebook login - implement as needed');
+                }}
+              >
+                <i className="mdi mdi-facebook" />
+              </a>
+            </li>
+            <li className="list-inline-item">
+              <a
+                href="#"
+                className="social-list-item bg-danger text-white border-danger"
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log('Google login - implement as needed');
+                }}
+              >
+                <i className="mdi mdi-google" />
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        {/* Forgot Password Link */}
+        <div className="mt-4 text-center">
+          <a href="/forgot-password" className="text-muted">
+            <i className="mdi mdi-lock me-1" />
+            Forgot your password?
+          </a>
         </div>
       </Form>
     </div>

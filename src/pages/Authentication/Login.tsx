@@ -43,8 +43,8 @@ const Login: React.FC<LoginProps> = (props) => {
     enableReinitialize: true,
 
     initialValues: {
-      email: "admin@themesbrand.com",
-      password: "123456",
+      email: "admin@gmail.com",
+      password: "12345678",
     },
     validationSchema: Yup.object({
       email: Yup.string().required("Please Enter Your Email"),

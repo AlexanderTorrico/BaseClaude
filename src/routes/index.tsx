@@ -22,6 +22,8 @@ import FilterSumaryInfo from "../modules/Components/Molecules/FilterSumaryInfo/i
 import CrudBasicResponsive from "../modules/Components/Pages/CrudBasicResponsive/index";
 import PageApi from "../modules/Components/PageApi/index";
 
+import Users from "../modules/Security/Users/index";
+
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: Dashboard },
@@ -41,8 +43,10 @@ const authProtectedRoutes = [
   { path: "/pages/crud-basic-responsive", component: CrudBasicResponsive },
 
   { path: "/page-api", component: PageApi },
+
   //Security
   { path: "/security-user", component: User },
+  { path: "/users", component: Users },
 
   //   // this route should be at the end of all other routes
   //   // eslint-disable-next-line react/display-name

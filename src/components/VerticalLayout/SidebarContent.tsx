@@ -228,6 +228,15 @@ const SidebarContent = (props) => {
               </ul>
             </li>
 
+            <li className="menu-title">Seguridad</li>
+
+            <li>
+              <Link to="/users" className=" ">
+                <i className="bx bx-user"></i>
+                <span>Usuarios</span>
+              </Link>
+            </li>
+
             <li>
               <Link to="/page-api" className=" ">
                 <i className="bx bx-calendar"></i>

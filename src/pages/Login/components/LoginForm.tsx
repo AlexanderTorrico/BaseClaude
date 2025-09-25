@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Row, Col } from 'reactstrap';
+import { Form } from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
 import { EmailField } from './EmailField';
 import { PasswordField } from './PasswordField';

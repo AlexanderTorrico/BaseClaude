@@ -46,15 +46,22 @@ export const LoginAlert: React.FC<LoginAlertProps> = ({
 
   if (!message) return null;
 
+  // Create alert props conditionally
+  const alertProps: any = {
+    color: getAlertColor(),
+    isOpen: !!message,
+    className: "mb-3",
+    fade: true,
+    timeout: 150
+  };
+
+  // Only add toggle prop if dismissible and onDismiss exist
+  if (dismissible && onDismiss) {
+    alertProps.toggle = onDismiss;
+  }
+
   return (
-    <Alert
-      color={getAlertColor()}
-      isOpen={!!message}
-      toggle={dismissible ? onDismiss : undefined}
-      className="mb-3"
-      fade={true}
-      timeout={150}
-    >
+    <Alert {...alertProps}>
       <span className="me-2">{getAlertIcon()}</span>
       {message}
     </Alert>

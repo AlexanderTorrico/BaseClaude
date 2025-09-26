@@ -12,17 +12,17 @@ import {
 } from '../constants/layout'
 
 // DOM manipulation utilities (moved from saga)
-const changeBodyAttribute = (attribute, value) => {
+const changeBodyAttribute = (attribute: string, value: string) => {
   if (document.body) document.body.setAttribute(attribute, value)
   return true
 }
 
-const changeHtmlAttribute = (attribute, value) => {
+const changeHtmlAttribute = (attribute : string, value: string) => {
   if (document.documentElement) document.documentElement.setAttribute(attribute, value)
   return true
 }
 
-const manageBodyClass = (cssClass, action = 'toggle') => {
+const manageBodyClass = (cssClass: string, action = 'toggle') => {
   switch (action) {
     case 'add':
       if (document.body) document.body.classList.add(cssClass)
@@ -78,7 +78,7 @@ export const changeLayoutModeAsync = createAsyncThunk(
 
 export const changeLayoutWidthAsync = createAsyncThunk(
   'layout/changeLayoutWidth',
-  async (width, { dispatch }) => {
+  async (width : string, { dispatch }) => {
     if (width === 'boxed') {
       dispatch(changeSidebarTypeAsync({ sidebarType: 'icon' }))
       changeBodyAttribute('data-layout-size', width)
@@ -97,7 +97,7 @@ export const changeLayoutWidthAsync = createAsyncThunk(
 
 export const changeSidebarThemeAsync = createAsyncThunk(
   'layout/changeSidebarTheme',
-  async (theme) => {
+  async (theme :string ) => {
     changeBodyAttribute('data-sidebar', theme)
     return theme
   }
@@ -105,7 +105,7 @@ export const changeSidebarThemeAsync = createAsyncThunk(
 
 export const changeSidebarThemeImageAsync = createAsyncThunk(
   'layout/changeSidebarThemeImage',
-  async (theme) => {
+  async (theme : string) => {
     changeBodyAttribute('data-sidebar-image', theme)
     return theme
   }
@@ -113,7 +113,7 @@ export const changeSidebarThemeImageAsync = createAsyncThunk(
 
 export const changeTopbarThemeAsync = createAsyncThunk(
   'layout/changeTopbarTheme',
-  async (theme) => {
+  async (theme : string) => {
     changeBodyAttribute('data-topbar', theme)
     return theme
   }
@@ -121,7 +121,7 @@ export const changeTopbarThemeAsync = createAsyncThunk(
 
 export const changeSidebarTypeAsync = createAsyncThunk(
   'layout/changeSidebarType',
-  async ({ sidebarType, isMobile }) => {
+  async ({ sidebarType, isMobile }: { sidebarType: string; isMobile?: boolean }) => {
     switch (sidebarType) {
       case 'compact':
         changeBodyAttribute('data-sidebar-size', 'small')
@@ -159,7 +159,7 @@ export const changeSidebarTypeAsync = createAsyncThunk(
 
 export const showRightSidebarAsync = createAsyncThunk(
   'layout/showRightSidebar',
-  async (isOpen) => {
+  async (isOpen : boolean) => {
     if (isOpen) {
       manageBodyClass('right-bar-enabled', 'add')
     } else {

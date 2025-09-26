@@ -1,5 +1,24 @@
 @import "../../assets/scss/theme.scss";
 
+// Optimizations for smooth scrolling
+.right-bar {
+  transform: translate3d(0, 0, 0); // Hardware acceleration
+  backface-visibility: hidden; // Prevent flickering
+  -webkit-backface-visibility: hidden;
+  will-change: transform; // Optimize for scroll
+
+  // Optimize SimpleBar scrolling
+  .simplebar-content-wrapper {
+    overflow-scrolling: touch; // iOS smooth scrolling
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .simplebar-content {
+    transform: translate3d(0, 0, 0); // Hardware acceleration
+    will-change: transform;
+  }
+}
+
 .radio-toolbar {
   label {
     display: inline-block;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useCallback } from "react";
 import { Row, Col, FormGroup } from "reactstrap";
 
 import { connect } from "react-redux";
@@ -41,20 +41,70 @@ import {
   leftSideBarThemeTypes,
 } from "../../constants/layout";
 
-const RightSidebar = props => {
+const RightSidebar = memo((props) => {
+  const handleCloseRightbar = useCallback((e) => {
+    e.preventDefault();
+    props.showRightSidebarAction(false);
+  }, [props]);
+
+  // Optimized handlers for layout changes
+  const handleLayoutChange = useCallback((value) => {
+    props.changeLayout(value);
+  }, [props.changeLayout]);
+
+  const handleLayoutModeChange = useCallback((value) => {
+    props.changeLayoutMode(value);
+  }, [props.changeLayoutMode]);
+
+  const handleLayoutWidthChange = useCallback((value) => {
+    props.changeLayoutWidth(value);
+  }, [props.changeLayoutWidth]);
+
+  const handleSidebarThemeChange = useCallback((value) => {
+    props.changeSidebarTheme(value);
+  }, [props.changeSidebarTheme]);
+
+  const handleTopbarThemeChange = useCallback((value) => {
+    props.changeTopbarTheme(value);
+  }, [props.changeTopbarTheme]);
+
+  const handleSidebarTypeChange = useCallback((sidebarType) => {
+    props.changeSidebarTypeAsync({
+      sidebarType,
+      isMobile: window.innerWidth <= 768
+    });
+  }, [props.changeSidebarTypeAsync]);
+
+  const handlePreloaderToggle = useCallback(() => {
+    props.changePreloader(!props.isPreloader);
+  }, [props.changePreloader, props.isPreloader]);
+
+  const handleSidebarThemeImageChange = useCallback((value) => {
+    props.changeSidebarThemeImage(value);
+  }, [props.changeSidebarThemeImage]);
 
   return (
     <React.Fragment>
       <div className="right-bar" id="right-bar">
-        <SimpleBar style={{ height: "900px" }}>
-          <div data-simplebar className="h-100">
+        <SimpleBar
+          style={{
+            height: "100vh",
+            maxHeight: "100vh"
+          }}
+          autoHide={false}
+          forceVisible="y"
+          scrollableNodeProps={{
+            style: {
+              transform: "translate3d(0, 0, 0)", // Hardware acceleration
+              willChange: "transform" // Optimize for scroll
+            }
+          }}
+        >
+          <div className="h-100">
             <div className="rightbar-title px-3 py-4">
               <Link
                 to="#"
-                onClick={e => {
-                  e.preventDefault()
-                  props.showRightSidebarAction(false)
-                }}
+                onClick={handleCloseRightbar}
                 className="right-bar-toggle float-end"
               >
                 <i className="mdi mdi-close noti-icon" />
@@ -73,11 +123,7 @@ const RightSidebar = props => {
                   name="radioFruit"
                   value={layoutTypes.VERTICAL}
                   checked={props.layoutType === layoutTypes.VERTICAL}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      props.changeLayout(e.target.value);
-                    }
-                  }}
+                  onChange={e => e.target.checked && handleLayoutChange(e.target.value)}
                 />
                 <label className="me-1" htmlFor="radioVertical">Vertical</label>
                 <input
@@ -86,11 +132,7 @@ const RightSidebar = props => {
                   name="radioFruit"
                   value={layoutTypes.HORIZONTAL}
                   checked={props.layoutType === layoutTypes.HORIZONTAL}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      props.changeLayout(e.target.value);
-                    }
-                  }}
+                  onChange={e => e.target.checked && handleLayoutChange(e.target.value)}
                 />
                 <label htmlFor="radioHorizontal">Horizontal</label>
               </div>
@@ -104,11 +146,7 @@ const RightSidebar = props => {
                   name="radioLight"
                   value={layoutModeTypes.LIGHT}
                   checked={props.layoutModeType === layoutModeTypes.LIGHT}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      props.changeLayoutMode(e.target.value);
-                    }
-                  }}
+                  onChange={e => e.target.checked && handleLayoutModeChange(e.target.value)}
                 />
                 <label className="me-1" htmlFor="radioLight">Light</label>
                 <input
@@ -117,11 +155,7 @@ const RightSidebar = props => {
                   name="radioDark"
                   value={layoutModeTypes.DARK}
                   checked={props.layoutModeType === layoutModeTypes.DARK}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      props.changeLayoutMode(e.target.value);
-                    }
-                  }}
+                  onChange={e => e.target.checked && handleLayoutModeChange(e.target.value)}
                 />
                 <label htmlFor="radioDark">Dark</label>
               </div>
@@ -137,11 +171,7 @@ const RightSidebar = props => {
                   name="radioWidth"
                   value={layoutWidthTypes.FLUID}
                   checked={props.layoutWidth === layoutWidthTypes.FLUID}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      props.changeLayoutWidth(e.target.value);
-                    }
-                  }}
+                  onChange={e => e.target.checked && handleLayoutWidthChange(e.target.value)}
                 />
                 <label className="me-1" htmlFor="radioFluid">Fluid</label>
                 <input
@@ -150,11 +180,7 @@ const RightSidebar = props => {
                   name="radioWidth"
                   value={layoutWidthTypes.BOXED}
                   checked={props.layoutWidth === layoutWidthTypes.BOXED}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      props.changeLayoutWidth(e.target.value);
-                    }
-                  }}
+                  onChange={e => e.target.checked && handleLayoutWidthChange(e.target.value)}
                 />
                 <label htmlFor="radioBoxed" className="me-1">
                   Boxed
@@ -165,11 +191,7 @@ const RightSidebar = props => {
                   name="radioscrollable"
                   value={layoutWidthTypes.SCROLLABLE}
                   checked={props.layoutWidth === layoutWidthTypes.SCROLLABLE}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      props.changeLayoutWidth(e.target.value);
-                    }
-                  }}
+                  onChange={e => e.target.checked && handleLayoutWidthChange(e.target.value)}
                 />
                 <label htmlFor="radioscrollable">Scrollable</label>
               </div>
@@ -185,11 +207,7 @@ const RightSidebar = props => {
                   name="radioTheme"
                   value={topBarThemeTypes.LIGHT}
                   checked={props.topbarTheme === topBarThemeTypes.LIGHT}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      props.changeTopbarTheme(e.target.value);
-                    }
-                  }}
+                  onChange={e => e.target.checked && handleTopbarThemeChange(e.target.value)}
                 />
                 <label className="me-1" htmlFor="radioThemeLight">Light</label>
                 <input
@@ -198,11 +216,7 @@ const RightSidebar = props => {
                   name="radioTheme"
                   value={topBarThemeTypes.DARK}
                   checked={props.topbarTheme === topBarThemeTypes.DARK}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      props.changeTopbarTheme(e.target.value);
-                    }
-                  }}
+                  onChange={e => e.target.checked && handleTopbarThemeChange(e.target.value)}
                 />
                 <label className="me-1" htmlFor="radioThemeDark">Dark</label>
                 {props.layoutType === "vertical" ? null : (
@@ -237,12 +251,7 @@ const RightSidebar = props => {
                       name="sidebarType"
                       value={leftSidebarTypes.DEFAULT}
                       checked={props.leftSideBarType === leftSidebarTypes.DEFAULT}
-                      onChange={() => {
-                        props.changeSidebarTypeAsync({
-                          sidebarType: leftSidebarTypes.DEFAULT,
-                          isMobile: window.innerWidth <= 768
-                        });
-                      }}
+                      onChange={() => handleSidebarTypeChange(leftSidebarTypes.DEFAULT)}
                     />
                     <label className="me-1" htmlFor="sidebarDefault">Default</label>
                     <input
@@ -251,12 +260,7 @@ const RightSidebar = props => {
                       name="sidebarType"
                       value={leftSidebarTypes.COMPACT}
                       checked={props.leftSideBarType === leftSidebarTypes.COMPACT}
-                      onChange={() => {
-                        props.changeSidebarTypeAsync({
-                          sidebarType: leftSidebarTypes.COMPACT,
-                          isMobile: window.innerWidth <= 768
-                        });
-                      }}
+                      onChange={() => handleSidebarTypeChange(leftSidebarTypes.COMPACT)}
                     />
                     <label htmlFor="sidebarCompact" className="me-1">Compact</label>
                     <input
@@ -265,12 +269,7 @@ const RightSidebar = props => {
                       name="sidebarType"
                       value={leftSidebarTypes.ICON}
                       checked={props.leftSideBarType === leftSidebarTypes.ICON}
-                      onChange={() => {
-                        props.changeSidebarTypeAsync({
-                          sidebarType: leftSidebarTypes.ICON,
-                          isMobile: window.innerWidth <= 768
-                        });
-                      }}
+                      onChange={() => handleSidebarTypeChange(leftSidebarTypes.ICON)}
                     />
                     <label htmlFor="sidebarIcon">Icon</label>
                   </div>
@@ -289,11 +288,7 @@ const RightSidebar = props => {
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.LIGHT}
                           checked={props.leftSideBarTheme === leftSideBarThemeTypes.LIGHT}
-                          onChange={e => {
-                            if (e.target.checked) {
-                              props.changeSidebarTheme(e.target.value);
-                            }
-                          }}
+                          onChange={e => e.target.checked && handleSidebarThemeChange(e.target.value)}
                         />
                         <label
                           htmlFor="leftsidebarThemelight"
@@ -306,11 +301,7 @@ const RightSidebar = props => {
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.DARK}
                           checked={props.leftSideBarTheme === leftSideBarThemeTypes.DARK}
-                          onChange={e => {
-                            if (e.target.checked) {
-                              props.changeSidebarTheme(e.target.value);
-                            }
-                          }}
+                          onChange={e => e.target.checked && handleSidebarThemeChange(e.target.value)}
                         />
                         <label
                           htmlFor="leftsidebarThemedark"
@@ -323,11 +314,7 @@ const RightSidebar = props => {
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.COLORED}
                           checked={props.leftSideBarTheme === leftSideBarThemeTypes.COLORED}
-                          onChange={e => {
-                            if (e.target.checked) {
-                              props.changeSidebarTheme(e.target.value);
-                            }
-                          }}
+                          onChange={e => e.target.checked && handleSidebarThemeChange(e.target.value)}
                         />
                         <label
                           htmlFor="leftsidebarThemecolored"
@@ -344,11 +331,7 @@ const RightSidebar = props => {
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.WINTER}
                           checked={props.leftSideBarTheme === leftSideBarThemeTypes.WINTER}
-                          onChange={e => {
-                            if (e.target.checked) {
-                              props.changeSidebarTheme(e.target.value);
-                            }
-                          }}
+                          onChange={e => e.target.checked && handleSidebarThemeChange(e.target.value)}
                         />
                         <label
                           htmlFor="leftsidebarThemewinter"
@@ -361,11 +344,7 @@ const RightSidebar = props => {
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.LADYLIP}
                           checked={props.leftSideBarTheme === leftSideBarThemeTypes.LADYLIP}
-                          onChange={e => {
-                            if (e.target.checked) {
-                              props.changeSidebarTheme(e.target.value);
-                            }
-                          }}
+                          onChange={e => e.target.checked && handleSidebarThemeChange(e.target.value)}
                         />
                         <label
                           htmlFor="leftsidebarThemeladylip"
@@ -378,11 +357,7 @@ const RightSidebar = props => {
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.PLUMPLATE}
                           checked={props.leftSideBarTheme === leftSideBarThemeTypes.PLUMPLATE}
-                          onChange={e => {
-                            if (e.target.checked) {
-                              props.changeSidebarTheme(e.target.value);
-                            }
-                          }}
+                          onChange={e => e.target.checked && handleSidebarThemeChange(e.target.value)}
                         />
                         <label
                           htmlFor="leftsidebarThemeplumplate"
@@ -395,11 +370,7 @@ const RightSidebar = props => {
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.STRONGBLISS}
                           checked={props.leftSideBarTheme === leftSideBarThemeTypes.STRONGBLISS}
-                          onChange={e => {
-                            if (e.target.checked) {
-                              props.changeSidebarTheme(e.target.value);
-                            }
-                          }}
+                          onChange={e => e.target.checked && handleSidebarThemeChange(e.target.value)}
                         />
                         <label
                           htmlFor="leftsidebarThemestrongbliss"
@@ -411,11 +382,7 @@ const RightSidebar = props => {
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.GREATWHALE}
                           checked={props.leftSideBarTheme === leftSideBarThemeTypes.GREATWHALE}
-                          onChange={e => {
-                            if (e.target.checked) {
-                              props.changeSidebarTheme(e.target.value);
-                            }
-                          }}
+                          onChange={e => e.target.checked && handleSidebarThemeChange(e.target.value)}
                         />
                         <label
                           htmlFor="leftsidebarThemesgreatwhale"
@@ -435,11 +402,7 @@ const RightSidebar = props => {
                         name="leftsidebarThemeImage"
                         value={leftBarThemeImageTypes.IMG1}
                         checked={props.leftSideBarThemeImage === leftBarThemeImageTypes.IMG1}
-                        onChange={e => {
-                          if (e.target.checked) {
-                            props.changeSidebarThemeImage(e.target.value);
-                          }
-                        }}
+                        onChange={e => e.target.checked && handleSidebarThemeImageChange(e.target.value)}
                       />
 
                       <label htmlFor="leftsidebarThemebgimg1">
@@ -458,11 +421,7 @@ const RightSidebar = props => {
                         name="leftsidebarThemeImage"
                         value={leftBarThemeImageTypes.IMG2}
                         checked={props.leftSideBarThemeImage === leftBarThemeImageTypes.IMG2}
-                        onChange={e => {
-                          if (e.target.checked) {
-                            props.changeSidebarThemeImage(e.target.value);
-                          }
-                        }}
+                        onChange={e => e.target.checked && handleSidebarThemeImageChange(e.target.value)}
                       />
 
                       <label htmlFor="leftsidebarThemebgimg2">
@@ -481,11 +440,7 @@ const RightSidebar = props => {
                         name="leftsidebarThemeImage"
                         value={leftBarThemeImageTypes.IMG3}
                         checked={props.leftSideBarThemeImage === leftBarThemeImageTypes.IMG3}
-                        onChange={e => {
-                          if (e.target.checked) {
-                            props.changeSidebarThemeImage(e.target.value);
-                          }
-                        }}
+                        onChange={e => e.target.checked && handleSidebarThemeImageChange(e.target.value)}
                       />
 
                       <label htmlFor="leftsidebarThemebgimg3">
@@ -503,11 +458,7 @@ const RightSidebar = props => {
                         name="leftsidebarThemeImage"
                         value={leftBarThemeImageTypes.IMG4}
                         checked={props.leftSideBarThemeImage === leftBarThemeImageTypes.IMG4}
-                        onChange={e => {
-                          if (e.target.checked) {
-                            props.changeSidebarThemeImage(e.target.value);
-                          }
-                        }}
+                        onChange={e => e.target.checked && handleSidebarThemeImageChange(e.target.value)}
                       />
                       <label htmlFor="leftsidebarThemebgimg4">
                         <img
@@ -525,11 +476,7 @@ const RightSidebar = props => {
                         name="leftsidebarThemeImage"
                         value={leftBarThemeImageTypes.NONE}
                         checked={props.leftSideBarThemeImage === leftBarThemeImageTypes.NONE}
-                        onChange={e => {
-                          if (e.target.checked) {
-                            props.changeSidebarThemeImage(e.target.value);
-                          }
-                        }}
+                        onChange={e => e.target.checked && handleSidebarThemeImageChange(e.target.value)}
                       />
                       <label htmlFor="leftsidebarThemenone">
                         <div style={{ width: "40px", height: "80px" }}>
@@ -556,9 +503,7 @@ const RightSidebar = props => {
                     className="form-check-input checkbox"
                     id="checkbox_1"
                     checked={props.isPreloader}
-                    onChange={() => {
-                      props.changePreloader(!props.isPreloader);
-                    }}
+                    onChange={handlePreloaderToggle}
                   />
 
                   <label className="form-check-label" htmlFor="checkbox_1">
@@ -601,7 +546,7 @@ const RightSidebar = props => {
       <div className="rightbar-overlay"></div>
     </React.Fragment>
   );
-};
+});
 
 const mapStateToProps = state => {
   return { ...state.layout };

@@ -7,7 +7,7 @@ import {
   Card,
   Container,
 } from 'reactstrap';
-import { LoginForm } from './components/LoginForm';
+import { SimpleLoginForm } from './components/SimpleLoginForm';
 
 // Import images - same as original
 import profile from '../../assets/images/profile-img.png';
@@ -79,8 +79,8 @@ const LoginPage: React.FC = () => {
                     </Link>
                   </div>
 
-                  {/* Use our new LoginForm but with original styling container */}
-                  <LoginForm
+                  {/* Use our simplified LoginForm */}
+                  <SimpleLoginForm
                     onSuccess={handleLoginSuccess}
                     onError={handleLoginError}
                   />

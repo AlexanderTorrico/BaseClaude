@@ -3,14 +3,14 @@
 // ==========================================
 
 import React, { useEffect } from 'react';
-import { useUserAuth } from '../hooks/useUserAuth';
+import { useAuth } from '../../../hooks/auth/useAuth';
 
 interface AuthInitializerProps {
   children: React.ReactNode;
 }
 
 export const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
-  const { initializeAuth } = useUserAuth();
+  const { initializeAuth } = useAuth();
 
   useEffect(() => {
     // Initialize authentication state from storage on app startup

@@ -1,7 +1,3 @@
-// ==========================================
-// USE USER AUTH HOOK - CLEAN ARCHITECTURE
-// ==========================================
-
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -13,17 +9,15 @@ import {
   selectUserDisplayName,
   selectUserInitials,
   clearError
-} from '../slices';
+} from '../../pages/Login/slices';
 import {
   loginWithStateUseCase,
   logoutWithStateUseCase,
-  initializeUserFromStorageUseCase,
-  updateUserProfileUseCase,
-  resetUserStateUseCase
-} from '../usecases/userStateUseCase';
-import type { LoginCredentials, AuthUser } from '../models';
+  initializeUserFromStorageUseCase
+} from '../../pages/Login/usecases/userStateUseCase';
+import type { LoginCredentials, AuthUser } from '../../pages/Login/models';
 
-export const useUserAuth = () => {
+export const useAuth = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -38,12 +32,10 @@ export const useUserAuth = () => {
   // Login function
   const login = useCallback(async (credentials: LoginCredentials) => {
     try {
-      // Execute login with state management use case
       const loginWithState = loginWithStateUseCase();
       const result = await loginWithState(dispatch, credentials);
 
       if (result.success) {
-        // Navigate to dashboard
         navigate('/dashboard');
       }
 
@@ -57,16 +49,12 @@ export const useUserAuth = () => {
   // Logout function
   const logout = useCallback(async () => {
     try {
-      // Execute logout with state management use case
       const logoutWithState = logoutWithStateUseCase();
       const result = await logoutWithState(dispatch);
 
-      // Always navigate to login (even if server logout fails)
       navigate('/login');
-
       return result;
     } catch (error: any) {
-      // Navigate to login even on error
       navigate('/login');
       const errorMessage = error.message || 'Error al cerrar sesión';
       return { success: false, error: errorMessage };
@@ -78,7 +66,7 @@ export const useUserAuth = () => {
     dispatch(clearError());
   }, [dispatch]);
 
-  // Initialize from storage (useful for app startup)
+  // Initialize from storage
   const initializeAuth = useCallback(async () => {
     try {
       const initializeFromStorage = initializeUserFromStorageUseCase();
@@ -86,34 +74,6 @@ export const useUserAuth = () => {
       return result;
     } catch (error: any) {
       const errorMessage = error.message || 'Error al inicializar autenticación';
-      return { success: false, error: errorMessage };
-    }
-  }, [dispatch]);
-
-  // Update user profile
-  const updateProfile = useCallback(async (updates: Partial<AuthUser>) => {
-    if (!user) {
-      return { success: false, error: 'No authenticated user' };
-    }
-
-    try {
-      const updateProfile = updateUserProfileUseCase();
-      const result = await updateProfile(dispatch, updates, user);
-      return result;
-    } catch (error: any) {
-      const errorMessage = error.message || 'Error al actualizar perfil';
-      return { success: false, error: errorMessage };
-    }
-  }, [dispatch, user]);
-
-  // Reset user state
-  const resetAuth = useCallback(async () => {
-    try {
-      const resetState = resetUserStateUseCase();
-      const result = await resetState(dispatch);
-      return result;
-    } catch (error: any) {
-      const errorMessage = error.message || 'Error al resetear estado';
       return { success: false, error: errorMessage };
     }
   }, [dispatch]);
@@ -142,8 +102,6 @@ export const useUserAuth = () => {
     // Actions
     login,
     logout,
-    updateProfile,
-    resetAuth,
     clearAuthError,
     initializeAuth,
 

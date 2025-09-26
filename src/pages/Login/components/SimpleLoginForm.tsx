@@ -1,25 +1,30 @@
 import React, { useState } from 'react';
 import { Form } from 'reactstrap';
-import { useNavigate } from 'react-router-dom';
-import { EmailField } from './EmailField';
-import { PasswordField } from './PasswordField';
-import { RememberMeCheckbox } from './RememberMeCheckbox';
-import { LoginButton } from './LoginButton';
-import { LoginAlert } from './LoginAlert';
-import { useLoginForm } from '../hooks/useLoginForm';
-import { useUserAuth } from '../hooks/useUserAuth';
+import { FormField, LoadingButton, CheckboxField, AlertMessage } from '../../../components/Common/Form';
+import { useAuth } from '../../../hooks/auth/useAuth';
+import { useForm } from '../../../hooks/form/useForm';
+import { validateLoginForm } from '../utils/loginValidators';
+import { sanitizeLoginCredentials } from '../utils/loginHelpers';
 import type { LoginCredentials } from '../models';
 
-interface LoginFormProps {
+interface SimpleLoginFormProps {
   onSuccess?: () => void;
   onError?: (error: string) => void;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({
+const initialLoginData: LoginCredentials = {
+  email: '',
+  password: '',
+  rememberMe: false
+};
+
+export const SimpleLoginForm: React.FC<SimpleLoginFormProps> = ({
   onSuccess,
   onError
 }) => {
   const [generalError, setGeneralError] = useState<string>('');
+  const { login, isLoading, error, clearAuthError } = useAuth();
+
   const {
     formData,
     setField,
@@ -27,10 +32,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     resetForm,
     setSubmitting,
     getFormValues
-  } = useLoginForm();
-
-  // Use Redux auth hook
-  const { login, isLoading: reduxLoading, error: reduxError, clearAuthError } = useUserAuth();
+  } = useForm(initialLoginData);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,7 +42,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     clearAuthError();
 
     // Validate form
-    if (!validateForm()) {
+    if (!validateForm((data) => validateLoginForm(data))) {
       return;
     }
 
@@ -48,19 +50,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       setSubmitting(true);
 
       // Get sanitized form values
-      const credentials = getFormValues();
+      const credentials = sanitizeLoginCredentials(getFormValues());
 
-      // Execute login with Redux
+      // Execute login
       const result = await login(credentials);
 
       if (result.success) {
-        // Success callback
         onSuccess?.();
-        // Reset form
-        resetForm();
-        // Navigation is handled by useUserAuth hook
+        resetForm(initialLoginData);
       } else {
-        // Handle login error
         const errorMsg = result.error || 'Error al iniciar sesión';
         setGeneralError(errorMsg);
         onError?.(errorMsg);
@@ -75,27 +73,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   };
 
   const handleFieldChange = (field: keyof LoginCredentials) => (value: any) => {
-    // Clear errors when user starts typing
-    if (generalError) {
-      setGeneralError('');
-    }
-    if (reduxError) {
-      clearAuthError();
-    }
+    if (generalError) setGeneralError('');
+    if (error) clearAuthError();
     setField(field, value);
   };
 
-  // Combine loading states
-  const isSubmitting = formData.isSubmitting || reduxLoading;
-
-  // Combine errors - prioritize form validation errors, then Redux errors, then general errors
-  const displayError = generalError || reduxError;
+  const isSubmitting = formData.isSubmitting || isLoading;
+  const displayError = generalError || error;
 
   return (
     <div className="p-2">
       <Form className="form-horizontal" onSubmit={handleSubmit}>
-        {/* Combined Error Alert */}
-        <LoginAlert
+        {/* Error Alert */}
+        <AlertMessage
           message={displayError || ''}
           type="error"
           onDismiss={() => {
@@ -105,24 +95,33 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         />
 
         {/* Email Field */}
-        <EmailField
+        <FormField
+          label="Email"
+          type="email"
+          placeholder="Ingresa tu email"
           value={formData.email}
           onChange={handleFieldChange('email')}
           error={formData.errors.email}
           disabled={isSubmitting}
+          required
         />
 
         {/* Password Field */}
-        <PasswordField
+        <FormField
+          label="Contraseña"
+          type="password"
+          placeholder="Ingresa tu contraseña"
           value={formData.password}
           onChange={handleFieldChange('password')}
           error={formData.errors.password}
           disabled={isSubmitting}
+          required
         />
 
         {/* Remember Me Checkbox */}
-        <div className="float-end">
-          <RememberMeCheckbox
+        <div className="float-end mb-3">
+          <CheckboxField
+            label="Recordarme"
             checked={formData.rememberMe || false}
             onChange={handleFieldChange('rememberMe')}
             disabled={isSubmitting}
@@ -130,7 +129,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </div>
 
         {/* Forgot Password Link */}
-        <div className="text-end">
+        <div className="text-end mb-3">
           <p className="mb-0">
             <a href="/forgot-password" className="text-muted">
               ¿Olvidaste tu contraseña?
@@ -140,16 +139,20 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
         {/* Submit Button */}
         <div className="mt-3 d-grid">
-          <LoginButton
+          <LoadingButton
+            type="submit"
+            variant="primary"
             loading={isSubmitting}
             disabled={isSubmitting}
-          />
+            fullWidth
+          >
+            Iniciar Sesión
+          </LoadingButton>
         </div>
 
         {/* Social Login Section */}
         <div className="mt-4 text-center">
           <h5 className="font-size-14 mb-3">Sign in with</h5>
-
           <ul className="list-inline">
             <li className="list-inline-item">
               <a
@@ -178,7 +181,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           </ul>
         </div>
 
-        {/* Forgot Password Link */}
+        {/* Additional Forgot Password Link */}
         <div className="mt-4 text-center">
           <a href="/forgot-password" className="text-muted">
             <i className="mdi mdi-lock me-1" />

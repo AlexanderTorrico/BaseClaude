@@ -15,7 +15,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   text
 }) => {
   return (
-    <div className={`d-flex align-items-center ${className}`}>
+    <div className={`d-flex align-items-center justify-content-center ${className}`}>
       <Spinner size={size} color={color} />
       {text && <span className="ms-2">{text}</span>}
     </div>

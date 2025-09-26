@@ -11,34 +11,41 @@ import {
   leftSideBarThemeTypes,
 } from '../constants/layout'
 
-// DOM manipulation utilities (moved from saga)
-const changeBodyAttribute = (attribute: string, value: string) => {
-  if (document.body) document.body.setAttribute(attribute, value)
-  return true
+// DOM manipulation utilities
+const changeBodyAttribute = (attribute: string, value: string): void => {
+  document.body?.setAttribute(attribute, value)
 }
 
-const changeHtmlAttribute = (attribute : string, value: string) => {
-  if (document.documentElement) document.documentElement.setAttribute(attribute, value)
-  return true
+const changeHtmlAttribute = (attribute: string, value: string): void => {
+  document.documentElement?.setAttribute(attribute, value)
 }
 
-const manageBodyClass = (cssClass: string, action = 'toggle') => {
-  switch (action) {
-    case 'add':
-      if (document.body) document.body.classList.add(cssClass)
-      break
-    case 'remove':
-      if (document.body) document.body.classList.remove(cssClass)
-      break
-    default:
-      if (document.body) document.body.classList.toggle(cssClass)
-      break
+const manageBodyClass = (cssClass: string, action: 'add' | 'remove' = 'add'): void => {
+  if (!document.body) return
+
+  if (action === 'add') {
+    document.body.classList.add(cssClass)
+  } else {
+    document.body.classList.remove(cssClass)
   }
-  return true
 }
 
-// Initial state
-const initialState = {
+interface LayoutState {
+  layoutType: string
+  layoutModeType: string
+  layoutWidth: string
+  leftSideBarTheme: string
+  leftSideBarThemeImage: string
+  leftSideBarType: string
+  topbarTheme: string
+  isPreloader: boolean
+  showRightSidebar: boolean
+  isMobile: boolean
+  showSidebar: boolean
+  leftMenu: boolean
+}
+
+const initialState: LayoutState = {
   layoutType: layoutTypes.VERTICAL,
   layoutModeType: layoutModeTypes.LIGHT,
   layoutWidth: layoutWidthTypes.FLUID,
@@ -122,49 +129,46 @@ export const changeTopbarThemeAsync = createAsyncThunk(
 export const changeSidebarTypeAsync = createAsyncThunk(
   'layout/changeSidebarType',
   async ({ sidebarType, isMobile }: { sidebarType: string; isMobile?: boolean }) => {
+    // Reset common attributes and classes
+    changeBodyAttribute('data-sidebar-size', '')
+    manageBodyClass('sidebar-enable', 'remove')
+    manageBodyClass('vertical-collpsed', 'remove')
+
     switch (sidebarType) {
       case 'compact':
         changeBodyAttribute('data-sidebar-size', 'small')
-        manageBodyClass('sidebar-enable', 'remove')
-        manageBodyClass('vertical-collpsed', 'remove')
         break
+
       case 'icon':
-        changeBodyAttribute('data-sidebar-size', '')
         changeBodyAttribute('data-keep-enlarged', 'true')
         manageBodyClass('vertical-collpsed', 'add')
         break
+
       case 'condensed':
+        const isDesktop = window.innerWidth >= 992
         manageBodyClass('sidebar-enable', 'add')
-        if (window.screen.width >= 992) {
-          manageBodyClass('vertical-collpsed', 'remove')
-          manageBodyClass('sidebar-enable', 'remove')
+        if (isDesktop) {
           manageBodyClass('vertical-collpsed', 'add')
-          manageBodyClass('sidebar-enable', 'add')
         } else {
-          manageBodyClass('sidebar-enable', 'add')
           manageBodyClass('vertical-collpsed', 'add')
         }
         break
-      default:
-        changeBodyAttribute('data-sidebar-size', '')
-        manageBodyClass('sidebar-enable', 'remove')
-        if (!isMobile)
-          manageBodyClass('vertical-collpsed', 'remove')
+
+      default: // 'default' case
+        if (!isMobile) {
+          // Keep default state - classes already removed above
+        }
         break
     }
-    
+
     return { sidebarType, isMobile }
   }
 )
 
 export const showRightSidebarAsync = createAsyncThunk(
   'layout/showRightSidebar',
-  async (isOpen : boolean) => {
-    if (isOpen) {
-      manageBodyClass('right-bar-enabled', 'add')
-    } else {
-      manageBodyClass('right-bar-enabled', 'remove')
-    }
+  async (isOpen: boolean) => {
+    manageBodyClass('right-bar-enabled', isOpen ? 'add' : 'remove')
     return isOpen
   }
 )

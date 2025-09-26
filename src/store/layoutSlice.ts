@@ -56,7 +56,7 @@ const initialState = {
 // Async thunks for complex layout changes
 export const changeLayoutAsync = createAsyncThunk(
   'layout/changeLayout',
-  async (layout) => {
+  async (layout: string) => {
     if (layout === 'horizontal') {
       document.body.removeAttribute('data-sidebar')
       document.body.removeAttribute('data-sidebar-image')
@@ -70,7 +70,7 @@ export const changeLayoutAsync = createAsyncThunk(
 
 export const changeLayoutModeAsync = createAsyncThunk(
   'layout/changeLayoutMode',
-  async (mode) => {
+  async (mode: string) => {
     changeHtmlAttribute('data-bs-theme', mode)
     return mode
   }
@@ -82,14 +82,14 @@ export const changeLayoutWidthAsync = createAsyncThunk(
     if (width === 'boxed') {
       dispatch(changeSidebarTypeAsync({ sidebarType: 'icon' }))
       changeBodyAttribute('data-layout-size', width)
-      changeBodyAttribute('data-layout-scrollable', false)
+      changeBodyAttribute('data-layout-scrollable', 'false')
     } else if (width === 'scrollable') {
       dispatch(changeSidebarTypeAsync({ sidebarType: 'default' }))
-      changeBodyAttribute('data-layout-scrollable', true)
+      changeBodyAttribute('data-layout-scrollable', 'true')
     } else {
       dispatch(changeSidebarTypeAsync({ sidebarType: 'default' }))
       changeBodyAttribute('data-layout-size', width)
-      changeBodyAttribute('data-layout-scrollable', false)
+      changeBodyAttribute('data-layout-scrollable', 'false')
     }
     return width
   }

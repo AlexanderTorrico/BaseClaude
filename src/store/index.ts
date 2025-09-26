@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-// Import modern modular reducers
-import { authReducer } from '@/pages/Authentication';
-import { userReducer } from '@/pages/Login';
-import { registerReducer } from '@/pages/Register';
-import layoutReducer from './layoutSlice';
+// Import reducers - usando rutas relativas
 import usersReducer from './usersSlice';
+import layoutReducer from './layoutSlice';
+
+// Importar usando rutas relativas en lugar de alias
+import { authReducer } from '../pages/Authentication/index';
+import { userReducer } from '../pages/Login/index';
+import { registerReducer } from '../pages/Register/index';
 import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Hooks/crudBasicSlice';
 
 export const store = configureStore({

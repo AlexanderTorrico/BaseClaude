@@ -8,11 +8,11 @@ import {
   changeLayoutWidth,
   changeSidebarTheme,
   changeSidebarThemeImage,
-  changeSidebarType,
+  changeSidebarTypeAsync,
   changePreloader,
   changeTopbarTheme,
   showRightSidebarAction,
-} from "/src/store/layoutSlice";
+} from "../../store/layoutSlice";
 
 //SimpleBar
 import SimpleBar from "simplebar-react";
@@ -237,10 +237,11 @@ const RightSidebar = props => {
                       name="sidebarType"
                       value={leftSidebarTypes.DEFAULT}
                       checked={props.leftSideBarType === leftSidebarTypes.DEFAULT}
-                      onChange={e => {
-                        if (e.target.checked) {
-                          props.changeSidebarType(e.target.value);
-                        }
+                      onChange={() => {
+                        props.changeSidebarTypeAsync({
+                          sidebarType: leftSidebarTypes.DEFAULT,
+                          isMobile: window.innerWidth <= 768
+                        });
                       }}
                     />
                     <label className="me-1" htmlFor="sidebarDefault">Default</label>
@@ -250,26 +251,28 @@ const RightSidebar = props => {
                       name="sidebarType"
                       value={leftSidebarTypes.COMPACT}
                       checked={props.leftSideBarType === leftSidebarTypes.COMPACT}
-                      onChange={e => {
-                        if (e.target.checked) {
-                          props.changeSidebarType(e.target.value);
-                        }
+                      onChange={() => {
+                        props.changeSidebarTypeAsync({
+                          sidebarType: leftSidebarTypes.COMPACT,
+                          isMobile: window.innerWidth <= 768
+                        });
                       }}
                     />
-                    <label className="me-1" htmlFor="sidebarCompact">Compact</label>
+                    <label htmlFor="sidebarCompact" className="me-1">Compact</label>
                     <input
                       type="radio"
                       id="sidebarIcon"
                       name="sidebarType"
                       value={leftSidebarTypes.ICON}
                       checked={props.leftSideBarType === leftSidebarTypes.ICON}
-                      onChange={e => {
-                        if (e.target.checked) {
-                          props.changeSidebarType(e.target.value);
-                        }
+                      onChange={() => {
+                        props.changeSidebarTypeAsync({
+                          sidebarType: leftSidebarTypes.ICON,
+                          isMobile: window.innerWidth <= 768
+                        });
                       }}
                     />
-                    <label className="me-1" htmlFor="sidebarIcon">Icon</label>
+                    <label htmlFor="sidebarIcon">Icon</label>
                   </div>
 
                   <hr className="mt-1" />
@@ -609,7 +612,7 @@ export default connect(mapStateToProps, {
   changeLayoutMode,
   changeSidebarTheme,
   changeSidebarThemeImage,
-  changeSidebarType,
+  changeSidebarTypeAsync,
   changeLayoutWidth,
   changeTopbarTheme,
   changePreloader,

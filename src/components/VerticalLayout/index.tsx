@@ -52,9 +52,9 @@ const Layout = (props) => {
 
   const toggleMenuCallback = () => {
     if (leftSideBarType === "default") {
-      dispatch(changeSidebarType("condensed", isMobile));
+      dispatch(changeSidebarType({ sidebarType: "condensed", isMobile }));
     } else if (leftSideBarType === "condensed") {
-      dispatch(changeSidebarType("default", isMobile));
+      dispatch(changeSidebarType({ sidebarType: "default", isMobile }));
     }
   };
 
@@ -126,7 +126,7 @@ const Layout = (props) => {
 
   useEffect(() => {
     if (leftSideBarType) {
-      dispatch(changeSidebarType(leftSideBarType));
+      dispatch(changeSidebarType({ sidebarType: leftSideBarType, isMobile }));
     }
   }, [leftSideBarType, dispatch]);
 

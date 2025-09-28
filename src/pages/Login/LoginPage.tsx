@@ -14,7 +14,7 @@ import profile from '../../assets/images/profile-img.png';
 import logo from '../../assets/images/logo.svg';
 import lightlogo from '../../assets/images/logo-light.svg';
 
-const LoginPage: React.FC = () => {
+const LoginPage = () : JSX.Element => {
   // Meta title - same as original
   document.title = 'Login | Skote - Vite React Admin & Dashboard Template';
 

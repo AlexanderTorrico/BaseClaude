@@ -6,7 +6,6 @@ export {
   loginFailure,
   updateUserProfile,
   clearError,
-  setLoading,
   initializeUser,
   resetUserState,
   selectUser,

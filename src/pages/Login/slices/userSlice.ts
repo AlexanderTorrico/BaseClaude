@@ -52,10 +52,6 @@ export const userSlice = createSlice({
       state.error = null;
     },
 
-    // Set loading state
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload;
-    },
 
     // Initialize user from data (pure action)
     initializeUser: (state, action: PayloadAction<{ user: AuthUser | null; lastLogin?: string }>) => {
@@ -92,7 +88,6 @@ export const {
   loginFailure,
   updateUserProfile,
   clearError,
-  setLoading,
   initializeUser,
   resetUserState
 } = userSlice.actions;

@@ -1,16 +1,16 @@
 import React from 'react';
-import { Button } from '../../Atoms';
+import { Button } from 'reactstrap';
 
 interface LoadingButtonProps {
   loading?: boolean;
   disabled?: boolean;
-  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'info' | 'light' | 'dark';
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  color?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'info' | 'light' | 'dark';
+  size?: 'sm' | 'lg';
   type?: 'button' | 'submit' | 'reset';
   children: React.ReactNode;
   onClick?: () => void;
   className?: string;
-  fullWidth?: boolean;
+  block?: boolean;
 }
 
 export const LoadingButton: React.FC<LoadingButtonProps> = ({
@@ -22,9 +22,11 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
   return (
     <Button
       {...props}
-      loading={loading}
       disabled={disabled || loading}
     >
+      {loading && (
+        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+      )}
       {children}
     </Button>
   );

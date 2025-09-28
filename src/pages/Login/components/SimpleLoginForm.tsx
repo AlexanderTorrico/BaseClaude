@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Form } from 'reactstrap';
+import { Form, FormGroup, Label, Input } from 'reactstrap';
 import { AlertMessage } from '../../../components/Common/Form';
-import { Input } from '../../../components/Atoms';
 import { useAuth } from '../../../hooks/auth/useAuth';
 import { useForm } from '../../../hooks/form/useForm';
 import { validateLoginForm } from '../utils/loginValidators';
@@ -96,28 +95,46 @@ export const SimpleLoginForm: React.FC<SimpleLoginFormProps> = ({
         />
 
         {/* Email Field */}
-        <Input
-          label="Email"
-          type="email"
-          placeholder="Ingresa tu email"
-          value={formData.email}
-          onChange={(e) => handleFieldChange('email')(e.target.value)}
-          error={formData.errors.email}
-          disabled={isSubmitting}
-          required
-        />
+        <FormGroup>
+          <Label for="email">Email <span className="text-danger">*</span></Label>
+          <Input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Ingresa tu email"
+            value={formData.email}
+            onChange={(e) => handleFieldChange('email')(e.target.value)}
+            disabled={isSubmitting}
+            required
+            invalid={!!formData.errors.email}
+          />
+          {formData.errors.email && (
+            <div className="invalid-feedback d-block">
+              {formData.errors.email}
+            </div>
+          )}
+        </FormGroup>
 
         {/* Password Field */}
-        <Input
-          label="Contraseña"
-          type="password"
-          placeholder="Ingresa tu contraseña"
-          value={formData.password}
-          onChange={(e) => handleFieldChange('password')(e.target.value)}
-          error={formData.errors.password}
-          disabled={isSubmitting}
-          required
-        />
+        <FormGroup>
+          <Label for="password">Contraseña <span className="text-danger">*</span></Label>
+          <Input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Ingresa tu contraseña"
+            value={formData.password}
+            onChange={(e) => handleFieldChange('password')(e.target.value)}
+            disabled={isSubmitting}
+            required
+            invalid={!!formData.errors.password}
+          />
+          {formData.errors.password && (
+            <div className="invalid-feedback d-block">
+              {formData.errors.password}
+            </div>
+          )}
+        </FormGroup>
 
         {/* Remember Me Checkbox */}
         <div className="form-check">

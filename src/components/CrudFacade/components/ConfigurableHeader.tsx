@@ -3,7 +3,6 @@ import { Row, Col, Card, CardBody, Button, Badge, InputGroup, InputGroupText, In
 import FilterInfoPanel from "../../CrudComponents/FilterInfoPanel";
 import CustomSelect from "../../CrudComponents/CustomSelect";
 import { opcionesOrdenamiento } from "../../../pages/CrudV2/config/userConstants.js";
-import { opcionesOrdenamientoAtomo } from "../../../modules/Components/Atomo/config/atomoConstants.js";
 
 const ConfigurableHeader = ({
   title,
@@ -37,8 +36,8 @@ const ConfigurableHeader = ({
   entity = "usuarios"
 }) => {
   
-  // Determinar opciones de ordenamiento según la entidad
-  const sortingOptions = entity === "atomos" ? opcionesOrdenamientoAtomo : opcionesOrdenamiento;
+  // Usar opciones de ordenamiento por defecto
+  const sortingOptions = opcionesOrdenamiento;
   const renderDefaultActions = () => (
     <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
       <Button color="primary" onClick={onAddItem} size="sm">

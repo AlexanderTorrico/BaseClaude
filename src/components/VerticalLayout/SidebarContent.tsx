@@ -189,12 +189,6 @@ const SidebarContent = (props) => {
               </ul>
             </li>
 
-            <li>
-              <Link to="/atomo" className=" ">
-                <i className="bx bx-calendar"></i>
-                <span>Atomos</span>
-              </Link>
-            </li>
 
             <li>
               <Link to="/#" className="has-arrow ">

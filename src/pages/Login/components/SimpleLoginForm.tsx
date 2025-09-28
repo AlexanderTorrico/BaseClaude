@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Form } from 'reactstrap';
-import { FormField, AlertMessage } from '../../../components/Common/Form';
+import { AlertMessage } from '../../../components/Common/Form';
+import { Input } from '../../../components/Atoms';
 import { useAuth } from '../../../hooks/auth/useAuth';
 import { useForm } from '../../../hooks/form/useForm';
 import { validateLoginForm } from '../utils/loginValidators';
@@ -95,24 +96,24 @@ export const SimpleLoginForm: React.FC<SimpleLoginFormProps> = ({
         />
 
         {/* Email Field */}
-        <FormField
+        <Input
           label="Email"
           type="email"
           placeholder="Ingresa tu email"
           value={formData.email}
-          onChange={handleFieldChange('email')}
+          onChange={(e) => handleFieldChange('email')(e.target.value)}
           error={formData.errors.email}
           disabled={isSubmitting}
           required
         />
 
         {/* Password Field */}
-        <FormField
+        <Input
           label="Contraseña"
           type="password"
           placeholder="Ingresa tu contraseña"
           value={formData.password}
-          onChange={handleFieldChange('password')}
+          onChange={(e) => handleFieldChange('password')(e.target.value)}
           error={formData.errors.password}
           disabled={isSubmitting}
           required

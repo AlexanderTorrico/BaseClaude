@@ -3,7 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 // Import reducers
 import layoutReducer from './layoutSlice';
 import { authReducer } from '../pages/Authentication/index';
-import { userReducer } from '../pages/Login/index';
+import { userReducer } from '../pages/Login/slices';
 import { registerReducer } from '../pages/Register/index';
 import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Hooks/crudBasicSlice';
 

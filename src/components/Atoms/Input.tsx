@@ -1,28 +1,52 @@
 import React, { forwardRef, useMemo, useState } from 'react';
+
 /**
  * Componente Input - Átomo base para campos de entrada
- * 
+ *
  * Campo de entrada altamente personalizable con etiquetas, estados de error,
  * soporte para íconos y modos dark/light automático.
- * 
+ *
  * @component
  * @example
  * // Input básico
  * <Input label="Nombre" placeholder="Ingresa tu nombre" />
- * 
+ *
  * // Input con ícono y validación
- * <Input 
- *   label="Email" 
- *   type="email" 
+ * <Input
+ *   label="Email"
+ *   type="email"
  *   icon={<Icon name="mail" />}
  *   error="Email inválido"
  * />
- * 
+ *
  * // Input de solo lectura
  * <Input label="ID" value="12345" readonly />
  */
 
-const Input = forwardRef(({ 
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  type?: string;
+  placeholder?: string;
+  value?: string;
+  defaultValue?: string;
+  error?: string;
+  helperText?: string;
+  disabled?: boolean;
+  readonly?: boolean;
+  required?: boolean;
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  variant?: 'default' | 'filled' | 'underlined';
+  icon?: React.ReactElement;
+  iconPosition?: 'left' | 'right';
+  className?: string;
+  id?: string;
+  name?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+}
+
+const Input = forwardRef<HTMLInputElement, InputProps>(({
   label,
   type = 'text',
   placeholder,
@@ -43,7 +67,7 @@ const Input = forwardRef(({
   onChange,
   onFocus,
   onBlur,
-  ...props 
+  ...props
 }, ref) => {
   
   const baseInputClasses = 'form-control border transition-all duration-200 focus:outline-none';
@@ -157,7 +181,7 @@ const Input = forwardRef(({
 
 Input.displayName = 'Input';
 
-Input// Optimizar con React.memo
+// Optimizar con React.memo
 const MemoizedInput = React.memo(Input, (prevProps, nextProps) => {
   // Comparación optimizada para Input
   const criticalProps = [

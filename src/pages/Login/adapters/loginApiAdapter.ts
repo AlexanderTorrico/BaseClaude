@@ -50,10 +50,6 @@ export const isValidSocialLoginResponse = (response: any): boolean => {
   return response?.data?.success && response?.data?.data;
 };
 
-// Validate logout response structure
-export const isValidLogoutResponse = (response: any): boolean => {
-  return response?.data?.success;
-};
 
 // Session storage adapter functions
 export const saveUserToStorage = (user: AuthUser): void => {

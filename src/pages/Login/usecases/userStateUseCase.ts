@@ -8,9 +8,6 @@ import {
   loginStart,
   loginSuccess,
   loginFailure,
-  logoutStart,
-  logoutSuccess,
-  logoutFailure,
   updateUserProfile,
   initializeUser,
   resetUserState
@@ -22,7 +19,6 @@ import {
   clearUserFromStorage
 } from '../services/storageService';
 import { loginUseCase } from './loginUseCase';
-import { logoutUseCase } from './logoutUseCase';
 
 // Login with state management use case
 export const loginWithStateUseCase = () => {
@@ -62,40 +58,6 @@ export const loginWithStateUseCase = () => {
   };
 };
 
-// Logout with state management use case
-export const logoutWithStateUseCase = () => {
-  return async (dispatch: Dispatch): Promise<Result<boolean>> => {
-    // Start logout process
-    dispatch(logoutStart());
-
-    try {
-      // Execute logout business logic
-      const logoutWithDependencies = logoutUseCase();
-      const result = await logoutWithDependencies();
-
-      // Clear storage regardless of server response
-      const storageResult = await clearUserFromStorage();
-
-      if (!storageResult.success) {
-      }
-
-      if (result.success) {
-        dispatch(logoutSuccess());
-        return { success: true, data: true };
-      } else {
-        // Even if server logout fails, clear local state
-        dispatch(logoutFailure(result.error || 'Logout failed'));
-        return { success: false, error: result.error || 'Logout failed' };
-      }
-    } catch (error: any) {
-      // Clear storage and state even on error
-      await clearUserFromStorage();
-      const errorMessage = error.message || 'Unexpected error during logout';
-      dispatch(logoutFailure(errorMessage));
-      return { success: false, error: errorMessage };
-    }
-  };
-};
 
 // Initialize user from storage use case
 export const initializeUserFromStorageUseCase = () => {

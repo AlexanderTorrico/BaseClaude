@@ -9,8 +9,7 @@ import {
   adaptApiUserToAuthUser,
   adaptSocialApiUserToAuthUser,
   isValidLoginResponse,
-  isValidSocialLoginResponse,
-  isValidLogoutResponse
+  isValidSocialLoginResponse
 } from '../adapters/loginApiAdapter';
 import { extractErrorMessage } from '../utils/loginHelpers';
 
@@ -160,43 +159,6 @@ export const socialLoginService = async (
   }
 };
 
-// Raw logout HTTP service
-export const logoutHttpCall = (): AxiosCallModel<ApiResponse> => {
-  const controller = loadAbort();
-
-  return {
-    call: api.post<ApiResponse>('/auth/logout', {}, {
-      signal: controller.signal
-    }),
-    controller
-  };
-};
-
-// Logout service with automatic adapter
-export const logoutService = async (): Promise<Result<boolean>> => {
-  try {
-    const axiosCall = logoutHttpCall();
-    const response = await axiosCall.call;
-
-    if (isValidLogoutResponse(response)) {
-      return {
-        success: true,
-        data: true
-      };
-    }
-
-    return {
-      success: false,
-      error: response.data.message || 'Logout failed'
-    };
-  } catch (error: any) {
-    // Even if API logout fails, we consider it successful locally
-    return {
-      success: true,
-      data: true
-    };
-  }
-};
 
 // Raw refresh token HTTP service
 export const refreshTokenHttpCall = (

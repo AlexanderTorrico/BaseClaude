@@ -39,27 +39,6 @@ export const userSlice = createSlice({
       state.error = action.payload;
     },
 
-    // Logout actions
-    logoutStart: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-
-    logoutSuccess: (state) => {
-      state.loading = false;
-      state.isAuthenticated = false;
-      state.user = null;
-      state.error = null;
-      state.lastLogin = undefined;
-    },
-
-    logoutFailure: (state, action: PayloadAction<string>) => {
-      state.loading = false;
-      state.error = action.payload;
-      // Even if logout fails on server, clear local state
-      state.isAuthenticated = false;
-      state.user = null;
-    },
 
     // Update user profile
     updateUserProfile: (state, action: PayloadAction<Partial<AuthUser>>) => {
@@ -111,9 +90,6 @@ export const {
   loginStart,
   loginSuccess,
   loginFailure,
-  logoutStart,
-  logoutSuccess,
-  logoutFailure,
   updateUserProfile,
   clearError,
   setLoading,

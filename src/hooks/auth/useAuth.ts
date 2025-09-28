@@ -12,14 +12,15 @@ import {
 } from '../../pages/Login/slices';
 import {
   loginWithStateUseCase,
-  logoutWithStateUseCase,
   initializeUserFromStorageUseCase
 } from '../../pages/Login/usecases/userStateUseCase';
+import { useLogout } from '../useLogout';
 import type { LoginCredentials, AuthUser } from '../../pages/Login/models';
 
 export const useAuth = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { logout: globalLogout } = useLogout();
 
   // Selectors
   const user = useSelector(selectUser);
@@ -49,17 +50,16 @@ export const useAuth = () => {
   // Logout function
   const logout = useCallback(async () => {
     try {
-      const logoutWithState = logoutWithStateUseCase();
-      const result = await logoutWithState(dispatch);
+      // Use global logout service
+      await globalLogout();
 
-      navigate('/login');
-      return result;
+      // The global logout already handles navigation, but we can ensure it
+      return { success: true, data: true };
     } catch (error: any) {
-      navigate('/login');
       const errorMessage = error.message || 'Error al cerrar sesión';
       return { success: false, error: errorMessage };
     }
-  }, [dispatch, navigate]);
+  }, [globalLogout]);
 
   // Clear error function
   const clearAuthError = useCallback(() => {

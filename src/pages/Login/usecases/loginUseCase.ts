@@ -6,29 +6,26 @@ import type { LoginCredentials, AuthUser, Result } from '../models';
 import { validateLoginForm } from '../utils/loginValidators';
 import { sanitizeLoginCredentials } from '../utils/loginHelpers';
 import {
-  loginFromApi,
   saveUserToStorage,
   getUserFromStorage,
-  clearUserFromStorage,
-  logoutFromApi
+  clearUserFromStorage
 } from '../adapters/loginApiAdapter';
+import { loginService } from '../services/loginHttpService';
 
 // Dependencies interface for dependency injection
 interface LoginUseCaseDependencies {
-  loginFromApi: typeof loginFromApi;
+  loginService: typeof loginService;
   saveUserToStorage: typeof saveUserToStorage;
   getUserFromStorage: typeof getUserFromStorage;
   clearUserFromStorage: typeof clearUserFromStorage;
-  logoutFromApi: typeof logoutFromApi;
 }
 
 // Default dependencies
 const defaultDependencies: LoginUseCaseDependencies = {
-  loginFromApi,
+  loginService,
   saveUserToStorage,
   getUserFromStorage,
-  clearUserFromStorage,
-  logoutFromApi
+  clearUserFromStorage
 };
 
 // Login use case function
@@ -50,7 +47,7 @@ export const loginUseCase = (
     const sanitizedCredentials = sanitizeLoginCredentials(credentials);
 
     // 3. Attempt login via API
-    const loginResult = await dependencies.loginFromApi(sanitizedCredentials);
+    const loginResult = await dependencies.loginService(sanitizedCredentials);
 
     if (!loginResult.success) {
       return loginResult;
@@ -72,29 +69,6 @@ export const loginUseCase = (
   }
 };
 
-// Logout use case function
-export const logoutUseCase = (
-  dependencies: LoginUseCaseDependencies = defaultDependencies
-) => async (): Promise<Result<boolean>> => {
-  try {
-    // 1. Clear local storage first
-    dependencies.clearUserFromStorage();
-
-    // 2. Attempt API logout (non-blocking)
-    await dependencies.logoutFromApi();
-
-    return {
-      success: true,
-      data: true
-    };
-  } catch (error: any) {
-    // Even if API logout fails, local logout is successful
-    return {
-      success: true,
-      data: true
-    };
-  }
-};
 
 // Get current user use case function
 export const getCurrentUserUseCase = (

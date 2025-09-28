@@ -18,10 +18,10 @@ const initialLoginData: LoginCredentials = {
   rememberMe: false
 };
 
-export const SimpleLoginForm: React.FC<SimpleLoginFormProps> = ({
+export const SimpleLoginForm = ({
   onSuccess,
   onError
-}) => {
+}: SimpleLoginFormProps) => {
   const [generalError, setGeneralError] = useState<string>('');
   const { login, isLoading, error, clearAuthError } = useAuth();
 

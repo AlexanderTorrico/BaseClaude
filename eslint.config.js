@@ -33,6 +33,9 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+
+      "@typescript-eslint/interface-name-prefix": "off",
+      "@typescript-eslint/explicit-function-return-type": "off"
     },
   },
 ]

@@ -1,10 +1,18 @@
 // ==========================================
-// LOGIN HTTP SERVICE - FUNCTIONAL APPROACH
+// LOGIN HTTP SERVICE - WITH AUTOMATIC ADAPTER
 // ==========================================
 
 import { createApiInstance, loadAbort } from '@/services/httpService';
 import { AxiosCallModel } from '@/models/axiosCallModel';
-import type { LoginCredentials } from '../models';
+import type { LoginCredentials, AuthUser, Result } from '../models';
+import {
+  adaptApiUserToAuthUser,
+  adaptSocialApiUserToAuthUser,
+  isValidLoginResponse,
+  isValidSocialLoginResponse,
+  isValidLogoutResponse
+} from '../adapters/loginApiAdapter';
+import { extractErrorMessage } from '../utils/loginHelpers';
 
 // Create API instance
 const api = createApiInstance();
@@ -51,8 +59,8 @@ interface ApiResponse {
   };
 }
 
-// Login HTTP service
-export const loginService = (
+// Raw login HTTP service (returns AxiosCallModel)
+export const loginHttpCall = (
   credentials: LoginCredentials
 ): AxiosCallModel<ApiResponse> => {
   const controller = loadAbort();
@@ -69,15 +77,52 @@ export const loginService = (
   };
 };
 
-// Social login service
-export const socialLoginService = (
+// Login service with automatic adapter (returns Promise<Result<AuthUser>>)
+export const loginService = async (
+  credentials: LoginCredentials
+): Promise<Result<AuthUser>> => {
+  try {
+    const axiosCall = loginHttpCall(credentials);
+    const response = await axiosCall.call;
+
+    // Debug temporal - revisar la respuesta completa
+    console.log('🔍 Login Response Debug:', {
+      status: response.status,
+      data: response.data,
+      dataStatus: response.data?.status,
+      dataMessage: response.data?.message,
+      hasData: !!response.data?.data
+    });
+
+    if (isValidLoginResponse(response)) {
+      const authUser = adaptApiUserToAuthUser(response);
+      return {
+        success: true,
+        data: authUser
+      };
+    }
+
+    return {
+      success: false,
+      error: response.data.message || 'Login failed'
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: extractErrorMessage(error)
+    };
+  }
+};
+
+// Raw social login HTTP service
+export const socialLoginHttpCall = (
   provider: string,
   token: string
-): AxiosCallModel<ApiResponse<LoginApiResponse>> => {
+): AxiosCallModel<ApiResponse> => {
   const controller = loadAbort();
 
   return {
-    call: api.post<ApiResponse<LoginApiResponse>>(`/auth/social/${provider}`, {
+    call: api.post<ApiResponse>(`/auth/social/${provider}`, {
       access_token: token
     }, {
       signal: controller.signal
@@ -86,8 +131,37 @@ export const socialLoginService = (
   };
 };
 
-// Logout service
-export const logoutService = (): AxiosCallModel<ApiResponse> => {
+// Social login service with automatic adapter
+export const socialLoginService = async (
+  provider: string,
+  token: string
+): Promise<Result<AuthUser>> => {
+  try {
+    const axiosCall = socialLoginHttpCall(provider, token);
+    const response = await axiosCall.call;
+
+    if (isValidSocialLoginResponse(response)) {
+      const authUser = adaptSocialApiUserToAuthUser(response.data.data);
+      return {
+        success: true,
+        data: authUser
+      };
+    }
+
+    return {
+      success: false,
+      error: response.data.message || 'Social login failed'
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: extractErrorMessage(error)
+    };
+  }
+};
+
+// Raw logout HTTP service
+export const logoutHttpCall = (): AxiosCallModel<ApiResponse> => {
   const controller = loadAbort();
 
   return {
@@ -98,14 +172,40 @@ export const logoutService = (): AxiosCallModel<ApiResponse> => {
   };
 };
 
-// Refresh token service
-export const refreshTokenService = (
+// Logout service with automatic adapter
+export const logoutService = async (): Promise<Result<boolean>> => {
+  try {
+    const axiosCall = logoutHttpCall();
+    const response = await axiosCall.call;
+
+    if (isValidLogoutResponse(response)) {
+      return {
+        success: true,
+        data: true
+      };
+    }
+
+    return {
+      success: false,
+      error: response.data.message || 'Logout failed'
+    };
+  } catch (error: any) {
+    // Even if API logout fails, we consider it successful locally
+    return {
+      success: true,
+      data: true
+    };
+  }
+};
+
+// Raw refresh token HTTP service
+export const refreshTokenHttpCall = (
   refreshToken: string
-): AxiosCallModel<ApiResponse<{ access_token: string; expires_in: number }>> => {
+): AxiosCallModel<ApiResponse> => {
   const controller = loadAbort();
 
   return {
-    call: api.post<ApiResponse<{ access_token: string; expires_in: number }>>('/auth/refresh', {
+    call: api.post<ApiResponse>('/auth/refresh', {
       refresh_token: refreshToken
     }, {
       signal: controller.signal
@@ -114,12 +214,12 @@ export const refreshTokenService = (
   };
 };
 
-// Validate session service
-export const validateSessionService = (): AxiosCallModel<ApiResponse<{ valid: boolean }>> => {
+// Raw validate session HTTP service
+export const validateSessionHttpCall = (): AxiosCallModel<ApiResponse> => {
   const controller = loadAbort();
 
   return {
-    call: api.get<ApiResponse<{ valid: boolean }>>('/auth/validate', {
+    call: api.get<ApiResponse>('/auth/validate', {
       signal: controller.signal
     }),
     controller

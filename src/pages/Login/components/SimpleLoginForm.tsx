@@ -1,10 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Form, FormGroup, Label, Input } from 'reactstrap';
 import { AlertMessage } from '../../../components/Common/Form';
-import { useAuth } from '../../../hooks/auth/useAuth';
-import { useForm } from '../../../hooks/form/useForm';
-import { validateLoginForm } from '../utils/loginValidators';
-import { sanitizeLoginCredentials } from '../utils/loginHelpers';
+import { useSimpleLogin } from '../hooks/useSimpleLogin';
 import type { LoginCredentials } from '../models';
 
 interface SimpleLoginFormProps {
@@ -12,74 +9,18 @@ interface SimpleLoginFormProps {
   onError?: (error: string) => void;
 }
 
-const initialLoginData: LoginCredentials = {
-  email: '',
-  password: '',
-  rememberMe: false
-};
-
 export const SimpleLoginForm = ({
   onSuccess,
   onError
 }: SimpleLoginFormProps) => {
-  const [generalError, setGeneralError] = useState<string>('');
-  const { login, isLoading, error, clearAuthError } = useAuth();
-
   const {
     formData,
-    setField,
-    validateForm,
-    resetForm,
-    setSubmitting,
-    getFormValues
-  } = useForm(initialLoginData);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    // Clear previous errors
-    setGeneralError('');
-    clearAuthError();
-
-    // Validate form
-    if (!validateForm((data) => validateLoginForm(data))) {
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-
-      // Get sanitized form values
-      const credentials = sanitizeLoginCredentials(getFormValues());
-
-      // Execute login
-      const result = await login(credentials);
-
-      if (result.success) {
-        onSuccess?.();
-        resetForm(initialLoginData);
-      } else {
-        const errorMsg = result.error || 'Error al iniciar sesión';
-        setGeneralError(errorMsg);
-        onError?.(errorMsg);
-      }
-    } catch (error: any) {
-      const errorMessage = error.message || 'Error inesperado al iniciar sesión';
-      setGeneralError(errorMessage);
-      onError?.(errorMessage);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleFieldChange = (field: keyof LoginCredentials) => (value: any) => {
-    if (generalError) setGeneralError('');
-    if (error) clearAuthError();
-    setField(field, value);
-  };
-
-  const isSubmitting = formData.isSubmitting || isLoading;
-  const displayError = generalError || error;
+    handleSubmit,
+    handleFieldChange,
+    clearErrors,
+    isSubmitting,
+    displayError
+  } = useSimpleLogin({ onSuccess, onError });
 
   return (
     <div className="p-2">
@@ -88,10 +29,7 @@ export const SimpleLoginForm = ({
         <AlertMessage
           message={displayError || ''}
           type="error"
-          onDismiss={() => {
-            setGeneralError('');
-            clearAuthError();
-          }}
+          onDismiss={clearErrors}
         />
 
         {/* Email Field */}

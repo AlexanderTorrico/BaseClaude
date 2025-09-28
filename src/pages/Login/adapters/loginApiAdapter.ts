@@ -1,10 +1,8 @@
 // ==========================================
-// LOGIN API ADAPTER - FUNCTIONAL APPROACH
+// LOGIN API ADAPTER - PURE TRANSFORMATION FUNCTIONS
 // ==========================================
 
-import type { LoginCredentials, AuthUser, Result } from '../models';
-import { loginService, socialLoginService, logoutService } from '../services/loginHttpService';
-import { extractErrorMessage } from '../utils/loginHelpers';
+import type { AuthUser } from '../models';
 
 // Adapt API user response to domain AuthUser
 export const adaptApiUserToAuthUser = (apiResponse: any): AuthUser => ({
@@ -23,102 +21,38 @@ export const adaptApiUserToAuthUser = (apiResponse: any): AuthUser => ({
   permissions: apiResponse.data.direct_permissions || []
 });
 
-// Login adapter function
-export const loginFromApi = async (
-  credentials: LoginCredentials
-): Promise<Result<AuthUser>> => {
-  try {
-    const axiosCall = loginService(credentials);
-    const response = await axiosCall.call;
+// Adapt social login API response to domain AuthUser
+export const adaptSocialApiUserToAuthUser = (apiResponse: any): AuthUser => ({
+  id: apiResponse.user.id?.toString() || '',
+  name: apiResponse.user.name || '',
+  lastName: apiResponse.user.last_name || '',
+  email: apiResponse.user.email || '',
+  token: apiResponse.access_token || '',
+  privilege: apiResponse.user.privilege || 'user',
+  phone: apiResponse.user.phone || '',
+  logo: apiResponse.user.logo || '',
+  language: apiResponse.user.language || 'es',
+  status: apiResponse.user.status === 1 ? 'active' : 'inactive',
+  modules: apiResponse.modules || [],
+  roles: apiResponse.roles || [],
+  permissions: apiResponse.permissions || []
+});
 
-    // Debug temporal - revisar la respuesta completa
-    console.log('🔍 Login Response Debug:', {
-      status: response.status,
-      data: response.data,
-      dataStatus: response.data?.status,
-      dataMessage: response.data?.message,
-      hasData: !!response.data?.data
-    });
-
-    // Tu backend responde con status: 200 y message: "success"
-    if (response.data.status === 200 && response.data.message === "success" && response.data.data) {
-      const authUser = adaptApiUserToAuthUser(response);
-
-
-      return {
-        success: true,
-        data: authUser
-      };
-    }
-
-    return {
-      success: false,
-      error: response.data.message || 'Login failed'
-    };
-  } catch (error: any) {
-
-    return {
-      success: false,
-      error: extractErrorMessage(error)
-    };
-  }
+// Validate login response structure
+export const isValidLoginResponse = (response: any): boolean => {
+  return response?.data?.status === 200 &&
+         response?.data?.message === "success" &&
+         response?.data?.data;
 };
 
-// Social login adapter function
-export const socialLoginFromApi = async (
-  provider: string,
-  token: string
-): Promise<Result<AuthUser>> => {
-  try {
-    const axiosCall = socialLoginService(provider, token);
-    const response = await axiosCall.call;
-
-    if (response.data.success && response.data.data) {
-      const { data } = response.data;
-      const authUser = adaptApiUserToAuthUser(data.user, data.access_token);
-
-      return {
-        success: true,
-        data: authUser
-      };
-    }
-
-    return {
-      success: false,
-      error: response.data.message || 'Social login failed'
-    };
-  } catch (error: any) {
-    return {
-      success: false,
-      error: extractErrorMessage(error)
-    };
-  }
+// Validate social login response structure
+export const isValidSocialLoginResponse = (response: any): boolean => {
+  return response?.data?.success && response?.data?.data;
 };
 
-// Logout adapter function
-export const logoutFromApi = async (): Promise<Result<boolean>> => {
-  try {
-    const axiosCall = logoutService();
-    const response = await axiosCall.call;
-
-    if (response.data.success) {
-      return {
-        success: true,
-        data: true
-      };
-    }
-
-    return {
-      success: false,
-      error: response.data.message || 'Logout failed'
-    };
-  } catch (error: any) {
-    // Even if API logout fails, we consider it successful locally
-    return {
-      success: true,
-      data: true
-    };
-  }
+// Validate logout response structure
+export const isValidLogoutResponse = (response: any): boolean => {
+  return response?.data?.success;
 };
 
 // Session storage adapter functions

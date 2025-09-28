@@ -31,17 +31,19 @@ export const loginFromApi = async (
     const axiosCall = loginService(credentials);
     const response = await axiosCall.call;
 
-    // Log para debug - puedes quitar esto después
+    // Debug temporal - revisar la respuesta completa
     console.log('🔍 Login Response Debug:', {
       status: response.status,
-      data: response.data
+      data: response.data,
+      dataStatus: response.data?.status,
+      dataMessage: response.data?.message,
+      hasData: !!response.data?.data
     });
 
     // Tu backend responde con status: 200 y message: "success"
     if (response.data.status === 200 && response.data.message === "success" && response.data.data) {
       const authUser = adaptApiUserToAuthUser(response);
 
-      console.log('✅ Login Success - AuthUser created:', authUser);
 
       return {
         success: true,
@@ -49,14 +51,11 @@ export const loginFromApi = async (
       };
     }
 
-    console.log('❌ Login Failed - Response:', response.data);
     return {
       success: false,
       error: response.data.message || 'Login failed'
     };
   } catch (error: any) {
-    console.log('🚨 Login Error:', error);
-    console.log('🚨 Error Response:', error.response?.data);
 
     return {
       success: false,
@@ -139,7 +138,6 @@ export const saveUserToStorage = (user: AuthUser): void => {
     localStorage.setItem('authToken', user.token);
     localStorage.setItem('lastLogin', new Date().toISOString());
   } catch (error) {
-    console.warn('Failed to save user to storage:', error);
   }
 };
 
@@ -159,7 +157,6 @@ export const getUserFromStorage = (): AuthUser | null => {
       permissions: []
     };
   } catch (error) {
-    console.warn('Failed to get user from storage:', error);
     return null;
   }
 };
@@ -170,6 +167,5 @@ export const clearUserFromStorage = (): void => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('lastLogin');
   } catch (error) {
-    console.warn('Failed to clear user from storage:', error);
   }
 };

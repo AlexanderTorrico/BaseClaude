@@ -135,7 +135,6 @@ export const rememberMeUseCase = (
       }));
       sessionStorage.setItem('authToken', user.token);
     } catch (error) {
-      console.warn('Failed to save to session storage:', error);
     }
   }
 };

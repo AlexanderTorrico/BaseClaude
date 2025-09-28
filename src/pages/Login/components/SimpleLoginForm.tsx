@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form } from 'reactstrap';
-import { FormField, LoadingButton, CheckboxField, AlertMessage } from '../../../components/Common/Form';
+import { FormField, AlertMessage } from '../../../components/Common/Form';
 import { useAuth } from '../../../hooks/auth/useAuth';
 import { useForm } from '../../../hooks/form/useForm';
 import { validateLoginForm } from '../utils/loginValidators';
@@ -119,75 +119,34 @@ export const SimpleLoginForm: React.FC<SimpleLoginFormProps> = ({
         />
 
         {/* Remember Me Checkbox */}
-        <div className="float-end mb-3">
-          <CheckboxField
-            label="Recordarme"
+        <div className="form-check">
+          <input
+            type="checkbox"
+            className="form-check-input"
+            id="customControlInline"
             checked={formData.rememberMe || false}
-            onChange={handleFieldChange('rememberMe')}
+            onChange={(e) => handleFieldChange('rememberMe')(e.target.checked)}
             disabled={isSubmitting}
           />
-        </div>
-
-        {/* Forgot Password Link */}
-        <div className="text-end mb-3">
-          <p className="mb-0">
-            <a href="/forgot-password" className="text-muted">
-              ¿Olvidaste tu contraseña?
-            </a>
-          </p>
+          <label
+            className="form-check-label"
+            htmlFor="customControlInline"
+          >
+            Remember me
+          </label>
         </div>
 
         {/* Submit Button */}
         <div className="mt-3 d-grid">
-          <LoadingButton
+          <button
+            className="btn btn-primary btn-block"
             type="submit"
-            variant="primary"
-            loading={isSubmitting}
             disabled={isSubmitting}
-            fullWidth
           >
-            Iniciar Sesión
-          </LoadingButton>
+            {isSubmitting ? "Logging in..." : "Log In"}
+          </button>
         </div>
 
-        {/* Social Login Section */}
-        <div className="mt-4 text-center">
-          <h5 className="font-size-14 mb-3">Sign in with</h5>
-          <ul className="list-inline">
-            <li className="list-inline-item">
-              <a
-                href="#"
-                className="social-list-item bg-primary text-white border-primary"
-                onClick={(e) => {
-                  e.preventDefault();
-                  console.log('Facebook login - implement as needed');
-                }}
-              >
-                <i className="mdi mdi-facebook" />
-              </a>
-            </li>
-            <li className="list-inline-item">
-              <a
-                href="#"
-                className="social-list-item bg-danger text-white border-danger"
-                onClick={(e) => {
-                  e.preventDefault();
-                  console.log('Google login - implement as needed');
-                }}
-              >
-                <i className="mdi mdi-google" />
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        {/* Additional Forgot Password Link */}
-        <div className="mt-4 text-center">
-          <a href="/forgot-password" className="text-muted">
-            <i className="mdi mdi-lock me-1" />
-            Forgot your password?
-          </a>
-        </div>
       </Form>
     </div>
   );

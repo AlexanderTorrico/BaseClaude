@@ -33,6 +33,7 @@ export const AlertMessage: React.FC<AlertMessageProps> = ({
       isOpen={!!message}
       toggle={dismissible ? onDismiss : undefined}
       className={`mb-3 ${className}`}
+      fade={false}
     >
       {message}
     </Alert>

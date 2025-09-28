@@ -32,7 +32,6 @@ export const saveUserToStorage = (user: AuthUser): Result<boolean> => {
 
     return { success: true, data: true };
   } catch (error: any) {
-    console.warn('Failed to save user to storage:', error);
     return { success: false, error: error.message || 'Failed to save to storage' };
   }
 };
@@ -58,7 +57,6 @@ export const getUserFromStorage = (): Result<AuthUser | null> => {
 
     return { success: true, data: authUser };
   } catch (error: any) {
-    console.warn('Failed to get user from storage:', error);
     return { success: false, error: error.message || 'Failed to load from storage' };
   }
 };
@@ -69,7 +67,6 @@ export const getLastLoginFromStorage = (): Result<string | null> => {
     const lastLogin = localStorage.getItem(STORAGE_KEYS.LAST_LOGIN);
     return { success: true, data: lastLogin };
   } catch (error: any) {
-    console.warn('Failed to get last login from storage:', error);
     return { success: false, error: error.message || 'Failed to load last login' };
   }
 };
@@ -83,7 +80,6 @@ export const clearUserFromStorage = (): Result<boolean> => {
 
     return { success: true, data: true };
   } catch (error: any) {
-    console.warn('Failed to clear user from storage:', error);
     return { success: false, error: error.message || 'Failed to clear storage' };
   }
 };
@@ -99,7 +95,6 @@ export const hasUserInStorage = (): Result<boolean> => {
       data: !!(userData && token)
     };
   } catch (error: any) {
-    console.warn('Failed to check storage:', error);
     return { success: false, error: error.message || 'Failed to check storage' };
   }
 };

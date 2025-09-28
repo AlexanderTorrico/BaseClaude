@@ -18,13 +18,6 @@ const LoginPage: React.FC = () => {
   // Meta title - same as original
   document.title = 'Login | Skote - Vite React Admin & Dashboard Template';
 
-  const handleLoginSuccess = () => {
-    console.log('Login successful');
-  };
-
-  const handleLoginError = (error: string) => {
-    console.error('Login error:', error);
-  };
 
   return (
     <React.Fragment>
@@ -80,10 +73,7 @@ const LoginPage: React.FC = () => {
                   </div>
 
                   {/* Use our simplified LoginForm */}
-                  <SimpleLoginForm
-                    onSuccess={handleLoginSuccess}
-                    onError={handleLoginError}
-                  />
+                  <SimpleLoginForm />
 
                 </CardBody>
               </Card>

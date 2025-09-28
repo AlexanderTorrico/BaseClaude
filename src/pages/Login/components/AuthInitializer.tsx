@@ -16,14 +16,9 @@ export const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) =>
     // Initialize authentication state from storage on app startup
     const initAuth = async () => {
       try {
-        const result = await initializeAuth();
-        if (result && result.success) {
-          console.log('✅ Authentication initialized successfully');
-        } else {
-          console.log('ℹ️ No stored authentication found');
-        }
+        await initializeAuth();
       } catch (error) {
-        console.warn('⚠️ Failed to initialize authentication:', error);
+        // Silent fail - initialization errors are not critical
       }
     };
 

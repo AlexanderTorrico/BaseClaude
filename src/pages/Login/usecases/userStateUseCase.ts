@@ -43,8 +43,7 @@ export const loginWithStateUseCase = () => {
         const storageResult = await saveUserToStorage(result.data);
 
         if (!storageResult.success) {
-          console.warn('Failed to save user to storage:', storageResult.error);
-        }
+          }
 
         // Update Redux state
         dispatch(loginSuccess(result.data));
@@ -78,7 +77,6 @@ export const logoutWithStateUseCase = () => {
       const storageResult = await clearUserFromStorage();
 
       if (!storageResult.success) {
-        console.warn('Failed to clear user from storage:', storageResult.error);
       }
 
       if (result.success) {
@@ -145,7 +143,6 @@ export const updateUserProfileUseCase = () => {
       const storageResult = await saveUserToStorage(updatedUser);
 
       if (!storageResult.success) {
-        console.warn('Failed to save updated user to storage:', storageResult.error);
         return { success: false, error: storageResult.error || 'Failed to save profile updates' };
       }
 
@@ -164,7 +161,6 @@ export const resetUserStateUseCase = () => {
       const storageResult = await clearUserFromStorage();
 
       if (!storageResult.success) {
-        console.warn('Failed to clear storage during reset:', storageResult.error);
       }
 
       // Reset Redux state

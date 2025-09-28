@@ -24,7 +24,6 @@ export const logoutUseCase = () => {
       };
     } catch (error: any) {
       // Even if logout fails, we return success for local cleanup
-      console.warn('Logout use case error:', error);
       return {
         success: true,
         data: true

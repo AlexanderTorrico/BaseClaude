@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { useAuth } from '../../../hooks/auth/useAuth';
 import { useForm } from '../../../hooks/form/useForm';
 import { validateLoginForm } from '../utils/loginValidators';
-import { sanitizeLoginCredentials } from '../utils/loginHelpers';
+import { useLoginRequest } from './useLoginRequest';
 import type { LoginCredentials } from '../models';
 
 const initialLoginData: LoginCredentials = {
@@ -13,7 +12,12 @@ const initialLoginData: LoginCredentials = {
 
 export const useSimpleLogin = () => {
   const [generalError, setGeneralError] = useState<string>('');
-  const { login, isLoading, error, clearAuthError } = useAuth();
+  const {
+    executeLogin,
+    isLoading: loginLoading,
+    error: loginError,
+    clearError: clearLoginError
+  } = useLoginRequest();
 
   const {
     formData,
@@ -24,54 +28,74 @@ export const useSimpleLogin = () => {
     getFormValues
   } = useForm(initialLoginData);
 
+  // 1. Clear all errors
+  const clearAllErrors = () => {
+    setGeneralError('');
+    clearLoginError();
+  };
+
+  // 2. Validate form data
+  const validateFormData = (): boolean => {
+    return validateForm((data) => validateLoginForm(data));
+  };
+
+  // 3. Handle successful login
+  const handleLoginSuccess = () => {
+    resetForm(initialLoginData);
+  };
+
+  // 4. Execute login process
+  const performLogin = async (credentials: LoginCredentials) => {
+    const result = await executeLogin(credentials);
+
+    if (result.success) {
+      handleLoginSuccess();
+    }
+
+    return result;
+  };
+
+  // Main submit handler - orchestrates all responsibilities
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Clear previous errors
-    setGeneralError('');
-    clearAuthError();
+    // Step 1: Clear previous errors
+    clearAllErrors();
 
-    // Validate form
-    if (!validateForm((data) => validateLoginForm(data))) {
+    // Step 2: Validate form
+    if (!validateFormData()) {
       return;
     }
 
     try {
+      // Step 3: Start loading state
       setSubmitting(true);
 
-      // Get sanitized form values
-      const credentials = sanitizeLoginCredentials(getFormValues());
+      // Step 4: Get form data and execute login
+      const credentials = getFormValues();
+      await performLogin(credentials);
 
-      // Execute login
-      const result = await login(credentials);
-
-      if (result.success) {
-        resetForm(initialLoginData);
-      } else {
-        const errorMsg = result.error || 'Error al iniciar sesión';
-        setGeneralError(errorMsg);
-      }
     } catch (error: any) {
-      const errorMessage = error.message || 'Error inesperado al iniciar sesión';
+      // Step 5: Handle unexpected errors
+      const errorMessage = error.message || 'Error inesperado';
       setGeneralError(errorMessage);
     } finally {
+      // Step 6: Reset loading state
       setSubmitting(false);
     }
   };
 
   const handleFieldChange = (field: keyof LoginCredentials) => (value: any) => {
     if (generalError) setGeneralError('');
-    if (error) clearAuthError();
+    if (loginError) clearLoginError();
     setField(field, value);
   };
 
-  const clearErrors = () => {
-    setGeneralError('');
-    clearAuthError();
-  };
+  // Expose clearAllErrors as clearErrors for external use
+  const clearErrors = clearAllErrors;
 
-  const isSubmitting = formData.isSubmitting || isLoading;
-  const displayError = generalError || error;
+  const isSubmitting = formData.isSubmitting || loginLoading;
+  const displayError = generalError || loginError;
 
   return {
     // Form data and validation
@@ -88,7 +112,7 @@ export const useSimpleLogin = () => {
     generalError,
 
     // Auth state
-    isLoading,
-    error
+    isLoading: loginLoading,
+    error: loginError
   };
 };

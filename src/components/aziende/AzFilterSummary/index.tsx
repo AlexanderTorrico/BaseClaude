@@ -131,19 +131,7 @@ const FilterSummary = ({
     return (
       <div className={`d-flex justify-content-between align-items-center ${countClassName}`}>
         <small className="text-muted">
-          {isFiltered ? (
-            <>
-              <strong className="text-primary">{filteredData.length}</strong>
-              <span>/</span>
-              <strong>{data.length}</strong>
-              <span> elementos</span>
-            </>
-          ) : (
-            <>
-              <strong>{data.length}</strong>
-              <span> elementos</span>
-            </>
-          )}
+          
         </small>
       </div>
     );

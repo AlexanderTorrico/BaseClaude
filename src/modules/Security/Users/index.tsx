@@ -7,7 +7,6 @@ import { mockUsers, User } from './data/mockUsers';
 import { userTableColumns } from './config/tableColumns';
 
 const Users: React.FC = () => {
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
 
   const handleCreateUser = () => {
     console.log('Crear nuevo usuario');
@@ -25,26 +24,6 @@ const Users: React.FC = () => {
     console.log('Ver detalles usuario:', userId);
   };
 
-  const handleBulkDelete = () => {
-    if (selectedUsers.length > 0) {
-      console.log('Eliminar usuarios seleccionados:', selectedUsers);
-      setSelectedUsers([]);
-    }
-  };
-
-  const handleBulkActivate = () => {
-    if (selectedUsers.length > 0) {
-      console.log('Activar usuarios seleccionados:', selectedUsers);
-      setSelectedUsers([]);
-    }
-  };
-
-  const handleBulkDeactivate = () => {
-    if (selectedUsers.length > 0) {
-      console.log('Desactivar usuarios seleccionados:', selectedUsers);
-      setSelectedUsers([]);
-    }
-  };
 
   // Calcular estadísticas para el header
   const activeUsers = mockUsers.filter(user => user.estado).length;
@@ -61,59 +40,15 @@ const Users: React.FC = () => {
           badgeColor="primary"
           badgeCount={activeUsers}
           badgeTotal={totalUsers}
-          showBottomRow={selectedUsers.length > 0}
           contentTopRight={
             <Button
-              color="primary"
+              color="warning"
               onClick={handleCreateUser}
               className="d-flex align-items-center"
             >
               <i className="mdi mdi-plus me-1"></i>
               Nuevo Usuario
             </Button>
-          }
-          bottomLeftSlot={
-            selectedUsers.length > 0 && (
-              <div className="d-flex align-items-center">
-                <i className="mdi mdi-information-outline text-info me-2"></i>
-                <span className="text-muted">
-                  {selectedUsers.length} usuario{selectedUsers.length !== 1 ? 's' : ''} seleccionado{selectedUsers.length !== 1 ? 's' : ''}
-                </span>
-              </div>
-            )
-          }
-          bottomRightSlot={
-            selectedUsers.length > 0 && (
-              <>
-                <Button
-                  color="success"
-                  size="sm"
-                  onClick={handleBulkActivate}
-                  className="d-flex align-items-center"
-                >
-                  <i className="mdi mdi-check-circle me-1"></i>
-                  Activar
-                </Button>
-                <Button
-                  color="warning"
-                  size="sm"
-                  onClick={handleBulkDeactivate}
-                  className="d-flex align-items-center"
-                >
-                  <i className="mdi mdi-pause-circle me-1"></i>
-                  Desactivar
-                </Button>
-                <Button
-                  color="danger"
-                  size="sm"
-                  onClick={handleBulkDelete}
-                  className="d-flex align-items-center"
-                >
-                  <i className="mdi mdi-delete me-1"></i>
-                  Eliminar
-                </Button>
-              </>
-            )
           }
         />
 
@@ -132,8 +67,6 @@ const Users: React.FC = () => {
                 <AzTable
                 data={filteredData}
                 columns={userTableColumns}
-                selectedItems={selectedUsers}
-                onSelectedChange={setSelectedUsers}
                 pagination={true}
                 filters={filters}
                 onFilterChange={onFilterChange}

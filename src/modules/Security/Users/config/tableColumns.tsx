@@ -85,7 +85,7 @@ export const userTableColumns = [
     key: "fechaCreacion",
     header: "Fecha Creación",
     sortable: true,
-    filterable: false,
+    filterable: true,
     cell: ({ row }) => {
       const fecha = new Date(row.original.fechaCreacion);
       return (
@@ -100,7 +100,7 @@ export const userTableColumns = [
     key: "ultimoAcceso",
     header: "Último Acceso",
     sortable: true,
-    filterable: false,
+    filterable: true,
     cell: ({ row }) => {
       const fecha = new Date(row.original.ultimoAcceso);
       const diasDesdeAcceso = Math.floor((Date.now() - fecha.getTime()) / (1000 * 60 * 60 * 24));

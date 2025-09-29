@@ -4,15 +4,7 @@ import { AlertMessage } from '../../../components/Common/Form';
 import { useSimpleLogin } from '../hooks/useSimpleLogin';
 import type { LoginCredentials } from '../models';
 
-interface SimpleLoginFormProps {
-  onSuccess?: () => void;
-  onError?: (error: string) => void;
-}
-
-export const SimpleLoginForm = ({
-  onSuccess,
-  onError
-}: SimpleLoginFormProps) => {
+export const LoginForm = () => {
   const {
     formData,
     handleSubmit,
@@ -20,8 +12,8 @@ export const SimpleLoginForm = ({
     clearErrors,
     isSubmitting,
     displayError
-  } = useSimpleLogin({ onSuccess, onError });
-
+  } = useSimpleLogin();
+  
   return (
     <div className="p-2">
       <Form className="form-horizontal" onSubmit={handleSubmit}>

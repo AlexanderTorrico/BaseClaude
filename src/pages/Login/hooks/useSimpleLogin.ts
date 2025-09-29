@@ -11,12 +11,7 @@ const initialLoginData: LoginCredentials = {
   rememberMe: false
 };
 
-interface UseSimpleLoginProps {
-  onSuccess?: () => void;
-  onError?: (error: string) => void;
-}
-
-export const useSimpleLogin = ({ onSuccess, onError }: UseSimpleLoginProps = {}) => {
+export const useSimpleLogin = () => {
   const [generalError, setGeneralError] = useState<string>('');
   const { login, isLoading, error, clearAuthError } = useAuth();
 
@@ -51,17 +46,14 @@ export const useSimpleLogin = ({ onSuccess, onError }: UseSimpleLoginProps = {})
       const result = await login(credentials);
 
       if (result.success) {
-        onSuccess?.();
         resetForm(initialLoginData);
       } else {
         const errorMsg = result.error || 'Error al iniciar sesión';
         setGeneralError(errorMsg);
-        onError?.(errorMsg);
       }
     } catch (error: any) {
       const errorMessage = error.message || 'Error inesperado al iniciar sesión';
       setGeneralError(errorMessage);
-      onError?.(errorMessage);
     } finally {
       setSubmitting(false);
     }

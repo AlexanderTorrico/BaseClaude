@@ -1,116 +1,181 @@
 import React from 'react';
 import { Badge } from 'reactstrap';
-import { rolesOptions, departamentosOptions, estadoOptions } from '../data/mockUsers';
+import { privilegeOptions, languageOptions, statusOptions } from '../data/mockUsers';
 
 export const userTableColumns = [
   {
-    key: "nombre",
-    header: "Nombre",
+    key: "name",
+    header: "Usuario",
     sortable: true,
     filterable: true,
     filterType: "text",
     cell: ({ row }) => (
       <div className="d-flex flex-column">
-        <span className="fw-medium">{row.original.nombre}</span>
+        <div className="d-flex align-items-center">
+          {row.original.logo ? (
+            <img
+              src={row.original.logo}
+              alt={`${row.original.name} ${row.original.lastName}`}
+              className="avatar-xs rounded-circle me-2"
+            />
+          ) : (
+            <div className="avatar-xs bg-primary rounded-circle d-flex align-items-center justify-content-center me-2">
+              <span className="text-white font-size-10">
+                {row.original.name.charAt(0)}{row.original.lastName.charAt(0)}
+              </span>
+            </div>
+          )}
+          <span className="fw-medium">{row.original.name} {row.original.lastName}</span>
+        </div>
         <small className="text-muted">{row.original.email}</small>
       </div>
     )
   },
   {
-    key: "rol",
-    header: "Rol",
+    key: "privilege",
+    header: "Privilegio",
     sortable: true,
     filterable: true,
     filterType: "select",
-    filterOptions: rolesOptions,
+    filterOptions: privilegeOptions,
     cell: ({ row }) => {
-      const getRoleBadgeColor = (rol: string) => {
-        switch (rol) {
-          case "Administrador":
+      const getPrivilegeBadgeColor = (privilege: string) => {
+        switch (privilege) {
+          case "admin":
             return "danger";
-          case "Supervisor":
+          case "supervisor":
             return "warning";
-          case "Usuario":
+          case "user":
             return "info";
           default:
             return "secondary";
         }
       };
 
+      const getPrivilegeLabel = (privilege: string) => {
+        switch (privilege) {
+          case "admin":
+            return "Administrador";
+          case "supervisor":
+            return "Supervisor";
+          case "user":
+            return "Usuario";
+          default:
+            return privilege;
+        }
+      };
+
       return (
-        <Badge color={getRoleBadgeColor(row.original.rol)} className="badge-soft-primary">
-          {row.original.rol}
+        <Badge color={getPrivilegeBadgeColor(row.original.privilege)} className="badge-soft-primary">
+          {getPrivilegeLabel(row.original.privilege)}
         </Badge>
       );
     }
   },
   {
-    key: "departamento",
-    header: "Departamento",
-    sortable: true,
-    filterable: true,
-    filterType: "select",
-    filterOptions: departamentosOptions,
+    key: "roles",
+    header: "Roles",
+    sortable: false,
+    filterable: false,
     cell: ({ row }) => (
-      <span className="text-muted">{row.original.departamento}</span>
+      <div className="d-flex flex-wrap gap-1">
+        {row.original.roles.length > 0 ?
+          row.original.roles.slice(0, 2).map((role, index) => (
+            <Badge key={index} color="secondary" className="badge-soft-secondary">
+              {role}
+            </Badge>
+          )) :
+          <span className="text-muted">Sin roles</span>
+        }
+        {row.original.roles.length > 2 && (
+          <Badge color="light" className="badge-soft-light">
+            +{row.original.roles.length - 2}
+          </Badge>
+        )}
+      </div>
     )
   },
   {
-    key: "estado",
+    key: "permissions",
+    header: "Permisos",
+    sortable: false,
+    filterable: false,
+    cell: ({ row }) => (
+      <div className="d-flex flex-wrap gap-1">
+        {row.original.permissions.length > 0 ?
+          row.original.permissions.slice(0, 3).map((permission, index) => (
+            <Badge key={index} color="info" className="badge-soft-info font-size-10">
+              {permission}
+            </Badge>
+          )) :
+          <span className="text-muted">Sin permisos</span>
+        }
+        {row.original.permissions.length > 3 && (
+          <Badge color="light" className="badge-soft-light font-size-10">
+            +{row.original.permissions.length - 3}
+          </Badge>
+        )}
+      </div>
+    )
+  },
+  {
+    key: "status",
     header: "Estado",
     sortable: true,
     filterable: true,
     filterType: "select",
-    filterOptions: estadoOptions,
+    filterOptions: statusOptions,
     cell: ({ row }) => (
       <Badge
-        color={row.original.estado ? "success" : "danger"}
-        className={`badge-soft-${row.original.estado ? "success" : "danger"}`}
+        color={row.original.status === 'active' ? "success" : "danger"}
+        className={`badge-soft-${row.original.status === 'active' ? "success" : "danger"}`}
       >
-        {row.original.estado ? "Activo" : "Inactivo"}
+        {row.original.status === 'active' ? "Activo" : "Inactivo"}
       </Badge>
     )
   },
   {
-    key: "telefono",
+    key: "phone",
     header: "Teléfono",
     sortable: false,
     filterable: true,
     filterType: "text",
     cell: ({ row }) => (
-      <span className="text-muted font-family-monospace">{row.original.telefono}</span>
+      <span className="text-muted font-family-monospace">{row.original.phone || 'N/A'}</span>
     )
   },
   {
-    key: "fechaCreacion",
-    header: "Fecha Creación",
+    key: "language",
+    header: "Idioma",
     sortable: true,
     filterable: true,
+    filterType: "select",
+    filterOptions: languageOptions,
     cell: ({ row }) => {
-      const fecha = new Date(row.original.fechaCreacion);
-      return (
-        <div className="d-flex flex-column">
-          <span>{fecha.toLocaleDateString('es-ES')}</span>
-          <small className="text-muted">Hace {Math.floor((Date.now() - fecha.getTime()) / (1000 * 60 * 60 * 24))} días</small>
-        </div>
-      );
-    }
-  },
-  {
-    key: "ultimoAcceso",
-    header: "Último Acceso",
-    sortable: true,
-    filterable: true,
-    cell: ({ row }) => {
-      const fecha = new Date(row.original.ultimoAcceso);
-      const diasDesdeAcceso = Math.floor((Date.now() - fecha.getTime()) / (1000 * 60 * 60 * 24));
+      const getLanguageFlag = (lang: string) => {
+        switch (lang) {
+          case "es": return "🇪🇸";
+          case "en": return "🇺🇸";
+          case "fr": return "🇫🇷";
+          case "de": return "🇩🇪";
+          default: return "🌐";
+        }
+      };
+
+      const getLanguageName = (lang: string) => {
+        switch (lang) {
+          case "es": return "Español";
+          case "en": return "English";
+          case "fr": return "Français";
+          case "de": return "Deutsch";
+          default: return lang;
+        }
+      };
 
       return (
-        <div className="d-flex flex-column">
-          <span>{fecha.toLocaleDateString('es-ES')}</span>
-          <small className={`${diasDesdeAcceso > 7 ? 'text-warning' : diasDesdeAcceso > 30 ? 'text-danger' : 'text-muted'}`}>
-            Hace {diasDesdeAcceso} días
-          </small>
+        <div className="d-flex align-items-center">
+          <span className="me-1">{getLanguageFlag(row.original.language)}</span>
+          <span>{getLanguageName(row.original.language)}</span>
         </div>
       );
     }

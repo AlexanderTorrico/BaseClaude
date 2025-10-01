@@ -94,7 +94,7 @@ export const loginService = async (
     });
 
     if (isValidLoginResponse(response)) {
-      const authUser = adaptApiUserToAuthUser(response);
+      const authUser = adaptApiUserToAuthUser(response.data);
       return {
         success: true,
         data: authUser

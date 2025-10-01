@@ -5,21 +5,24 @@
 import type { AuthUser } from '../models';
 
 // Adapt API user response to domain AuthUser
-export const adaptApiUserToAuthUser = (apiResponse: any): AuthUser => ({
-  id: apiResponse.data.data.id?.toString() || '',
-  name: apiResponse.data.data.name || '',
-  lastName: apiResponse.data.data.last_name || '',
-  email: apiResponse.data.data.email || '',
-  token: apiResponse.data.access_token || '',
-  privilege: apiResponse.data.data.privilege || 'user',
-  phone: apiResponse.data.data.phone || '',
-  logo: apiResponse.data.data.logo || '',
-  language: apiResponse.data.data.language || 'es',
-  status: apiResponse.data.data.status === 1 ? 'active' : 'inactive',
-  modules: apiResponse.data.modules || [],
-  roles: apiResponse.data.roles || [],
-  permissions: apiResponse.data.direct_permissions || []
-});
+export const adaptApiUserToAuthUser = (apiResponse: any): AuthUser => {
+  console.log('API Response:', apiResponse);
+  return {
+    id: apiResponse.data.data.id?.toString() || '',
+    name: apiResponse.data.data.name || '',
+    lastName: apiResponse.data.data.last_name || '',
+    email: apiResponse.data.data.email || '',
+    token: apiResponse.data.access_token || '',
+    privilege: apiResponse.data.data.privilege || 'user',
+    phone: apiResponse.data.data.phone || '',
+    logo: apiResponse.data.data.logo || '',
+    language: apiResponse.data.data.language || 'es',
+    status: apiResponse.data.data.status === 1 ? 'active' : 'inactive',
+    modules: apiResponse.data.modules || [],
+    roles: apiResponse.data.roles || [],
+    permissions: apiResponse.data.direct_permissions || []
+  };
+};
 
 // Adapt social login API response to domain AuthUser
 export const adaptSocialApiUserToAuthUser = (apiResponse: any): AuthUser => ({
@@ -41,8 +44,8 @@ export const adaptSocialApiUserToAuthUser = (apiResponse: any): AuthUser => ({
 // Validate login response structure
 export const isValidLoginResponse = (response: any): boolean => {
   return response?.data?.status === 200 &&
-         response?.data?.message === "success" &&
-         response?.data?.data;
+    response?.data?.message === "success" &&
+    response?.data?.data;
 };
 
 // Validate social login response structure

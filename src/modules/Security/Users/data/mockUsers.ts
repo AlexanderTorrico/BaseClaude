@@ -1,183 +1,133 @@
 export interface User {
-  id: number;
-  nombre: string;
+  id: string;
+  name: string;
+  lastName: string;
   email: string;
-  rol: string;
-  estado: boolean;
-  fechaCreacion: string;
-  ultimoAcceso: string;
-  telefono: string;
-  departamento: string;
+  privilege: string;
+  phone: string;
+  logo: string;
+  language: string;
+  status: 'active' | 'inactive';
+  modules: any[];
+  roles: any[];
+  permissions: any[];
 }
 
 export const mockUsers: User[] = [
   {
-    id: 1,
-    nombre: "Juan Carlos Pérez",
+    id: "1",
+    name: "Juan Carlos",
+    lastName: "Pérez",
     email: "juan.perez@empresa.com",
-    rol: "Administrador",
-    estado: true,
-    fechaCreacion: "2024-01-15",
-    ultimoAcceso: "2024-09-28",
-    telefono: "+1 555-0101",
-    departamento: "TI"
+    privilege: "admin",
+    phone: "+1 555-0101",
+    logo: "",
+    language: "es",
+    status: "active",
+    modules: [],
+    roles: ["Administrador"],
+    permissions: ["read", "write", "delete"]
   },
   {
-    id: 2,
-    nombre: "María García López",
+    id: "2",
+    name: "María",
+    lastName: "García López",
     email: "maria.garcia@empresa.com",
-    rol: "Usuario",
-    estado: true,
-    fechaCreacion: "2024-02-20",
-    ultimoAcceso: "2024-09-27",
-    telefono: "+1 555-0102",
-    departamento: "Ventas"
+    privilege: "user",
+    phone: "+1 555-0102",
+    logo: "",
+    language: "es",
+    status: "active",
+    modules: [],
+    roles: ["Usuario"],
+    permissions: ["read"]
   },
   {
-    id: 3,
-    nombre: "Carlos Rodríguez",
+    id: "3",
+    name: "Carlos",
+    lastName: "Rodríguez",
     email: "carlos.rodriguez@empresa.com",
-    rol: "Supervisor",
-    estado: false,
-    fechaCreacion: "2024-01-10",
-    ultimoAcceso: "2024-09-20",
-    telefono: "+1 555-0103",
-    departamento: "Producción"
+    privilege: "supervisor",
+    phone: "+1 555-0103",
+    logo: "",
+    language: "es",
+    status: "inactive",
+    modules: [],
+    roles: ["Supervisor"],
+    permissions: ["read", "write"]
   },
   {
-    id: 4,
-    nombre: "Ana Martínez Silva",
+    id: "4",
+    name: "Ana",
+    lastName: "Martínez Silva",
     email: "ana.martinez@empresa.com",
-    rol: "Usuario",
-    estado: true,
-    fechaCreacion: "2024-03-05",
-    ultimoAcceso: "2024-09-29",
-    telefono: "+1 555-0104",
-    departamento: "Recursos Humanos"
+    privilege: "user",
+    phone: "+1 555-0104",
+    logo: "",
+    language: "es",
+    status: "active",
+    modules: [],
+    roles: ["Usuario"],
+    permissions: ["read"]
   },
   {
-    id: 5,
-    nombre: "Pedro González",
+    id: "5",
+    name: "Pedro",
+    lastName: "González",
     email: "pedro.gonzalez@empresa.com",
-    rol: "Administrador",
-    estado: true,
-    fechaCreacion: "2024-01-25",
-    ultimoAcceso: "2024-09-29",
-    telefono: "+1 555-0105",
-    departamento: "TI"
+    privilege: "admin",
+    phone: "+1 555-0105",
+    logo: "",
+    language: "es",
+    status: "active",
+    modules: [],
+    roles: ["Administrador"],
+    permissions: ["read", "write", "delete"]
   },
   {
-    id: 6,
-    nombre: "Laura Hernández",
+    id: "6",
+    name: "Laura",
+    lastName: "Hernández",
     email: "laura.hernandez@empresa.com",
-    rol: "Usuario",
-    estado: false,
-    fechaCreacion: "2024-04-12",
-    ultimoAcceso: "2024-09-15",
-    telefono: "+1 555-0106",
-    departamento: "Marketing"
+    privilege: "user",
+    phone: "+1 555-0106",
+    logo: "",
+    language: "es",
+    status: "inactive",
+    modules: [],
+    roles: ["Usuario"],
+    permissions: ["read"]
   },
   {
-    id: 7,
-    nombre: "Roberto Díaz",
+    id: "7",
+    name: "Roberto",
+    lastName: "Díaz",
     email: "roberto.diaz@empresa.com",
-    rol: "Supervisor",
-    estado: true,
-    fechaCreacion: "2024-02-08",
-    ultimoAcceso: "2024-09-28",
-    telefono: "+1 555-0107",
-    departamento: "Finanzas"
+    privilege: "supervisor",
+    phone: "+1 555-0107",
+    logo: "",
+    language: "es",
+    status: "active",
+    modules: [],
+    roles: ["Supervisor"],
+    permissions: ["read", "write"]
   },
   {
-    id: 8,
-    nombre: "Carmen Torres",
+    id: "8",
+    name: "Carmen",
+    lastName: "Torres",
     email: "carmen.torres@empresa.com",
-    rol: "Usuario",
-    estado: true,
-    fechaCreacion: "2024-03-18",
-    ultimoAcceso: "2024-09-26",
-    telefono: "+1 555-0108",
-    departamento: "Legal"
-  },
-  {
-    id: 9,
-    nombre: "Miguel Ángel Vargas",
-    email: "miguel.vargas@empresa.com",
-    rol: "Administrador",
-    estado: false,
-    fechaCreacion: "2024-01-30",
-    ultimoAcceso: "2024-09-10",
-    telefono: "+1 555-0109",
-    departamento: "TI"
-  },
-  {
-    id: 10,
-    nombre: "Sofía Jiménez",
-    email: "sofia.jimenez@empresa.com",
-    rol: "Usuario",
-    estado: true,
-    fechaCreacion: "2024-04-25",
-    ultimoAcceso: "2024-09-29",
-    telefono: "+1 555-0110",
-    departamento: "Atención al Cliente"
-  },
-  {
-    id: 11,
-    nombre: "Daniel Morales",
-    email: "daniel.morales@empresa.com",
-    rol: "Supervisor",
-    estado: true,
-    fechaCreacion: "2024-02-14",
-    ultimoAcceso: "2024-09-28",
-    telefono: "+1 555-0111",
-    departamento: "Logística"
-  },
-  {
-    id: 12,
-    nombre: "Patricia Ruiz",
-    email: "patricia.ruiz@empresa.com",
-    rol: "Usuario",
-    estado: false,
-    fechaCreacion: "2024-03-22",
-    ultimoAcceso: "2024-09-12",
-    telefono: "+1 555-0112",
-    departamento: "Compras"
-  },
-  {
-    id: 13,
-    nombre: "Francisco López",
-    email: "francisco.lopez@empresa.com",
-    rol: "Administrador",
-    estado: true,
-    fechaCreacion: "2024-01-05",
-    ultimoAcceso: "2024-09-29",
-    telefono: "+1 555-0113",
-    departamento: "TI"
-  },
-  {
-    id: 14,
-    nombre: "Beatriz Sánchez",
-    email: "beatriz.sanchez@empresa.com",
-    rol: "Usuario",
-    estado: true,
-    fechaCreacion: "2024-04-08",
-    ultimoAcceso: "2024-09-27",
-    telefono: "+1 555-0114",
-    departamento: "Calidad"
-  },
-  {
-    id: 15,
-    nombre: "Alejandro Castro",
-    email: "alejandro.castro@empresa.com",
-    rol: "Supervisor",
-    estado: false,
-    fechaCreacion: "2024-02-28",
-    ultimoAcceso: "2024-09-18",
-    telefono: "+1 555-0115",
-    departamento: "Mantenimiento"
+    privilege: "user",
+    phone: "+1 555-0108",
+    logo: "",
+    language: "es",
+    status: "active",
+    modules: [],
+    roles: ["Usuario"],
+    permissions: ["read"]
   }
 ];
 
-export const rolesOptions = ["Administrador", "Supervisor", "Usuario"];
-export const departamentosOptions = ["TI", "Ventas", "Producción", "Recursos Humanos", "Marketing", "Finanzas", "Legal", "Atención al Cliente", "Logística", "Compras", "Calidad", "Mantenimiento"];
-export const estadoOptions = ["Sí", "No"];
+export const privilegeOptions = ["admin", "supervisor", "user"];
+export const languageOptions = ["es", "en", "fr", "de"];
+export const statusOptions = ["active", "inactive"];

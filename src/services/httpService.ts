@@ -1,4 +1,5 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
+import { AxiosCallModel } from '@/models/axiosCallModel';
 
 export interface HttpConfig {
   baseURL?: string;
@@ -48,4 +49,121 @@ export const handleRequest = async <T>(
  */
 export const loadAbort = (): AbortController => {
   return new AbortController();
+};
+
+/**
+ * Get authentication token from localStorage
+ */
+const getAuthToken = (): string | null => {
+  return localStorage.getItem('authToken');
+};
+
+/**
+ * Create authenticated API call (with token in headers)
+ */
+export const createAuthenticatedCall = <T>(
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+  url: string,
+  data?: any,
+  config?: AxiosRequestConfig
+): AxiosCallModel<T> => {
+  const controller = loadAbort();
+  const api = createApiInstance();
+  const token = getAuthToken();
+
+  // Configurar headers con token
+  const headers = {
+    ...config?.headers,
+    'Authorization': token ? `Bearer ${token}` : undefined,
+  };
+
+  // Remover Authorization si no hay token
+  if (!token) {
+    delete headers.Authorization;
+  }
+
+  const requestConfig: AxiosRequestConfig = {
+    ...config,
+    headers,
+    signal: controller.signal,
+  };
+
+  let call: Promise<AxiosResponse<T>>;
+
+  switch (method) {
+    case 'GET':
+      call = api.get<T>(url, requestConfig);
+      break;
+    case 'POST':
+      call = api.post<T>(url, data, requestConfig);
+      break;
+    case 'PUT':
+      call = api.put<T>(url, data, requestConfig);
+      break;
+    case 'DELETE':
+      call = api.delete<T>(url, requestConfig);
+      break;
+    case 'PATCH':
+      call = api.patch<T>(url, data, requestConfig);
+      break;
+    default:
+      throw new Error(`Unsupported HTTP method: ${method}`);
+  }
+
+  return {
+    call,
+    controller
+  };
+};
+
+/**
+ * Create public API call (without authentication)
+ */
+export const createPublicCall = <T>(
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+  url: string,
+  data?: any,
+  config?: AxiosRequestConfig
+): AxiosCallModel<T> => {
+  const controller = loadAbort();
+  const api = createApiInstance();
+
+  const requestConfig: AxiosRequestConfig = {
+    ...config,
+    signal: controller.signal,
+  };
+
+  let call: Promise<AxiosResponse<T>>;
+
+  switch (method) {
+    case 'GET':
+      call = api.get<T>(url, requestConfig);
+      break;
+    case 'POST':
+      call = api.post<T>(url, data, requestConfig);
+      break;
+    case 'PUT':
+      call = api.put<T>(url, data, requestConfig);
+      break;
+    case 'DELETE':
+      call = api.delete<T>(url, requestConfig);
+      break;
+    case 'PATCH':
+      call = api.patch<T>(url, data, requestConfig);
+      break;
+    default:
+      throw new Error(`Unsupported HTTP method: ${method}`);
+  }
+
+  return {
+    call,
+    controller
+  };
+};
+
+/**
+ * Legacy function - create API instance (backward compatibility)
+ */
+export const userCall = (): AxiosCallModel<any> => {
+  return createAuthenticatedCall('POST', '/rrhh/by_company_id/1', {});
 };

@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Container, Row, Col, Card, Button } from 'reactstrap';
 import { AzHeaderCard } from '../../../components/aziende/AzHeader';
 import AzFilterSummary from '../../../components/aziende/AzFilterSummary';
 import AzTable from '../../../components/aziende/AzTable';
 import { mockUsers, User } from './data/mockUsers';
 import { userTableColumns } from './config/tableColumns';
+import { getUsers } from './controller/userController';
+import { get } from 'lodash';
 
 // Tipos para el render props de AzFilterSummary
 interface FilterSummaryRenderProps {
@@ -27,22 +29,30 @@ const Users: React.FC = () => {
     console.log('Crear nuevo usuario');
   };
 
-  const handleEditUser = (userId: number) => {
+  const handleEditUser = (userId: string) => {
     console.log('Editar usuario:', userId);
   };
 
-  const handleDeleteUser = (userId: number) => {
+  const handleDeleteUser = (userId: string) => {
     console.log('Eliminar usuario:', userId);
   };
 
-  const handleViewUser = (userId: number) => {
+  const handleViewUser = (userId: string) => {
     console.log('Ver detalles usuario:', userId);
   };
 
 
   // Calcular estadísticas para el header
-  const activeUsers = mockUsers.filter(user => user.estado).length;
+  const activeUsers = mockUsers.filter(user => user.status === 'active').length;
   const totalUsers = mockUsers.length;
+
+  useEffect(() => {
+    getUsers().then(response => {
+      console.log('Usuarios cargados desde API:', response);
+    }).catch(error => {
+      console.error('Error al cargar usuarios:', error);
+    });
+  }, []);
 
   return (
     <div className="page-content">

@@ -6,6 +6,21 @@ import AzTable from '../../../components/aziende/AzTable';
 import { mockUsers, User } from './data/mockUsers';
 import { userTableColumns } from './config/tableColumns';
 
+// Tipos para el render props de AzFilterSummary
+interface FilterSummaryRenderProps {
+  filteredData: User[];
+  originalData: User[];
+  filters: Record<string, string>;
+  sorting: { field: string; direction: string };
+  onFilterChange: (filterKey: string, value: string) => void;
+  onSortChange: (sortConfig: { field: string; direction: string }) => void;
+  onClearAll: () => void;
+  hasActiveFilters: boolean;
+  hasActiveSorting: boolean;
+  hasActiveItems: boolean;
+  columns: any[];
+}
+
 const Users: React.FC = () => {
 
   const handleCreateUser = () => {
@@ -63,7 +78,7 @@ const Users: React.FC = () => {
             showCount="always"
             countPosition="top"
             >
-            {({ filteredData, onFilterChange, onSortChange, filters, sorting }) => (
+            {({ filteredData, onFilterChange, onSortChange, filters, sorting }: FilterSummaryRenderProps) => (
                 <AzTable
                 data={filteredData}
                 columns={userTableColumns}
@@ -79,8 +94,8 @@ const Users: React.FC = () => {
                     size="sm"
                     color="info"
                     outline
-                    onClick={(e) => {
-                        const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}');
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                        const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as User;
                         handleViewUser(rowData.id);
                     }}
                     title="Ver detalles"
@@ -91,8 +106,8 @@ const Users: React.FC = () => {
                     size="sm"
                     color="primary"
                     outline
-                    onClick={(e) => {
-                        const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}');
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                        const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as User;
                         handleEditUser(rowData.id);
                     }}
                     title="Editar usuario"
@@ -103,8 +118,8 @@ const Users: React.FC = () => {
                     size="sm"
                     color="danger"
                     outline
-                    onClick={(e) => {
-                        const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}');
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                        const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as User;
                         handleDeleteUser(rowData.id);
                     }}
                     title="Eliminar usuario"

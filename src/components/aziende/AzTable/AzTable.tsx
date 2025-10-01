@@ -1,4 +1,31 @@
 import React, { useMemo, useState, Children, useCallback } from "react";
+
+// Interfaces TypeScript
+interface AzTableActionsProps {
+  children: React.ReactNode;
+  row?: any;
+  index?: number;
+  isSelected?: boolean;
+  [key: string]: any;
+}
+
+interface AzTableProps {
+  data?: any[];
+  columns?: any[];
+  selectedItems?: any[];
+  onSelectedChange?: (items: any[]) => void;
+  pagination?: boolean;
+  sorting?: { field: string; direction: string };
+  onSortChange?: (config: { field: string; direction: string }) => void;
+  filters?: Record<string, string>;
+  onFilterChange?: (column: string, value: string) => void;
+  className?: string;
+  tableProps?: any;
+  children?: React.ReactNode;
+  showActions?: boolean;
+  components?: any;
+}
+
 import { Input } from "reactstrap";
 import { useTranslation } from "react-i18next";
 import TableContainer from "./TableContainer";
@@ -6,7 +33,7 @@ import TableContainer from "./TableContainer";
 /**
  * AzTable - Componente genérico de tabla con funcionalidades avanzadas
  */
-const AzTable = (props) => {
+const AzTable: React.FC<AzTableProps> & { Actions: React.FC<AzTableActionsProps> } = (props) => {
   const {
   data = [],
   columns = [],
@@ -644,7 +671,7 @@ const AzTableHeader = ({
 /**
  * Componente de acciones personalizable
  */
-const AzTableActions = ({ children, row, index, isSelected, ...props }) => {
+const AzTableActions: React.FC<AzTableActionsProps> = ({ children, row, index, isSelected, ...props }) => {
   const processedChildren = Children.map(children, child => {
     if (React.isValidElement(child)) {
       return React.cloneElement(child, {
@@ -664,7 +691,7 @@ const AzTableActions = ({ children, row, index, isSelected, ...props }) => {
 AzTableActions.displayName = 'AzTableActions';
 
 // Asignar subcomponentes
-AzTable.Actions = AzTableActions;
+(AzTable as any).Actions = AzTableActions;
 
 // También exportar AzTable directamente para uso interno
 export { AzTable, AzTableActions };

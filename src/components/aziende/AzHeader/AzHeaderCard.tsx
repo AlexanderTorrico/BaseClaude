@@ -1,6 +1,23 @@
 import React from "react";
 import { Row, Col, Card, CardBody, Badge } from "reactstrap";
 
+// Interface TypeScript para las props
+interface AzHeaderCardProps {
+  title: string;
+  description?: string;
+  showBadge?: boolean;
+  badgeColor?: string;
+  badgeText?: string;
+  badgeCount?: number;
+  badgeTotal?: number;
+  showBottomRow?: boolean;
+  contentTopRight?: React.ReactNode;
+  bottomLeftSlot?: React.ReactNode;
+  bottomRightSlot?: React.ReactNode;
+  className?: string;
+  cardClassName?: string;
+}
+
 /**
  * AzHeaderCard - Componente genérico de header optimizado
  *
@@ -18,7 +35,7 @@ import { Row, Col, Card, CardBody, Badge } from "reactstrap";
  * @param {string} [className=""] - Clases CSS adicionales para el CardBody
  * @param {string} [cardClassName=""] - Clases CSS adicionales para el Card
  */
-const AzHeaderCard = React.memo(({
+const AzHeaderCard: React.FC<AzHeaderCardProps> = React.memo(({
   title,
   description,
   showBadge = false,

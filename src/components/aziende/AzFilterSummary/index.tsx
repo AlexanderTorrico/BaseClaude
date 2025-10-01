@@ -1,11 +1,22 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Button, CardBody } from 'reactstrap';
 
+// Interfaces TypeScript
+interface FilterSummaryProps {
+  data?: any[];
+  columns?: any[];
+  children?: React.ReactNode | ((props: any) => React.ReactNode);
+  className?: string;
+  showCount?: "auto" | "always" | "never";
+  countPosition?: "top" | "bottom" | "both";
+  alwaysVisible?: boolean;
+}
+
 /**
  * FilterSummary - Container component que gestiona filtros y ordenamientos
  * Utiliza render props pattern para pasar datos filtrados a componentes hijos
  */
-const FilterSummary = ({
+const FilterSummary: React.FC<FilterSummaryProps> = ({
   data = [],
   columns = [],
   children,
@@ -14,6 +25,11 @@ const FilterSummary = ({
   countPosition = "top", // "top", "bottom", "both"
   alwaysVisible = false // true = always show filter summary, false = only when filters are active
 }) => {
+
+  // Validación y warning para desarrolladores
+  if (!Array.isArray(data)) {
+    console.error('AzFilterSummary: La prop "data" debe ser una lista/array. Recibido:', typeof data);
+  }
   // Estados internos para filtros y ordenamiento
   const [filters, setFilters] = useState({});
   const [sorting, setSorting] = useState({ field: "", direction: "" });

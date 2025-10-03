@@ -108,11 +108,6 @@ export const useSimpleLogin = () => {
 
     // State
     isSubmitting,
-    displayError,
-    generalError,
-
-    // Auth state
-    isLoading: loginLoading,
-    error: loginError
+    displayError
   };
 };

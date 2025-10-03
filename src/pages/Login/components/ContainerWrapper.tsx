@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from 'react-router-dom';
 import { Container, Col, Row, Card, CardBody } from "reactstrap";
 
@@ -12,9 +11,8 @@ interface ContainerWrapperProps {
 }
 
 export const ContainerWrapper: React.FC<ContainerWrapperProps> = ({ children }) => {
-
     return (
-        <React.Fragment>
+        <>
       <div className="home-btn d-none d-sm-block">
         <Link to="/" className="text-dark">
           <i className="bx bx-home h2" />
@@ -88,6 +86,6 @@ export const ContainerWrapper: React.FC<ContainerWrapperProps> = ({ children }) 
           </Row>
         </Container>
       </div>
-    </React.Fragment>
+    </>
     );
 }

@@ -1,8 +1,6 @@
-import React from 'react';
 import { Form, FormGroup, Label, Input } from 'reactstrap';
 import { AlertMessage } from '../../../components/Common/Form';
 import { useSimpleLogin } from '../hooks/useSimpleLogin';
-import type { LoginCredentials } from '../models';
 
 export const LoginForm = () => {
   const {

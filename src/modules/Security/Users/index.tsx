@@ -5,8 +5,7 @@ import AzFilterSummary from '../../../components/aziende/AzFilterSummary';
 import AzTable from '../../../components/aziende/AzTable';
 import { mockUsers, User } from './data/mockUsers';
 import { userTableColumns } from './config/tableColumns';
-import { getUsers } from './controller/userController';
-import { get } from 'lodash';
+import { getUsersByCompany } from './controller/userController';
 
 // Tipos para el render props de AzFilterSummary
 interface FilterSummaryRenderProps {
@@ -47,7 +46,7 @@ const Users: React.FC = () => {
   const totalUsers = mockUsers.length;
 
   useEffect(() => {
-    getUsers().then(response => {
+    getUsersByCompany(1).then(response => {
       console.log('Usuarios cargados desde API:', response);
     }).catch(error => {
       console.error('Error al cargar usuarios:', error);

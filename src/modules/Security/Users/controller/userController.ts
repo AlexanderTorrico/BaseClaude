@@ -13,16 +13,7 @@ import { userCall } from '@/services/httpService';
 import { UserResponseModel } from '../models/UserResponseModel';
 import { ApiResponse } from '@/pages/Authentication/models';
 
-// Helper para redirect al login
-const redirectToLogin = () => {
-  // Limpiar el token del localStorage
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('authUser');
-  localStorage.removeItem('lastLogin');
 
-  // Redirect al login
-  window.location.href = '/authentication/login';
-};
 
 export class UserController {
 

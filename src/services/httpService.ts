@@ -76,11 +76,7 @@ export const createAuthenticatedCall = <T>(
     ...config?.headers,
     'Authorization': token ? `Bearer ${token}` : undefined,
   };
-
-  // Remover Authorization si no hay token
-  if (!token) {
-    delete headers.Authorization;
-  }
+  console.log('Auth Token:', token);
 
   const requestConfig: AxiosRequestConfig = {
     ...config,

@@ -10,7 +10,9 @@
     "build:staging": "vite build --mode staging",
     "build:production": "vite build --mode production",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+
+    "create_page:module": "node scripts/create-module.js"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.9.0",

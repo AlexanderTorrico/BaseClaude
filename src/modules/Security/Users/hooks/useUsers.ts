@@ -31,20 +31,6 @@ export const useUsers = () => {
   // ==========================================
 
   /**
-   * Filtrar usuarios activos (sincrónico)
-   */
-  const getActiveUsers = (): UserModel[] => {
-    return users.filter(user => user.isActive);
-  };
-
-  /**
-   * Filtrar usuarios inactivos (sincrónico)
-   */
-  const getInactiveUsers = (): UserModel[] => {
-    return users.filter(user => !user.isActive);
-  };
-
-  /**
    * Buscar usuario por email (sincrónico)
    */
   const findUserByEmail = (email: string): UserModel | undefined => {
@@ -58,13 +44,6 @@ export const useUsers = () => {
     return users.length;
   };
 
-  /**
-   * Obtener usuarios por privilegio (sincrónico)
-   */
-  const getUsersByPrivilege = (privilege: string): UserModel[] => {
-    return users.filter(user => user.privilege === privilege);
-  };
-
   return {
     // Estado de Redux
     users,
@@ -75,10 +54,7 @@ export const useUsers = () => {
     fetchUsersByCompany,
 
     // Funciones sync (lógica local)
-    getActiveUsers,
-    getInactiveUsers,
     findUserByEmail,
-    getTotalUsers,
-    getUsersByPrivilege
+    getTotalUsers
   };
 };

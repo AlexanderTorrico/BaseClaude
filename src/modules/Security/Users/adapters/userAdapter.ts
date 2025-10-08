@@ -1,22 +1,32 @@
 import { UserResponseModel } from '../models/UserResponseModel';
 import { UserModel } from '../models/UserModel';
+import { WorkStationModel } from '../models/WorkStationModel';
+
+/**
+ * Adapta WorkStation de la API al modelo de la UI
+ */
+const adaptWorkStation = (workStation: UserResponseModel['workStation']): WorkStationModel => {
+  return {
+    id: workStation.id,
+    name: workStation.name,
+    level: workStation.level,
+    dependencyId: workStation.dependency_id
+  };
+};
 
 /**
  * Adapta la respuesta de la API al modelo de la UI
  */
-export const adaptUserResponseToUserModel = (apiUser: any): UserModel => {
+export const adaptUserResponseToUserModel = (apiUser: UserResponseModel): UserModel => {
   return {
     id: apiUser.id,
-    fullName: `${apiUser.name} ${apiUser.last_name}`.trim(),
-    firstName: apiUser.name,
-    lastName: apiUser.last_name,
-    lastNameMother: apiUser.last_name_mother || '',
+    fullName: `${apiUser.name} ${apiUser.lastName}`.trim(),
+    name: apiUser.name,
+    lastName: apiUser.lastName,
     email: apiUser.email,
-    privilege: apiUser.privilege,
     phone: apiUser.phone,
-    logo: apiUser.logo,
-    language: apiUser.language,
-    isActive: apiUser.status === 1
+    avatar: apiUser.avatar,
+    workStation: adaptWorkStation(apiUser.workStation)
   };
 };
 
@@ -25,18 +35,4 @@ export const adaptUserResponseToUserModel = (apiUser: any): UserModel => {
  */
 export const adaptUsersArrayToUserModels = (apiUsers: UserResponseModel[]): UserModel[] => {
   return apiUsers.map(adaptUserResponseToUserModel);
-};
-
-/**
- * Helper para convertir string ISO a Date cuando lo necesites en la UI
- */
-export const parseUserDate = (isoString: string): Date => {
-  return new Date(isoString);
-};
-
-/**
- * Helper para formatear fecha de usuario
- */
-export const formatUserDate = (isoString: string, locale: string = 'es-ES'): string => {
-  return new Date(isoString).toLocaleDateString(locale);
 };

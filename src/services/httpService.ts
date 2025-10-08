@@ -71,7 +71,6 @@ export const createAuthenticatedCall = <T>(
   const api = createApiInstance();
   const token = getAuthToken();
 
-  // Configurar headers con token (solo agregar si existe)
   const headers: any = {
     'Content-Type': 'application/json',
     ...config?.headers,
@@ -80,9 +79,6 @@ export const createAuthenticatedCall = <T>(
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-
-  console.log('🔐 Auth Token:', token ? `${token.substring(0, 30)}...` : 'No token found');
-  console.log('📤 Request Headers:', headers);
 
   const requestConfig: AxiosRequestConfig = {
     ...config,
@@ -108,14 +104,9 @@ export const createAuthenticatedCall = <T>(
     case 'PATCH':
       call = api.patch<T>(url, data, requestConfig);
       break;
-    default:
-      throw new Error(`Unsupported HTTP method: ${method}`);
   }
 
-  return {
-    call,
-    controller
-  };
+  return { call, controller };
 };
 
 /**
@@ -153,19 +144,7 @@ export const createPublicCall = <T>(
     case 'PATCH':
       call = api.patch<T>(url, data, requestConfig);
       break;
-    default:
-      throw new Error(`Unsupported HTTP method: ${method}`);
   }
 
-  return {
-    call,
-    controller
-  };
-};
-
-/**
- * Legacy function - create API instance (backward compatibility)
- */
-export const userCall = (): AxiosCallModel<any> => {
-  return createAuthenticatedCall('POST', '/rrhh/by_company_id/1', {});
+  return { call, controller };
 };

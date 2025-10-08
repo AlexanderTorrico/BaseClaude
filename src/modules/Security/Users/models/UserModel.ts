@@ -1,16 +1,15 @@
+import { WorkStationModel } from './WorkStationModel';
+
 /**
  * Modelo de Usuario para la UI (mapeado desde la API)
  */
 export interface UserModel {
   id: number;
   fullName: string;
-  firstName: string;
+  name: string;
   lastName: string;
-  lastNameMother: string;
   email: string;
-  privilege: string;
   phone: string | null;
-  logo: string | null;
-  language: string;
-  isActive: boolean;
+  avatar: string | null;
+  workStation: WorkStationModel;
 }

@@ -71,12 +71,18 @@ export const createAuthenticatedCall = <T>(
   const api = createApiInstance();
   const token = getAuthToken();
 
-  // Configurar headers con token
-  const headers = {
+  // Configurar headers con token (solo agregar si existe)
+  const headers: any = {
+    'Content-Type': 'application/json',
     ...config?.headers,
-    'Authorization': token ? `Bearer ${token}` : undefined,
   };
-  console.log('Auth Token:', token);
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  console.log('🔐 Auth Token:', token ? `${token.substring(0, 30)}...` : 'No token found');
+  console.log('📤 Request Headers:', headers);
 
   const requestConfig: AxiosRequestConfig = {
     ...config,

@@ -6,6 +6,7 @@ import { authReducer } from '../pages/Authentication/index';
 import { userReducer } from '../pages/Login/slices';
 import { registerReducer } from '../pages/Register/index';
 import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Hooks/crudBasicSlice';
+import usersReducer from '../modules/Security/Users/slices/usersSice';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     register: registerReducer,
     layout: layoutReducer,
     crudBasic: crudBasicReducer,
+    users: usersReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

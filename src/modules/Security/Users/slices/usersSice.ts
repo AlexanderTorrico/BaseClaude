@@ -1,28 +1,64 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { UserResponseModel } from '../models/UserResponseModel';
+import { UserModel } from '../models/UserModel';
 
 // Interface para el estado del slice
 interface UserState {
-  list: UserResponseModel[];
+  list: UserModel[];
+  loading: boolean;
+  error: string | null;
 }
 
 // Pure initial state - no external dependencies
 const initialState: UserState = {
   list: [],
+  loading: false,
+  error: null
 };
 
 export const userSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
-    setUsers: (state, action: PayloadAction<UserResponseModel[]>) => {
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
+    },
+    setUsers: (state, action: PayloadAction<UserModel[]>) => {
       state.list = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    setError: (state, action: PayloadAction<string>) => {
+      state.error = action.payload;
+      state.loading = false;
     },
     clearUsers: (state) => {
       state.list = [];
+      state.loading = false;
+      state.error = null;
+    },
+    addUser: (state, action: PayloadAction<UserModel>) => {
+      state.list.push(action.payload);
+    },
+    updateUser: (state, action: PayloadAction<UserModel>) => {
+      const index = state.list.findIndex(user => user.id === action.payload.id);
+      if (index !== -1) {
+        state.list[index] = action.payload;
+      }
+    },
+    removeUser: (state, action: PayloadAction<number>) => {
+      state.list = state.list.filter(user => user.id !== action.payload);
     }
   }
 });
 
-export const { setUsers, clearUsers } = userSlice.actions;
+export const {
+  setLoading,
+  setUsers,
+  setError,
+  clearUsers,
+  addUser,
+  updateUser,
+  removeUser
+} = userSlice.actions;
+
 export default userSlice.reducer;

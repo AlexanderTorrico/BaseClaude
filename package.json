@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
 
-    "create_page:module": "node scripts/create-module.js"
+    "create_page:module": "node scripts/createPage/create-module.js"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.9.0",

@@ -2,7 +2,7 @@ import { getUsersByCompanyCall } from '../services/userServices';
 import { store } from '@/store';
 import { setLoading, setUsers, setError } from '../slices/usersSice';
 import { adaptUsersArrayToUserModels } from '../adapters/userAdapter';
-import { ControllerResponse, createSuccessResponse, createErrorResponse } from '../models/ControllerResponse';
+import { ControllerResponse, createSuccessResponse, createErrorResponse } from '@/shared/controllers/ControllerResponse';
 import { UserModel } from '../models/UserModel';
 
 export class UserController {

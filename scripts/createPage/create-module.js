@@ -29,7 +29,7 @@ const config = [
     folder: 'hooks',
     template: 'hook.template.js',
     fileName: '.ts',
-    prefix: 'use'
+    prefix: 'Use'
   },
   {
     folder: 'slices',

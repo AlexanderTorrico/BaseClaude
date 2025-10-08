@@ -1,11 +1,10 @@
-import { UserResponseModel } from '../models/UserResponseModel';
 import { UserModel } from '../models/UserModel';
 import { WorkStationModel } from '../models/WorkStationModel';
 
 /**
  * Adapta WorkStation de la API al modelo de la UI
  */
-const adaptWorkStation = (workStation: UserResponseModel['workStation']): WorkStationModel => {
+const adaptWorkStation = (workStation: any): WorkStationModel => {
   return {
     id: workStation.id,
     name: workStation.name,
@@ -17,7 +16,7 @@ const adaptWorkStation = (workStation: UserResponseModel['workStation']): WorkSt
 /**
  * Adapta la respuesta de la API al modelo de la UI
  */
-export const adaptUserResponseToUserModel = (apiUser: UserResponseModel): UserModel => {
+export const adaptUserResponseToUserModel = (apiUser: any): UserModel => {
   return {
     id: apiUser.id,
     fullName: `${apiUser.name} ${apiUser.lastName}`.trim(),
@@ -33,6 +32,6 @@ export const adaptUserResponseToUserModel = (apiUser: UserResponseModel): UserMo
 /**
  * Adapta un array de usuarios de la API
  */
-export const adaptUsersArrayToUserModels = (apiUsers: UserResponseModel[]): UserModel[] => {
+export const adaptUsersArrayToUserModels = (apiUsers: any): UserModel[] => {
   return apiUsers.map(adaptUserResponseToUserModel);
 };

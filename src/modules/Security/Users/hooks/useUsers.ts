@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { UserController } from '../controllers/UserController';
-import { ControllerResponse } from '../models/ControllerResponse';
+import { ControllerResponse } from '@/shared/controllers/ControllerResponse';
 import { UserModel } from '../models/UserModel';
 
 /**

@@ -23,6 +23,7 @@ interface FilterSummaryRenderProps {
 }
 
 const Users: React.FC = () => {
+  // Hook con caché inteligente
   const { users, loading, error, fetchUsersByCompany, getTotalUsers } = useUsers();
 
   const handleCreateUser = () => {
@@ -41,10 +42,19 @@ const Users: React.FC = () => {
     console.log('Ver detalles usuario:', userId);
   };
 
+  const handleRefresh = async () => {
+    // Forzar recarga desde la API
+    const response = await fetchUsersByCompany(1, { force: true });
+    if (response.success) {
+      console.log('🔄 Datos actualizados desde la API');
+    }
+  };
+
+  // Llamada al hook (usa caché si ya hay datos)
   useEffect(() => {
     fetchUsersByCompany(1).then(response => {
       if (response.success) {
-        console.log('✅ Usuarios cargados desde API:', response.data);
+        console.log('✅ Usuarios cargados:', response.data);
       } else {
         console.error('❌ Error al cargar usuarios:', response.error);
       }
@@ -77,15 +87,27 @@ const Users: React.FC = () => {
           badgeCount={getTotalUsers()}
           badgeTotal={getTotalUsers()}
           contentTopRight={
-            <Button
-              color="warning"
-              onClick={handleCreateUser}
-              className="d-flex align-items-center"
-              disabled={loading}
-            >
-              <i className="mdi mdi-plus me-1"></i>
-              Nuevo Usuario
-            </Button>
+            <div className="d-flex gap-2">
+              <Button
+                color="light"
+                onClick={handleRefresh}
+                className="d-flex align-items-center"
+                disabled={loading}
+                title="Actualizar datos"
+              >
+                <i className={`mdi mdi-refresh ${loading ? 'mdi-spin' : ''} me-1`}></i>
+                Actualizar
+              </Button>
+              <Button
+                color="warning"
+                onClick={handleCreateUser}
+                className="d-flex align-items-center"
+                disabled={loading}
+              >
+                <i className="mdi mdi-plus me-1"></i>
+                Nuevo Usuario
+              </Button>
+            </div>
           }
         />
 

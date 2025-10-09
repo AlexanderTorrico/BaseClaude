@@ -44,6 +44,23 @@ export const useUsers = () => {
     return await UserController.getUsersByCompany(companyId);
   };
 
+  /**
+   * Cargar usuarios (wrapper que maneja ControllerResponse internamente)
+   * La UI no necesita manejar .then() - esta función procesa la respuesta automáticamente
+   */
+  const loadUsers = async (
+    companyId: number,
+    options?: { force?: boolean }
+  ): Promise<void> => {
+    const response = await fetchUsersByCompany(companyId, options);
+
+    if (response.success) {
+      console.log('✅ Usuarios cargados:', response.data);
+    } else {
+      console.error('❌ Error al cargar usuarios:', response.error);
+    }
+  };
+
   // ==========================================
   // FUNCIONES SÍNCRONAS (lógica de negocio local)
   // ==========================================
@@ -77,6 +94,7 @@ export const useUsers = () => {
 
     // Funciones async (con caché inteligente)
     fetchUsersByCompany,
+    loadUsers,
 
     // Funciones sync (lógica local)
     findUserByEmail,

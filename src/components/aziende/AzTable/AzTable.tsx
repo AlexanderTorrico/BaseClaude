@@ -24,11 +24,13 @@ interface AzTableProps {
   children?: React.ReactNode;
   showActions?: boolean;
   components?: any;
+  loading?: boolean;
 }
 
 import { Input } from "reactstrap";
 import { useTranslation } from "react-i18next";
 import TableContainer from "./TableContainer";
+import { Loading } from "@/shared/components/Loading";
 
 /**
  * AzTable - Componente genérico de tabla con funcionalidades avanzadas
@@ -48,7 +50,8 @@ const AzTable: React.FC<AzTableProps> & { Actions: React.FC<AzTableActionsProps>
   tableProps = {},
   children,
   showActions = false,
-  components = null
+  components = null,
+  loading = false
   } = props;
   const { t } = useTranslation();
 
@@ -378,6 +381,15 @@ const AzTable: React.FC<AzTableProps> & { Actions: React.FC<AzTableActionsProps>
 
     return finalColumns;
   }, [columns, finalData, currentSelectedItems, onSelectedChange, actionColumn, currentSorting, currentFilters, handleSortChange, handleFilterChange, handleSelectionChange]);
+
+  // If loading, show loading component
+  if (loading) {
+    return (
+      <div className={`table-responsive az-table-container ${className}`}>
+        <Loading size={400} message="Cargando datos..." color="primary" />
+      </div>
+    );
+  }
 
   return (
     <div className={`table-responsive az-table-container ${className}`}>

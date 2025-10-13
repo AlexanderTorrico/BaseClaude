@@ -1,0 +1,36 @@
+/* Responsividad */
+@media (max-width: 768px) {
+    #contendOpcionCookies {
+        grid-template-columns: unset !important;
+        overflow: scroll;
+    }
+
+    #contendCookies {
+        padding: 0 !important;
+        height: 100% !important;
+    }
+
+    #contendCookies p {
+        font-size: 1rem !important;
+    }
+
+    #contendCokkiesButtons {
+        grid-template-columns: unset !important;
+        justify-content: unset !important;
+    }
+
+    #contendCokkiesButtons button {
+        font-size: 1rem !important;
+        height: 3rem !important;
+    }
+}
+
+#contendCookies p {
+    margin: 0 !important;
+    color: white;
+}
+
+#privacy:hover {
+    color: #ffbc1f !important;
+    /* color: var(--accent) !important; */
+}

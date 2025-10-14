@@ -24,6 +24,10 @@ import PageApi from "../modules/Components/PageApi/index";
 import Users from "../modules/Security/Users/index";
 import Testear from "../modules/Testear/index";
 
+// -------------------------------------------------------------
+import Landing from "../pages/Landing/Landing";
+// -------------------------------------------------------------
+
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: Dashboard },
@@ -59,6 +63,7 @@ const publicRoutes = [
   { path: "/login", component: LoginPage },
   { path: "/forgot-password", component: ForgetPwd },
   { path: "/register", component: RegisterPage },
+  { path: "/", component: Landing },
 ];
 
 // export { authProtectedRoutes, publicRoutes };

@@ -1,4 +1,7 @@
-export default (moduleName) => `export default function ${moduleName}() {
+export default (moduleName) => `
+import React from 'react';
+
+const  ${moduleName} : React.FC = () => {
   return (
     <div className="page-content">
       <h1>${moduleName} Module</h1>
@@ -6,4 +9,6 @@ export default (moduleName) => `export default function ${moduleName}() {
     </div>
   );
 }
+
+export default ${moduleName};
 `;

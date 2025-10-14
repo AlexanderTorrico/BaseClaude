@@ -12,6 +12,9 @@ This is Skote - a React admin dashboard template built with Vite. It's a starter
 - `npm run build` - Build production bundle
 - `npm run lint` - Run ESLint for code quality checks
 - `npm run preview` - Preview production build locally
+- `npm run test` - Run all tests with Vitest
+- `npm run test:ui` - Run tests with visual UI interface
+- `npm run test:coverage` - Run tests and generate coverage report
 
 ## Architecture
 
@@ -76,3 +79,69 @@ When adding new features:
 6. Add new translations to locale files if needed
 
 The codebase follows React functional component patterns with hooks and uses modern JavaScript/ES6+ features throughout.
+
+## Testing Architecture
+
+### Testing Stack
+- **Vitest** - Fast unit test framework optimized for Vite
+- **React Testing Library** - Component testing utilities
+- **MSW (Mock Service Worker)** - API mocking for integration tests
+- **@vitest/ui** - Visual test interface
+- **@vitest/coverage-v8** - Code coverage reporting
+
+### Test Organization
+Tests are organized by module following this structure:
+```
+src/modules/{Module}/
+└── __tests__/
+    ├── fixtures/          # Mock data and test fixtures
+    ├── unit/              # Unit tests (adapters, slices)
+    ├── integration/       # Integration tests (controllers, hooks)
+    └── api/               # API tests with MSW
+```
+
+### Shared Test Utilities
+Located in `src/shared/__tests__/`:
+- `setup/vitest.setup.ts` - Global test configuration
+- `utils/renderWithProviders.tsx` - Helper for rendering with Redux + Router
+- `utils/createMockStore.ts` - Redux store factory for tests
+- `utils/testHelpers.ts` - Common testing utilities
+- `mocks/` - MSW handlers and server configuration
+
+### Test Configurations
+Multiple Vitest configurations in `/test` directory:
+- `vitest.config.ts` - Base configuration
+- `vitest.unit.config.ts` - Unit tests only
+- `vitest.integration.config.ts` - Integration tests only
+- `vitest.api.config.ts` - API tests only
+
+### Running Specific Test Types
+```bash
+# Run all tests
+npm run test
+
+# Run only unit tests
+vitest --config test/vitest.unit.config.ts
+
+# Run only integration tests
+vitest --config test/vitest.integration.config.ts
+
+# Run only API tests
+vitest --config test/vitest.api.config.ts
+
+# Watch mode
+npm run test -- --watch
+
+# Generate coverage
+npm run test:coverage
+```
+
+### Testing Guidelines
+1. **Unit Tests**: Test pure functions in isolation (adapters, reducers)
+2. **Integration Tests**: Test modules working together (controllers with Redux, hooks)
+3. **API Tests**: Test HTTP calls with MSW interceptors (services)
+4. **Coverage Goals**: Aim for 80%+ coverage on business logic layers
+5. **Test Naming**: Use `.test.ts` extension for all test files
+6. **Fixtures**: Store mock data in `__tests__/fixtures/` within each module
+
+For detailed testing documentation, see [TESTING.md](./TESTING.md).

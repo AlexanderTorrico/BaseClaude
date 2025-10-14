@@ -22,6 +22,7 @@ import CrudBasicResponsive from "../modules/Components/Pages/CrudBasicResponsive
 import PageApi from "../modules/Components/PageApi/index";
 
 import Users from "../modules/Security/Users/index";
+import Testear from "../modules/Testear/index";
 
 
 const authProtectedRoutes = [
@@ -45,6 +46,9 @@ const authProtectedRoutes = [
   //Security
   { path: "/security-user", component: User },
   { path: "/users", component: Users },
+  { path: "/test", component: Testear },
+
+  { path: "/Pagina pruebas", component: Users },
 
   //   // this route should be at the end of all other routes
   //   // eslint-disable-next-line react/display-name

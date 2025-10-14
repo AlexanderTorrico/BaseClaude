@@ -13,6 +13,11 @@ dist
 dist-ssr
 *.local
 
+# Testing
+coverage
+.vitest
+node_modules/.vitest
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

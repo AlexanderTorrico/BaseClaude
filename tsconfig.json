@@ -32,9 +32,11 @@
       "@/helpers/*": ["src/helpers/*"],
       "@/store/*": ["src/store/*"],
       "@/models/*": ["src/models/*"],
-      "@/assets/*": ["src/assets/*"]
+      "@/assets/*": ["src/assets/*"],
+      "@/test/*": ["test/*"],
+      "@/shared/__tests__/*": ["src/shared/__tests__/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "test"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

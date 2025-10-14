@@ -21,7 +21,7 @@ interface FilterSummaryRenderProps {
 }
 
 const ContentTable: React.FC = () => {
-  const { users, loading, error, loadUsers } = useUsers();
+  const { users, loading, error, fetchUsersByCompany } = useUsers();
 
   const handleEditUser = (userId: number) => {
     console.log('Editar usuario:', userId);
@@ -40,7 +40,7 @@ const ContentTable: React.FC = () => {
   };
 
   useEffect(() => {
-    loadUsers(1);
+    fetchUsersByCompany(1);
   }, []);
 
   return (

@@ -1,171 +1,74 @@
 import { UserModel } from '../../models/UserModel';
+import { WorkStationModel } from '../../models/WorkStationModel';
 
-/**
- * Fixtures centralizados para tests del módulo Users
- *
- * Contiene datos mock para:
- * - UserModel (modelo de UI después del adapter)
- * - UserApiResponse (respuesta cruda del API)
- * - WorkStation (estación de trabajo)
- */
+// ==================== LISTA DE WORKSTATIONS ====================
+const WS_DEVELOPER: WorkStationModel = { id: 1, name: 'Developer', level: 2, dependencyId: 5 };
+const WS_DESIGNER: WorkStationModel = { id: 2, name: 'Designer', level: 3, dependencyId: 6 };
+const WS_TEST: WorkStationModel = { id: 3, name: 'Test', level: 1, dependencyId: 1 };
 
-// ==================== MODELOS DE UI (UserModel) ====================
-
-/**
- * Usuario básico para tests unitarios
- */
-export const mockUserModel: UserModel = {
-  id: 1,
-  fullName: 'Juan Pérez',
-  name: 'Juan',
-  lastName: 'Pérez',
-  email: 'juan@example.com',
-  phone: '+1 555-0101',
-  avatar: null,
-  workStation: {
+// ==================== LISTA DE USUARIOS (UI Models) ====================
+export const MOCK_USERS: UserModel[] = [
+  {
     id: 1,
-    name: 'Developer',
-    level: 2,
-    dependencyId: 5,
+    fullName: 'Juan Pérez',
+    name: 'Juan',
+    lastName: 'Pérez',
+    email: 'juan@example.com',
+    phone: '+1 555-0101',
+    avatar: null,
+    workStation: WS_DEVELOPER,
   },
-};
-
-/**
- * Usuario con avatar
- */
-export const mockUserWithAvatar: UserModel = {
-  id: 2,
-  fullName: 'María García',
-  name: 'María',
-  lastName: 'García',
-  email: 'maria@example.com',
-  phone: '+1 555-0102',
-  avatar: 'https://example.com/avatar.jpg',
-  workStation: {
+  {
     id: 2,
-    name: 'Designer',
-    level: 3,
-    dependencyId: 6,
+    fullName: 'María García',
+    name: 'María',
+    lastName: 'García',
+    email: 'maria@example.com',
+    phone: '+1 555-0102',
+    avatar: 'https://example.com/avatar.jpg',
+    workStation: WS_DESIGNER,
   },
-};
-
-/**
- * Usuario con nombres vacíos
- */
-export const mockUserEmptyNames: UserModel = {
-  id: 3,
-  fullName: '',
-  name: '',
-  lastName: '',
-  email: 'empty@example.com',
-  phone: null,
-  avatar: null,
-  workStation: {
-    id: 1,
-    name: 'Test',
-    level: 1,
-    dependencyId: 1,
+  {
+    id: 3,
+    fullName: '',
+    name: '',
+    lastName: '',
+    email: 'empty@example.com',
+    phone: null,
+    avatar: null,
+    workStation: WS_TEST,
   },
-};
-
-/**
- * Array de usuarios para tests de integración
- */
-export const mockUsersArray: UserModel[] = [
-  mockUserModel,
-  mockUserWithAvatar,
 ];
 
-// ==================== RESPUESTAS DEL API (formato crudo) ====================
+// ==================== EXPORTACIONES INDIVIDUALES ====================
+export const mockUserModel = MOCK_USERS[0];
+export const mockUserWithAvatar = MOCK_USERS[1];
+export const mockUserEmptyNames = MOCK_USERS[2];
+export const mockUsersArray = [MOCK_USERS[0], MOCK_USERS[1]];
 
-/**
- * Usuario del API (formato snake_case como viene del backend)
- */
-export const mockApiUser = {
-  id: 1,
-  name: 'Juan',
-  lastName: 'Pérez',
-  email: 'juan@example.com',
-  phone: '+1 555-0101',
-  avatar: null,
-  workStation: {
-    id: 1,
-    name: 'Developer',
-    level: 2,
-    dependency_id: 5, // snake_case
-  },
-};
+// ==================== LISTA DE USUARIOS API (formato backend) ====================
+// Se genera automáticamente desde MOCK_USERS para evitar duplicación
+const toApiFormat = (user: UserModel) => ({
+  id: user.id,
+  name: user.name,
+  lastName: user.lastName,
+  email: user.email,
+  phone: user.phone,
+  avatar: user.avatar,
+  workStation: { ...user.workStation, dependency_id: user.workStation.dependencyId },
+});
 
-/**
- * Usuario del API con avatar
- */
-export const mockApiUserWithAvatar = {
-  id: 2,
-  name: 'María',
-  lastName: 'García',
-  email: 'maria@example.com',
-  phone: '+1 555-0102',
-  avatar: 'https://example.com/avatar.jpg',
-  workStation: {
-    id: 2,
-    name: 'Designer',
-    level: 3,
-    dependency_id: 6,
-  },
-};
+const MOCK_API_USERS = MOCK_USERS.map(toApiFormat);
 
-/**
- * Usuario del API con nombres vacíos
- */
-export const mockApiUserEmptyNames = {
-  id: 3,
-  name: '',
-  lastName: '',
-  email: 'empty@example.com',
-  phone: null,
-  avatar: null,
-  workStation: {
-    id: 1,
-    name: 'Test',
-    level: 1,
-    dependency_id: 1,
-  },
-};
+export const mockApiUser = MOCK_API_USERS[0];
+export const mockApiUserWithAvatar = MOCK_API_USERS[1];
+export const mockApiUserEmptyNames = MOCK_API_USERS[2];
+export const mockApiUsersArray = [MOCK_API_USERS[0], MOCK_API_USERS[1]];
 
-/**
- * Array de usuarios del API
- */
-export const mockApiUsersArray = [mockApiUser, mockApiUserWithAvatar];
-
-/**
- * Respuesta exitosa del API
- */
-export const mockApiSuccessResponse = {
-  data: {
-    success: true,
-    data: mockApiUsersArray,
-  },
-};
-
-/**
- * Respuesta del API vacía
- */
-export const mockApiEmptyResponse = {
-  data: {
-    success: true,
-    data: [],
-  },
-};
-
-/**
- * Respuesta del API con datos null
- */
-export const mockApiNullDataResponse = {
-  data: {
-    success: true,
-    data: null,
-  },
-};
+// ==================== RESPUESTAS API ====================
+export const mockApiSuccessResponse = { data: { success: true, data: mockApiUsersArray } };
+export const mockApiEmptyResponse = { data: { success: true, data: [] } };
+export const mockApiNullDataResponse = { data: { success: true, data: null } };
 
 // ==================== ERRORES ====================
 
@@ -242,15 +145,28 @@ export const mockReduxStateWithError = {
  * Crea un usuario con datos personalizados
  */
 export const createMockUser = (overrides: Partial<UserModel> = {}): UserModel => ({
-  ...mockUserModel,
+  id: 1,
+  fullName: 'Juan Pérez',
+  name: 'Juan',
+  lastName: 'Pérez',
+  email: 'juan@example.com',
+  phone: '+1 555-0101',
+  avatar: null,
+  workStation: WS_DEVELOPER,
   ...overrides,
 });
 
 /**
  * Crea un usuario del API con datos personalizados
  */
-export const createMockApiUser = (overrides: Partial<typeof mockApiUser> = {}) => ({
-  ...mockApiUser,
+export const createMockApiUser = (overrides: Partial<ReturnType<typeof toApiFormat>> = {}) => ({
+  id: 1,
+  name: 'Juan',
+  lastName: 'Pérez',
+  email: 'juan@example.com',
+  phone: '+1 555-0101',
+  avatar: null,
+  workStation: { ...WS_DEVELOPER, dependency_id: 5 },
   ...overrides,
 });
 
@@ -258,11 +174,12 @@ export const createMockApiUser = (overrides: Partial<typeof mockApiUser> = {}) =
  * Crea múltiples usuarios mock
  */
 export const createMockUsersArray = (count: number): UserModel[] => {
-  return Array.from({ length: count }, (_, i) => ({
-    ...mockUserModel,
-    id: i + 1,
-    email: `user${i + 1}@example.com`,
-    name: `User${i + 1}`,
-    fullName: `User${i + 1} Test`,
-  }));
+  return Array.from({ length: count }, (_, i) =>
+    createMockUser({
+      id: i + 1,
+      email: `user${i + 1}@example.com`,
+      name: `User${i + 1}`,
+      fullName: `User${i + 1} Test`,
+    })
+  );
 };

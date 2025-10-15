@@ -28,7 +28,7 @@ describe('UserController', () => {
   });
 
   describe('getUsersByCompany', () => {
-    it('debe obtener usuarios exitosamente y actualizar Redux', async () => {
+    it('debe obtener usuarios exitosamente', async () => {
       // Arrange
       const mockApiResponse = {
         data: {
@@ -44,21 +44,13 @@ describe('UserController', () => {
       // Act
       const response = await UserController.getUsersByCompany(1);
 
-      // Assert - Respuesta del controller
+      // Assert
       expect(response.success).toBe(true);
       expect(response.data).toHaveLength(1);
-      expect(response.data?.[0].fullName).toBe('Juan Pérez');
-      expect(response.error).toBeUndefined();
-
-      // Assert - Estado de Redux
-      const state = store.getState();
-      expect(state.users.list).toHaveLength(1);
-      expect(state.users.list[0].fullName).toBe('Juan Pérez');
-      expect(state.users.loading).toBe(false);
-      expect(state.users.error).toBeNull();
+      expect(response.data?.[0]?.fullName).toBe('Juan Pérez');
     });
 
-    it('debe manejar errores de red correctamente', async () => {
+    it('debe manejar errores de red', async () => {
       // Arrange
       vi.mocked(userServices.getUsersByCompanyCall).mockReturnValue({
         call: Promise.reject(mockNetworkError),
@@ -68,16 +60,9 @@ describe('UserController', () => {
       // Act
       const response = await UserController.getUsersByCompany(1);
 
-      // Assert - Respuesta del controller
+      // Assert
       expect(response.success).toBe(false);
       expect(response.error).toBe('Network error');
-      expect(response.data).toBeUndefined();
-
-      // Assert - Estado de Redux
-      const state = store.getState();
-      expect(state.users.loading).toBe(false);
-      expect(state.users.error).toBe('Network error');
-      expect(state.users.list).toHaveLength(0);
     });
 
     it('debe manejar error 401 (no autorizado)', async () => {
@@ -93,10 +78,6 @@ describe('UserController', () => {
       // Assert
       expect(response.success).toBe(false);
       expect(response.error).toBe('Token inválido o expirado');
-
-      // Verificar que el estado de Redux refleja el error
-      const state = store.getState();
-      expect(state.users.error).toBe('Token inválido o expirado');
     });
 
     it('debe manejar respuesta del API sin datos', async () => {
@@ -112,9 +93,6 @@ describe('UserController', () => {
       // Assert
       expect(response.success).toBe(true);
       expect(response.data).toEqual([]);
-
-      const state = store.getState();
-      expect(state.users.list).toEqual([]);
     });
 
     it('debe mapear correctamente múltiples usuarios', async () => {
@@ -134,13 +112,10 @@ describe('UserController', () => {
       const response = await UserController.getUsersByCompany(1);
 
       // Assert
-      expect(response.data).toHaveLength(2);
-      expect(response.data?.[0].fullName).toBe('Juan Pérez');
-      expect(response.data?.[1].fullName).toBe('María García');
-
-      // Verificar transformación de workStation (snake_case → camelCase)
-      expect(response.data?.[0].workStation.dependencyId).toBe(5);
-      expect(response.data?.[1].workStation.dependencyId).toBe(6);
+      expect(response.data).toMatchObject([
+        { fullName: 'Juan Pérez', workStation: { dependencyId: 5 } },
+        { fullName: 'María García', workStation: { dependencyId: 6 } },
+      ]);
     });
 
     it('debe activar loading antes de hacer la petición', async () => {

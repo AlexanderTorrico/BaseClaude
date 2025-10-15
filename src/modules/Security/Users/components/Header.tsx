@@ -4,14 +4,14 @@ import { AzHeaderCard } from '../../../../components/aziende/AzHeader';
 import { useUsers } from '../hooks/useUsers';
 
 const Header: React.FC = () => {
-  const { loading, loadUsers, getTotalUsers } = useUsers();
+  const { loading, fetchUsersByCompany, getTotalUsers } = useUsers();
 
   const handleCreateUser = () => {
     console.log('Crear nuevo usuario');
   };
 
   const handleRefresh = async () => {
-    await loadUsers(1, { force: true });
+    await fetchUsersByCompany(1, { force: true });
     console.log('🔄 Datos actualizados desde la API');
   };
 

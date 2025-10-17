@@ -4,23 +4,39 @@
 
 ```
 src/modules/Security/Users/
-├── adapters/               # Mapeo entre API y UI
+├── components/            # Submódulos y componentes de UI
+│   ├── Header.tsx        # Submódulo principal (header del módulo)
+│   └── ContentTable.tsx  # Submódulo principal (tabla de contenido)
+├── adapters/             # Mapeo entre API y UI
 │   └── userAdapter.ts
-├── controllers/            # Lógica de negocio + dispatch a Redux
+├── controllers/          # Lógica de negocio + dispatch a Redux
 │   └── UserController.ts
-├── hooks/                  # Estado + funciones para UI
+├── hooks/                # Estado + funciones para UI
 │   └── useUsers.ts
-├── models/                 # Tipos de datos
-│   ├── UserModel.ts       # Modelo para UI (mapeado)
-│   ├── UserResponseModel.ts # Modelo del API (crudo)
-│   └── ControllerResponse.ts # Respuesta estándar del Controller
-├── services/              # Llamadas HTTP
+├── models/               # Tipos de datos
+│   ├── UserModel.ts      # Modelo para UI (camelCase)
+│   ├── WorkStationModel.ts # Modelo anidado
+│   └── [UserResponseModel.ts] # RECOMENDADO: Modelo del API (snake_case)
+├── services/             # Llamadas HTTP
 │   └── userServices.ts
-├── slices/                # Redux state
+├── slices/               # Redux state
 │   └── usersSice.ts
-└── examples/              # Ejemplos de uso
-    └── UsersPageExample.tsx
+├── config/               # Configuración
+│   └── tableColumns.tsx  # Configuración de columnas para AzTable
+├── __tests__/            # Tests del módulo
+│   ├── fixtures/         # Mock data y helpers de testing
+│   │   └── mockUsers.ts
+│   ├── unit/             # Tests unitarios (adapters, slices)
+│   │   ├── userAdapter.test.ts
+│   │   └── usersSice.test.ts
+│   ├── integration/      # Tests de integración (controllers, hooks)
+│   │   ├── UserController.test.ts
+│   │   └── useUsers.test.ts
+│   └── api/              # Tests de API (services con MSW) [OPCIONAL]
+└── index.tsx             # Módulo principal (abstracto)
 ```
+
+**Nota:** `UserResponseModel.ts` actualmente no existe en la implementación, pero es **altamente recomendado** crearlo para mejorar el type-safety en la capa de adaptación en lugar de usar `any`.
 
 ## 🔄 Flujo de Datos
 
@@ -148,45 +164,91 @@ const userSlice = createSlice({
 **Responsabilidad:**
 - Lee estado desde Redux (síncrono)
 - Expone funciones async que llaman al Controller
-- Puede contener lógica de negocio local (filtros, búsquedas)
+- Puede contener lógica de negocio local (filtros, búsquedas, caché)
 
-**Ejemplo:**
+**Ejemplo (implementación real del proyecto):**
 ```typescript
 export const useUsers = () => {
   // SYNC: Lee de Redux
-  const users = useSelector(state => state.users.list);
-  const loading = useSelector(state => state.users.loading);
+  const users = useSelector((state: RootState) => state.users.list);
+  const loading = useSelector((state: RootState) => state.users.loading);
+  const error = useSelector((state: RootState) => state.users.error);
 
-  // ASYNC: Llama al Controller
-  const fetchUsers = async (filters) => {
-    return await UserController.getUsers(filters);
+  // ASYNC: Llama al Controller (con caché inteligente)
+  const fetchUsersByCompany = async (
+    companyId: number,
+    options?: { force?: boolean }
+  ): Promise<ControllerResponse<UserModel[]>> => {
+    // Implementa caché: si ya hay datos y no se fuerza, retorna del cache
+    if (users.length > 0 && !options?.force) {
+      console.log('📦 Usando datos en caché (usuarios ya cargados)');
+      return { loading: false, data: users, success: true };
+    }
+
+    console.log('🌐 Llamando al Controller para obtener usuarios...');
+    return await UserController.getUsersByCompany(companyId);
   };
 
-  // SYNC: Lógica local
-  const getActiveUsers = () => users.filter(u => u.isActive);
+  // SYNC: Funciones auxiliares
+  const getTotalUsers = (): number => users.length;
+  const findUserById = (id: number) => users.find(u => u.id === id);
+  const findUserByEmail = (email: string) => users.find(u => u.email === email);
 
-  return { users, loading, fetchUsers, getActiveUsers };
+  return {
+    // Estado
+    users,
+    loading,
+    error,
+
+    // Funciones async
+    fetchUsersByCompany,
+
+    // Funciones sync
+    getTotalUsers,
+    findUserById,
+    findUserByEmail
+  };
 };
 ```
 
 ### 6️⃣ **UI Components**
-**Archivo:** `index.tsx` o cualquier componente
+
+**Estructura de componentes:**
+- **`index.tsx`** - Módulo principal (ABSTRACTO - solo renderiza submódulos)
+- **`components/Header.tsx`** - Submódulo del header
+- **`components/ContentTable.tsx`** - Submódulo de la tabla de contenido
 
 **Responsabilidad:**
-- Solo presentación
-- Llama al hook `useUsers()`
+- `index.tsx`: Solo renderiza submódulos, NO contiene lógica
+- `components/`: Contiene lógica de UI, llama hooks, maneja eventos
 - NUNCA llama directamente al Controller
 
-**Ejemplo:**
+**Ejemplo index.tsx:**
 ```typescript
-const UsersPage = () => {
-  const { users, loading, fetchUsers } = useUsers();
+// src/modules/Security/Users/index.tsx
+const Users: React.FC = () => {
+  return (
+    <div className="page-content">
+      <Container fluid>
+        <Header />
+        <ContentTable />
+      </Container>
+    </div>
+  );
+};
+```
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+**Ejemplo componente (Header.tsx):**
+```typescript
+// src/modules/Security/Users/components/Header.tsx
+const Header: React.FC = () => {
+  const { loading, fetchUsersByCompany, getTotalUsers } = useUsers();
 
-  return <UserTable users={users} loading={loading} />;
+  const handleRefresh = async () => {
+    await fetchUsersByCompany(1, { force: true });
+  };
+
+  return <AzHeaderCard title="Usuarios" badgeCount={getTotalUsers()} ... />;
 };
 ```
 
@@ -231,62 +293,203 @@ if (response.success) {
 - Service → Redux (nunca)
 - Adapter → Redux (nunca)
 
-## 📊 Ejemplo Completo
+## 📊 Ejemplo Completo (Implementación Real)
 
 ```typescript
-// 1. UI Component
-const UsersPage = () => {
-  const { users, loading, fetchUsers } = useUsers();
+// 1. UI Component - index.tsx (ABSTRACTO)
+const Users: React.FC = () => {
+  return (
+    <div className="page-content">
+      <Container fluid>
+        <Header />
+        <ContentTable />
+      </Container>
+    </div>
+  );
+};
+
+// 2. Submódulo - components/ContentTable.tsx
+const ContentTable: React.FC = () => {
+  const { users, loading, error, fetchUsersByCompany } = useUsers();
 
   useEffect(() => {
-    loadData();
+    fetchUsersByCompany(1); // Primera carga
   }, []);
 
-  const loadData = async () => {
-    const response = await fetchUsers({ status: 'active' });
+  const handleRefresh = async () => {
+    await fetchUsersByCompany(1, { force: true }); // Fuerza recarga
+  };
 
-    if (response.success) {
-      console.log('✅ Datos cargados:', response.data);
-    } else {
-      alert(`Error: ${response.error}`);
+  return (
+    <AzFilterSummary data={users} columns={userTableColumns}>
+      {({ filteredData, filters, sorting, onFilterChange, onSortChange }) => (
+        <AzTable
+          data={filteredData}
+          columns={userTableColumns}
+          loading={loading}
+          filters={filters}
+          onFilterChange={onFilterChange}
+          sorting={sorting}
+          onSortChange={onSortChange}
+        >
+          <AzTable.Actions>
+            <Button onClick={(e) => handleEdit(row.id)}>Editar</Button>
+          </AzTable.Actions>
+        </AzTable>
+      )}
+    </AzFilterSummary>
+  );
+};
+
+// 3. Hook - hooks/useUsers.ts
+export const useUsers = () => {
+  const users = useSelector((state: RootState) => state.users.list);
+  const loading = useSelector((state: RootState) => state.users.loading);
+
+  const fetchUsersByCompany = async (
+    companyId: number,
+    options?: { force?: boolean }
+  ): Promise<ControllerResponse<UserModel[]>> => {
+    if (users.length > 0 && !options?.force) {
+      return { loading: false, data: users, success: true };
     }
+    return await UserController.getUsersByCompany(companyId);
   };
 
-  return <div>{users.map(u => <UserCard user={u} />)}</div>;
+  const getTotalUsers = (): number => users.length;
+
+  return { users, loading, fetchUsersByCompany, getTotalUsers };
 };
 
-// 2. Hook
-const useUsers = () => {
-  const users = useSelector(state => state.users.list);
-  const fetchUsers = async (filters) => {
-    return await UserController.getUsers(filters);
-  };
-  return { users, fetchUsers };
-};
+// 4. Controller - controllers/UserController.ts
+export class UserController {
+  static async getUsersByCompany(companyId: number): Promise<ControllerResponse<UserModel[]>> {
+    try {
+      store.dispatch(setLoading(true));
 
-// 3. Controller
-class UserController {
-  static async getUsers(filters) {
-    store.dispatch(setLoading(true));
-    const { call } = getUsersCall(filters);
-    const response = await call;
-    const mapped = adaptUsersArrayToUserModels(response.data.data);
-    store.dispatch(setUsers(mapped));
-    return createSuccessResponse(mapped);
+      const { call } = getUsersByCompanyCall(companyId);
+      const response = await call;
+      const mappedUsers = adaptUsersArrayToUserModels(response.data.data ?? []);
+
+      store.dispatch(setUsers(mappedUsers));
+      return createSuccessResponse(mappedUsers);
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Error desconocido';
+      store.dispatch(setError(errorMessage));
+      return createErrorResponse(errorMessage);
+    }
   }
 }
 
-// 4. Service
-const getUsersCall = (filters) => {
-  return createAuthenticatedCall('GET', '/users');
+// 5. Service - services/userServices.ts
+export const getUsersByCompanyCall = (companyId: number) => {
+  return createAuthenticatedCall<ApiResponse<any>>(
+    'GET',
+    `/rrhh/by_company_id/${companyId}`
+  );
+};
+
+// 6. Adapter - adapters/userAdapter.ts
+export const adaptUserResponseToUserModel = (apiUser: any): UserModel => {
+  return {
+    id: apiUser.id,
+    fullName: `${apiUser.name} ${apiUser.lastName}`.trim(),
+    name: apiUser.name,
+    lastName: apiUser.lastName,
+    email: apiUser.email,
+    phone: apiUser.phone,
+    avatar: apiUser.avatar,
+    workStation: {
+      id: apiUser.workStation.id,
+      name: apiUser.workStation.name,
+      level: apiUser.workStation.level,
+      dependencyId: apiUser.workStation.dependency_id // snake_case → camelCase
+    }
+  };
 };
 ```
+
+## 🧪 Testing
+
+El módulo Users cuenta con **tests completos** usando Vitest:
+
+### Estructura de Tests
+
+```
+__tests__/
+├── fixtures/
+│   └── mockUsers.ts          # Mock data compartida
+├── unit/
+│   ├── userAdapter.test.ts   # Test del adapter (mapeo)
+│   └── usersSice.test.ts     # Test del slice (reducers)
+└── integration/
+    ├── UserController.test.ts # Test del controller (con Redux)
+    └── useUsers.test.ts       # Test del hook (con Redux)
+```
+
+### Ejemplo de Tests
+
+```typescript
+// Unit Test - userAdapter.test.ts
+describe('userAdapter', () => {
+  it('debe mapear correctamente un usuario del API', () => {
+    const result = adaptUserResponseToUserModel(mockApiUser);
+    expect(result.fullName).toBe('Juan Pérez');
+    expect(result.workStation.dependencyId).toBe(5); // snake_case → camelCase
+  });
+});
+
+// Integration Test - UserController.test.ts
+describe('UserController', () => {
+  it('debe obtener usuarios y actualizar Redux', async () => {
+    const response = await UserController.getUsersByCompany(1);
+
+    expect(response.success).toBe(true);
+    expect(response.data).toHaveLength(2);
+    expect(store.getState().users.list).toHaveLength(2);
+  });
+
+  it('debe manejar error 401 (no autorizado)', async () => {
+    // Mock error 401
+    vi.mocked(userServices.getUsersByCompanyCall).mockReturnValue({
+      call: Promise.reject(mockAuthError),
+      controller: new AbortController(),
+    });
+
+    const response = await UserController.getUsersByCompany(1);
+
+    expect(response.success).toBe(false);
+    expect(response.error).toBe('Token inválido o expirado');
+  });
+});
+```
+
+### Ejecutar Tests
+
+```bash
+# Todos los tests del módulo
+npm run test src/modules/Security/Users
+
+# Solo unit tests
+vitest --config test/vitest.unit.config.ts src/modules/Security/Users
+
+# Solo integration tests
+vitest --config test/vitest.integration.config.ts src/modules/Security/Users
+
+# Con UI visual
+npm run test:ui
+```
+
+**Ver [TESTING.md](../../../TESTING.md) para guía completa de testing.**
+
+---
 
 ## 🚀 Ventajas de esta Arquitectura
 
 1. **Separación Clara** - Cada capa tiene una responsabilidad única
-2. **Testeable** - Cada parte se puede testear independientemente
+2. **Testeable** - Cada parte se puede testear independientemente (100% cobertura en adapters)
 3. **Escalable** - Fácil agregar nuevas features
 4. **Type-Safe** - TypeScript en todas las capas
 5. **Predecible** - Siempre sabes dónde está la lógica
 6. **Reutilizable** - Los hooks pueden combinar múltiples controllers
+7. **Mantenible** - Tests garantizan que los cambios no rompen funcionalidad

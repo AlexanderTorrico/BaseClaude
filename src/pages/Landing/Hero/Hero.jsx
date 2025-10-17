@@ -17,7 +17,7 @@ const Hero = () => {
             <form onSubmit={createPage}>
                 <input type="text" placeholder={t("create a landing page for my ...")} />
                 <button type="submit" >
-                    <i class="bx bx-arrow-up-stroke"></i>
+                    <i className="bx bx-arrow-up-stroke"></i>
                 </button>
             </form>
         </div>

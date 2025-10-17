@@ -6,13 +6,15 @@ interface UserState {
   list: UserModel[];
   loading: boolean;
   error: string | null;
+  currentView: string; // '0' = table, '1' = cards
 }
 
 // Pure initial state - no external dependencies
 const initialState: UserState = {
   list: [],
   loading: false,
-  error: null
+  error: null,
+  currentView: '0' // Por defecto vista tabla
 };
 
 export const userSlice = createSlice({
@@ -47,6 +49,9 @@ export const userSlice = createSlice({
     },
     removeUser: (state, action: PayloadAction<number>) => {
       state.list = state.list.filter(user => user.id !== action.payload);
+    },
+    setCurrentView: (state, action: PayloadAction<string>) => {
+      state.currentView = action.payload;
     }
   }
 });
@@ -58,7 +63,8 @@ export const {
   clearUsers,
   addUser,
   updateUser,
-  removeUser
+  removeUser,
+  setCurrentView
 } = userSlice.actions;
 
 export default userSlice.reducer;

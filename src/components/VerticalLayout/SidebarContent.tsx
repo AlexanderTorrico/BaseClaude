@@ -230,6 +230,12 @@ const SidebarContent = (props) => {
                 <span>Usuarios</span>
               </Link>
             </li>
+            <li>
+              <Link to="/roles" className=" ">
+                <i className="bx bx-user"></i>
+                <span>Roles</span>
+              </Link>
+            </li>
 
             <li>
               <Link to="/test" className=" ">
@@ -242,6 +248,15 @@ const SidebarContent = (props) => {
               <Link to="/page-api" className=" ">
                 <i className="bx bx-calendar"></i>
                 <span>Page Api</span>
+              </Link>
+            </li>
+
+            <li className="menu-title">RRHH</li>
+
+            <li>
+              <Link to="/workstations" className=" ">
+                <i className="bx bx-sitemap"></i>
+                <span>Puestos de Trabajo</span>
               </Link>
             </li>
 

@@ -1,5 +1,7 @@
 import { UserModel } from '../models/UserModel';
 import { WorkStationModel } from '../models/WorkStationModel';
+import { RoleModel } from '../../Roles/models/RoleModel';
+import { PermissionModel } from '../../Roles/models/PermissionModel';
 
 /**
  * Adapta WorkStation de la API al modelo de la UI
@@ -25,7 +27,12 @@ export const adaptUserResponseToUserModel = (apiUser: any): UserModel => {
     email: apiUser.email,
     phone: apiUser.phone,
     avatar: apiUser.avatar,
-    workStation: adaptWorkStation(apiUser.workStation)
+    workStation: adaptWorkStation(apiUser.workStation),
+    // Roles y permisos (opcionales)
+    roleIds: apiUser.roleIds || apiUser.role_ids || [],
+    roles: apiUser.roles || [],
+    permissionIds: apiUser.permissionIds || apiUser.permission_ids || [],
+    permissions: apiUser.permissions || []
   };
 };
 

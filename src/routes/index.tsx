@@ -22,7 +22,11 @@ import CrudBasicResponsive from "../modules/Components/Pages/CrudBasicResponsive
 import PageApi from "../modules/Components/PageApi/index";
 
 import Users from "../modules/Security/Users/index";
+import Roles from "../modules/Security/Roles/index";
 import Testear from "../modules/Testear/index";
+
+// RRHH
+import WorkStations from "../modules/RRHH/WorkStations/index";
 
 // -------------------------------------------------------------
 import Landing from "../pages/Landing/Landing";
@@ -50,7 +54,11 @@ const authProtectedRoutes = [
   //Security
   { path: "/security-user", component: User },
   { path: "/users", component: Users },
+  { path: "/roles", component: Roles },
   { path: "/test", component: Testear },
+
+  // RRHH
+  { path: "/workstations", component: WorkStations },
 
   { path: "/Pagina pruebas", component: Users },
 

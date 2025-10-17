@@ -1,10 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from 'reactstrap';
-import { AzHeaderCard } from '../../../../components/aziende/AzHeader';
+import { useDispatch } from 'react-redux';
+import AzHeaderCardViews from '../../../../components/aziende/AzHeader/AzHeaderCardViews';
 import { useUsers } from '../hooks/useUsers';
+import { setCurrentView } from '../slices/usersSice';
 
 const Header: React.FC = () => {
-  const { loading, fetchUsersByCompany, getTotalUsers } = useUsers();
+  const dispatch = useDispatch();
+  const { loading, fetchUsersByCompany, getTotalUsers, currentView } = useUsers();
+
+  // Estado local para detectar tamaño de pantalla
+  const [responsiveView, setResponsiveView] = useState<string>('0');
+  const [isManualOverride, setIsManualOverride] = useState(false);
+
+  // Detectar tamaño de pantalla y ajustar vista automáticamente
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768; // Breakpoint md (768px)
+      const autoView = isMobile ? '1' : '0'; // '0' = tabla, '1' = cards
+
+      setResponsiveView(autoView);
+
+      // Solo actualizar Redux si no hay override manual
+      if (!isManualOverride) {
+        dispatch(setCurrentView(autoView));
+      }
+    };
+
+    // Ejecutar al montar
+    handleResize();
+
+    // Escuchar cambios de tamaño
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, [dispatch, isManualOverride]);
 
   const handleCreateUser = () => {
     console.log('Crear nuevo usuario');
@@ -15,14 +46,31 @@ const Header: React.FC = () => {
     console.log('🔄 Datos actualizados desde la API');
   };
 
+  const handleViewChange = (viewKey: string) => {
+    dispatch(setCurrentView(viewKey));
+    setIsManualOverride(true);
+
+    // Resetear override después de 5 segundos de inactividad
+    setTimeout(() => {
+      setIsManualOverride(false);
+    }, 5000);
+  };
+
   return (
-    <AzHeaderCard
+    <AzHeaderCardViews
       title="Gestión de Usuarios"
       description="Administra los usuarios del sistema"
-      showBadge={true}
-      badgeColor="primary"
-      badgeCount={getTotalUsers()}
-      badgeTotal={getTotalUsers()}
+      badge={{
+        count: getTotalUsers(),
+        total: getTotalUsers(),
+        color: 'primary'
+      }}
+      currentView={currentView}
+      onViewChange={handleViewChange}
+      views={[
+        { key: '0', name: 'Tabla', icon: 'mdi-table', title: 'Vista Tabla' },
+        { key: '1', name: 'Cards', icon: 'mdi-card-multiple', title: 'Vista Cards' }
+      ]}
       contentTopRight={
         <div className="d-flex gap-2">
           <Button
@@ -46,6 +94,9 @@ const Header: React.FC = () => {
           </Button>
         </div>
       }
+      responsiveMode={!isManualOverride}
+      responsiveView={responsiveView}
+      isManualOverride={isManualOverride}
     />
   );
 };

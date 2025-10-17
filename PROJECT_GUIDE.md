@@ -60,11 +60,11 @@ API → Service (HTTP) → Adapter (mapeo) → Controller (dispatch Redux) → H
 ```
 src/modules/[Area]/[Modulo]/
 ├── index.tsx                    # Módulo principal (ABSTRACTO - solo renderiza submódulos)
-├── Header.tsx                   # Submódulo 1 (en raíz, NO en components/)
-├── ContentTable.tsx             # Submódulo 2 (en raíz, NO en components/)
-├── components/                  # Solo componentes pequeños usados por submódulos
-│   ├── UserAvatar.tsx          # Componente pequeño
-│   └── ActionButtons.tsx       # Componente pequeño
+├── components/                  # Submódulos y componentes de UI
+│   ├── Header.tsx              # Submódulo principal (header del módulo)
+│   ├── ContentTable.tsx        # Submódulo principal (tabla de contenido)
+│   ├── UserAvatar.tsx          # Componente pequeño reutilizable
+│   └── ActionButtons.tsx       # Componente pequeño reutilizable
 ├── hooks/
 │   └── useUsers.ts             # Hook con lógica sync + llamadas a Controller
 ├── controllers/
@@ -75,11 +75,16 @@ src/modules/[Area]/[Modulo]/
 │   └── userAdapter.ts          # Mapeo API → UI models
 ├── models/
 │   ├── UserModel.ts            # Modelo UI (camelCase)
-│   └── UserResponseModel.ts    # Modelo API (snake_case)
+│   └── UserResponseModel.ts    # Modelo API (snake_case) [RECOMENDADO]
 ├── slices/
 │   └── usersSlice.ts           # Redux slice
-└── config/
-    └── tableColumns.tsx        # Configuración de columnas para AzTable
+├── config/
+│   └── tableColumns.tsx        # Configuración de columnas para AzTable
+└── __tests__/                   # Tests del módulo
+    ├── fixtures/               # Mock data y helpers de testing
+    ├── unit/                   # Tests unitarios (adapters, slices)
+    ├── integration/            # Tests de integración (controllers, hooks)
+    └── api/                    # Tests de API (services con MSW)
 ```
 
 ### Responsabilidades de Cada Capa
@@ -114,28 +119,34 @@ const Users: React.FC = () => {
 ```
 
 #### 2. **Submódulos** (Header.tsx, ContentTable.tsx)
-- **Ubicación:** En la raíz del módulo (NO en carpeta `components/`)
+- **Ubicación:** En la carpeta `components/` del módulo
 - **Responsabilidad:** Lógica específica de UI, handlers, llamadas a hooks
 - **Debe:** Manejar interacciones del usuario, renderizar componentes
 - **NO debe:** Llamar directamente a Controllers o Services
 
 ```typescript
-// ✅ CORRECTO - Submódulo en raíz
+// ✅ CORRECTO - Submódulo en components/
+// src/modules/Security/Users/components/Header.tsx
 const Header: React.FC = () => {
-  const { loading, loadUsers, getTotalUsers } = useUsers(); // ✅ Llama al hook
+  const { loading, fetchUsersByCompany, getTotalUsers } = useUsers(); // ✅ Llama al hook
 
   const handleRefresh = async () => {
-    await loadUsers(1, { force: true }); // ✅ Usa función del hook
+    await fetchUsersByCompany(1, { force: true }); // ✅ Usa función del hook
   };
 
   return <AzHeaderCard ... />;
 };
 ```
 
-#### 3. **components/** (Componentes Pequeños)
-- **Responsabilidad:** Componentes reutilizables pequeños usados por submódulos
-- **Ejemplo:** `UserAvatar.tsx`, `ActionButtons.tsx`, `StatusBadge.tsx`
-- **NO debe:** Contener lógica de negocio compleja
+#### 3. **components/** (Submódulos y Componentes)
+- **Responsabilidad:**
+  - Submódulos principales del módulo (Header, ContentTable, etc.)
+  - Componentes reutilizables pequeños usados por submódulos
+- **Ejemplo Submódulos:** `Header.tsx`, `ContentTable.tsx`
+- **Ejemplo Componentes:** `UserAvatar.tsx` (usado dentro de tableColumns), `ActionButtons.tsx`
+- **NO debe:** Contener lógica de negocio (usar hooks para eso)
+
+**Nota:** A diferencia de la convención ideal, en la implementación actual tanto submódulos grandes como componentes pequeños están en `components/`.
 
 #### 4. **Hooks** (useUsers.ts)
 - **Responsabilidad:**
@@ -151,52 +162,51 @@ const Header: React.FC = () => {
   - Mapear datos (eso es del Adapter)
 
 ```typescript
-// ✅ Estructura correcta de un Hook
+// ✅ Estructura correcta de un Hook (implementación real del proyecto)
 export const useUsers = () => {
   // Lectura de Redux (sync)
   const users = useSelector((state: RootState) => state.users.list);
   const loading = useSelector((state: RootState) => state.users.loading);
   const error = useSelector((state: RootState) => state.users.error);
 
-  // Función async que llama al Controller
+  // Función async que llama al Controller (con caché inteligente)
   const fetchUsersByCompany = async (
     companyId: number,
     options?: { force?: boolean }
   ): Promise<ControllerResponse<UserModel[]>> => {
+    // Implementa caché: si ya hay datos y no se fuerza, retorna del cache
     if (users.length > 0 && !options?.force) {
+      console.log('📦 Usando datos en caché (usuarios ya cargados)');
       return { loading: false, data: users, success: true };
     }
-    return await UserController.getUsersByCompany(companyId);
-  };
 
-  // Función wrapper que maneja ControllerResponse internamente
-  const loadUsers = async (
-    companyId: number,
-    options?: { force?: boolean }
-  ): Promise<void> => {
-    const response = await fetchUsersByCompany(companyId, options);
-    if (response.success) {
-      console.log('✅ Usuarios cargados:', response.data);
-    } else {
-      console.error('❌ Error al cargar usuarios:', response.error);
-    }
+    console.log('🌐 Llamando al Controller para obtener usuarios...');
+    return await UserController.getUsersByCompany(companyId);
   };
 
   // Funciones auxiliares (sync)
   const getTotalUsers = (): number => users.length;
   const findUserById = (id: number) => users.find(u => u.id === id);
+  const findUserByEmail = (email: string) => users.find(u => u.email === email);
 
   return {
+    // Estado
     users,
     loading,
     error,
-    fetchUsersByCompany,  // Para casos avanzados
-    loadUsers,            // Para UI simple
+
+    // Funciones async
+    fetchUsersByCompany,
+
+    // Funciones sync
     getTotalUsers,
-    findUserById
+    findUserById,
+    findUserByEmail
   };
 };
 ```
+
+**Nota:** La implementación actual expone `fetchUsersByCompany` que retorna `ControllerResponse<T>`. Opcionalmente puedes agregar una función wrapper `loadUsers` que maneje la respuesta internamente para UIs más simples.
 
 #### 5. **Controllers** (UserController.ts)
 - **Responsabilidad:**
@@ -1001,10 +1011,11 @@ export const getUsersByCompanyCall = (companyId: number) => {
 #### 1. index.tsx (Módulo Principal)
 
 ```typescript
+// src/modules/Security/Users/index.tsx
 import React from 'react';
 import { Container } from 'reactstrap';
-import Header from './Header';
-import ContentTable from './ContentTable';
+import Header from './components/Header';
+import ContentTable from './components/ContentTable';
 
 const Users: React.FC = () => {
   return (
@@ -1020,24 +1031,25 @@ const Users: React.FC = () => {
 export default Users;
 ```
 
-#### 2. Header.tsx (Submódulo)
+#### 2. components/Header.tsx (Submódulo)
 
 ```typescript
+// src/modules/Security/Users/components/Header.tsx
 import React from 'react';
 import { Button } from 'reactstrap';
-import { AzHeaderCard } from '@/components/aziende/AzHeader';
-import { useUsers } from './hooks/useUsers';
+import { AzHeaderCard } from '../../../../components/aziende/AzHeader';
+import { useUsers } from '../hooks/useUsers';
 
 const Header: React.FC = () => {
-  const { loading, loadUsers, getTotalUsers } = useUsers();
+  const { loading, fetchUsersByCompany, getTotalUsers } = useUsers();
 
   const handleCreateUser = () => {
     console.log('Crear nuevo usuario');
   };
 
   const handleRefresh = async () => {
-    await loadUsers(1, { force: true });
-    console.log('🔄 Datos actualizados');
+    await fetchUsersByCompany(1, { force: true });
+    console.log('🔄 Datos actualizados desde la API');
   };
 
   return (
@@ -1047,6 +1059,7 @@ const Header: React.FC = () => {
       showBadge={true}
       badgeColor="primary"
       badgeCount={getTotalUsers()}
+      badgeTotal={getTotalUsers()}
       contentTopRight={
         <div className="d-flex gap-2">
           <Button color="light" onClick={handleRefresh} disabled={loading}>
@@ -1066,76 +1079,98 @@ const Header: React.FC = () => {
 export default Header;
 ```
 
-#### 3. ContentTable.tsx (Submódulo)
+#### 3. components/ContentTable.tsx (Submódulo)
 
 ```typescript
+// src/modules/Security/Users/components/ContentTable.tsx
 import React, { useEffect } from 'react';
-import { Row, Col, Button } from 'reactstrap';
-import AzFilterSummary from '@/components/aziende/AzFilterSummary';
-import AzTable from '@/components/aziende/AzTable';
-import { userTableColumns } from './config/tableColumns';
-import { useUsers } from './hooks/useUsers';
-import { UserModel } from './models/UserModel';
+import { Row, Col, Button, Alert } from 'reactstrap';
+import AzFilterSummary from '../../../../components/aziende/AzFilterSummary';
+import AzTable from '../../../../components/aziende/AzTable';
+import { userTableColumns } from '../config/tableColumns';
+import { useUsers } from '../hooks/useUsers';
+import { UserModel } from '../models/UserModel';
 
 const ContentTable: React.FC = () => {
-  const { users, loading, error, loadUsers } = useUsers();
+  const { users, loading, error, fetchUsersByCompany } = useUsers();
 
-  const handleView = (userId: number) => console.log('Ver:', userId);
+  const handleView = (userId: number) => console.log('Ver detalles:', userId);
   const handleEdit = (userId: number) => console.log('Editar:', userId);
   const handleDelete = (userId: number) => console.log('Eliminar:', userId);
 
   useEffect(() => {
-    loadUsers(1);
+    fetchUsersByCompany(1);
   }, []);
 
   return (
-    <Row>
-      <Col xl={12}>
-        <AzFilterSummary
-          data={users}
-          columns={userTableColumns}
-          alwaysVisible={true}
-          showCount="always"
-        >
-          {({ filteredData, onFilterChange, onSortChange, filters, sorting }) => (
-            <AzTable
-              data={filteredData}
-              columns={userTableColumns}
-              loading={loading}
-              pagination={true}
-              filters={filters}
-              onFilterChange={onFilterChange}
-              sorting={sorting}
-              onSortChange={onSortChange}
-            >
-              <AzTable.Actions>
-                <Button size="sm" color="info" outline
-                  onClick={(e) => {
-                    const row = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}');
-                    handleView(row.id);
-                  }}>
-                  <i className="mdi mdi-eye"></i>
-                </Button>
-                <Button size="sm" color="primary" outline
-                  onClick={(e) => {
-                    const row = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}');
-                    handleEdit(row.id);
-                  }}>
-                  <i className="mdi mdi-pencil"></i>
-                </Button>
-                <Button size="sm" color="danger" outline
-                  onClick={(e) => {
-                    const row = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}');
-                    handleDelete(row.id);
-                  }}>
-                  <i className="mdi mdi-trash-can"></i>
-                </Button>
-              </AzTable.Actions>
-            </AzTable>
-          )}
-        </AzFilterSummary>
-      </Col>
-    </Row>
+    <>
+      {/* Error Alert */}
+      {error && (
+        <Row className="mb-3">
+          <Col>
+            <Alert color="danger" className="d-flex align-items-center">
+              <i className="mdi mdi-alert-circle-outline me-2"></i>
+              <div>
+                <strong>Error:</strong> {error}
+              </div>
+            </Alert>
+          </Col>
+        </Row>
+      )}
+
+      <Row>
+        <Col xl={12}>
+          <AzFilterSummary
+            data={users}
+            columns={userTableColumns}
+            alwaysVisible={true}
+            showCount="always"
+            countPosition="top"
+          >
+            {({ filteredData, onFilterChange, onSortChange, filters, sorting }) => (
+              <AzTable
+                data={filteredData}
+                columns={userTableColumns}
+                loading={loading}
+                pagination={true}
+                filters={filters}
+                onFilterChange={onFilterChange}
+                sorting={sorting}
+                onSortChange={onSortChange}
+                className="table-centered"
+              >
+                <AzTable.Actions>
+                  <Button size="sm" color="info" outline
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                      const row = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
+                      handleView(row.id);
+                    }}
+                    title="Ver detalles">
+                    <i className="mdi mdi-eye"></i>
+                  </Button>
+                  <Button size="sm" color="primary" outline
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                      const row = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
+                      handleEdit(row.id);
+                    }}
+                    title="Editar usuario">
+                    <i className="mdi mdi-pencil"></i>
+                  </Button>
+                  <Button size="sm" color="danger" outline
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                      const row = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
+                      handleDelete(row.id);
+                    }}
+                    title="Eliminar usuario">
+                    <i className="mdi mdi-trash-can"></i>
+                  </Button>
+                </AzTable.Actions>
+              </AzTable>
+            )}
+          </AzFilterSummary>
+        </Col>
+      </Row>
+    </>
   );
 };
 
@@ -1254,25 +1289,44 @@ Existe un script `npm run create_page:module --name=NombreModulo` para generar e
 5. **NO usar Date en Redux** (usar string ISO)
 6. **NO omitir ControllerResponse** en Controllers
 7. **NO crear módulos con scripts** (hacerlo manualmente)
-8. **NO poner submódulos en carpeta components/** (en raíz del módulo)
+8. **NO usar tipos `any` en Adapters** (crear modelos tipados para API)
 
 ---
 
 ## Checklist para Crear un Nuevo Módulo
 
+### Estructura Base
 - [ ] Crear estructura de carpetas siguiendo el patrón establecido
-- [ ] `index.tsx` abstracto (solo renderiza submódulos)
-- [ ] Submódulos en raíz del módulo (Header.tsx, ContentTable.tsx, etc.)
+- [ ] `index.tsx` abstracto (solo renderiza submódulos desde `components/`)
+- [ ] Submódulos en `components/` (Header.tsx, ContentTable.tsx, etc.)
+- [ ] Componentes pequeños reutilizables en `components/` (si son necesarios)
+
+### Lógica de Negocio
 - [ ] Hook con funciones sync (lectura Redux) y async (llamadas a Controller)
 - [ ] Controller con lógica async, retorna `ControllerResponse<T>`
 - [ ] Service con solo llamadas HTTP usando `createAuthenticatedCall`
 - [ ] Adapter para mapeo snake_case → camelCase
-- [ ] Models separados: `*Model.ts` (UI) y `*ResponseModel.ts` (API)
+
+### Modelos y Estado
+- [ ] Models separados: `*Model.ts` (UI) y `*ResponseModel.ts` (API - RECOMENDADO)
 - [ ] Slice de Redux con estructura estándar (`list`, `loading`, `error`)
+
+### UI y Configuración
 - [ ] Configuración de columnas en `config/tableColumns.tsx`
 - [ ] Usar componentes AZ (AzHeaderCard, AzTable, AzFilterSummary)
-- [ ] Implementar caché inteligente en hooks si es necesario
 - [ ] Manejar estados de loading con `loading` prop en AzTable
+- [ ] Implementar manejo de errores con Alert components
+
+### Testing
+- [ ] Crear estructura `__tests__/` con subdirectorios
+- [ ] Agregar fixtures en `__tests__/fixtures/`
+- [ ] Tests unitarios en `__tests__/unit/` (adapters, slices)
+- [ ] Tests de integración en `__tests__/integration/` (controllers, hooks)
+- [ ] Tests de API en `__tests__/api/` (services con MSW)
+
+### Optimizaciones
+- [ ] Implementar caché inteligente en hooks si es necesario
+- [ ] Evitar usar `any`, crear tipos específicos
 
 ---
 

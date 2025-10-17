@@ -1,0 +1,153 @@
+/**
+ * Estilos personalizados para el módulo de WorkStations
+ * Especialmente para el árbol organizacional vertical
+ */
+
+// ============================================================================
+// ORGANIGRAMA (Árbol vertical)
+// ============================================================================
+
+.organization-chart-container {
+  // Scroll suave
+  scroll-behavior: smooth;
+
+  // Ajustes para react-organizational-chart
+  .rst__tree {
+    padding: 20px;
+  }
+
+  // Líneas de conexión del árbol
+  .rst__lineHalfHorizontalRight,
+  .rst__lineFullVertical,
+  .rst__lineHalfVerticalTop,
+  .rst__lineHalfVerticalBottom {
+    &::before {
+      background-color: #e0e0e0;
+    }
+  }
+}
+
+// Nodos del árbol (WorkStationNode)
+.workstation-node {
+  transition: all 0.3s ease;
+
+  // Hover effect
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    transform: translateY(-2px) !important;
+  }
+
+  // Animación de entrada
+  animation: fadeInUp 0.4s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================================================
+// LISTA JERÁRQUICA
+// ============================================================================
+
+.workstation-list-item {
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f8f9fa;
+  }
+}
+
+// ============================================================================
+// SIDEBAR DE REQUISITOS
+// ============================================================================
+
+.requirements-sidebar {
+  // Estilos adicionales para el Offcanvas si es necesario
+
+  .requirement-item {
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #f8f9fa;
+    }
+  }
+}
+
+// ============================================================================
+// RESPONSIVE
+// ============================================================================
+
+// Mobile
+@media (max-width: 768px) {
+  .organization-chart-container {
+    padding: 10px !important;
+
+    .workstation-node {
+      min-width: 180px !important;
+      max-width: 200px !important;
+      font-size: 12px;
+    }
+  }
+}
+
+// Tablet
+@media (min-width: 768px) and (max-width: 1024px) {
+  .organization-chart-container {
+    .workstation-node {
+      min-width: 190px;
+      max-width: 220px;
+    }
+  }
+}
+
+// ============================================================================
+// UTILIDADES
+// ============================================================================
+
+// Barra indicadora de nivel (usada en varios componentes)
+.level-indicator {
+  width: 4px;
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.2s ease;
+
+  &:hover {
+    width: 6px;
+  }
+}
+
+// Badge con gradiente
+.level-badge-gradient {
+  background: linear-gradient(135deg, var(--bg-color) 0%, var(--bg-color-dark) 100%);
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+// Smooth transitions para cambios de vista
+.view-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.view-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.view-transition-exit {
+  opacity: 1;
+}
+
+.view-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}

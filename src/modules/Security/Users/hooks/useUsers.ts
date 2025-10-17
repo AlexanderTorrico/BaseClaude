@@ -15,6 +15,7 @@ export const useUsers = () => {
   const users = useSelector((state: RootState) => state.users.list);
   const loading = useSelector((state: RootState) => state.users.loading);
   const error = useSelector((state: RootState) => state.users.error);
+  const currentView = useSelector((state: RootState) => state.users.currentView);
 
   // ==========================================
   // FUNCIONES ASÍNCRONAS (llaman al Controller con caché)
@@ -74,6 +75,7 @@ export const useUsers = () => {
     users,
     loading,
     error,
+    currentView,
 
     // Funciones async (con caché inteligente)
     fetchUsersByCompany,

@@ -21,6 +21,11 @@ const config = [
     fileName: 'Model.ts'
   },
   {
+    folder: 'data',
+    template: 'model.template.js',
+    fileName: ''
+  },
+  {
     folder: 'services',
     template: 'service.template.js',
     fileName: 'Service.ts'

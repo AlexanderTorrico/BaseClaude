@@ -1,10 +1,76 @@
 /**
- * Estilos personalizados para el m骴ulo de WorkStations
- * Especialmente para el 醨bol organizacional vertical
+ * Estilos personalizados para el m贸dulo de WorkStations
+ * Especialmente para el 谩rbol organizacional vertical
  */
 
 // ============================================================================
-// ORGANIGRAMA (羠bol vertical)
+// ORGANIGRAMA VERTICAL COMPACTO
+// ============================================================================
+
+.vertical-org-chart {
+  // Scroll suave
+  scroll-behavior: smooth;
+
+  // Scrollbar personalizado
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+
+    &:hover {
+      background: #555;
+    }
+  }
+}
+
+// Nodos compactos
+.compact-node-wrapper {
+  margin-bottom: 0;
+}
+
+.compact-node {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:hover {
+    background-color: #f8f9fa !important;
+  }
+
+  &.selected {
+    background-color: #f0f7ff !important;
+    border-left-width: 4px !important;
+    box-shadow: inset 0 0 8px rgba(66, 133, 244, 0.1);
+  }
+
+  // Animaci贸n al expandir/contraer
+  .compact-node-children {
+    animation: slideDown 0.2s ease;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================================================
+// ORGANIGRAMA HORIZONTAL (legacy - react-organizational-chart)
 // ============================================================================
 
 .organization-chart-container {
@@ -16,7 +82,7 @@
     padding: 20px;
   }
 
-  // L韓eas de conexi髇 del 醨bol
+  // L铆neas de conexi贸n del 谩rbol
   .rst__lineHalfHorizontalRight,
   .rst__lineFullVertical,
   .rst__lineHalfVerticalTop,
@@ -27,7 +93,7 @@
   }
 }
 
-// Nodos del 醨bol (WorkStationNode)
+// Nodos del 谩rbol (WorkStationNode)
 .workstation-node {
   transition: all 0.3s ease;
 
@@ -37,7 +103,7 @@
     transform: translateY(-2px) !important;
   }
 
-  // Animaci髇 de entrada
+  // Animaci贸n de entrada
   animation: fadeInUp 0.4s ease;
 }
 
@@ -53,7 +119,7 @@
 }
 
 // ============================================================================
-// LISTA JER罵QUICA
+// LISTA JER脕RQUICA
 // ============================================================================
 
 .workstation-list-item {
@@ -95,6 +161,11 @@
       font-size: 12px;
     }
   }
+
+  .vertical-org-chart {
+    height: auto !important;
+    max-height: 400px;
+  }
 }
 
 // Tablet
@@ -104,6 +175,10 @@
       min-width: 190px;
       max-width: 220px;
     }
+  }
+
+  .vertical-org-chart {
+    height: calc(100vh - 400px) !important;
   }
 }
 

@@ -1,13 +1,13 @@
-import React from 'react';
-import { Tree, TreeNode } from 'react-organizational-chart';
-import { Card, CardBody, Spinner } from 'reactstrap';
+import React, { useState } from 'react';
+import { Row, Col, Spinner, Card, CardBody } from 'reactstrap';
 import { WorkStationModel } from '../models/WorkStationModel';
 import { useWorkStations } from '../hooks/useWorkStations';
-import WorkStationNode from './WorkStationNode';
+import VerticalOrgChart from './VerticalOrgChart';
+import WorkStationDetailsPanel from './WorkStationDetailsPanel';
 
 /**
- * Vista de Organigrama (¡rbol vertical)
- * Usa react-organizational-chart para visualizaciÛn jer·rquica
+ * Vista de Organigrama (√°rbol vertical compacto)
+ * Layout: 4 columnas para √°rbol + 8 columnas para detalles
  */
 
 const OrganizationChartView: React.FC = () => {
@@ -18,31 +18,34 @@ const OrganizationChartView: React.FC = () => {
     openSidebar
   } = useWorkStations();
 
+  // Estado para el nodo seleccionado
+  const [selectedNode, setSelectedNode] = useState<WorkStationModel | null>(null);
+
   /**
-   * Renderizar nodo del ·rbol recursivamente
+   * Manejar selecci√≥n de nodo
    */
-  const renderTreeNode = (workStation: WorkStationModel): JSX.Element => {
-    return (
-      <TreeNode
-        key={workStation.id}
-        label={
-          <WorkStationNode
-            workStation={workStation}
-            onViewRequirements={(ws) => openSidebar(ws)}
-            onEdit={(ws) => console.log('Edit:', ws)}
-            onDelete={(ws) => console.log('Delete:', ws)}
-          />
-        }
-      >
-        {workStation.children && workStation.children.length > 0 && (
-          <>
-            {workStation.children.map(child => renderTreeNode(child))}
-          </>
-        )}
-      </TreeNode>
-    );
+  const handleSelectNode = (workStation: WorkStationModel) => {
+    setSelectedNode(workStation);
   };
 
+  /**
+   * Manejar acciones sobre el nodo
+   */
+  const handleViewRequirements = (workStation: WorkStationModel) => {
+    openSidebar(workStation);
+  };
+
+  const handleEdit = (workStation: WorkStationModel) => {
+    console.log('Edit:', workStation);
+    // TODO: Implementar modal de edici√≥n
+  };
+
+  const handleDelete = (workStation: WorkStationModel) => {
+    console.log('Delete:', workStation);
+    // TODO: Implementar confirmaci√≥n de eliminaci√≥n
+  };
+
+  // Loading state
   if (loading) {
     return (
       <Card>
@@ -54,6 +57,7 @@ const OrganizationChartView: React.FC = () => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <Card>
@@ -65,6 +69,7 @@ const OrganizationChartView: React.FC = () => {
     );
   }
 
+  // Empty state
   if (!workStationTree || workStationTree.length === 0) {
     return (
       <Card>
@@ -77,51 +82,29 @@ const OrganizationChartView: React.FC = () => {
   }
 
   return (
-    <Card>
-      <CardBody>
-        <div
-          className="organization-chart-container"
-          style={{
-            overflowX: 'auto',
-            overflowY: 'auto',
-            maxHeight: 'calc(100vh - 300px)',
-            padding: '20px'
-          }}
-        >
-          {/* ¡rbol organizacional vertical */}
-          {workStationTree.map(root => (
-            <Tree
-              key={root.id}
-              lineWidth="2px"
-              lineColor="#e0e0e0"
-              lineBorderRadius="8px"
-              label={
-                <WorkStationNode
-                  workStation={root}
-                  onViewRequirements={(ws) => openSidebar(ws)}
-                  onEdit={(ws) => console.log('Edit:', ws)}
-                  onDelete={(ws) => console.log('Delete:', ws)}
-                />
-              }
-            >
-              {root.children && root.children.length > 0 && (
-                <>
-                  {root.children.map(child => renderTreeNode(child))}
-                </>
-              )}
-            </Tree>
-          ))}
-        </div>
+    <Row>
+      {/* Columna del √Årbol Vertical - 4/12 (33%) */}
+      <Col lg={4} md={5} sm={12} className="mb-3 mb-lg-0">
+        <VerticalOrgChart
+          workStations={workStationTree}
+          onSelectNode={handleSelectNode}
+          selectedNodeId={selectedNode?.id}
+          onViewRequirements={handleViewRequirements}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </Col>
 
-        {/* Leyenda de niveles */}
-        <div className="mt-3 pt-3 border-top">
-          <div className="text-muted small mb-2">
-            <i className="mdi mdi-information me-1"></i>
-            Haz clic en el men˙ de acciones (Ó) para ver requisitos, editar o eliminar un puesto
-          </div>
-        </div>
-      </CardBody>
-    </Card>
+      {/* Columna del Panel de Detalles - 8/12 (67%) */}
+      <Col lg={8} md={7} sm={12}>
+        <WorkStationDetailsPanel
+          workStation={selectedNode}
+          onViewRequirements={handleViewRequirements}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </Col>
+    </Row>
   );
 };
 

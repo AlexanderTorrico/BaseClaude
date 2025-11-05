@@ -3,8 +3,8 @@ import { RootState, store } from '@/store';
 import { IUserService } from '../services/IUserService';
 import { UserMockService } from '../services/UserMockService';
 import { setUsers, setLoading, setError } from '../slices/userSlice';
-import { ControllerResponse, createSuccessResponse, createErrorResponse } from '@/shared/controllers/ControllerResponse';
 import { UserModel } from '../models/UserModel';
+import { ServiceResponse, createSuccessResponse, createErrorResponse } from '@/shared/services/ServiceResponse';
 
 // Instancia compartida del service por defecto
 const defaultUserService = new UserMockService();
@@ -36,7 +36,7 @@ export const useUsers = (userService: IUserService = defaultUserService) => {
   const fetchUsersByCompany = async (
     companyId: number,
     options?: { force?: boolean }
-  ): Promise<ControllerResponse<UserModel[]>> => {
+  ): Promise<ServiceResponse<UserModel[]>> => {
     // Si ya hay datos y no se fuerza la recarga, no hace nada
     if (users.length > 0 && !options?.force) {
       console.log('📦 Usando datos en caché (usuarios ya cargados)');

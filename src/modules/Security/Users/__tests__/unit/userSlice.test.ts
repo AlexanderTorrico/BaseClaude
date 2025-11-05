@@ -7,7 +7,7 @@ import userSlice, {
   addUser,
   updateUser,
   removeUser,
-} from '../../slices/usersSice';
+} from '../../slices/userSlice';
 import { mockUserModel, mockInitialReduxState, createMockUser } from '../fixtures/mockUsers';
 
 /**

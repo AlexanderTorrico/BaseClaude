@@ -6,13 +6,30 @@ import { userTableColumns } from './config/tableColumns';
 import Header from './components/Header';
 import ContentTable from './components/ContentTable';
 import ContentCards from './components/ContentCards';
+import { UserApiService } from './services/UserApiService';
+import { UserMockService } from './services/UserMockService';
+
+// Instancia única del service (fuera del componente)
+const userService = new UserMockService();
+// Para usar API real, descomentar:
+// const userService = new UserApiService();
 
 const Users: React.FC = () => {
-  const { currentView, users, error } = useUsers();
+  const { currentView, users, error } = useUsers(userService);
 
   return (
-    <div className="page-content">
-      <Container fluid>
+    <div className="page-content" style={{ overflowX: 'clip' }}>
+      <style>{`
+        /* Eliminar scroll del wrapper externo de AzTable */
+        .az-table-container.table-responsive {
+          overflow-x: visible !important;
+        }
+        /* Mantener scroll solo en el div interno de la tabla */
+        .az-table-container .table-responsive {
+          overflow-x: auto !important;
+        }
+      `}</style>
+      <Container fluid style={{ overflowX: 'clip' }}>
         <Header />
 
         {/* Error Alert */}

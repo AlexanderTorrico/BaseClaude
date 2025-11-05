@@ -6,7 +6,7 @@ import { authReducer } from '../pages/Authentication/index';
 import { userReducer } from '../pages/Login/slices';
 import { registerReducer } from '../pages/Register/index';
 import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Hooks/crudBasicSlice';
-import usersReducer from '../modules/Security/Users/slices/usersSice';
+import usersReducer from '../modules/Security/Users/slices/userSlice';
 import workStationsReducer from '../modules/RRHH/WorkStations/slices/workStationsSlice';
 
 export const store = configureStore({

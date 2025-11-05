@@ -132,6 +132,8 @@ The **`Security/Users`** module is the reference implementation showcasing:
 4. **Components**: Use AZ components for tables and headers
 5. **State Management**: Use Redux slices with manual dispatch
 6. **Imports**: Use `@/` alias for absolute imports
+7. **Layout & Scrolling**: To avoid double horizontal scroll, apply `style={{ overflowX: 'hidden' }}` to the main Container fluid in module index files. The AzTable component handles its own scrolling internally.
+8. **Mock Data for Development**: Use mock data in controllers during development. Set `USE_MOCK_DATA = true` in the controller and import from `data/mockFile.ts`. Switch to `false` for production API calls.
 
 The codebase follows React functional component patterns with hooks and uses modern TypeScript/ES6+ features throughout.
 

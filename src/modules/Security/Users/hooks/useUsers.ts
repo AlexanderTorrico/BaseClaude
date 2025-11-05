@@ -1,16 +1,23 @@
 import { useSelector } from 'react-redux';
-import { RootState } from '@/store';
-import { UserController } from '../controllers/UserController';
-import { ControllerResponse } from '@/shared/controllers/ControllerResponse';
+import { RootState, store } from '@/store';
+import { IUserService } from '../services/IUserService';
+import { UserMockService } from '../services/UserMockService';
+import { setUsers, setLoading, setError } from '../slices/userSlice';
+import { ControllerResponse, createSuccessResponse, createErrorResponse } from '@/shared/controllers/ControllerResponse';
 import { UserModel } from '../models/UserModel';
+
+// Instancia compartida del service por defecto
+const defaultUserService = new UserMockService();
 
 /**
  * Hook personalizado para manejar usuarios
  * - Lee del Redux (sync)
- * - Llama al Controller para operaciones async (con caché inteligente)
- * - La UI solo se comunica con este hook
+ * - Usa inyección de dependencias para Services (Mock o API)
+ * - Si no se pasa service, usa UserMockService por defecto
  */
-export const useUsers = () => {
+export const useUsers = (userService: IUserService = defaultUserService) => {
+
+
   // Lectura del estado desde Redux (sincrónico)
   const users = useSelector((state: RootState) => state.users.list);
   const loading = useSelector((state: RootState) => state.users.loading);
@@ -18,7 +25,7 @@ export const useUsers = () => {
   const currentView = useSelector((state: RootState) => state.users.currentView);
 
   // ==========================================
-  // FUNCIONES ASÍNCRONAS (llaman al Controller con caché)
+  // FUNCIONES ASÍNCRONAS (llaman al Service con caché)
   // ==========================================
 
   /**
@@ -40,9 +47,23 @@ export const useUsers = () => {
       };
     }
 
-    // Si no hay datos o se fuerza, llama al Controller
-    console.log('🌐 Llamando al Controller para obtener usuarios...');
-    return await UserController.getUsersByCompany(companyId);
+    // Dispatch loading
+    store.dispatch(setLoading(true));
+
+    try {
+      // Llamar al service
+      const result = await userService.getUsersByCompany(companyId);
+
+      // Guardar en Redux
+      store.dispatch(setUsers(result.data));
+
+      return createSuccessResponse(result.data);
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Error desconocido';
+      store.dispatch(setError(errorMessage));
+
+      return createErrorResponse(errorMessage);
+    }
   };
 
   // ==========================================

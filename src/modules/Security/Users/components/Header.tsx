@@ -3,7 +3,7 @@ import { Button } from 'reactstrap';
 import { useDispatch } from 'react-redux';
 import AzHeaderCardViews from '../../../../components/aziende/AzHeader/AzHeaderCardViews';
 import { useUsers } from '../hooks/useUsers';
-import { setCurrentView } from '../slices/usersSice';
+import { setCurrentView } from '../slices/userSlice';
 
 const Header: React.FC = () => {
   const dispatch = useDispatch();

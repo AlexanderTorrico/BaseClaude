@@ -2,18 +2,15 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { UserModel } from '../models/UserModel';
 
 // Interface para el estado del slice
+// NOTA: Loading y error se manejan en ServiceWrapper, NO en Redux
 interface UserState {
   list: UserModel[];
-  loading: boolean;
-  error: string | null;
   currentView: string; // '0' = table, '1' = cards
 }
 
 // Pure initial state - no external dependencies
 const initialState: UserState = {
   list: [],
-  loading: false,
-  error: null,
   currentView: '0' // Por defecto vista tabla
 };
 
@@ -21,22 +18,11 @@ export const userSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload;
-    },
     setUsers: (state, action: PayloadAction<UserModel[]>) => {
       state.list = action.payload;
-      state.loading = false;
-      state.error = null;
-    },
-    setError: (state, action: PayloadAction<string>) => {
-      state.error = action.payload;
-      state.loading = false;
     },
     clearUsers: (state) => {
       state.list = [];
-      state.loading = false;
-      state.error = null;
     },
     addUser: (state, action: PayloadAction<UserModel>) => {
       state.list.push(action.payload);
@@ -57,9 +43,7 @@ export const userSlice = createSlice({
 });
 
 export const {
-  setLoading,
   setUsers,
-  setError,
   clearUsers,
   addUser,
   updateUser,

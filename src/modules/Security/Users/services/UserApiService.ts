@@ -1,33 +1,38 @@
+import { ServiceManager } from '@/shared/services/ServiceManager';
 import { IUserService } from './IUserService';
+import { ServiceData, createServiceData } from '@/shared/services/IBaseService';
 import { UserModel } from '../models/UserModel';
 import { getUsersByCompanyCall } from './userApiCalls';
 import { adaptUsersArrayToUserModels } from '../adapters/userAdapter';
+import { createAuthenticatedCall } from '@/services/httpService';
+import { ApiResponse } from '@/pages/Authentication/models';
 
 /**
  * Implementación del servicio de usuarios usando API real
+ *
+ * IMPORTANTE:
+ * - Hereda de ServiceManager (maneja loading/error automáticamente con Proxy)
+ * - NO necesitas try/catch (ServiceManager lo hace automáticamente)
+ * - NO necesitas manejar loading (ServiceManager lo hace automáticamente)
+ * - Solo escribe la lógica del método
+ * - Si hay error, simplemente déjalo lanzar (ServiceManager lo captura)
  */
-export class UserApiService implements IUserService {
-  private _loading = false;
-
+export class UserApiService extends ServiceManager implements IUserService {
   /**
-   * Obtiene usuarios desde la API
+   * NOTA: El Proxy de ServiceManager envuelve este método automáticamente
+   * Si la petición falla, el error se loggea automáticamente
    */
-  async getUsersByCompany(companyId: number): Promise<{ data: UserModel[], loading: boolean }> {
-    this._loading = true;
+  async getUsersByCompany(companyId: number): Promise<ServiceData<UserModel[]>> {
+    // Llamada a la API (si falla, ServiceManager captura el error)
+    const { call } = createAuthenticatedCall<ApiResponse<any>>(
+        'GET', `/rrhh/by_company_id/${companyId}`
+      );
+    const response = await call;
 
-    try {
-      const { call } = getUsersByCompanyCall(companyId);
-      const response = await call;
-      const users = adaptUsersArrayToUserModels(response.data.data ?? []);
+    // Adaptar datos de API a modelo UI
+    const users = adaptUsersArrayToUserModels(response.data.data ?? []);
 
-      this._loading = false;
-      return { data: users, loading: false };
-
-    } catch (error: any) {
-      this._loading = false;
-
-      const errorMessage = error?.response?.data?.message || error?.message || 'Error al obtener usuarios';
-      throw new Error(errorMessage);
-    }
+    // Retornar solo datos (ServiceManager maneja loading/try-catch)
+    return createServiceData(users);
   }
 }

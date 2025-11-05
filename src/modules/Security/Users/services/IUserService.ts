@@ -1,14 +1,19 @@
+import { IBaseService, ServiceData } from '@/shared/services/IBaseService';
 import { UserModel } from '../models/UserModel';
 
 /**
  * Interface para el servicio de usuarios
- * Define el contrato que deben cumplir todas las implementaciones (API, Mock, etc.)
+ *
+ * IMPORTANTE:
+ * - Todos los métodos deben retornar ServiceData<T>
+ * - NO incluir loading en la respuesta (lo maneja ServiceWrapper)
+ * - ServiceWrapper se encarga de try/catch y logs
  */
-export interface IUserService {
+export interface IUserService extends IBaseService {
   /**
    * Obtiene usuarios por company_id
    * @param companyId - ID de la compañía
-   * @returns Promise con objeto { data: UserModel[], loading: boolean }
+   * @returns Promise con ServiceData<UserModel[]>
    */
-  getUsersByCompany(companyId: number): Promise<{ data: UserModel[], loading: boolean }>;
+  getUsersByCompany(companyId: number): Promise<ServiceData<UserModel[]>>;
 }

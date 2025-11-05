@@ -1,13 +1,13 @@
 import React from 'react';
-import { Container, Row, Col, Alert } from 'reactstrap';
+import { Container, Row, Col } from 'reactstrap';
 import { useUsers } from './hooks/useUsers';
 import AzFilterSummary from '../../../components/aziende/AzFilterSummary';
 import { userTableColumns } from './config/tableColumns';
 import Header from './components/Header';
 import ContentTable from './components/ContentTable';
 import ContentCards from './components/ContentCards';
-import { UserApiService } from './services/UserApiService';
 import { UserMockService } from './services/UserMockService';
+// import { UserApiService } from './services/UserApiService';
 
 // Instancia única del service (fuera del componente)
 const userService = new UserMockService();
@@ -15,7 +15,7 @@ const userService = new UserMockService();
 // const userService = new UserApiService();
 
 const Users: React.FC = () => {
-  const { currentView, users, error } = useUsers(userService);
+  const { currentView, users } = useUsers(userService);
 
   return (
     <div className="page-content" style={{ overflowX: 'clip' }}>
@@ -31,20 +31,6 @@ const Users: React.FC = () => {
       `}</style>
       <Container fluid style={{ overflowX: 'clip' }}>
         <Header />
-
-        {/* Error Alert */}
-        {error && (
-          <Row className="mb-3">
-            <Col>
-              <Alert color="danger" className="d-flex align-items-center">
-                <i className="mdi mdi-alert-circle-outline me-2"></i>
-                <div>
-                  <strong>Error:</strong> {error}
-                </div>
-              </Alert>
-            </Col>
-          </Row>
-        )}
 
         {/* Filter Summary envolviendo ambas vistas */}
         <AzFilterSummary

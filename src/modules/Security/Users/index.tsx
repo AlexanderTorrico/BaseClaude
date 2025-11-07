@@ -6,7 +6,7 @@ import { userTableColumns } from './config/tableColumns';
 import Header from './components/Header';
 import ContentTable from './components/ContentTable';
 import ContentCards from './components/ContentCards';
-import { UserMockService } from './services/UserMockService';
+//import { UserMockService } from './services/UserMockService';
 import { UserApiService } from './services/UserApiService';
 
 const Users: React.FC = () => {

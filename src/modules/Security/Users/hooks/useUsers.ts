@@ -15,12 +15,7 @@ export const useUsers = (service: IUserService = defaultUserService) => {
 
   const [loading, setLoading] = useState(false);
 
-  const fetchUsersByCompany = async (
-    companyId: number,
-    options?: { force?: boolean }
-  ): Promise<void> => {
-    
-
+  const fetchUsersByCompany = async (companyId: number): Promise<void> => {
     const result = await service.getUsersByCompany(companyId, setLoading);
 
     if ('error' in result) {

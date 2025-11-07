@@ -1,8 +1,7 @@
-import { IBaseService } from '@/shared/services/IBaseService';
 import { UserModel } from '../models/UserModel';
 import { ISetState, ServiceResult } from '@/shared/types/commonTypes';
 
-export interface IUserService extends IBaseService {
+export interface IUserService {
   getUsersByCompany(
     companyId: number,
     setLoading?: ISetState

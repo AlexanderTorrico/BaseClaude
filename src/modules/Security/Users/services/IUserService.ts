@@ -1,19 +1,10 @@
-import { IBaseService, ServiceData } from '@/shared/services/IBaseService';
+import { IBaseService } from '@/shared/services/IBaseService';
 import { UserModel } from '../models/UserModel';
+import { ISetState, ServiceResult } from '@/shared/types/commonTypes';
 
-/**
- * Interface para el servicio de usuarios
- *
- * IMPORTANTE:
- * - Todos los métodos deben retornar ServiceData<T>
- * - NO incluir loading en la respuesta (lo maneja ServiceWrapper)
- * - ServiceWrapper se encarga de try/catch y logs
- */
 export interface IUserService extends IBaseService {
-  /**
-   * Obtiene usuarios por company_id
-   * @param companyId - ID de la compañía
-   * @returns Promise con ServiceData<UserModel[]>
-   */
-  getUsersByCompany(companyId: number): Promise<ServiceData<UserModel[]>>;
+  getUsersByCompany(
+    companyId: number,
+    setLoading?: ISetState
+  ): Promise<ServiceResult<UserModel[]>>;
 }

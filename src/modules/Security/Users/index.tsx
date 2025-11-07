@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import { useUsers } from './hooks/useUsers';
 import AzFilterSummary from '../../../components/aziende/AzFilterSummary';
@@ -7,15 +7,15 @@ import Header from './components/Header';
 import ContentTable from './components/ContentTable';
 import ContentCards from './components/ContentCards';
 import { UserMockService } from './services/UserMockService';
-// import { UserApiService } from './services/UserApiService';
-
-// Instancia única del service (fuera del componente)
-const userService = new UserMockService();
-// Para usar API real, descomentar:
-// const userService = new UserApiService();
+import { UserApiService } from './services/UserApiService';
 
 const Users: React.FC = () => {
-  const { currentView, users } = useUsers(userService);
+  const userService = new UserApiService();
+  const { currentView, users, fetchUsersByCompany } = useUsers(userService);
+
+  useEffect(() => {
+    fetchUsersByCompany(1);
+  }, []);
 
   return (
     <div className="page-content" style={{ overflowX: 'clip' }}>

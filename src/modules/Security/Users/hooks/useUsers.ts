@@ -1,41 +1,35 @@
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, store } from '@/store';
-import { ServiceManager } from '@/shared/services/ServiceManager';
-import { useServiceLoading } from '@/shared/hooks/useServiceManager';
 import { IUserService } from '../services/IUserService';
 import { UserMockService } from '../services/UserMockService';
 import { setUsers } from '../slices/userSlice';
 import { UserModel } from '../models/UserModel';
+import { logServiceError } from '@/shared/services/ServiceResponse';
 
 const defaultUserService = new UserMockService();
 
-export const useUsers = (service: IUserService & ServiceManager = defaultUserService) => {
-  // Lectura del estado desde Redux (sincrónico)
+export const useUsers = (service: IUserService = defaultUserService) => {
   const users = useSelector((state: RootState) => state.users.list);
   const currentView = useSelector((state: RootState) => state.users.currentView);
 
-  
-  const loading = useServiceLoading(service);
+  const [loading, setLoading] = useState(false);
 
   const fetchUsersByCompany = async (
     companyId: number,
     options?: { force?: boolean }
   ): Promise<void> => {
-    // Caché: si ya hay datos y no se fuerza, no hace petición
-    if (users.length > 0 && !options?.force) {
-      console.log('📦 Usando datos en caché (usuarios ya cargados)');
+    
+
+    const result = await service.getUsersByCompany(companyId, setLoading);
+
+    if ('error' in result) {
+      logServiceError(result);
       return;
     }
 
-    const result = await service.getUsersByCompany(companyId);
-    if (result?.data) {
-      store.dispatch(setUsers(result.data));
-    }
+    store.dispatch(setUsers(result.data));
   };
-
-  // ==========================================
-  // FUNCIONES SÍNCRONAS (helpers)
-  // ==========================================
 
   const findUserByEmail = (email: string): UserModel | undefined => {
     return users.find(user => user.email === email);

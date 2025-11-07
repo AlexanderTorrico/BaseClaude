@@ -1,14 +1,13 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
 import { AxiosCallModel } from '@/models/axiosCallModel';
+import { ResponseSuccessService, ResponseErrorService } from '@/shared/services/ServiceResponse';
+import { ISetState } from '@/shared/types/commonTypes';
 
 export interface HttpConfig {
   baseURL?: string;
   timeout?: number;
 }
 
-/**
- * Create a configured axios instance
- */
 export const createApiInstance = (config?: HttpConfig): AxiosInstance => {
   const baseURL = config?.baseURL ||
                  import.meta.env.VITE_APP_API_URL ||
@@ -23,9 +22,6 @@ export const createApiInstance = (config?: HttpConfig): AxiosInstance => {
   });
 };
 
-/**
- * Generic request handler for consistent error handling
- */
 export const handleRequest = async <T>(
   request: Promise<AxiosResponse<T>>
 ): Promise<T> => {
@@ -44,22 +40,221 @@ export const handleRequest = async <T>(
   }
 };
 
-/**
- * Creates AbortController for request cancellation
- */
 export const loadAbort = (): AbortController => {
   return new AbortController();
 };
 
-/**
- * Get authentication token from localStorage
- */
 const getAuthToken = (): string | null => {
   return localStorage.getItem('authToken');
 };
 
+const executeRequest = async <T>(
+  api: AxiosInstance,
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+  url: string,
+  data?: any,
+  config?: AxiosRequestConfig,
+  setLoading?: ISetState
+): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+  setLoading?.(true);
+
+  try {
+    let response: AxiosResponse<T>;
+
+    switch (method) {
+      case 'GET':
+        response = await api.get<T>(url, config);
+        break;
+      case 'POST':
+        response = await api.post<T>(url, data, config);
+        break;
+      case 'PUT':
+        response = await api.put<T>(url, data, config);
+        break;
+      case 'DELETE':
+        response = await api.delete<T>(url, config);
+        break;
+      case 'PATCH':
+        response = await api.patch<T>(url, data, config);
+        break;
+    }
+
+    setLoading?.(false);
+
+    return {
+      data: response.data,
+      status: response.status,
+      message: 'Success',
+    };
+  } catch (error: any) {
+    setLoading?.(false);
+
+    return {
+      data: null,
+      status: error.response?.status || 500,
+      message: error.response?.data?.message || error.message || 'Request failed',
+      error: error,
+    };
+  }
+};
+
+export const httpRequest = {
+  get: async <T>(
+    url: string,
+    setLoading?: ISetState,
+    config?: AxiosRequestConfig
+  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+    const api = createApiInstance();
+    return executeRequest<T>(api, 'GET', url, undefined, config, setLoading);
+  },
+
+  post: async <T>(
+    url: string,
+    data: any,
+    setLoading?: ISetState,
+    config?: AxiosRequestConfig
+  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+    const api = createApiInstance();
+    return executeRequest<T>(api, 'POST', url, data, config, setLoading);
+  },
+
+  put: async <T>(
+    url: string,
+    data: any,
+    setLoading?: ISetState,
+    config?: AxiosRequestConfig
+  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+    const api = createApiInstance();
+    return executeRequest<T>(api, 'PUT', url, data, config, setLoading);
+  },
+
+  patch: async <T>(
+    url: string,
+    data: any,
+    setLoading?: ISetState,
+    config?: AxiosRequestConfig
+  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+    const api = createApiInstance();
+    return executeRequest<T>(api, 'PATCH', url, data, config, setLoading);
+  },
+
+  delete: async <T>(
+    url: string,
+    setLoading?: ISetState,
+    config?: AxiosRequestConfig
+  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+    const api = createApiInstance();
+    return executeRequest<T>(api, 'DELETE', url, undefined, config, setLoading);
+  },
+};
+
+export const httpRequestWithAuth = {
+  get: async <T>(
+    url: string,
+    setLoading?: ISetState,
+    config?: AxiosRequestConfig
+  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+    const api = createApiInstance();
+    const token = getAuthToken();
+
+    const requestConfig: AxiosRequestConfig = {
+      ...config,
+      headers: {
+        'Content-Type': 'application/json',
+        ...config?.headers,
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    };
+
+    return executeRequest<T>(api, 'GET', url, undefined, requestConfig, setLoading);
+  },
+
+  post: async <T>(
+    url: string,
+    data: any,
+    setLoading?: ISetState,
+    config?: AxiosRequestConfig
+  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+    const api = createApiInstance();
+    const token = getAuthToken();
+
+    const requestConfig: AxiosRequestConfig = {
+      ...config,
+      headers: {
+        'Content-Type': 'application/json',
+        ...config?.headers,
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    };
+
+    return executeRequest<T>(api, 'POST', url, data, requestConfig, setLoading);
+  },
+
+  put: async <T>(
+    url: string,
+    data: any,
+    setLoading?: ISetState,
+    config?: AxiosRequestConfig
+  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+    const api = createApiInstance();
+    const token = getAuthToken();
+
+    const requestConfig: AxiosRequestConfig = {
+      ...config,
+      headers: {
+        'Content-Type': 'application/json',
+        ...config?.headers,
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    };
+
+    return executeRequest<T>(api, 'PUT', url, data, requestConfig, setLoading);
+  },
+
+  patch: async <T>(
+    url: string,
+    data: any,
+    setLoading?: ISetState,
+    config?: AxiosRequestConfig
+  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+    const api = createApiInstance();
+    const token = getAuthToken();
+
+    const requestConfig: AxiosRequestConfig = {
+      ...config,
+      headers: {
+        'Content-Type': 'application/json',
+        ...config?.headers,
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    };
+
+    return executeRequest<T>(api, 'PATCH', url, data, requestConfig, setLoading);
+  },
+
+  delete: async <T>(
+    url: string,
+    setLoading?: ISetState,
+    config?: AxiosRequestConfig
+  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+    const api = createApiInstance();
+    const token = getAuthToken();
+
+    const requestConfig: AxiosRequestConfig = {
+      ...config,
+      headers: {
+        'Content-Type': 'application/json',
+        ...config?.headers,
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    };
+
+    return executeRequest<T>(api, 'DELETE', url, undefined, requestConfig, setLoading);
+  },
+};
+
 /**
- * Create authenticated API call (with token in headers)
+ * @deprecated Use httpRequest or httpRequestWithAuth instead
  */
 export const createAuthenticatedCall = <T>(
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
@@ -110,7 +305,7 @@ export const createAuthenticatedCall = <T>(
 };
 
 /**
- * Create public API call (without authentication)
+ * @deprecated Use httpRequest instead
  */
 export const createPublicCall = <T>(
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',

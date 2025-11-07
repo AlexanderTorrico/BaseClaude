@@ -1,7 +1,37 @@
-/**
- * Respuesta estándar de los Controllers
- * @template T - Tipo de dato que devuelve el controller
- */
+export interface BaseServiceResponse {
+  status: number;
+  message: string;
+}
+
+export interface ResponseSuccessService<T = any> extends BaseServiceResponse {
+  data: T;
+}
+
+export interface ResponseErrorService extends BaseServiceResponse {
+  data: null;
+  error: any;
+}
+
+export const logServiceError = (error: ResponseErrorService): void => {
+  console.log('[Service Error]', {
+    status: error.status,
+    message: error.message,
+    error: error.error
+  });
+};
+
+export const wrapperData = <T>(
+  response: ResponseSuccessService<any> | ResponseErrorService,
+  adapter: (data: any) => T
+): ResponseSuccessService<T> | ResponseErrorService => {
+  if ('error' in response) return response;
+  return {
+    data: adapter(response.data),
+    status: response.status,
+    message: response.message,
+  };
+};
+
 export interface ServiceResponse<T> {
   loading: boolean;
   data?: T;
@@ -9,27 +39,18 @@ export interface ServiceResponse<T> {
   success: boolean;
 }
 
-/**
- * Helper para crear respuesta exitosa
- */
 export const createSuccessResponse = <T>(data: T): ServiceResponse<T> => ({
   loading: false,
   data,
   success: true
 });
 
-/**
- * Helper para crear respuesta de error
- */
 export const createErrorResponse = <T>(error: string): ServiceResponse<T> => ({
   loading: false,
   error,
   success: false
 });
 
-/**
- * Helper para crear respuesta en loading
- */
 export const createLoadingResponse = <T>(): ServiceResponse<T> => ({
   loading: true,
   success: false

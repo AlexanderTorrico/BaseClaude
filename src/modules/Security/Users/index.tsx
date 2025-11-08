@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import { useUsers } from './hooks/useUsers';
 import AzFilterSummary from '../../../components/aziende/AzFilterSummary';
@@ -10,7 +10,7 @@ import ContentCards from './components/ContentCards';
 import { UserApiService } from './services/UserApiService';
 
 const Users: React.FC = () => {
-  const userService = new UserApiService();
+  const userService = useMemo(() => new UserApiService(), []);
   const { currentView, users, fetchUsersByCompany } = useUsers(userService);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const Users: React.FC = () => {
         }
       `}</style>
       <Container fluid style={{ overflowX: 'clip' }}>
-        <Header />
+        <Header service={userService} />
 
         {/* Filter Summary envolviendo ambas vistas */}
         <AzFilterSummary
@@ -52,6 +52,7 @@ const Users: React.FC = () => {
                       sorting={sorting}
                       onFilterChange={onFilterChange}
                       onSortChange={onSortChange}
+                      service={userService}
                     />
                   </Col>
                 </Row>
@@ -59,7 +60,7 @@ const Users: React.FC = () => {
 
               {/* Vista Cards */}
               {currentView === '1' && (
-                <ContentCards filteredUsers={filteredData} />
+                <ContentCards filteredUsers={filteredData} service={userService} />
               )}
             </>
           )}

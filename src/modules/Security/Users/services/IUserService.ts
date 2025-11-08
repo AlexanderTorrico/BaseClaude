@@ -1,9 +1,9 @@
 import { UserModel } from '../models/UserModel';
-import { ISetState, ServiceResult } from '@/shared/types/commonTypes';
+import { SetStateFn, ServiceResult } from '@/shared/types/commonTypes';
 
 export interface IUserService {
   getUsersByCompany(
     companyId: number,
-    setLoading?: ISetState
+    setLoading?: SetStateFn
   ): Promise<ServiceResult<UserModel[]>>;
 }

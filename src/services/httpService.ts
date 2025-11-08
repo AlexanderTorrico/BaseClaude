@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
 import { AxiosCallModel } from '@/models/axiosCallModel';
-import { ResponseSuccessService, ResponseErrorService } from '@/shared/services/ServiceResponse';
-import { ISetState } from '@/shared/types/commonTypes';
+import { ServiceSuccessResponse, ServiceErrorResponse } from '@/shared/services/ServiceResponse';
+import { SetStateFn } from '@/shared/types/commonTypes';
 
 export interface HttpConfig {
   baseURL?: string;
@@ -54,8 +54,8 @@ const executeRequest = async <T>(
   url: string,
   data?: any,
   config?: AxiosRequestConfig,
-  setLoading?: ISetState
-): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+  setLoading?: SetStateFn
+): Promise<ServiceSuccessResponse<T> | ServiceErrorResponse> => {
   setLoading?.(true);
 
   try {
@@ -101,9 +101,9 @@ const executeRequest = async <T>(
 export const httpRequest = {
   get: async <T>(
     url: string,
-    setLoading?: ISetState,
+    setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+  ): Promise<ServiceSuccessResponse<T> | ServiceErrorResponse> => {
     const api = createApiInstance();
     return executeRequest<T>(api, 'GET', url, undefined, config, setLoading);
   },
@@ -111,9 +111,9 @@ export const httpRequest = {
   post: async <T>(
     url: string,
     data: any,
-    setLoading?: ISetState,
+    setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+  ): Promise<ServiceSuccessResponse<T> | ServiceErrorResponse> => {
     const api = createApiInstance();
     return executeRequest<T>(api, 'POST', url, data, config, setLoading);
   },
@@ -121,9 +121,9 @@ export const httpRequest = {
   put: async <T>(
     url: string,
     data: any,
-    setLoading?: ISetState,
+    setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+  ): Promise<ServiceSuccessResponse<T> | ServiceErrorResponse> => {
     const api = createApiInstance();
     return executeRequest<T>(api, 'PUT', url, data, config, setLoading);
   },
@@ -131,18 +131,18 @@ export const httpRequest = {
   patch: async <T>(
     url: string,
     data: any,
-    setLoading?: ISetState,
+    setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+  ): Promise<ServiceSuccessResponse<T> | ServiceErrorResponse> => {
     const api = createApiInstance();
     return executeRequest<T>(api, 'PATCH', url, data, config, setLoading);
   },
 
   delete: async <T>(
     url: string,
-    setLoading?: ISetState,
+    setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+  ): Promise<ServiceSuccessResponse<T> | ServiceErrorResponse> => {
     const api = createApiInstance();
     return executeRequest<T>(api, 'DELETE', url, undefined, config, setLoading);
   },
@@ -151,9 +151,9 @@ export const httpRequest = {
 export const httpRequestWithAuth = {
   get: async <T>(
     url: string,
-    setLoading?: ISetState,
+    setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+  ): Promise<ServiceSuccessResponse<T> | ServiceErrorResponse> => {
     const api = createApiInstance();
     const token = getAuthToken();
 
@@ -172,9 +172,9 @@ export const httpRequestWithAuth = {
   post: async <T>(
     url: string,
     data: any,
-    setLoading?: ISetState,
+    setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+  ): Promise<ServiceSuccessResponse<T> | ServiceErrorResponse> => {
     const api = createApiInstance();
     const token = getAuthToken();
 
@@ -193,9 +193,9 @@ export const httpRequestWithAuth = {
   put: async <T>(
     url: string,
     data: any,
-    setLoading?: ISetState,
+    setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+  ): Promise<ServiceSuccessResponse<T> | ServiceErrorResponse> => {
     const api = createApiInstance();
     const token = getAuthToken();
 
@@ -214,9 +214,9 @@ export const httpRequestWithAuth = {
   patch: async <T>(
     url: string,
     data: any,
-    setLoading?: ISetState,
+    setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+  ): Promise<ServiceSuccessResponse<T> | ServiceErrorResponse> => {
     const api = createApiInstance();
     const token = getAuthToken();
 
@@ -234,9 +234,9 @@ export const httpRequestWithAuth = {
 
   delete: async <T>(
     url: string,
-    setLoading?: ISetState,
+    setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ResponseSuccessService<T> | ResponseErrorService> => {
+  ): Promise<ServiceSuccessResponse<T> | ServiceErrorResponse> => {
     const api = createApiInstance();
     const token = getAuthToken();
 

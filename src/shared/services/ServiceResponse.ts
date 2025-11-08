@@ -1,18 +1,18 @@
-export interface BaseServiceResponse {
+export interface ServiceResponse {
   status: number;
   message: string;
 }
 
-export interface ResponseSuccessService<T = any> extends BaseServiceResponse {
+export interface ServiceSuccessResponse<T = any> extends ServiceResponse {
   data: T;
 }
 
-export interface ResponseErrorService extends BaseServiceResponse {
+export interface ServiceErrorResponse extends ServiceResponse {
   data: null;
   error: any;
 }
 
-export const logServiceError = (error: ResponseErrorService): void => {
+export const logServiceError = (error: ServiceErrorResponse): void => {
   console.log('[Service Error]', {
     status: error.status,
     message: error.message,
@@ -20,38 +20,14 @@ export const logServiceError = (error: ResponseErrorService): void => {
   });
 };
 
-export const wrapperData = <T>(
-  response: ResponseSuccessService<any> | ResponseErrorService,
-  adapter: (data: any) => T
-): ResponseSuccessService<T> | ResponseErrorService => {
+export const transformServiceData = <T>(
+  response: ServiceSuccessResponse<any> | ServiceErrorResponse,
+  transform: (data: any) => T
+): ServiceSuccessResponse<T> | ServiceErrorResponse => {
   if ('error' in response) return response;
   return {
-    data: adapter(response.data),
+    data: transform(response.data),
     status: response.status,
     message: response.message,
   };
 };
-
-export interface ServiceResponse<T> {
-  loading: boolean;
-  data?: T;
-  error?: string;
-  success: boolean;
-}
-
-export const createSuccessResponse = <T>(data: T): ServiceResponse<T> => ({
-  loading: false,
-  data,
-  success: true
-});
-
-export const createErrorResponse = <T>(error: string): ServiceResponse<T> => ({
-  loading: false,
-  error,
-  success: false
-});
-
-export const createLoadingResponse = <T>(): ServiceResponse<T> => ({
-  loading: true,
-  success: false
-});

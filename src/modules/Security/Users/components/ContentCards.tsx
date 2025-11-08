@@ -3,6 +3,7 @@ import { Row, Col, Card, CardBody, Button, Badge, UncontrolledTooltip } from 're
 import { UserModel } from '../models/UserModel';
 import { useUsers } from '../hooks/useUsers';
 import UserRolesPermissionsModal from './UserRolesPermissionsModal';
+import { IUserService } from '../services/IUserService';
 
 /**
  * Genera las iniciales del nombre completo
@@ -191,10 +192,11 @@ const UserCard: React.FC<{
  */
 interface ContentCardsProps {
   filteredUsers: UserModel[];
+  service: IUserService;
 }
 
-const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers }) => {
-  const { fetchUsersByCompany } = useUsers();
+const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, service }) => {
+  const { fetchUsersByCompany } = useUsers(service);
 
   // Estado para modal de roles/permisos
   const [isRolesPermissionsModalOpen, setIsRolesPermissionsModalOpen] = useState(false);

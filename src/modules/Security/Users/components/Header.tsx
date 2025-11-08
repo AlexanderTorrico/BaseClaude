@@ -4,10 +4,15 @@ import { useDispatch } from 'react-redux';
 import AzHeaderCardViews from '../../../../components/aziende/AzHeader/AzHeaderCardViews';
 import { useUsers } from '../hooks/useUsers';
 import { setCurrentView } from '../slices/userSlice';
+import { IUserService } from '../services/IUserService';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  service: IUserService;
+}
+
+const Header: React.FC<HeaderProps> = ({ service }) => {
   const dispatch = useDispatch();
-  const { loading, fetchUsersByCompany, getTotalUsers, currentView } = useUsers();
+  const { loading, fetchUsersByCompany, getTotalUsers, currentView } = useUsers(service);
 
   // Estado local para detectar tamaño de pantalla
   const [responsiveView, setResponsiveView] = useState<string>('0');

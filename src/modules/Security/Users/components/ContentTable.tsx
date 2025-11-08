@@ -5,6 +5,7 @@ import { userTableColumns } from '../config/tableColumns';
 import { useUsers } from '../hooks/useUsers';
 import { UserModel } from '../models/UserModel';
 import UserRolesPermissionsModal from './UserRolesPermissionsModal';
+import { IUserService } from '../services/IUserService';
 
 interface ContentTableProps {
   filteredUsers: UserModel[];
@@ -12,6 +13,7 @@ interface ContentTableProps {
   sorting?: { field: string; direction: string };
   onFilterChange?: (column: string, value: string) => void;
   onSortChange?: (config: { field: string; direction: string }) => void;
+  service: IUserService;
 }
 
 const ContentTable: React.FC<ContentTableProps> = ({
@@ -19,9 +21,10 @@ const ContentTable: React.FC<ContentTableProps> = ({
   filters,
   sorting,
   onFilterChange,
-  onSortChange
+  onSortChange,
+  service
 }) => {
-  const { loading, fetchUsersByCompany } = useUsers();
+  const { loading, fetchUsersByCompany } = useUsers(service);
 
   // Estado para modal de roles/permisos
   const [isRolesPermissionsModalOpen, setIsRolesPermissionsModalOpen] = useState(false);

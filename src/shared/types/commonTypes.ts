@@ -1,7 +1,5 @@
-import { ResponseSuccessService, ResponseErrorService } from '../services/ServiceResponse';
+import { ServiceSuccessResponse, ServiceErrorResponse } from '../services/ServiceResponse';
 
-export interface ISetState<T = boolean> {
-  (value: T): void;
-}
+export type SetStateFn<T = boolean> = (value: T) => void;
 
-export type ServiceResult<T> = ResponseSuccessService<T> | ResponseErrorService;
+export type ServiceResult<T> = ServiceSuccessResponse<T> | ServiceErrorResponse;

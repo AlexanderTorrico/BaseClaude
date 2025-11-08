@@ -1,14 +1,14 @@
 import { IUserService } from './IUserService';
 import { UserModel } from '../models/UserModel';
 import { MOCK_USERS_WITH_ROLES } from '../data/mockUsersWithRoles';
-import { ISetState, ServiceResult } from '@/shared/types/commonTypes';
+import { SetStateFn, ServiceResult } from '@/shared/types/commonTypes';
 
 export class UserMockService implements IUserService {
   private mockUsers: UserModel[] = [...MOCK_USERS_WITH_ROLES];
 
   async getUsersByCompany(
     companyId: number,
-    setLoading?: ISetState
+    setLoading?: SetStateFn
   ): Promise<ServiceResult<UserModel[]>> {
     setLoading?.(true);
 

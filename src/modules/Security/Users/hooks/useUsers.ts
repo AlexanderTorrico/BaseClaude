@@ -12,7 +12,6 @@ export const useUsers = (service: IUserService) => {
   const [loading, setLoading] = useState(false);
 
   const fetchUsersByCompany = async (companyId: number): Promise<void> => {
-    console.log(`🔄 Fetching users for company ${companyId} using:`, service.constructor.name);
     const result = await service.getUsersByCompany(companyId, setLoading);
 
     if (result.status !== 200) {
@@ -20,7 +19,6 @@ export const useUsers = (service: IUserService) => {
       return;
     }
 
-    console.log(`✅ Successfully fetched ${result.data.length} users from API`);
     store.dispatch(setUsers(result.data));
   };
 

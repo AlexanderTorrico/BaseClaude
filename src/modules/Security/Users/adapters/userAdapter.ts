@@ -1,7 +1,5 @@
 import { UserModel } from '../models/UserModel';
 import { WorkStationModel } from '../models/WorkStationModel';
-import { RoleModel } from '../../Roles/models/RoleModel';
-import { PermissionModel } from '../../Roles/models/PermissionModel';
 
 /**
  * Adapta WorkStation de la API al modelo de la UI

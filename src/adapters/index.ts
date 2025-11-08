@@ -1,2 +1,2 @@
 // Adapters Layer Exports
-export { LoginApiAdapter } from './LoginApiAdapter';
+// LoginApiAdapter eliminado - no se usaba en el proyecto

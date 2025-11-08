@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import { useUsers } from './hooks/useUsers';
 import AzFilterSummary from '../../../components/aziende/AzFilterSummary';
@@ -9,8 +9,9 @@ import ContentCards from './components/ContentCards';
 //import { UserMockService } from './services/UserMockService';
 import { UserApiService } from './services/UserApiService';
 
+const userService = new UserApiService();
+
 const Users: React.FC = () => {
-  const userService = useMemo(() => new UserApiService(), []);
   const { currentView, users, fetchUsersByCompany } = useUsers(userService);
 
   useEffect(() => {

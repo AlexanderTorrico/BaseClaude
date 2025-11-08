@@ -48,6 +48,22 @@ const getAuthToken = (): string | null => {
   return localStorage.getItem('authToken');
 };
 
+// Instancias singleton de Axios para mejor performance
+const defaultApiInstance = createApiInstance();
+
+// Helper para crear headers con autenticación
+const createAuthHeaders = (config?: AxiosRequestConfig): AxiosRequestConfig => {
+  const token = getAuthToken();
+  return {
+    ...config,
+    headers: {
+      'Content-Type': 'application/json',
+      ...config?.headers,
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  };
+};
+
 const executeRequest = async <T>(
   api: AxiosInstance,
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
@@ -90,17 +106,19 @@ const executeRequest = async <T>(
     setLoading?.(false);
 
     // Log interno del error (lógica encapsulada)
-    console.error('[HTTP Service Error]', {
-      method,
-      url,
-      status: error.response?.status || 500,
-      message: error.response?.data?.message || error.message,
-      error: error
-    });
+    if (import.meta.env.DEV) {
+      console.error('[HTTP Service Error]', {
+        method,
+        url,
+        status: error.response?.status || 500,
+        message: error.response?.data?.message || error.message,
+        error: error
+      });
+    }
 
-    // Retorna respuesta con data vacía según el tipo esperado
+    // Retorna respuesta con data null en caso de error
     return {
-      data: (Array.isArray({}) ? [] : {}) as T,
+      data: null as unknown as T,
       status: error.response?.status || 500,
       message: error.response?.data?.message || error.message || 'Request failed',
     };
@@ -113,8 +131,7 @@ export const httpRequest = {
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
   ): Promise<ServiceResponse<T>> => {
-    const api = createApiInstance();
-    return executeRequest<T>(api, 'GET', url, undefined, config, setLoading);
+    return executeRequest<T>(defaultApiInstance, 'GET', url, undefined, config, setLoading);
   },
 
   post: async <T>(
@@ -123,8 +140,7 @@ export const httpRequest = {
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
   ): Promise<ServiceResponse<T>> => {
-    const api = createApiInstance();
-    return executeRequest<T>(api, 'POST', url, data, config, setLoading);
+    return executeRequest<T>(defaultApiInstance, 'POST', url, data, config, setLoading);
   },
 
   put: async <T>(
@@ -133,8 +149,7 @@ export const httpRequest = {
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
   ): Promise<ServiceResponse<T>> => {
-    const api = createApiInstance();
-    return executeRequest<T>(api, 'PUT', url, data, config, setLoading);
+    return executeRequest<T>(defaultApiInstance, 'PUT', url, data, config, setLoading);
   },
 
   patch: async <T>(
@@ -143,8 +158,7 @@ export const httpRequest = {
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
   ): Promise<ServiceResponse<T>> => {
-    const api = createApiInstance();
-    return executeRequest<T>(api, 'PATCH', url, data, config, setLoading);
+    return executeRequest<T>(defaultApiInstance, 'PATCH', url, data, config, setLoading);
   },
 
   delete: async <T>(
@@ -152,8 +166,7 @@ export const httpRequest = {
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
   ): Promise<ServiceResponse<T>> => {
-    const api = createApiInstance();
-    return executeRequest<T>(api, 'DELETE', url, undefined, config, setLoading);
+    return executeRequest<T>(defaultApiInstance, 'DELETE', url, undefined, config, setLoading);
   },
 };
 
@@ -163,19 +176,7 @@ export const httpRequestWithAuth = {
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
   ): Promise<ServiceResponse<T>> => {
-    const api = createApiInstance();
-    const token = getAuthToken();
-
-    const requestConfig: AxiosRequestConfig = {
-      ...config,
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    };
-
-    return executeRequest<T>(api, 'GET', url, undefined, requestConfig, setLoading);
+    return executeRequest<T>(defaultApiInstance, 'GET', url, undefined, createAuthHeaders(config), setLoading);
   },
 
   post: async <T>(
@@ -184,19 +185,7 @@ export const httpRequestWithAuth = {
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
   ): Promise<ServiceResponse<T>> => {
-    const api = createApiInstance();
-    const token = getAuthToken();
-
-    const requestConfig: AxiosRequestConfig = {
-      ...config,
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    };
-
-    return executeRequest<T>(api, 'POST', url, data, requestConfig, setLoading);
+    return executeRequest<T>(defaultApiInstance, 'POST', url, data, createAuthHeaders(config), setLoading);
   },
 
   put: async <T>(
@@ -205,19 +194,7 @@ export const httpRequestWithAuth = {
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
   ): Promise<ServiceResponse<T>> => {
-    const api = createApiInstance();
-    const token = getAuthToken();
-
-    const requestConfig: AxiosRequestConfig = {
-      ...config,
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    };
-
-    return executeRequest<T>(api, 'PUT', url, data, requestConfig, setLoading);
+    return executeRequest<T>(defaultApiInstance, 'PUT', url, data, createAuthHeaders(config), setLoading);
   },
 
   patch: async <T>(
@@ -226,19 +203,7 @@ export const httpRequestWithAuth = {
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
   ): Promise<ServiceResponse<T>> => {
-    const api = createApiInstance();
-    const token = getAuthToken();
-
-    const requestConfig: AxiosRequestConfig = {
-      ...config,
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    };
-
-    return executeRequest<T>(api, 'PATCH', url, data, requestConfig, setLoading);
+    return executeRequest<T>(defaultApiInstance, 'PATCH', url, data, createAuthHeaders(config), setLoading);
   },
 
   delete: async <T>(
@@ -246,19 +211,7 @@ export const httpRequestWithAuth = {
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
   ): Promise<ServiceResponse<T>> => {
-    const api = createApiInstance();
-    const token = getAuthToken();
-
-    const requestConfig: AxiosRequestConfig = {
-      ...config,
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    };
-
-    return executeRequest<T>(api, 'DELETE', url, undefined, requestConfig, setLoading);
+    return executeRequest<T>(defaultApiInstance, 'DELETE', url, undefined, createAuthHeaders(config), setLoading);
   },
 };
 

@@ -23,7 +23,6 @@ import PageApi from "../modules/Components/PageApi/index";
 
 import Users from "../modules/Security/Users/index";
 import Roles from "../modules/Security/Roles/index";
-import Testear from "../modules/Testear/index";
 
 // RRHH
 import WorkStations from "../modules/RRHH/WorkStations/index";
@@ -55,12 +54,9 @@ const authProtectedRoutes = [
   { path: "/security-user", component: User },
   { path: "/users", component: Users },
   { path: "/roles", component: Roles },
-  { path: "/test", component: Testear },
 
   // RRHH
   { path: "/workstations", component: WorkStations },
-
-  { path: "/Pagina pruebas", component: Users },
 
   //   // this route should be at the end of all other routes
   //   // eslint-disable-next-line react/display-name

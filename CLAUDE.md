@@ -35,20 +35,22 @@ The project follows a **layered modular architecture** for scalability:
 ```
 src/modules/[Area]/[Module]/
 ├── components/          # UI components (Header, ContentTable, etc.)
-├── hooks/              # Custom hooks (state + controller calls)
-├── controllers/        # Business logic + Redux dispatch
-├── services/           # HTTP calls (Axios)
+├── hooks/              # Custom hooks (state management + service calls)
+├── services/           # HTTP calls (Axios) - ApiService & MockService
 ├── adapters/           # API ↔ UI data mapping
 ├── models/             # TypeScript interfaces
 ├── slices/             # Redux state slices
 ├── config/             # Configuration files
+├── data/               # Mock data for development (used in MockService)
 └── __tests__/          # Tests (unit, integration, api)
 ```
 
 ### Data Flow Pattern
 
 ```
-UI Component → Hook → Controller → [Service, Adapter, Slice] → Redux Store
+UI Component → Hook → Service → Adapter → Redux Slice
+                        ↓
+                   Redux Store (dispatch)
 ```
 
 **Complete architecture documentation:** [PROJECT_GUIDE.md](./PROJECT_GUIDE.md)
@@ -61,7 +63,7 @@ UI Component → Hook → Controller → [Service, Adapter, Slice] → Redux Sto
   - `VerticalLayout/` and `HorizontalLayout/` - Main layout components
   - `Common/` - Shared components like Breadcrumb, TableContainer, Spinner
 - `src/shared/` - Shared utilities and types
-  - `controllers/` - Shared controller utilities (ControllerResponse)
+  - `services/` - ServiceResponse type definition
   - `__tests__/` - Shared test utilities and MSW mocks
 - `src/pages/` - Page components (legacy structure, migrating to modules)
 - `src/store/` - Redux store configuration
@@ -71,8 +73,8 @@ UI Component → Hook → Controller → [Service, Adapter, Slice] → Redux Sto
 
 ### State Management
 - **Redux Toolkit** with manual dispatch (NO createAsyncThunk)
-- Controllers handle async logic and dispatch to slices
-- Hooks provide sync access to state via `useSelector`
+- Hooks handle async logic and dispatch to slices
+- Hooks provide access to state via `useSelector` and operations via service calls
 - Each module has its own slice with standard structure: `{ list, loading, error }`
 
 ### Authentication
@@ -107,10 +109,11 @@ The app supports multiple layouts:
 Follow the modular architecture pattern (see [PROJECT_GUIDE.md](./PROJECT_GUIDE.md)):
 
 1. **Structure**: Create module in `src/modules/[Area]/[Module]/`
-2. **Layers**: Implement all layers (components, hooks, controllers, services, adapters, models, slices)
+2. **Layers**: Implement all layers (components, hooks, services, adapters, models, slices)
 3. **Testing**: Add tests in `__tests__/` (unit, integration, api)
 4. **Components**: Use AZ components (AzHeaderCard, AzTable, AzFilterSummary)
-5. **Data Flow**: Follow UI → Hook → Controller → [Service, Adapter, Slice] → Redux
+5. **Data Flow**: Follow UI → Hook → Service → Adapter → Redux Slice
+6. **Mock Data**: Create mock data in `data/` folder for development with MockService
 
 ### Reference Implementation
 
@@ -118,11 +121,12 @@ The **`Security/Users`** module is the reference implementation showcasing:
 - ✅ Complete layered architecture
 - ✅ TypeScript models (UserModel, WorkStationModel)
 - ✅ Redux Toolkit slice with standard structure
-- ✅ Controller with ControllerResponse pattern
-- ✅ Adapter for API-to-UI mapping
-- ✅ Hook with intelligent caching
+- ✅ Service layer with IUserService interface (ApiService & MockService)
+- ✅ Adapter for API-to-UI mapping (adaptUserResponseToUserModel)
+- ✅ Hook with state management (useUsers with useSelector + dispatch)
+- ✅ Mock data in `data/mockUsersWithRoles.ts` for development
 - ✅ Comprehensive testing (unit, integration, API)
-- ✅ AZ components integration (AzTable, AzHeaderCard)
+- ✅ AZ components integration (AzTable, AzFilterSummary, AzHeaderCard)
 
 ### Best Practices
 
@@ -130,10 +134,13 @@ The **`Security/Users`** module is the reference implementation showcasing:
 2. **Separation of Concerns**: Each layer has a single responsibility
 3. **Testing**: Aim for 80%+ coverage on business logic
 4. **Components**: Use AZ components for tables and headers
-5. **State Management**: Use Redux slices with manual dispatch
+5. **State Management**: Use Redux slices with manual dispatch in hooks
 6. **Imports**: Use `@/` alias for absolute imports
-7. **Layout & Scrolling**: To avoid double horizontal scroll, apply `style={{ overflowX: 'hidden' }}` to the main Container fluid in module index files. The AzTable component handles its own scrolling internally.
-8. **Mock Data for Development**: Use mock data in controllers during development. Set `USE_MOCK_DATA = true` in the controller and import from `data/mockFile.ts`. Switch to `false` for production API calls.
+7. **Layout & Scrolling**: To avoid double horizontal scroll, apply `style={{ overflowX: 'clip' }}` to the main Container fluid in module index files. The AzTable component handles its own scrolling internally.
+8. **Mock Data for Development**: Create mock data in `data/` folder and use MockService during development. Switch to ApiService for production API calls by changing the service instance in the component.
+9. **Service Pattern**: Always create a service interface (e.g., `IUserService`) implemented by both ApiService and MockService
+10. **No Memoization**: Do not use `useMemo` for service instantiation in components. Create singleton instances outside components instead.
+11. **Logging**: Use the `logger` utility from `@/utils/logger` for all console logging. Logs only run in DEV mode.
 
 The codebase follows React functional component patterns with hooks and uses modern TypeScript/ES6+ features throughout.
 
@@ -153,8 +160,8 @@ src/modules/{Module}/
 └── __tests__/
     ├── fixtures/          # Mock data and test fixtures
     ├── unit/              # Unit tests (adapters, slices)
-    ├── integration/       # Integration tests (controllers, hooks)
-    └── api/               # API tests with MSW
+    ├── integration/       # Integration tests (hooks with Redux)
+    └── api/               # API tests with MSW (services)
 ```
 
 ### Shared Test Utilities
@@ -195,7 +202,7 @@ npm run test:coverage
 
 ### Testing Guidelines
 1. **Unit Tests**: Test pure functions in isolation (adapters, reducers)
-2. **Integration Tests**: Test modules working together (controllers with Redux, hooks)
+2. **Integration Tests**: Test hooks with Redux store and service integration
 3. **API Tests**: Test HTTP calls with MSW interceptors (services)
 4. **Coverage Goals**: Aim for 80%+ coverage on business logic layers
 5. **Test Naming**: Use `.test.ts` extension for all test files
@@ -212,12 +219,14 @@ describe('userAdapter', () => {
   });
 });
 
-// Integration Test (controller)
-describe('UserController', () => {
+// Integration Test (hook)
+describe('useUsers', () => {
   it('debe obtener usuarios y actualizar Redux', async () => {
-    const response = await UserController.getUsersByCompany(1);
-    expect(response.success).toBe(true);
+    const { result } = renderHook(() => useUsers(mockService));
+    await act(() => result.current.fetchUsersByCompany(1));
+
     expect(store.getState().users.list).toHaveLength(2);
+    expect(result.current.users).toHaveLength(2);
   });
 });
 ```

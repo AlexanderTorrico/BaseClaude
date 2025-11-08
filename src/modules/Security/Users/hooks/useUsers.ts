@@ -4,7 +4,6 @@ import { RootState, store } from '@/store';
 import { IUserService } from '../services/IUserService';
 import { setUsers } from '../slices/userSlice';
 import { UserModel } from '../models/UserModel';
-import { logServiceError } from '@/shared/services/ServiceResponse';
 
 export const useUsers = (service: IUserService) => {
   const users = useSelector((state: RootState) => state.users.list);
@@ -16,9 +15,8 @@ export const useUsers = (service: IUserService) => {
     console.log(`🔄 Fetching users for company ${companyId} using:`, service.constructor.name);
     const result = await service.getUsersByCompany(companyId, setLoading);
 
-    if ('error' in result) {
-      console.error('❌ Error fetching users:', result);
-      logServiceError(result);
+    if (result.status !== 200) {
+      console.error(`❌ Error fetching users: [${result.status}] ${result.message}`);
       return;
     }
 

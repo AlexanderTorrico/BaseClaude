@@ -2,7 +2,6 @@ import React from "react";
 import { Button } from "reactstrap";
 import AzHeaderCard from "./AzHeaderCard";
 
-// Tipos para configuración de vistas
 interface ViewConfig {
   key?: string | undefined;
   name: string;
@@ -13,7 +12,6 @@ interface ViewConfig {
 
 type ViewInput = string | ViewConfig | Record<string, any>;
 
-// Interfaz para Badge
 interface BadgeConfig {
   count?: number | undefined;
   total?: number | undefined;
@@ -21,7 +19,6 @@ interface BadgeConfig {
   text?: string | undefined;
 }
 
-// Interfaz para las props del componente
 interface AzHeaderCardViewsProps {
   title: string;
   description?: string | undefined;
@@ -40,7 +37,6 @@ interface AzHeaderCardViewsProps {
   className?: string | undefined;
 }
 
-// Configuración estática de vistas predeterminadas
 const DEFAULT_VIEWS_CONFIG: Record<string, { name: string; icon: string; title: string }> = {
   web: { name: "Web", icon: "mdi-monitor", title: "Vista Web" },
   table: { name: "Tabla", icon: "mdi-table", title: "Vista Tabla" },
@@ -50,56 +46,54 @@ const DEFAULT_VIEWS_CONFIG: Record<string, { name: string; icon: string; title: 
   list: { name: "Lista", icon: "mdi-view-list", title: "Vista Lista" }
 };
 
-// Función helper para normalizar configuración de vistas
+const capitalize = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1);
+
+const ensureMdiPrefix = (icon: string): string =>
+  icon.startsWith('mdi-') ? icon : `mdi-${icon}`;
+
 const normalizeViewConfig = (view: ViewInput, index: number): ViewConfig => {
-  // Si es un objeto con name, icon y content
   if (typeof view === 'object' && view.name && view.icon) {
     return {
-      key: view.key || index.toString(), // Usar key si existe, sino índice
+      key: view.key || index.toString(),
       name: view.name,
-      icon: view.icon.startsWith('mdi-') ? view.icon : `mdi-${view.icon}`,
+      icon: ensureMdiPrefix(view.icon),
       title: view.title || `Vista ${view.name}`,
       content: view.content || null
     };
   }
 
-  // Si es string, verificar si es configuración predeterminada
   if (typeof view === 'string') {
-    // Formato "nombre:mdi-icon-name" (mantener compatibilidad)
     if (view.includes(':')) {
-      const [name, icon] = view.split(':');
+      const [name = '', icon = 'eye'] = view.split(':');
+      const capitalizedName = capitalize(name.trim());
       return {
         key: index.toString(),
-        name: name.charAt(0).toUpperCase() + name.slice(1),
-        icon: icon.startsWith('mdi-') ? icon : `mdi-${icon}`,
-        title: `Vista ${name.charAt(0).toUpperCase() + name.slice(1)}`,
+        name: capitalizedName,
+        icon: ensureMdiPrefix(icon.trim()),
+        title: `Vista ${capitalizedName}`,
         content: null
       };
     }
 
-    // String simple, buscar en configuraciones predeterminadas
-    if (DEFAULT_VIEWS_CONFIG[view]) {
-      const config = DEFAULT_VIEWS_CONFIG[view];
+    const defaultConfig = DEFAULT_VIEWS_CONFIG[view];
+    if (defaultConfig) {
       return {
         key: index.toString(),
-        name: config.name,
-        icon: config.icon,
-        title: config.title,
+        ...defaultConfig,
         content: null
       };
     }
 
-    // String personalizado sin configuración
+    const capitalizedView = capitalize(view);
     return {
       key: index.toString(),
-      name: view.charAt(0).toUpperCase() + view.slice(1),
+      name: capitalizedView,
       icon: "mdi-eye",
-      title: `Vista ${view.charAt(0).toUpperCase() + view.slice(1)}`,
+      title: `Vista ${capitalizedView}`,
       content: null
     };
   }
 
-  // Fallback genérico
   return {
     key: index.toString(),
     name: `Vista ${index + 1}`,
@@ -109,40 +103,29 @@ const normalizeViewConfig = (view: ViewInput, index: number): ViewConfig => {
   };
 };
 
-/**
- * AzHeaderCardViews con sistema de pestañas integrado
- * Componente de header con cambio de vistas y contenido dinámico
- */
 const AzHeaderCardViews: React.FC<AzHeaderCardViewsProps> = React.memo(({
   title,
   description,
-  // Badge simplificado
   badge,
-  // Vista actual y cambio
   currentView = "0",
   onViewChange,
   views = ["table", "cards"],
-  contents = [], // Array de contenidos adicionales
-  // Slots de contenido
+  contents = [],
   contentTopRight,
   contentBottomLeft,
   contentBottomRight,
-  // Configuración responsiva
   hideViewButtons = false,
   responsiveMode = false,
   isManualOverride = false,
   responsiveView,
-  // Estilos opcionales
   className
 }) => {
+  const normalizedViews = React.useMemo(() =>
+    views.map((view, index) => normalizeViewConfig(view, index)),
+    [views]
+  );
 
-  // Normalizar vistas a objetos consistentes
-  const normalizedViews = React.useMemo(() => {
-    return views.map((view, index) => normalizeViewConfig(view, index));
-  }, [views]);
-
-  const renderViewButtons = React.useCallback(() => {
-    // Ocultar botones si está configurado o si hay menos de 2 vistas
+  const viewButtons = React.useMemo(() => {
     if (hideViewButtons || normalizedViews.length < 2) return null;
 
     return (
@@ -157,15 +140,13 @@ const AzHeaderCardViews: React.FC<AzHeaderCardViewsProps> = React.memo(({
             <Button
               key={`${viewKey}-${index}`}
               color={isActive ? 'primary' : 'light'}
-              onClick={() => onViewChange && onViewChange(viewKey)}
+              onClick={() => onViewChange?.(viewKey)}
               size="sm"
               title={responsiveMode ?
                 `${viewTitle} ${isResponsiveMatch ? '(Vista responsiva)' : '(Override manual)'}` :
                 viewTitle
               }
-              style={{
-                position: 'relative'
-              }}
+              style={{ position: 'relative' }}
             >
               <i className={`mdi ${viewConfig.icon}`}></i>
               <span className="d-none d-lg-inline ms-1">{viewConfig.name}</span>
@@ -176,62 +157,33 @@ const AzHeaderCardViews: React.FC<AzHeaderCardViewsProps> = React.memo(({
     );
   }, [normalizedViews, currentView, responsiveView, hideViewButtons, onViewChange, responsiveMode]);
 
-  // Determinar badge props (memoizado para rendimiento)
   const badgeProps = React.useMemo(() => {
     if (!badge) return {};
 
     if (typeof badge === 'string') {
-      return {
-        showBadge: true,
-        badgeText: badge
-      };
+      return { showBadge: true, badgeText: badge };
     }
 
-    if (typeof badge === 'object') {
-      return {
-        showBadge: true,
-        badgeText: badge.text,
-        badgeCount: badge.count,
-        badgeTotal: badge.total,
-        badgeColor: badge.color || "info"
-      };
-    }
-
-    return {};
+    return {
+      showBadge: true,
+      badgeText: badge.text,
+      badgeCount: badge.count,
+      badgeTotal: badge.total,
+      badgeColor: badge.color || "info"
+    };
   }, [badge]);
 
-  // Renderizar contenido de la vista activa
-  const renderActiveViewContent = React.useCallback(() => {
+  const activeViewContent = React.useMemo(() => {
     const activeView = normalizedViews.find(view => view.key === currentView);
-    if (activeView && activeView.content) {
-      return (
-        <div className="mt-3">
-          {activeView.content}
-        </div>
-      );
-    }
-    return null;
+    return activeView?.content ? <div className="mt-3">{activeView.content}</div> : null;
   }, [normalizedViews, currentView]);
 
-  // Combinar contenido superior derecho con botones de vista y contenidos adicionales
   const combinedContentTopRight = React.useMemo(() => {
     const elements = [];
 
-    // Agregar botones de vista
-    const viewButtons = renderViewButtons();
-    if (viewButtons) {
-      elements.push(viewButtons);
-    }
-
-    // Agregar contenido superior derecho
-    if (contentTopRight) {
-      elements.push(contentTopRight);
-    }
-
-    // Agregar primer elemento del array contents si existe
-    if (contents && contents[0]) {
-      elements.push(contents[0]);
-    }
+    if (viewButtons) elements.push(viewButtons);
+    if (contentTopRight) elements.push(contentTopRight);
+    if (contents[0]) elements.push(contents[0]);
 
     return elements.length > 0 ? (
       <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
@@ -240,11 +192,10 @@ const AzHeaderCardViews: React.FC<AzHeaderCardViewsProps> = React.memo(({
         ))}
       </div>
     ) : null;
-  }, [renderViewButtons, contentTopRight, contents]);
+  }, [viewButtons, contentTopRight, contents]);
 
-  // Combinar contenido inferior izquierdo con elementos adicionales del array contents
   const combinedContentBottomLeft = React.useMemo(() => {
-    if (contentBottomLeft && contents && contents[1]) {
+    if (contentBottomLeft && contents[1]) {
       return (
         <div className="d-flex flex-wrap gap-2 align-items-center">
           {contentBottomLeft}
@@ -252,12 +203,11 @@ const AzHeaderCardViews: React.FC<AzHeaderCardViewsProps> = React.memo(({
         </div>
       );
     }
-    return contentBottomLeft || (contents && contents[1]) || null;
+    return contentBottomLeft || contents[1] || null;
   }, [contentBottomLeft, contents]);
 
-  // Combinar contenido inferior derecho con elementos adicionales del array contents
   const combinedContentBottomRight = React.useMemo(() => {
-    if (contentBottomRight && contents && contents[2]) {
+    if (contentBottomRight && contents[2]) {
       return (
         <div className="d-flex flex-wrap gap-2 align-items-center">
           {contentBottomRight}
@@ -265,11 +215,11 @@ const AzHeaderCardViews: React.FC<AzHeaderCardViewsProps> = React.memo(({
         </div>
       );
     }
-    return contentBottomRight || (contents && contents[2]) || null;
+    return contentBottomRight || contents[2] || null;
   }, [contentBottomRight, contents]);
 
   return (
-    <React.Fragment>
+    <>
       <AzHeaderCard
         title={title}
         description={description}
@@ -280,8 +230,8 @@ const AzHeaderCardViews: React.FC<AzHeaderCardViewsProps> = React.memo(({
         bottomRightSlot={combinedContentBottomRight}
         className={className}
       />
-      {renderActiveViewContent()}
-    </React.Fragment>
+      {activeViewContent}
+    </>
   );
 });
 

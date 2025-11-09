@@ -2,20 +2,20 @@ import React from "react";
 import { Row, Col, Card, CardBody, Badge } from "reactstrap";
 
 // Interface TypeScript para las props
-interface AzHeaderCardProps {
+export interface AzHeaderCardProps {
   title: string;
-  description?: string;
-  showBadge?: boolean;
-  badgeColor?: string;
-  badgeText?: string;
-  badgeCount?: number;
-  badgeTotal?: number;
-  showBottomRow?: boolean;
-  contentTopRight?: React.ReactNode;
-  bottomLeftSlot?: React.ReactNode;
-  bottomRightSlot?: React.ReactNode;
-  className?: string;
-  cardClassName?: string;
+  description?: string | undefined;
+  showBadge?: boolean | undefined;
+  badgeColor?: string | undefined;
+  badgeText?: string | undefined;
+  badgeCount?: number | undefined;
+  badgeTotal?: number | undefined;
+  showBottomRow?: boolean | undefined;
+  contentTopRight?: React.ReactNode | undefined;
+  bottomLeftSlot?: React.ReactNode | undefined;
+  bottomRightSlot?: React.ReactNode | undefined;
+  className?: string | undefined;
+  cardClassName?: string | undefined;
 }
 
 /**

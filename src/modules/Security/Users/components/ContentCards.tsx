@@ -2,42 +2,7 @@ import React, { useState } from 'react';
 import { Row, Col, Card, CardBody, Button, Badge, UncontrolledTooltip } from 'reactstrap';
 import { UserModel } from '../models/UserModel';
 import UserRolesPermissionsModal from './UserRolesPermissionsModal';
-
-/**
- * Genera las iniciales del nombre completo
- */
-const getInitials = (fullName: string): string => {
-  const names = fullName.trim().split(' ');
-  if (names.length >= 2) {
-    return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase();
-  }
-  return fullName.charAt(0).toUpperCase();
-};
-
-/**
- * Componente Avatar reutilizable
- */
-const UserAvatar: React.FC<{ user: UserModel; size?: 'sm' | 'md' | 'lg' }> = ({ user, size = 'md' }) => {
-  const sizeClass = size === 'lg' ? 'avatar-lg' : size === 'md' ? 'avatar-md' : 'avatar-sm';
-
-  if (user.avatar) {
-    return (
-      <img
-        src={user.avatar}
-        alt={user.fullName}
-        className={`${sizeClass} rounded-circle`}
-      />
-    );
-  }
-
-  return (
-    <div className={`${sizeClass} bg-primary rounded-circle d-flex align-items-center justify-content-center`}>
-      <span className="text-white font-size-16 fw-bold">
-        {getInitials(user.fullName)}
-      </span>
-    </div>
-  );
-};
+import UserAvatar from '../../../../components/Common/UserAvatar';
 
 /**
  * Card individual de usuario
@@ -50,7 +15,6 @@ const UserCard: React.FC<{
   const roleCount = user.roleIds?.length || 0;
   const directPermissionCount = user.permissionIds?.length || 0;
 
-  // Calcular permisos heredados de roles
   const inheritedPermissionCount = user.roles?.reduce((acc, role) => {
     return acc + (role.permissionIds?.length || 0);
   }, 0) || 0;
@@ -60,9 +24,8 @@ const UserCard: React.FC<{
   return (
     <Card className="border shadow-sm h-100">
       <CardBody>
-        {/* Header con Avatar y Nombre */}
         <div className="d-flex flex-column align-items-center text-center mb-3">
-          <UserAvatar user={user} size="lg" />
+          <UserAvatar fullName={user.fullName} avatar={user.avatar ?? undefined} size="lg" />
           <h5 className="mt-3 mb-1">{user.fullName}</h5>
           <p className="text-muted mb-0">
             <i className="mdi mdi-email-outline me-1"></i>

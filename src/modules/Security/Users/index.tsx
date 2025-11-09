@@ -22,7 +22,7 @@ const Users: React.FC = () => {
   return (
     <div className="page-content" style={{ overflowX: 'clip' }}>
       <Container fluid style={{ overflowX: 'clip' }}>
-        <Header service={userService} />
+        <Header loading={loading} onRefresh={fetchUsersByCompany} />
 
         <AzFilterSummary
           data={users}

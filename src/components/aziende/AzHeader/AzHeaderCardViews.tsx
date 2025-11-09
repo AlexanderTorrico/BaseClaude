@@ -2,8 +2,46 @@ import React from "react";
 import { Button } from "reactstrap";
 import AzHeaderCard from "./AzHeaderCard";
 
+// Tipos para configuración de vistas
+interface ViewConfig {
+  key?: string | undefined;
+  name: string;
+  icon: string;
+  title?: string | undefined;
+  content?: React.ReactNode | null | undefined;
+}
+
+type ViewInput = string | ViewConfig | Record<string, any>;
+
+// Interfaz para Badge
+interface BadgeConfig {
+  count?: number | undefined;
+  total?: number | undefined;
+  color?: string | undefined;
+  text?: string | undefined;
+}
+
+// Interfaz para las props del componente
+interface AzHeaderCardViewsProps {
+  title: string;
+  description?: string | undefined;
+  badge?: string | BadgeConfig | undefined;
+  currentView?: string | undefined;
+  onViewChange?: ((viewKey: string) => void) | undefined;
+  views?: (string | ViewConfig)[] | undefined;
+  contents?: React.ReactNode[] | undefined;
+  contentTopRight?: React.ReactNode | undefined;
+  contentBottomLeft?: React.ReactNode | undefined;
+  contentBottomRight?: React.ReactNode | undefined;
+  hideViewButtons?: boolean | undefined;
+  responsiveMode?: boolean | undefined;
+  isManualOverride?: boolean | undefined;
+  responsiveView?: string | undefined;
+  className?: string | undefined;
+}
+
 // Configuración estática de vistas predeterminadas
-const DEFAULT_VIEWS_CONFIG = {
+const DEFAULT_VIEWS_CONFIG: Record<string, { name: string; icon: string; title: string }> = {
   web: { name: "Web", icon: "mdi-monitor", title: "Vista Web" },
   table: { name: "Tabla", icon: "mdi-table", title: "Vista Tabla" },
   movil: { name: "Móvil", icon: "mdi-cellphone", title: "Vista Móvil" },
@@ -13,7 +51,7 @@ const DEFAULT_VIEWS_CONFIG = {
 };
 
 // Función helper para normalizar configuración de vistas
-const normalizeViewConfig = (view, index) => {
+const normalizeViewConfig = (view: ViewInput, index: number): ViewConfig => {
   // Si es un objeto con name, icon y content
   if (typeof view === 'object' && view.name && view.icon) {
     return {
@@ -74,22 +112,8 @@ const normalizeViewConfig = (view, index) => {
 /**
  * AzHeaderCardViews con sistema de pestañas integrado
  * Componente de header con cambio de vistas y contenido dinámico
- *
- * @param {string} title - Título principal del header
- * @param {string} [description] - Descripción opcional del header
- * @param {string|Object} [badge] - Badge simple (string) o complejo {count, total, color, text}
- * @param {string} [currentView="0"] - Vista actualmente seleccionada (índice de la vista)
- * @param {function} [onViewChange] - Función callback para cambio de vista
- * @param {Array} [views] - Array de vistas: objetos {name, icon, content} o strings (compatibilidad)
- * @param {Array} [contents] - Array de contenidos para usar como slots adicionales
- * @param {React.ReactNode} [contentTopRight] - Contenido del área superior derecha
- * @param {React.ReactNode} [contentBottomLeft] - Contenido del área inferior izquierda
- * @param {React.ReactNode} [contentBottomRight] - Contenido del área inferior derecha
- * @param {string} [className] - Clases CSS adicionales
- * @param {boolean} [hideViewButtons=false] - Oculta los botones de cambio de vista
- * @param {boolean} [responsiveMode=false] - Indica si está en modo responsivo (solo lectura)
  */
-const AzHeaderCardViews = React.memo(({
+const AzHeaderCardViews: React.FC<AzHeaderCardViewsProps> = React.memo(({
   title,
   description,
   // Badge simplificado
@@ -124,18 +148,20 @@ const AzHeaderCardViews = React.memo(({
     return (
       <div className="btn-group d-none d-md-flex me-2" role="group">
         {normalizedViews.map((viewConfig, index) => {
-          const isActive = currentView === viewConfig.key;
-          const isResponsiveMatch = responsiveView === viewConfig.key;
+          const viewKey = viewConfig.key ?? index.toString();
+          const isActive = currentView === viewKey;
+          const isResponsiveMatch = responsiveView === viewKey;
+          const viewTitle = viewConfig.title ?? `Vista ${viewConfig.name}`;
 
           return (
             <Button
-              key={`${viewConfig.key}-${index}`}
+              key={`${viewKey}-${index}`}
               color={isActive ? 'primary' : 'light'}
-              onClick={() => onViewChange && onViewChange(viewConfig.key)}
+              onClick={() => onViewChange && onViewChange(viewKey)}
               size="sm"
               title={responsiveMode ?
-                `${viewConfig.title} ${isResponsiveMatch ? '(Vista responsiva)' : '(Override manual)'}` :
-                viewConfig.title
+                `${viewTitle} ${isResponsiveMatch ? '(Vista responsiva)' : '(Override manual)'}` :
+                viewTitle
               }
               style={{
                 position: 'relative'

@@ -4,15 +4,15 @@ import { useDispatch } from 'react-redux';
 import AzHeaderCardViews from '../../../../components/aziende/AzHeader/AzHeaderCardViews';
 import { useUsers } from '../hooks/useUsers';
 import { setCurrentView } from '../slices/userSlice';
-import { IUserService } from '../services/IUserService';
 
 interface HeaderProps {
-  service: IUserService;
+  loading: boolean;
+  onRefresh: (companyId: number) => Promise<void>;
 }
 
-const Header: React.FC<HeaderProps> = ({ service }) => {
+const Header: React.FC<HeaderProps> = ({ loading, onRefresh }) => {
   const dispatch = useDispatch();
-  const { loading, fetchUsersByCompany, getTotalUsers, currentView } = useUsers(service);
+  const { getTotalUsers, currentView } = useUsers();
 
   // Estado local para detectar tamaño de pantalla
   const [responsiveView, setResponsiveView] = useState<string>('0');
@@ -47,7 +47,7 @@ const Header: React.FC<HeaderProps> = ({ service }) => {
   };
 
   const handleRefresh = async () => {
-    await fetchUsersByCompany(1, { force: true });
+    await onRefresh(1);
     console.log('🔄 Datos actualizados desde la API');
   };
 

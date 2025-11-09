@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Row, Col, Card, CardBody, Button, Badge, UncontrolledTooltip } from 'reactstrap';
 import { UserModel } from '../models/UserModel';
-import { useUsers } from '../hooks/useUsers';
 import UserRolesPermissionsModal from './UserRolesPermissionsModal';
-import { IUserService } from '../services/IUserService';
 
 /**
  * Genera las iniciales del nombre completo
@@ -192,13 +190,10 @@ const UserCard: React.FC<{
  */
 interface ContentCardsProps {
   filteredUsers: UserModel[];
-  service: IUserService;
+  onRefresh: (companyId: number) => Promise<void>;
 }
 
-const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, service }) => {
-  const { fetchUsersByCompany } = useUsers(service);
-
-  // Estado para modal de roles/permisos
+const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, onRefresh }) => {
   const [isRolesPermissionsModalOpen, setIsRolesPermissionsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
 
@@ -213,12 +208,11 @@ const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, service }) =
   const handleRolesPermissionsUpdated = () => {
     setIsRolesPermissionsModalOpen(false);
     setSelectedUser(null);
-    fetchUsersByCompany(1, { force: true }); // Recargar datos
+    onRefresh(1);
   };
 
   const handleEditUser = (userId: number) => {
     console.log('Editar usuario:', userId);
-    // TODO: Implementar lógica de edición
   };
 
   return (

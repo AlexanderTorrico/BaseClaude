@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Row, Col, Button } from 'reactstrap';
 import AzTable from '../../../../components/aziende/AzTable';
 import { userTableColumns } from '../config/tableColumns';
-import { useUsers } from '../hooks/useUsers';
 import { UserModel } from '../models/UserModel';
 import UserRolesPermissionsModal from './UserRolesPermissionsModal';
-import { IUserService } from '../services/IUserService';
 
 interface ContentTableProps {
   filteredUsers: UserModel[];
@@ -13,7 +11,8 @@ interface ContentTableProps {
   sorting?: { field: string; direction: string };
   onFilterChange?: (column: string, value: string) => void;
   onSortChange?: (config: { field: string; direction: string }) => void;
-  service: IUserService;
+  loading: boolean;
+  onRefresh: (companyId: number) => Promise<void>;
 }
 
 const ContentTable: React.FC<ContentTableProps> = ({
@@ -22,11 +21,9 @@ const ContentTable: React.FC<ContentTableProps> = ({
   sorting,
   onFilterChange,
   onSortChange,
-  service
+  loading,
+  onRefresh,
 }) => {
-  const { loading, fetchUsersByCompany } = useUsers(service);
-
-  // Estado para modal de roles/permisos
   const [isRolesPermissionsModalOpen, setIsRolesPermissionsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
 
@@ -41,7 +38,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
   const handleRolesPermissionsUpdated = () => {
     setIsRolesPermissionsModalOpen(false);
     setSelectedUser(null);
-    fetchUsersByCompany(1, { force: true }); // Recargar datos
+    onRefresh(1);
   };
 
   const handleEditUser = (userId: number) => {
@@ -55,10 +52,6 @@ const ContentTable: React.FC<ContentTableProps> = ({
   const handleViewUser = (userId: number) => {
     console.log('Ver detalles usuario:', userId);
   };
-
-  useEffect(() => {
-    fetchUsersByCompany(1);
-  }, []);
 
   return (
     <>

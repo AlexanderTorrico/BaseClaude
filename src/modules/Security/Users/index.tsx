@@ -1,18 +1,19 @@
 import React, { useEffect } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import { useUsers } from './hooks/useUsers';
+import { useUsersFetch } from './hooks/useUsersFetch';
 import AzFilterSummary from '../../../components/aziende/AzFilterSummary';
 import { userTableColumns } from './config/tableColumns';
 import Header from './components/Header';
 import ContentTable from './components/ContentTable';
 import ContentCards from './components/ContentCards';
-//import { UserMockService } from './services/UserMockService';
 import { UserApiService } from './services/UserApiService';
 
 const userService = new UserApiService();
 
 const Users: React.FC = () => {
-  const { currentView, users, fetchUsersByCompany } = useUsers(userService);
+  const { currentView, users } = useUsers();
+  const { loading, fetchUsersByCompany } = useUsersFetch(userService);
 
   useEffect(() => {
     fetchUsersByCompany(1);
@@ -20,20 +21,9 @@ const Users: React.FC = () => {
 
   return (
     <div className="page-content" style={{ overflowX: 'clip' }}>
-      <style>{`
-        /* Eliminar scroll del wrapper externo de AzTable */
-        .az-table-container.table-responsive {
-          overflow-x: visible !important;
-        }
-        /* Mantener scroll solo en el div interno de la tabla */
-        .az-table-container .table-responsive {
-          overflow-x: auto !important;
-        }
-      `}</style>
       <Container fluid style={{ overflowX: 'clip' }}>
         <Header service={userService} />
 
-        {/* Filter Summary envolviendo ambas vistas */}
         <AzFilterSummary
           data={users}
           columns={userTableColumns}
@@ -43,7 +33,6 @@ const Users: React.FC = () => {
         >
           {({ filteredData, filters, sorting, onFilterChange, onSortChange }) => (
             <>
-              {/* Vista Tabla */}
               {currentView === '0' && (
                 <Row>
                   <Col xl={12}>
@@ -53,15 +42,18 @@ const Users: React.FC = () => {
                       sorting={sorting}
                       onFilterChange={onFilterChange}
                       onSortChange={onSortChange}
-                      service={userService}
+                      loading={loading}
+                      onRefresh={fetchUsersByCompany}
                     />
                   </Col>
                 </Row>
               )}
 
-              {/* Vista Cards */}
               {currentView === '1' && (
-                <ContentCards filteredUsers={filteredData} service={userService} />
+                <ContentCards
+                  filteredUsers={filteredData}
+                  onRefresh={fetchUsersByCompany}
+                />
               )}
             </>
           )}

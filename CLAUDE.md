@@ -215,8 +215,34 @@ The app supports multiple layouts:
 - ✅ **Modificar `index.tsx` seleccionado** - agregar la nueva página/sección ahí
 - ✅ **Reutilizar servicios, hooks y modelos existentes** cuando sea posible
 - ✅ **Crear solo archivos nuevos cuando sea estrictamente necesario**
+- ✅ **Los archivos nuevos DEBEN estar dentro del mismo contexto/módulo** donde se está trabajando
 - ❌ **NO usar `npm run cp:module`** - ese comando es para módulos completos desde cero
 - ❌ **NO crear carpetas nuevas** - trabajar con la estructura existente
+- ❌ **NO crear archivos fuera del contexto actual** - mantener todo dentro del módulo
+
+#### Regla de Contexto de Archivos
+
+**IMPORTANTE**: Todos los archivos nuevos deben permanecer dentro del mismo contexto/módulo donde se está creando la página.
+
+**Ejemplo correcto** - Trabajando en `src/modules/Security/Users/`:
+```
+✅ src/modules/Security/Users/components/Statistics.tsx
+✅ src/modules/Security/Users/hooks/useStatistics.ts
+✅ src/modules/Security/Users/config/statisticsConfig.ts
+```
+
+**Ejemplo incorrecto** - NO salir del contexto:
+```
+❌ src/components/Common/Statistics.tsx          (fuera del módulo Users)
+❌ src/modules/Security/Statistics/index.tsx     (nuevo módulo)
+❌ src/hooks/useStatistics.ts                     (fuera del módulo Users)
+❌ src/shared/utils/statisticsHelper.ts          (fuera del módulo Users)
+```
+
+**Excepción**: Solo se puede crear archivos fuera del contexto si:
+- Son componentes compartidos genuinamente reusables en `src/components/Common/`
+- Son tipos/utilidades compartidas en `src/shared/`
+- **Y el usuario lo solicita explícitamente**
 
 #### Ejemplo de Flujo
 

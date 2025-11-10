@@ -1,68 +1,78 @@
-export default (moduleName) => `import { useSelector } from 'react-redux';
+/**
+ * Template para Hooks
+ * Genera 2 hooks: uno para estado sync y otro para fetch async
+ */
+
+const generateUseHook = (moduleName) => `import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
-import { ${moduleName}Controller } from '../controllers/${moduleName}Controller';
-import { ControllerResponse } from '@/shared/controllers/ControllerResponse';
+import { ${moduleName}Model } from '../models/${moduleName}Model';
 
 /**
- * Hook personalizado para ${moduleName}
- * - Lee del Redux (sync)
- * - Llama al Controller para operaciones async (con caché inteligente)
- * - La UI solo se comunica con este hook
+ * Hook para acceder al estado de ${moduleName} (solo lectura + helpers síncronos)
  */
 export const use${moduleName} = () => {
-  const data = useSelector((state: RootState) => state.${moduleName.toLowerCase()}.data);
-  const loading = useSelector((state: RootState) => state.${moduleName.toLowerCase()}.loading);
-  const error = useSelector((state: RootState) => state.${moduleName.toLowerCase()}.error);
-
-  // ==========================================
-  // FUNCIONES ASÍNCRONAS (con caché inteligente)
-  // ==========================================
+  const ${moduleName.toLowerCase()}s = useSelector((state: RootState) => state.${moduleName.toLowerCase()}.list);
+  const currentView = useSelector((state: RootState) => state.${moduleName.toLowerCase()}.currentView);
 
   /**
-   * Obtener datos
-   * Si ya hay datos en Redux, no hace la petición (caché)
-   * Para forzar recarga, usar force: true
+   * Buscar por ID
    */
-  const fetchData = async (
-    options?: { force?: boolean }
-  ): Promise<ControllerResponse<any>> => {
-    // Si ya hay datos y no se fuerza la recarga, usa caché
-    if (data && data.length > 0 && !options?.force) {
-      console.log('📦 Usando datos en caché');
-      return {
-        loading: false,
-        data,
-        success: true
-      };
-    }
-
-    // Si no hay datos o se fuerza, llama al Controller
-    console.log('🌐 Llamando al Controller...');
-    return await ${moduleName}Controller.getData();
+  const findById = (id: number): ${moduleName}Model | undefined => {
+    return ${moduleName.toLowerCase()}s.find(item => item.id === id);
   };
 
-  // ==========================================
-  // FUNCIONES SÍNCRONAS (lógica de negocio local)
-  // ==========================================
-
   /**
-   * Obtener total de items (sincrónico)
+   * Obtener total de elementos
    */
-  const getTotalItems = (): number => {
-    return data?.length || 0;
+  const getTotal = (): number => {
+    return ${moduleName.toLowerCase()}s.length;
   };
 
   return {
-    // Estado de Redux
-    data,
-    loading,
-    error,
-
-    // Funciones async (con caché)
-    fetchData,
-
-    // Funciones sync (lógica local)
-    getTotalItems
+    ${moduleName.toLowerCase()}s,
+    currentView,
+    findById,
+    getTotal,
   };
 };
 `;
+
+const generateUseFetchHook = (moduleName) => `import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { I${moduleName}Service } from '../services/I${moduleName}Service';
+import { set${moduleName}s } from '../slices/${moduleName.toLowerCase()}Slice';
+
+/**
+ * Hook para operaciones async de ${moduleName} (fetch, create, update, delete)
+ */
+export const use${moduleName}Fetch = (service: I${moduleName}Service) => {
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+
+  /**
+   * Obtener todos los elementos
+   */
+  const fetchAll = async (): Promise<void> => {
+    const result = await service.getAll(setLoading);
+
+    if (result.status !== 200) {
+      console.error(\`❌ Error fetching ${moduleName.toLowerCase()}: [\${result.status}] \${result.message}\`);
+      return;
+    }
+
+    dispatch(set${moduleName}s(result.data));
+  };
+
+  // TODO: Agregar más funciones (create, update, delete)
+
+  return {
+    loading,
+    fetchAll,
+  };
+};
+`;
+
+export {
+  generateUseHook,
+  generateUseFetchHook,
+};

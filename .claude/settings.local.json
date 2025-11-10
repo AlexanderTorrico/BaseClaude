@@ -26,7 +26,8 @@
       "Bash(npm run typecheck:*)",
       "Bash(npm run:*)",
       "Bash(dir:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(node scripts/createPage/create-module.js:*)"
     ],
     "deny": []
   }

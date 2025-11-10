@@ -1,14 +1,15 @@
-export default (moduleName) => `
-import React from 'react';
+export default (moduleName) => `import React from 'react';
+import { Container } from 'reactstrap';
 
-const  ${moduleName} : React.FC = () => {
+const ${moduleName}: React.FC = () => {
   return (
     <div className="page-content">
-      <h1>${moduleName} Module</h1>
-      <p>TODO: Implementar componente ${moduleName}</p>
+      <Container fluid style={{ overflowX: 'hidden' }}>
+        <h1>${moduleName}</h1>
+      </Container>
     </div>
   );
-}
+};
 
 export default ${moduleName};
 `;

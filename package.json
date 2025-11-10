@@ -11,7 +11,7 @@
     "build:production": "vite build --mode production",
     "lint": "eslint .",
     "preview": "vite preview",
-    "create_page:module": "node scripts/createPage/create-module.js",
+    "cp:module": "node scripts/createPage/create-module.js",
     "test": "vitest --config test/vitest.config.ts",
     "test:ui": "vitest --config test/vitest.config.ts --ui",
     "test:coverage": "vitest --config test/vitest.config.ts --coverage"

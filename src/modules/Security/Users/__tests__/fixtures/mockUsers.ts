@@ -17,6 +17,10 @@ export const MOCK_USERS: UserModel[] = [
     phone: '+1 555-0101',
     avatar: null,
     workStation: WS_DEVELOPER,
+    roleIds: [],
+    roles: [],
+    permissionIds: [],
+    permissions: [],
   },
   {
     id: 2,
@@ -27,6 +31,10 @@ export const MOCK_USERS: UserModel[] = [
     phone: '+1 555-0102',
     avatar: 'https://example.com/avatar.jpg',
     workStation: WS_DESIGNER,
+    roleIds: [],
+    roles: [],
+    permissionIds: [],
+    permissions: [],
   },
   {
     id: 3,
@@ -37,14 +45,20 @@ export const MOCK_USERS: UserModel[] = [
     phone: null,
     avatar: null,
     workStation: WS_TEST,
+    roleIds: [],
+    roles: [],
+    permissionIds: [],
+    permissions: [],
   },
 ];
 
 // ==================== EXPORTACIONES INDIVIDUALES ====================
-export const mockUserModel = MOCK_USERS[0];
-export const mockUserWithAvatar = MOCK_USERS[1];
-export const mockUserEmptyNames = MOCK_USERS[2];
-export const mockUsersArray = [MOCK_USERS[0], MOCK_USERS[1]];
+// Usamos non-null assertions (!) porque sabemos que estos índices existen
+export const mockUsers = [MOCK_USERS[0]!, MOCK_USERS[1]!]; // Alias para tests
+export const mockUserModel = MOCK_USERS[0]!;
+export const mockUserWithAvatar = MOCK_USERS[1]!;
+export const mockUserEmptyNames = MOCK_USERS[2]!;
+export const mockUsersArray = [MOCK_USERS[0]!, MOCK_USERS[1]!];
 
 // ==================== LISTA DE USUARIOS API (formato backend) ====================
 // Se genera automáticamente desde MOCK_USERS para evitar duplicación
@@ -60,10 +74,10 @@ const toApiFormat = (user: UserModel) => ({
 
 const MOCK_API_USERS = MOCK_USERS.map(toApiFormat);
 
-export const mockApiUser = MOCK_API_USERS[0];
-export const mockApiUserWithAvatar = MOCK_API_USERS[1];
-export const mockApiUserEmptyNames = MOCK_API_USERS[2];
-export const mockApiUsersArray = [MOCK_API_USERS[0], MOCK_API_USERS[1]];
+export const mockApiUser = MOCK_API_USERS[0]!;
+export const mockApiUserWithAvatar = MOCK_API_USERS[1]!;
+export const mockApiUserEmptyNames = MOCK_API_USERS[2]!;
+export const mockApiUsersArray = [MOCK_API_USERS[0]!, MOCK_API_USERS[1]!];
 
 // ==================== RESPUESTAS API ====================
 export const mockApiSuccessResponse = { data: { success: true, data: mockApiUsersArray } };

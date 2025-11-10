@@ -1,128 +1,107 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import userSlice, {
-  setLoading,
+import { describe, it, expect } from 'vitest';
+import userReducer, {
   setUsers,
-  setError,
   clearUsers,
   addUser,
   updateUser,
   removeUser,
+  setCurrentView,
 } from '../../slices/userSlice';
-import { mockUserModel, mockInitialReduxState, createMockUser } from '../fixtures/mockUsers';
+import { mockUserModel, createMockUser } from '../fixtures/mockUsers';
 
 /**
- * Unit Tests para usersSice (Redux Slice)
+ * Unit Tests para userSlice (Redux Slice)
  * Prueba los reducers y acciones de Redux
+ *
+ * NOTA: Loading y error NO están en el slice, se manejan en ServiceWrapper
  */
 
-describe('usersSice', () => {
-  const initialState = mockInitialReduxState;
-
-  describe('setLoading', () => {
-    it('debe cambiar el estado de loading a true', () => {
-      const state = userSlice(initialState, setLoading(true));
-
-      expect(state.loading).toBe(true);
-    });
-
-    it('debe cambiar el estado de loading a false', () => {
-      const loadingState = { ...initialState, loading: true };
-      const state = userSlice(loadingState, setLoading(false));
-
-      expect(state.loading).toBe(false);
-    });
-  });
+describe('userSlice', () => {
+  const initialState = {
+    list: [],
+    currentView: '0',
+  };
 
   describe('setUsers', () => {
-    it('debe actualizar la lista de usuarios', () => {
+    it('debe establecer la lista de usuarios', () => {
       const users = [mockUserModel];
-      const state = userSlice(initialState, setUsers(users));
 
-      expect(state.list).toEqual(users);
-      expect(state.list).toHaveLength(1);
-    });
+      const newState = userReducer(initialState, setUsers(users));
 
-    it('debe limpiar el loading y error al setear usuarios', () => {
-      const stateWithErrors = {
-        list: [],
-        loading: true,
-        error: 'Some error',
-      };
-
-      const state = userSlice(stateWithErrors, setUsers([mockUserModel]));
-
-      expect(state.loading).toBe(false);
-      expect(state.error).toBeNull();
+      expect(newState.list).toEqual(users);
+      expect(newState.list).toHaveLength(1);
     });
 
     it('debe reemplazar la lista existente con la nueva', () => {
       const existingState = {
         list: [mockUserModel],
-        loading: false,
-        error: null,
+        currentView: '0',
+      };
+      const newUser = createMockUser({ id: 2, name: 'María' });
+
+      const newState = userReducer(existingState, setUsers([newUser]));
+
+      expect(newState.list).toHaveLength(1);
+      expect(newState.list[0].id).toBe(2);
+    });
+
+    it('debe permitir establecer lista vacía', () => {
+      const existingState = {
+        list: [mockUserModel],
+        currentView: '0',
       };
 
-      const newUser = createMockUser({ id: 2, name: 'María' });
-      const state = userSlice(existingState, setUsers([newUser]));
+      const newState = userReducer(existingState, setUsers([]));
 
-      expect(state.list).toHaveLength(1);
-      expect(state.list[0].id).toBe(2);
-    });
-  });
-
-  describe('setError', () => {
-    it('debe establecer un mensaje de error', () => {
-      const errorMessage = 'Error al cargar usuarios';
-      const state = userSlice(initialState, setError(errorMessage));
-
-      expect(state.error).toBe(errorMessage);
-    });
-
-    it('debe desactivar loading al setear error', () => {
-      const loadingState = { ...initialState, loading: true };
-      const state = userSlice(loadingState, setError('Error'));
-
-      expect(state.loading).toBe(false);
+      expect(newState.list).toEqual([]);
     });
   });
 
   describe('clearUsers', () => {
-    it('debe limpiar todos los datos del estado', () => {
-      const filledState = {
+    it('debe limpiar la lista de usuarios', () => {
+      const stateWithUsers = {
         list: [mockUserModel],
-        loading: true,
-        error: 'Some error',
+        currentView: '0',
       };
 
-      const state = userSlice(filledState, clearUsers());
+      const newState = userReducer(stateWithUsers, clearUsers());
 
-      expect(state.list).toEqual([]);
-      expect(state.loading).toBe(false);
-      expect(state.error).toBeNull();
+      expect(newState.list).toEqual([]);
+    });
+
+    it('debe mantener currentView al limpiar', () => {
+      const stateWithUsers = {
+        list: [mockUserModel],
+        currentView: '1',
+      };
+
+      const newState = userReducer(stateWithUsers, clearUsers());
+
+      expect(newState.list).toEqual([]);
+      expect(newState.currentView).toBe('1');
     });
   });
 
   describe('addUser', () => {
-    it('debe agregar un usuario a la lista', () => {
-      const state = userSlice(initialState, addUser(mockUserModel));
+    it('debe agregar un usuario a lista vacía', () => {
+      const newState = userReducer(initialState, addUser(mockUserModel));
 
-      expect(state.list).toHaveLength(1);
-      expect(state.list[0]).toEqual(mockUserModel);
+      expect(newState.list).toHaveLength(1);
+      expect(newState.list[0]).toEqual(mockUserModel);
     });
 
     it('debe agregar un usuario sin afectar los existentes', () => {
       const existingState = {
         list: [mockUserModel],
-        loading: false,
-        error: null,
+        currentView: '0',
       };
-
       const newUser = createMockUser({ id: 2, name: 'María' });
-      const state = userSlice(existingState, addUser(newUser));
 
-      expect(state.list).toHaveLength(2);
-      expect(state.list[0].id).toBe(1);
-      expect(state.list[1].id).toBe(2);
+      const newState = userReducer(existingState, addUser(newUser));
+
+      expect(newState.list).toHaveLength(2);
+      expect(newState.list[0].id).toBe(1);
+      expect(newState.list[1].id).toBe(2);
     });
   });
 
@@ -130,33 +109,50 @@ describe('usersSice', () => {
     it('debe actualizar un usuario existente', () => {
       const existingState = {
         list: [mockUserModel],
-        loading: false,
-        error: null,
+        currentView: '0',
       };
-
       const updatedUser = createMockUser({
+        id: 1,
         name: 'Juan Carlos',
         fullName: 'Juan Carlos Pérez',
       });
 
-      const state = userSlice(existingState, updateUser(updatedUser));
+      const newState = userReducer(existingState, updateUser(updatedUser));
 
-      expect(state.list[0].name).toBe('Juan Carlos');
-      expect(state.list[0].fullName).toBe('Juan Carlos Pérez');
+      expect(newState.list[0].name).toBe('Juan Carlos');
+      expect(newState.list[0].fullName).toBe('Juan Carlos Pérez');
     });
 
     it('no debe modificar la lista si el usuario no existe', () => {
       const existingState = {
         list: [mockUserModel],
-        loading: false,
-        error: null,
+        currentView: '0',
       };
-
       const nonExistentUser = createMockUser({ id: 999 });
-      const state = userSlice(existingState, updateUser(nonExistentUser));
 
-      expect(state.list).toHaveLength(1);
-      expect(state.list[0].id).toBe(1);
+      const newState = userReducer(existingState, updateUser(nonExistentUser));
+
+      expect(newState.list).toHaveLength(1);
+      expect(newState.list[0].id).toBe(1);
+      expect(newState.list[0]).toEqual(mockUserModel);
+    });
+
+    it('debe actualizar solo el usuario correcto en lista múltiple', () => {
+      const user2 = createMockUser({ id: 2, name: 'María' });
+      const existingState = {
+        list: [mockUserModel, user2],
+        currentView: '0',
+      };
+      const updatedUser = createMockUser({
+        id: 2,
+        name: 'María García',
+      });
+
+      const newState = userReducer(existingState, updateUser(updatedUser));
+
+      expect(newState.list).toHaveLength(2);
+      expect(newState.list[0].name).toBe('Juan'); // No cambió
+      expect(newState.list[1].name).toBe('María García'); // Cambió
     });
   });
 
@@ -165,40 +161,75 @@ describe('usersSice', () => {
       const user2 = createMockUser({ id: 2, name: 'María' });
       const existingState = {
         list: [mockUserModel, user2],
-        loading: false,
-        error: null,
+        currentView: '0',
       };
 
-      const state = userSlice(existingState, removeUser(1));
+      const newState = userReducer(existingState, removeUser(1));
 
-      expect(state.list).toHaveLength(1);
-      expect(state.list[0].id).toBe(2);
+      expect(newState.list).toHaveLength(1);
+      expect(newState.list[0].id).toBe(2);
     });
 
     it('no debe modificar la lista si el ID no existe', () => {
       const existingState = {
         list: [mockUserModel],
-        loading: false,
-        error: null,
+        currentView: '0',
       };
 
-      const state = userSlice(existingState, removeUser(999));
+      const newState = userReducer(existingState, removeUser(999));
 
-      expect(state.list).toHaveLength(1);
-      expect(state.list[0].id).toBe(1);
+      expect(newState.list).toHaveLength(1);
+      expect(newState.list[0].id).toBe(1);
     });
 
-    it('debe manejar correctamente la eliminación del último usuario', () => {
+    it('debe poder eliminar el último usuario', () => {
       const existingState = {
         list: [mockUserModel],
-        loading: false,
-        error: null,
+        currentView: '0',
       };
 
-      const state = userSlice(existingState, removeUser(1));
+      const newState = userReducer(existingState, removeUser(1));
 
-      expect(state.list).toEqual([]);
-      expect(state.list).toHaveLength(0);
+      expect(newState.list).toEqual([]);
+      expect(newState.list).toHaveLength(0);
+    });
+  });
+
+  describe('setCurrentView', () => {
+    it('debe actualizar currentView', () => {
+      const newState = userReducer(initialState, setCurrentView('1'));
+
+      expect(newState.currentView).toBe('1');
+    });
+
+    it('debe cambiar de vista tabla a cards', () => {
+      const newState = userReducer(initialState, setCurrentView('1'));
+
+      expect(newState.currentView).toBe('1');
+    });
+
+    it('debe cambiar de vista cards a tabla', () => {
+      const existingState = {
+        list: [],
+        currentView: '1',
+      };
+
+      const newState = userReducer(existingState, setCurrentView('0'));
+
+      expect(newState.currentView).toBe('0');
+    });
+
+    it('debe mantener la lista al cambiar vista', () => {
+      const existingState = {
+        list: [mockUserModel],
+        currentView: '0',
+      };
+
+      const newState = userReducer(existingState, setCurrentView('1'));
+
+      expect(newState.currentView).toBe('1');
+      expect(newState.list).toHaveLength(1);
+      expect(newState.list[0]).toEqual(mockUserModel);
     });
   });
 });

@@ -25,7 +25,8 @@
       "Bash(grep:*)",
       "Bash(npm run typecheck:*)",
       "Bash(npm run:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(findstr:*)"
     ],
     "deny": []
   }

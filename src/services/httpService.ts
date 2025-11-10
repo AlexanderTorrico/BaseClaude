@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
 import { AxiosCallModel } from '@/models/axiosCallModel';
-import { ServiceResponse } from '@/shared/services/ServiceResponse';
+import { ApiResponse } from '@/shared/types';
 import { SetStateFn } from '@/shared/types/commonTypes';
 
 export interface HttpConfig {
@@ -71,7 +71,7 @@ const executeRequest = async <T>(
   data?: any,
   config?: AxiosRequestConfig,
   setLoading?: SetStateFn
-): Promise<ServiceResponse<T>> => {
+): Promise<ApiResponse<T>> => {
   setLoading?.(true);
 
   try {
@@ -98,9 +98,9 @@ const executeRequest = async <T>(
     setLoading?.(false);
 
     return {
-      data: response.data,
       status: response.status,
       message: 'Success',
+      data: response.data,
     };
   } catch (error: any) {
     setLoading?.(false);
@@ -118,9 +118,9 @@ const executeRequest = async <T>(
 
     // Retorna respuesta con data null en caso de error
     return {
-      data: null as unknown as T,
       status: error.response?.status || 500,
       message: error.response?.data?.message || error.message || 'Request failed',
+      data: null as unknown as T,
     };
   }
 };
@@ -130,7 +130,7 @@ export const httpRequest = {
     url: string,
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ServiceResponse<T>> => {
+  ): Promise<ApiResponse<T>> => {
     return executeRequest<T>(defaultApiInstance, 'GET', url, undefined, config, setLoading);
   },
 
@@ -139,7 +139,7 @@ export const httpRequest = {
     data: any,
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ServiceResponse<T>> => {
+  ): Promise<ApiResponse<T>> => {
     return executeRequest<T>(defaultApiInstance, 'POST', url, data, config, setLoading);
   },
 
@@ -148,7 +148,7 @@ export const httpRequest = {
     data: any,
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ServiceResponse<T>> => {
+  ): Promise<ApiResponse<T>> => {
     return executeRequest<T>(defaultApiInstance, 'PUT', url, data, config, setLoading);
   },
 
@@ -157,7 +157,7 @@ export const httpRequest = {
     data: any,
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ServiceResponse<T>> => {
+  ): Promise<ApiResponse<T>> => {
     return executeRequest<T>(defaultApiInstance, 'PATCH', url, data, config, setLoading);
   },
 
@@ -165,7 +165,7 @@ export const httpRequest = {
     url: string,
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ServiceResponse<T>> => {
+  ): Promise<ApiResponse<T>> => {
     return executeRequest<T>(defaultApiInstance, 'DELETE', url, undefined, config, setLoading);
   },
 };
@@ -175,7 +175,7 @@ export const httpRequestWithAuth = {
     url: string,
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ServiceResponse<T>> => {
+  ): Promise<ApiResponse<T>> => {
     return executeRequest<T>(defaultApiInstance, 'GET', url, undefined, createAuthHeaders(config), setLoading);
   },
 
@@ -184,7 +184,7 @@ export const httpRequestWithAuth = {
     data: any,
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ServiceResponse<T>> => {
+  ): Promise<ApiResponse<T>> => {
     return executeRequest<T>(defaultApiInstance, 'POST', url, data, createAuthHeaders(config), setLoading);
   },
 
@@ -193,7 +193,7 @@ export const httpRequestWithAuth = {
     data: any,
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ServiceResponse<T>> => {
+  ): Promise<ApiResponse<T>> => {
     return executeRequest<T>(defaultApiInstance, 'PUT', url, data, createAuthHeaders(config), setLoading);
   },
 
@@ -202,7 +202,7 @@ export const httpRequestWithAuth = {
     data: any,
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ServiceResponse<T>> => {
+  ): Promise<ApiResponse<T>> => {
     return executeRequest<T>(defaultApiInstance, 'PATCH', url, data, createAuthHeaders(config), setLoading);
   },
 
@@ -210,7 +210,7 @@ export const httpRequestWithAuth = {
     url: string,
     setLoading?: SetStateFn,
     config?: AxiosRequestConfig
-  ): Promise<ServiceResponse<T>> => {
+  ): Promise<ApiResponse<T>> => {
     return executeRequest<T>(defaultApiInstance, 'DELETE', url, undefined, createAuthHeaders(config), setLoading);
   },
 };

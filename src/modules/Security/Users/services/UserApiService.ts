@@ -2,14 +2,13 @@ import { IUserService } from './IUserService';
 import { UserModel } from '../models/UserModel';
 import { adaptUsersArrayToUserModels } from '../adapters/userAdapter';
 import { httpRequestWithAuth } from '@/services/httpService';
-import { ApiResponse } from '@/pages/Authentication/models';
-import { transformServiceData, ServiceResponse } from '@/shared/services/ServiceResponse';
+import { ApiResponse, transformApiData } from '@/shared/types';
 import { SetStateFn } from '@/shared/types/commonTypes';
 
 export class UserApiService implements IUserService {
 
-  async getUsersByCompany( companyId: number, setLoading?: SetStateFn ): Promise<ServiceResponse<UserModel[]>> {
+  async getUsersByCompany( companyId: number, setLoading?: SetStateFn ): Promise<ApiResponse<UserModel[]>> {
     const res = await httpRequestWithAuth.get<ApiResponse<any>>(`/rrhh/by_company_id/${companyId}`, setLoading);
-    return transformServiceData(res, (data) => adaptUsersArrayToUserModels(data.data ?? []) );
+    return transformApiData(res, (data) => adaptUsersArrayToUserModels(data.data ?? []) );
   }
 }

@@ -1,10 +1,10 @@
 import { UserModel } from '../models/UserModel';
 import { SetStateFn } from '@/shared/types/commonTypes';
-import { ServiceResponse } from '@/shared/services/ServiceResponse';
+import { ApiResponse } from '@/shared/types';
 
 /**
  * Interfaz del servicio de usuarios
- * Todos los métodos retornan ServiceResponse<T> = { status, message, data }
+ * Todos los métodos retornan ApiResponse<T> = { status, message, data }
  * Los errores se manejan internamente en httpService
  */
 export interface IUserService {
@@ -16,5 +16,5 @@ export interface IUserService {
   getUsersByCompany(
     companyId: number,
     setLoading?: SetStateFn
-  ): Promise<ServiceResponse<UserModel[]>>;
+  ): Promise<ApiResponse<UserModel[]>>;
 }

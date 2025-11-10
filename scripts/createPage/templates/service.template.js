@@ -4,33 +4,29 @@
  */
 
 const generateServiceInterface = (moduleName) => `import { ${moduleName}Model } from '../models/${moduleName}Model';
+import { ApiResponse } from '@/shared/types';
 
 export interface I${moduleName}Service {
-  getAll(setLoading?: (loading: boolean) => void): Promise<{
-    status: number;
-    message: string;
-    data: ${moduleName}Model[];
-  }>;
+  getAll(setLoading?: (loading: boolean) => void): Promise<ApiResponse<${moduleName}Model[]>>;
 }
 `;
 
 const generateApiService = (moduleName) => `import { httpRequestWithAuth } from '@/services/httpService';
-import { transformServiceData } from '@/shared/controllers/ServiceWrapper';
 import { I${moduleName}Service } from './I${moduleName}Service';
 import { ${moduleName}Model } from '../models/${moduleName}Model';
 import { adapt${moduleName}ArrayTo${moduleName}Models } from '../adapters/${moduleName.toLowerCase()}Adapter';
-import { ApiResponse } from '@/pages/Authentication/models';
+import { ApiResponse, transformApiData } from '@/shared/types';
 
 type SetStateFn = (loading: boolean) => void;
 
 export class ${moduleName}ApiService implements I${moduleName}Service {
-  async getAll(setLoading?: SetStateFn) {
+  async getAll(setLoading?: SetStateFn): Promise<ApiResponse<${moduleName}Model[]>> {
     const res = await httpRequestWithAuth.get<ApiResponse<any>>(
       \`/${moduleName.toLowerCase()}\`,
       setLoading
     );
 
-    return transformServiceData(res, (data) =>
+    return transformApiData(res, (data) =>
       adapt${moduleName}ArrayTo${moduleName}Models(data.data ?? [])
     );
   }
@@ -39,6 +35,7 @@ export class ${moduleName}ApiService implements I${moduleName}Service {
 
 const generateMockService = (moduleName) => `import { I${moduleName}Service } from './I${moduleName}Service';
 import { ${moduleName}Model } from '../models/${moduleName}Model';
+import { ApiResponse } from '@/shared/types';
 
 const MOCK_${moduleName.toUpperCase()}S: ${moduleName}Model[] = [
   { id: 1 },
@@ -48,7 +45,7 @@ const MOCK_${moduleName.toUpperCase()}S: ${moduleName}Model[] = [
 type SetStateFn = (loading: boolean) => void;
 
 export class ${moduleName}MockService implements I${moduleName}Service {
-  async getAll(setLoading?: SetStateFn) {
+  async getAll(setLoading?: SetStateFn): Promise<ApiResponse<${moduleName}Model[]>> {
     setLoading?.(true);
     await new Promise(resolve => setTimeout(resolve, 500));
     setLoading?.(false);

@@ -2,7 +2,7 @@ import { IUserService } from './IUserService';
 import { UserModel } from '../models/UserModel';
 import { MOCK_USERS_WITH_ROLES } from '../data/mockUsersWithRoles';
 import { SetStateFn } from '@/shared/types/commonTypes';
-import { ServiceResponse } from '@/shared/services/ServiceResponse';
+import { ApiResponse } from '@/shared/types';
 
 export class UserMockService implements IUserService {
   private mockUsers: UserModel[] = [...MOCK_USERS_WITH_ROLES];
@@ -10,7 +10,7 @@ export class UserMockService implements IUserService {
   async getUsersByCompany(
     companyId: number,
     setLoading?: SetStateFn
-  ): Promise<ServiceResponse<UserModel[]>> {
+  ): Promise<ApiResponse<UserModel[]>> {
     setLoading?.(true);
 
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -18,9 +18,9 @@ export class UserMockService implements IUserService {
     setLoading?.(false);
 
     return {
-      data: [...this.mockUsers],
       status: 200,
       message: 'Success',
+      data: [...this.mockUsers],
     };
   }
 }

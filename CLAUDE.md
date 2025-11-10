@@ -409,6 +409,7 @@ const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers }) => {
 ```typescript
 import { UserModel } from '../models/UserModel';
 import UserAvatar from '@/components/Common/UserAvatar';
+import { Badge } from 'reactstrap';
 
 export const userTableColumns = [
   {
@@ -417,19 +418,48 @@ export const userTableColumns = [
     sortable: true,
     filterable: true,
     filterType: "text",
-    cell: ({ row }: { row: { original: UserModel } }) => (
+    cell: ({ row: { original } }: { row: { original: UserModel } }) => (
       <div className="d-flex align-items-center">
-        <UserAvatar fullName={row.original.fullName} avatar={row.original.avatar} />
-        <span className="fw-medium">{row.original.fullName}</span>
+        <UserAvatar fullName={original.fullName} avatar={original.avatar} />
+        <span className="fw-medium">{original.fullName}</span>
       </div>
     )
+  },
+  {
+    key: "name",
+    header: "Nombre",
+    sortable: true,
+    filterable: true,
+    filterType: "text",
+    cell: ({ row: { original } }: { row: { original: UserModel } }) => original.name
   },
   {
     key: "email",
     header: "Email",
     sortable: true,
     filterable: true,
-    filterType: "text"
+    filterType: "text",
+    cell: ({ row: { original } }: { row: { original: UserModel } }) => (
+      <span className="text-muted">{original.email}</span>
+    )
+  },
+  {
+    key: "roles",
+    header: "Roles",
+    sortable: false,
+    filterable: false,
+    cell: ({ row: { original } }: { row: { original: UserModel } }) => {
+      const roleCount = original.roleIds?.length || 0;
+      if (roleCount === 0) {
+        return <Badge color="light" className="text-muted">Sin roles</Badge>;
+      }
+      return (
+        <Badge color="primary" pill>
+          <i className="mdi mdi-shield-crown me-1"></i>
+          {roleCount} {roleCount === 1 ? 'rol' : 'roles'}
+        </Badge>
+      );
+    }
   }
 ];
 ```
@@ -583,19 +613,54 @@ Security/Users/
 
 **Column Configuration:**
 ```typescript
-export const columns = [
+import { UserModel } from '../models/UserModel';
+
+export const userTableColumns = [
   {
-    key: "name",                       // Accessor field
-    header: "Nombre",                  // Header text
-    sortable: true,                    // Enable sorting
-    filterable: true,                  // Enable filtering
-    filterType: "text",                // "text" or "select"
-    cell: ({ row }) => (               // Custom renderer
-      <span>{row.original.name}</span>
+    key: "name",
+    header: "Nombre",
+    sortable: true,
+    filterable: true,
+    filterType: "text",
+    // Para texto simple: retornar valor directamente
+    cell: ({ row: { original } }: { row: { original: UserModel } }) => original.name
+  },
+  {
+    key: "email",
+    header: "Email",
+    sortable: true,
+    filterable: true,
+    filterType: "text",
+    // Para JSX con estilos: envolver en JSX
+    cell: ({ row: { original } }: { row: { original: UserModel } }) => (
+      <span className="text-muted">{original.email}</span>
     )
+  },
+  {
+    key: "roles",
+    header: "Roles",
+    sortable: false,
+    filterable: false,
+    // Para lógica compleja: función completa
+    cell: ({ row: { original } }: { row: { original: UserModel } }) => {
+      const roleCount = original.roleIds?.length || 0;
+      return (
+        <Badge color="primary" pill>
+          {roleCount} {roleCount === 1 ? 'rol' : 'roles'}
+        </Badge>
+      );
+    }
   }
 ];
 ```
+
+**IMPORTANTE - Patrón de Destructuring:**
+- ✅ **SIEMPRE usar**: `({ row: { original } }: { row: { original: ModelType } })`
+- ✅ **Texto simple**: Retornar valor directamente sin `<span>`
+- ✅ **JSX con estilos**: Envolver en JSX cuando se necesiten clases CSS
+- ✅ **Lógica compleja**: Usar función completa con variables locales
+- ❌ **NO usar**: `({ row }: any)` - pierde type safety
+- ❌ **NO usar**: `({ row }: { row: { original: ModelType } })` sin destructuring - verboso
 
 #### AzHeaderCardViews - Header with View Switcher
 

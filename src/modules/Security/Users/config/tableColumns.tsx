@@ -43,13 +43,13 @@ export const userTableColumns = [
     sortable: true,
     filterable: true,
     filterType: "text",
-    cell: ({ row }: { row: { original: UserModel } }) => (
+    cell: ({ row: { original } }: { row: { original: UserModel } }) => (
       <div className="d-flex flex-column">
         <div className="d-flex align-items-center">
-          <UserAvatar user={row.original} />
-          <span className="fw-medium">{row.original.fullName}</span>
+          <UserAvatar user={original} />
+          <span className="fw-medium">{original.fullName}</span>
         </div>
-        <small className="text-muted">{row.original.email}</small>
+        <small className="text-muted">{original.email}</small>
       </div>
     )
   },
@@ -59,9 +59,7 @@ export const userTableColumns = [
     sortable: true,
     filterable: true,
     filterType: "text",
-    cell: ({ row }: { row: { original: UserModel } }) => (
-      <span>{row.original.name}</span>
-    )
+    cell: ({ row: { original } }: { row: { original: UserModel } }) => original.name
   },
   {
     key: "lastName",
@@ -69,9 +67,7 @@ export const userTableColumns = [
     sortable: true,
     filterable: true,
     filterType: "text",
-    cell: ({ row }: { row: { original: UserModel } }) => (
-      <span>{row.original.lastName}</span>
-    )
+    cell: ({ row: { original } }: { row: { original: UserModel } }) => original.lastName
   },
   {
     key: "email",
@@ -79,8 +75,8 @@ export const userTableColumns = [
     sortable: true,
     filterable: true,
     filterType: "text",
-    cell: ({ row }: { row: { original: UserModel } }) => (
-      <span className="text-muted">{row.original.email}</span>
+    cell: ({ row: { original } }: { row: { original: UserModel } }) => (
+      <span className="text-muted">{original.email}</span>
     )
   },
   {
@@ -89,9 +85,9 @@ export const userTableColumns = [
     sortable: false,
     filterable: true,
     filterType: "text",
-    cell: ({ row }: { row: { original: UserModel } }) => (
+    cell: ({ row: { original } }: { row: { original: UserModel } }) => (
       <span className="text-muted font-family-monospace">
-        {row.original.phone || <span className="text-muted">N/A</span>}
+        {original.phone || <span className="text-muted">N/A</span>}
       </span>
     )
   },
@@ -100,9 +96,8 @@ export const userTableColumns = [
     header: "Roles",
     sortable: false,
     filterable: false,
-    cell: ({ row }: { row: { original: UserModel } }) => {
-      const user = row.original;
-      const roleCount = user.roleIds?.length || 0;
+    cell: ({ row: { original } }: { row: { original: UserModel } }) => {
+      const roleCount = original.roleIds?.length || 0;
 
       if (roleCount === 0) {
         return (
@@ -112,8 +107,8 @@ export const userTableColumns = [
         );
       }
 
-      const firstRole = user.roles?.[0];
-      const tooltipId = `roles-tooltip-${user.id}`;
+      const firstRole = original.roles?.[0];
+      const tooltipId = `roles-tooltip-${original.id}`;
 
       return (
         <div className="d-flex align-items-center gap-1">
@@ -123,7 +118,7 @@ export const userTableColumns = [
           </Badge>
           {firstRole && (
             <UncontrolledTooltip placement="top" target={tooltipId}>
-              {user.roles?.map((role, idx) => (
+              {original.roles?.map((role, idx) => (
                 <div key={role.id}>
                   {idx + 1}. {role.name}
                 </div>
@@ -139,17 +134,16 @@ export const userTableColumns = [
     header: "Permisos",
     sortable: false,
     filterable: false,
-    cell: ({ row }: { row: { original: UserModel } }) => {
-      const user = row.original;
-      const directPermissionCount = user.permissionIds?.length || 0;
+    cell: ({ row: { original } }: { row: { original: UserModel } }) => {
+      const directPermissionCount = original.permissionIds?.length || 0;
 
       // Calcular permisos heredados de roles
-      const inheritedPermissionCount = user.roles?.reduce((acc, role) => {
+      const inheritedPermissionCount = original.roles?.reduce((acc, role) => {
         return acc + (role.permissionIds?.length || 0);
       }, 0) || 0;
 
       const totalPermissions = directPermissionCount + inheritedPermissionCount;
-      const tooltipId = `permissions-tooltip-${user.id}`;
+      const tooltipId = `permissions-tooltip-${original.id}`;
 
       if (totalPermissions === 0) {
         return (

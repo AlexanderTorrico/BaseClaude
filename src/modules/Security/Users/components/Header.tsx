@@ -54,11 +54,6 @@ const Header: React.FC<HeaderProps> = ({ loading, onRefresh }) => {
   const handleViewChange = (viewKey: string) => {
     dispatch(setCurrentView(viewKey));
     setIsManualOverride(true);
-
-    // Resetear override después de 5 segundos de inactividad
-    setTimeout(() => {
-      setIsManualOverride(false);
-    }, 5000);
   };
 
   return (

@@ -182,7 +182,68 @@ The app supports multiple layouts:
 
 ## Working with This Codebase
 
-### Creating New Modules/Pages
+### Creating New Pages/Sections (In-Place Method)
+
+**IMPORTANTE**: Cuando el usuario solicite crear una nueva página o sección, seguir este flujo:
+
+#### Paso 1: Verificar Contexto
+1. **Verificar si hay un `index.tsx` seleccionado/abierto** por el usuario
+2. **Si NO hay archivo seleccionado**: Preguntar "Por favor, abre o selecciona el archivo `index.tsx` donde quieres que cree la nueva página/sección"
+3. **Si hay archivo seleccionado**: Proceder con la creación
+
+#### Paso 2: Analizar Estructura Existente
+1. Leer el `index.tsx` seleccionado
+2. Identificar la estructura actual del módulo
+3. Verificar qué carpetas/archivos ya existen:
+   - `components/` - Componentes UI ya creados
+   - `hooks/` - Hooks existentes
+   - `services/` - Servicios disponibles
+   - `models/` - Modelos definidos
+   - `config/` - Configuraciones existentes
+
+#### Paso 3: Crear Página/Sección
+1. **Agregar código directamente en el `index.tsx` seleccionado**
+2. **NO crear nuevas carpetas** - todas las carpetas ya existen
+3. **Crear nuevos archivos solo si es estrictamente necesario**:
+   - Nuevo componente en `components/` si es reutilizable
+   - Nuevo hook en `hooks/` si encapsula lógica compleja
+   - Nueva configuración en `config/` si es necesaria
+4. **Reutilizar archivos existentes cuando sea posible**
+
+#### Reglas Importantes
+- ✅ **Las carpetas de estructura siempre están creadas** - NO crear nuevas carpetas
+- ✅ **Modificar `index.tsx` seleccionado** - agregar la nueva página/sección ahí
+- ✅ **Reutilizar servicios, hooks y modelos existentes** cuando sea posible
+- ✅ **Crear solo archivos nuevos cuando sea estrictamente necesario**
+- ❌ **NO usar `npm run cp:module`** - ese comando es para módulos completos desde cero
+- ❌ **NO crear carpetas nuevas** - trabajar con la estructura existente
+
+#### Ejemplo de Flujo
+
+```
+Usuario: "Crea una página de estadísticas en el módulo de usuarios"
+
+1. IA verifica: ¿Hay index.tsx seleccionado?
+   - SÍ → Leer el archivo
+   - NO → "Por favor, abre src/modules/Security/Users/index.tsx"
+
+2. IA analiza estructura existente:
+   - useUsers hook ✓
+   - UserService ✓
+   - UserModel ✓
+
+3. IA crea la página:
+   - Agrega componente <Statistics /> directamente en index.tsx
+   - O crea components/Statistics.tsx si es complejo
+   - Reutiliza hooks y servicios existentes
+   - Actualiza el renderizado condicional en index.tsx
+```
+
+---
+
+### Creating New Modules/Pages (Full Module Method)
+
+**Usar este método solo cuando se necesite crear un módulo completamente nuevo desde cero.**
 
 #### 1. Generate Base Structure
 

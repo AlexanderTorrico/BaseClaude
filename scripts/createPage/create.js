@@ -73,17 +73,25 @@ const config = [
   }
 ];
 
-let moduleName = process.argv[2];
+const args = process.argv.slice(2);
+let targetFolder = 'modules';
+let moduleName = null;
 
-if (moduleName && moduleName.startsWith('--name=')) {
-  moduleName = moduleName.split('=')[1];
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === '--type' && args[i + 1]) {
+    targetFolder = args[i + 1];
+    i++;
+  } else if (args[i].startsWith('--name=')) {
+    moduleName = args[i].split('=')[1];
+  } else if (!moduleName) {
+    moduleName = args[i];
+  }
 }
 
 if (!moduleName || moduleName.trim() === '') {
   console.error('❌ Error: Debes proporcionar el nombre del módulo');
-  console.log('Uso: npm run cp:page Request');
-  console.log('O:   npm run cp:page --name=Request');
-  console.log('O:   npm run cp:page Security/Users');
+  console.log('Uso: npm run cp:module Request');
+  console.log('O:   npm run cp:page Request');
   process.exit(1);
 }
 
@@ -100,9 +108,9 @@ const loadTemplate = async (templateName) => {
   }
 };
 
-const createPage = async () => {
+const create = async () => {
   try {
-    const basePath = path.join(process.cwd(), 'src', 'pages', moduleName);
+    const basePath = path.join(process.cwd(), 'src', targetFolder, moduleName);
 
     fs.mkdirSync(basePath, { recursive: true });
     console.log(`✅ Carpeta creada: ${basePath}`);
@@ -164,8 +172,9 @@ const createPage = async () => {
     fs.writeFileSync(indexPath, indexContent);
     console.log(`✅ Archivo creado: ${indexPath}`);
 
-    console.log('\n🎉 ¡Página creada exitosamente!');
-    console.log(`📁 Ubicación: src/pages/${moduleName}`);
+    const entityType = targetFolder === 'modules' ? 'Módulo' : 'Página';
+    console.log(`\n🎉 ¡${entityType} creado exitosamente!`);
+    console.log(`📁 Ubicación: src/${targetFolder}/${moduleName}`);
     console.log('\n📋 Estructura generada:');
     console.log(`   ├── __tests__/ (fixtures, unit, integration)`);
     console.log(`   ├── adapters/ (${moduleNameOnly.toLowerCase()}Adapter.ts)`);
@@ -179,10 +188,10 @@ const createPage = async () => {
     console.log(`   └── index.tsx`);
 
   } catch (error) {
-    console.error('❌ Error al crear la página:', error.message);
+    console.error('❌ Error al crear:', error.message);
     console.error(error.stack);
     process.exit(1);
   }
 };
 
-createPage();
+create();

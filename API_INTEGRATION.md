@@ -1,5 +1,7 @@
 # Integración de Backend Real - Skote
 
+> **Nota**: Este documento cubre la configuración de autenticación global del template. Para la arquitectura modular de features (Security/Users, etc.), consulta [CLAUDE.md](./CLAUDE.md) que documenta el patrón Service Interface + ApiService + MockService.
+
 ## Descripción
 
 Este documento describe la implementación de autenticación con backend real en el template Skote, permitiendo el uso tanto del fakeBackend original como de una API externa.

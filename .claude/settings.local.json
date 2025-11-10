@@ -27,7 +27,9 @@
       "Bash(npm run:*)",
       "Bash(dir:*)",
       "Bash(findstr:*)",
-      "Bash(node scripts/createPage/create-module.js:*)"
+      "Bash(node scripts/createPage/create-module.js:*)",
+      "Bash(nul)",
+      "Bash(del OPTIMIZACIONES_TESTS.md)"
     ],
     "deny": []
   }

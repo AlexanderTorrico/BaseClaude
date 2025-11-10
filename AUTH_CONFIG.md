@@ -1,5 +1,7 @@
 # Authentication Configuration Guide
 
+> **Nota**: Este documento cubre la configuración de autenticación global del template. Para información completa sobre variables de entorno y configuración de APIs, consulta [API_CONFIGURATION.md](./API_CONFIGURATION.md). Para la arquitectura modular de features, consulta [CLAUDE.md](./CLAUDE.md).
+
 ## Overview
 
 The authentication system now supports multiple modes:

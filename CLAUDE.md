@@ -243,24 +243,39 @@ When the user requests UI generation for a new module/page:
 - Example:
   ```typescript
   // Interface
+  import { UserModel } from '../models/UserModel';
+  import { SetStateFn } from '@/shared/types/commonTypes';
   import { ApiResponse } from '@/shared/types';
 
   export interface IUserService {
-    getAll(setLoading?: SetStateFn): Promise<ApiResponse<UserModel[]>>;
+    getUsersByCompany(
+      companyId: number,
+      setLoading?: SetStateFn
+    ): Promise<ApiResponse<UserModel[]>>;
   }
 
   // MockService
+  import { IUserService } from './IUserService';
+  import { UserModel } from '../models/UserModel';
+  import { MOCK_USERS_WITH_ROLES } from '../data/mockUsersWithRoles';
+  import { SetStateFn } from '@/shared/types/commonTypes';
   import { ApiResponse } from '@/shared/types';
 
   export class UserMockService implements IUserService {
-    async getAll(setLoading?: SetStateFn): Promise<ApiResponse<UserModel[]>> {
+    private mockUsers: UserModel[] = [...MOCK_USERS_WITH_ROLES];
+
+    async getUsersByCompany(
+      companyId: number,
+      setLoading?: SetStateFn
+    ): Promise<ApiResponse<UserModel[]>> {
       setLoading?.(true);
       await new Promise(resolve => setTimeout(resolve, 500));
       setLoading?.(false);
+
       return {
         status: 200,
         message: 'Success',
-        data: [...MOCK_USERS]
+        data: [...this.mockUsers]
       };
     }
   }

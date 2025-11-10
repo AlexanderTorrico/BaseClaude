@@ -4,10 +4,21 @@
  */
 
 const generateServiceInterface = (moduleName) => `import { ${moduleName}Model } from '../models/${moduleName}Model';
+import { SetStateFn } from '@/shared/types/commonTypes';
 import { ApiResponse } from '@/shared/types';
 
+/**
+ * Interfaz del servicio de ${moduleName}
+ * Todos los métodos retornan ApiResponse<T> = { status, message, data }
+ * Los errores se manejan internamente en httpService
+ */
 export interface I${moduleName}Service {
-  getAll(setLoading?: (loading: boolean) => void): Promise<ApiResponse<${moduleName}Model[]>>;
+  /**
+   * Obtiene todos los ${moduleName.toLowerCase()}s
+   * @returns {status: 200, message: 'Success', data: ${moduleName}Model[]} en éxito
+   * @returns {status: 4xx/5xx, message: string, data: []} en error
+   */
+  getAll(setLoading?: SetStateFn): Promise<ApiResponse<${moduleName}Model[]>>;
 }
 `;
 

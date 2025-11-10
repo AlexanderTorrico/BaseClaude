@@ -13,8 +13,5 @@ export interface IUserService {
    * @returns {status: 200, message: 'Success', data: UserModel[]} en éxito
    * @returns {status: 4xx/5xx, message: string, data: []} en error
    */
-  getUsersByCompany(
-    companyId: number,
-    setLoading?: SetStateFn
-  ): Promise<ApiResponse<UserModel[]>>;
+  getUsersByCompany( companyId: number, setLoading?: SetStateFn): Promise<ApiResponse<UserModel[]>>;
 }

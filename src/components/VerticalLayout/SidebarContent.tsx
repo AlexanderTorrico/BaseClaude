@@ -185,7 +185,7 @@ const SidebarContent = (props) => {
                 <li>
                   <Link to="/crud_v2">CRUD V2</Link>
                 </li>
-              
+
               </ul>
             </li>
 
@@ -228,6 +228,30 @@ const SidebarContent = (props) => {
               <Link to="/users" className=" ">
                 <i className="bx bx-user"></i>
                 <span>Usuarios</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/company" className=" ">
+                <i className="bx bx-user"></i>
+                <span>company</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/reservation" className=" ">
+                <i className="bx bx-user"></i>
+                <span>Reservation</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/information" className=" ">
+                <i className="bx bx-user"></i>
+                <span>Information</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/paymentgateway" className=" ">
+                <i className="bx bx-user"></i>
+                <span>Payment gateway</span>
               </Link>
             </li>
             <li>

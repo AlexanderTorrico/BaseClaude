@@ -7,6 +7,7 @@ import { userReducer } from '../pages/Login/slices';
 import { registerReducer } from '../pages/Register/index';
 import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Hooks/crudBasicSlice';
 import usersReducer from '../modules/Security/Users/slices/userSlice';
+import companyReducer from '../modules/Security/Company/slices/companySlice';
 import workStationsReducer from '../modules/RRHH/WorkStations/slices/workStationsSlice';
 
 export const store = configureStore({
@@ -18,6 +19,7 @@ export const store = configureStore({
     crudBasic: crudBasicReducer,
     users: usersReducer,
     workStations: workStationsReducer,
+    company: companyReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

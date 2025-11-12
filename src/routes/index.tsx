@@ -29,6 +29,10 @@ import WorkStations from "../modules/RRHH/WorkStations/index";
 
 // -------------------------------------------------------------
 import Landing from "../pages/Landing/Landing";
+import Information from "@/modules/Security/Information";
+import PaymentGateway from "@/modules/Security/PaymentGateway";
+import Reservation from "@/modules/Security/Reservation";
+import Company from "@/modules/Security/Company";
 // -------------------------------------------------------------
 
 
@@ -53,6 +57,10 @@ const authProtectedRoutes = [
   //Security
   { path: "/security-user", component: User },
   { path: "/users", component: Users },
+  { path: "/reservation", component: Reservation },
+  { path: "/information", component: Information },
+  { path: "/company", component: Company },
+  { path: "/paymentgateway", component: PaymentGateway },
   { path: "/roles", component: Roles },
 
   // RRHH

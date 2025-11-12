@@ -656,13 +656,10 @@ const AzTableActions = ({ children, row, index, isSelected, ...props }) => {
 
 AzTableActions.displayName = 'AzTableActions';
 
-
-export default AzTable;
-
 // Asignar subcomponentes
 AzTable.Actions = AzTableActions;
 
-// También exportar AzTable directamente para uso interno
+// Exportaciones
 export { AzTable, AzTableActions };
 export default AzTable;
 

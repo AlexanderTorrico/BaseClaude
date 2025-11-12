@@ -6,10 +6,10 @@ const Header = () => {
     const { t } = useTranslation();
     return (
         <div className="header" >
-            <img src="Aziende.svg" alt="" />
+            <img src="Aziende.svg" alt="Aziende Logo" />
             <div className="containerBtn" >
-                <button className="btnGetStared" > {t("Get stared")} </button>
-                <button className="btnLogin" > {t("Login")} </button>
+                <button className="btnGetStared">Crear cuenta</button>
+                <button className="btnLogin">Iniciar sesión</button>
             </div>
         </div>
     )

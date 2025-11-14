@@ -15,7 +15,7 @@ export const adaptRequirementResponseToModel = (
   return {
     id: apiRequirement.id,
     description: apiRequirement.description,
-    workStationId: apiRequirement.rhh_workstation_id, // snake_case → camelCase
+    rhhWorkstationId: apiRequirement.rhh_workstation_id, // snake_case → camelCase
     category: apiRequirement.category,
     isRequired: apiRequirement.is_required ?? true // snake_case → camelCase, default true
   };
@@ -39,7 +39,7 @@ export const adaptRequirementModelToRequest = (
   return {
     id: uiRequirement.id,
     description: uiRequirement.description,
-    rhh_workstation_id: uiRequirement.workStationId, // camelCase → snake_case
+    rhh_workstation_id: uiRequirement.rhhWorkstationId, // camelCase → snake_case
     category: uiRequirement.category,
     is_required: uiRequirement.isRequired // camelCase → snake_case
   };

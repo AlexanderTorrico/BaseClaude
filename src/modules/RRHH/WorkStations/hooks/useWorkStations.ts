@@ -1,9 +1,9 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { RootState } from '@/store';
 import { WorkStationModel } from '../models/WorkStationModel';
-import { RequirementModel } from '../models/RequirementModel';
-import { WorkStationController } from '../controllers/WorkStationController';
+import { buildWorkStationTree } from '../utils/treeHelpers';
+import { filterByLevel, getUniqueLevels, getLevelStatistics } from '../utils/levelHelpers';
 import {
   setCurrentView,
   setSelectedLevel,
@@ -11,17 +11,15 @@ import {
   setSelectedWorkStation,
   clearSelection,
   openSidebar,
-  closeSidebar,
+  closeSidebar as closeSidebarAction,
   toggleSidebar
 } from '../slices/workStationsSlice';
-import { buildWorkStationTree } from '../utils/treeHelpers';
-import { filterByLevel, getUniqueLevels, getLevelStatistics } from '../utils/levelHelpers';
 
 /**
- * Hook personalizado para WorkStations
- * Patrón: Sync (useSelector) + Async (Controller calls)
+ * Hook síncrono para WorkStations
+ * Acceso a estado Redux y cálculos derivados
+ * NO maneja peticiones asíncronas (usar useWorkStationsFetch para eso)
  */
-
 export const useWorkStations = () => {
   const dispatch = useDispatch();
 
@@ -30,14 +28,12 @@ export const useWorkStations = () => {
   // =========================================================================
 
   const workStations = useSelector((state: RootState) => state.workStations.list);
-  const loading = useSelector((state: RootState) => state.workStations.loading);
-  const error = useSelector((state: RootState) => state.workStations.error);
   const currentView = useSelector((state: RootState) => state.workStations.currentView);
   const selectedLevel = useSelector((state: RootState) => state.workStations.selectedLevel);
   const selectedWorkStation = useSelector((state: RootState) => state.workStations.selectedWorkStation);
+  const isSidebarOpen = useSelector((state: RootState) => state.workStations.isSidebarOpen);
   const requirements = useSelector((state: RootState) => state.workStations.requirements);
   const loadingRequirements = useSelector((state: RootState) => state.workStations.loadingRequirements);
-  const isSidebarOpen = useSelector((state: RootState) => state.workStations.isSidebarOpen);
 
   // =========================================================================
   // DATOS CALCULADOS (useMemo para optimización)
@@ -50,12 +46,10 @@ export const useWorkStations = () => {
     return filterByLevel(workStations, selectedLevel);
   }, [workStations, selectedLevel]);
 
-  /**
-   * Árbol jerárquico (para vista Organigrama)
-   */
   const workStationTree = useMemo(() => {
     const dataToUse = selectedLevel !== null ? filteredWorkStations : workStations;
-    return buildWorkStationTree(dataToUse);
+    const showWarnings = selectedLevel === null;
+    return buildWorkStationTree(dataToUse, showWarnings);
   }, [workStations, filteredWorkStations, selectedLevel]);
 
   /**
@@ -90,7 +84,53 @@ export const useWorkStations = () => {
   }, [workStations, filteredWorkStations, selectedLevel]);
 
   // =========================================================================
-  // ACCIONES SÍNCRONAS (dispatch directo)
+  // FUNCIONES HELPERS
+  // =========================================================================
+
+  /**
+   * Encontrar un puesto de trabajo por ID
+   */
+  const findWorkStationById = (id: number): WorkStationModel | undefined => {
+    return workStations.find(ws => ws.id === id);
+  };
+
+  /**
+   * Encontrar un puesto de trabajo por nombre
+   */
+  const findWorkStationByName = (name: string): WorkStationModel | undefined => {
+    return workStations.find(ws => ws.name.toLowerCase() === name.toLowerCase());
+  };
+
+  /**
+   * Obtener total de puestos de trabajo
+   */
+  const getTotalWorkStations = (): number => {
+    return workStations.length;
+  };
+
+  /**
+   * Obtener puestos de trabajo de un nivel específico
+   */
+  const getWorkStationsByLevel = (level: number): WorkStationModel[] => {
+    return workStations.filter(ws => ws.level === level);
+  };
+
+  /**
+   * Obtener hijos directos de un puesto de trabajo
+   */
+  const getChildrenWorkStations = (parentId: number): WorkStationModel[] => {
+    return workStations.filter(ws => ws.dependencyId === parentId);
+  };
+
+  /**
+   * Verificar si un puesto tiene hijos
+   */
+  const hasChildren = (id: number): boolean => {
+    return workStations.some(ws => ws.dependencyId === id);
+  };
+
+  // =========================================================================
+  // ACCIONES SÍNCRONAS (dispatch directo a Redux)
   // =========================================================================
 
   const handleSetCurrentView = (view: string) => {
@@ -121,63 +161,12 @@ export const useWorkStations = () => {
   };
 
   const handleCloseSidebar = () => {
-    dispatch(closeSidebar());
+    dispatch(closeSidebarAction());
   };
 
   const handleToggleSidebar = () => {
     dispatch(toggleSidebar());
   };
-
-  // =========================================================================
-  // ACCIONES ASÍNCRONAS (Controller calls)
-  // =========================================================================
-
-  const loadWorkStations = async () => {
-    return await WorkStationController.getWorkStations();
-  };
-
-  const loadWorkStationById = async (id: number) => {
-    return await WorkStationController.getWorkStationById(id);
-  };
-
-  const createWorkStation = async (data: Partial<WorkStationModel>) => {
-    return await WorkStationController.createWorkStation(data);
-  };
-
-  const updateWorkStation = async (id: number, data: Partial<WorkStationModel>) => {
-    return await WorkStationController.updateWorkStation(id, data);
-  };
-
-  const deleteWorkStation = async (id: number) => {
-    return await WorkStationController.deleteWorkStation(id);
-  };
-
-  const loadRequirementsByWorkStation = async (workStationId: number) => {
-    return await WorkStationController.getRequirementsByWorkStation(workStationId);
-  };
-
-  const createRequirement = async (data: Partial<RequirementModel>) => {
-    return await WorkStationController.createRequirement(data);
-  };
-
-  const updateRequirement = async (id: number, data: Partial<RequirementModel>) => {
-    return await WorkStationController.updateRequirement(id, data);
-  };
-
-  const deleteRequirement = async (id: number, workStationId: number) => {
-    return await WorkStationController.deleteRequirement(id, workStationId);
-  };
-
-  // =========================================================================
-  // CARGA INICIAL
-  // =========================================================================
-
-  useEffect(() => {
-    // Solo cargar si la lista está vacía (caching inteligente)
-    if (workStations.length === 0 && !loading && !error) {
-      loadWorkStations();
-    }
-  }, []);
 
   // =========================================================================
   // RETURN
@@ -186,14 +175,12 @@ export const useWorkStations = () => {
   return {
     // Estado
     workStations,
-    loading,
-    error,
     currentView,
     selectedLevel,
     selectedWorkStation,
+    isSidebarOpen,
     requirements,
     loadingRequirements,
-    isSidebarOpen,
 
     // Datos calculados
     filteredWorkStations,
@@ -201,6 +188,14 @@ export const useWorkStations = () => {
     availableLevels,
     levelStatistics,
     workStationsByLevel,
+
+    // Funciones helpers
+    findWorkStationById,
+    findWorkStationByName,
+    getTotalWorkStations,
+    getWorkStationsByLevel,
+    getChildrenWorkStations,
+    hasChildren,
 
     // Acciones síncronas
     setCurrentView: handleSetCurrentView,
@@ -211,16 +206,5 @@ export const useWorkStations = () => {
     openSidebar: handleOpenSidebar,
     closeSidebar: handleCloseSidebar,
     toggleSidebar: handleToggleSidebar,
-
-    // Acciones asíncronas
-    loadWorkStations,
-    loadWorkStationById,
-    createWorkStation,
-    updateWorkStation,
-    deleteWorkStation,
-    loadRequirementsByWorkStation,
-    createRequirement,
-    updateRequirement,
-    deleteRequirement
   };
 };

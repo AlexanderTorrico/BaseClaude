@@ -30,7 +30,8 @@
       "Bash(node scripts/createPage/create-module.js:*)",
       "Bash(nul)",
       "Bash(del OPTIMIZACIONES_TESTS.md)",
-      "Bash(del \"e:\\skote\\Skote_React_4.3.0\\Skote_Vite_v4.3.0\\Starterkit - ts\\src\\modules\\Security\\Users\\RESPONSIVE_IMPLEMENTATION.md\")"
+      "Bash(del \"e:\\skote\\Skote_React_4.3.0\\Skote_Vite_v4.3.0\\Starterkit - ts\\src\\modules\\Security\\Users\\RESPONSIVE_IMPLEMENTATION.md\")",
+      "Bash(cat:*)"
     ],
     "deny": []
   }

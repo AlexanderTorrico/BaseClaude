@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Offcanvas, OffcanvasHeader, OffcanvasBody, Badge, ListGroup, ListGroupItem, Spinner, Button } from 'reactstrap';
 import { useWorkStations } from '../hooks/useWorkStations';
+import { useRequirementsFetch } from '../hooks/useRequirementsFetch';
+import { RequirementMockService } from '../services/RequirementMockService';
 import { RequirementModel } from '../models/RequirementModel';
 import { groupRequirementsByCategory } from '../adapters/requirementAdapter';
+
+// Instancia del servicio (Mock por ahora)
+const requirementService = new RequirementMockService();
 
 /**
  * Sidebar lateral para mostrar y gestionar Requirements
@@ -14,24 +19,28 @@ const RequirementsSidebar: React.FC = () => {
     isSidebarOpen,
     selectedWorkStation,
     requirements,
-    loadingRequirements,
-    closeSidebar,
-    loadRequirementsByWorkStation
+    closeSidebar
   } = useWorkStations();
+
+  const { loading, fetchRequirementsByWorkStation } = useRequirementsFetch(requirementService);
 
   const [groupedRequirements, setGroupedRequirements] = useState<Record<string, RequirementModel[]>>({});
 
-  // Cargar requirements cuando se abre el sidebar
+  // Cargar requirements cuando se abre el sidebar con un workstation seleccionado
   useEffect(() => {
     if (isSidebarOpen && selectedWorkStation) {
-      loadRequirementsByWorkStation(selectedWorkStation.id);
+      fetchRequirementsByWorkStation(selectedWorkStation.id);
     }
   }, [isSidebarOpen, selectedWorkStation]);
 
-  // Agrupar requirements por categor韆
+  // Agrupar requirements por categor铆a
   useEffect(() => {
-    const grouped = groupRequirementsByCategory(requirements);
-    setGroupedRequirements(grouped);
+    if (requirements && requirements.length > 0) {
+      const grouped = groupRequirementsByCategory(requirements);
+      setGroupedRequirements(grouped);
+    } else {
+      setGroupedRequirements({});
+    }
   }, [requirements]);
 
   const handleAddRequirement = () => {
@@ -41,7 +50,7 @@ const RequirementsSidebar: React.FC = () => {
 
   const handleEditRequirement = (requirement: RequirementModel) => {
     console.log('Edit requirement:', requirement);
-    // TODO: Abrir modal de edici髇
+    // TODO: Abrir modal de edici贸n
   };
 
   const handleDeleteRequirement = (requirementId: number) => {
@@ -51,13 +60,13 @@ const RequirementsSidebar: React.FC = () => {
 
   const getCategoryIcon = (category?: string) => {
     switch (category) {
-      case 'Educaci髇':
+      case 'Educaci贸n':
         return 'mdi mdi-school';
       case 'Experiencia':
         return 'mdi mdi-briefcase';
       case 'Competencias':
         return 'mdi mdi-head-lightbulb';
-      case 'Habilidades T閏nicas':
+      case 'Habilidades T茅cnicas':
         return 'mdi mdi-tools';
       case 'Certificaciones':
         return 'mdi mdi-certificate';
@@ -92,7 +101,7 @@ const RequirementsSidebar: React.FC = () => {
 
         {selectedWorkStation && (
           <>
-            {/* Informaci髇 del puesto */}
+            {/* Informaci贸n del puesto */}
             <div className="border rounded p-3 mb-3" style={{ backgroundColor: '#f8f9fa' }}>
               <div className="d-flex justify-content-between align-items-start mb-2">
                 <div className="fw-medium">{selectedWorkStation.name}</div>
@@ -113,12 +122,12 @@ const RequirementsSidebar: React.FC = () => {
                 </span>
                 <span className="small">
                   <i className="mdi mdi-clipboard-list me-1"></i>
-                  {requirements.length} requisitos
+                  {requirements?.length || 0} requisitos
                 </span>
               </div>
             </div>
 
-            {/* Bot髇 agregar requisito */}
+            {/* Bot贸n agregar requisito */}
             <Button
               color="primary"
               size="sm"
@@ -130,7 +139,7 @@ const RequirementsSidebar: React.FC = () => {
             </Button>
 
             {/* Loading state */}
-            {loadingRequirements && (
+            {loading && (
               <div className="text-center py-5">
                 <Spinner color="primary" size="sm" />
                 <div className="mt-2 small">Cargando requisitos...</div>
@@ -138,7 +147,7 @@ const RequirementsSidebar: React.FC = () => {
             )}
 
             {/* Empty state */}
-            {!loadingRequirements && requirements.length === 0 && (
+            {!loading && (!requirements || requirements.length === 0) && (
               <div className="text-center py-5 text-muted">
                 <i className="mdi mdi-clipboard-alert-outline" style={{ fontSize: '48px' }}></i>
                 <div className="mt-2">No hay requisitos definidos</div>
@@ -146,12 +155,12 @@ const RequirementsSidebar: React.FC = () => {
               </div>
             )}
 
-            {/* Lista de requisitos agrupados por categor韆 */}
-            {!loadingRequirements && requirements.length > 0 && (
+            {/* Lista de requisitos agrupados por categor铆a */}
+            {!loading && requirements && requirements.length > 0 && (
               <div>
                 {Object.entries(groupedRequirements).map(([category, reqs]) => (
                   <div key={category} className="mb-4">
-                    {/* Header de categor韆 */}
+                    {/* Header de categor铆a */}
                     <div className="d-flex align-items-center mb-2">
                       <i className={`${getCategoryIcon(category)} me-2 text-primary`}></i>
                       <h6 className="mb-0">{category}</h6>

@@ -11,7 +11,7 @@ import { UserApiService } from './services/UserApiService';
 
 const userService = new UserApiService();
 
-const UsersTest: React.FC = () => {
+const Users: React.FC = () => {
   const { currentView, users } = useUsers();
   const { loading, fetchUsersByCompany } = useUsersFetch(userService);
 
@@ -63,4 +63,4 @@ const UsersTest: React.FC = () => {
   );
 };
 
-export default UsersTest;
+export default Users;

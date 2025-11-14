@@ -54,6 +54,21 @@ const workStationsSlice = createSlice({
       state.list = action.payload;
     },
 
+    addWorkStation: (state, action: PayloadAction<WorkStationModel>) => {
+      state.list.push(action.payload);
+    },
+
+    updateWorkStation: (state, action: PayloadAction<WorkStationModel>) => {
+      const index = state.list.findIndex(ws => ws.id === action.payload.id);
+      if (index !== -1) {
+        state.list[index] = action.payload;
+      }
+    },
+
+    deleteWorkStation: (state, action: PayloadAction<number>) => {
+      state.list = state.list.filter(ws => ws.id !== action.payload);
+    },
+
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
@@ -147,6 +162,9 @@ const workStationsSlice = createSlice({
 // Exportar acciones
 export const {
   setWorkStations,
+  addWorkStation,
+  updateWorkStation,
+  deleteWorkStation,
   setLoading,
   setError,
   setCurrentView,

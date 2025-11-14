@@ -5,34 +5,31 @@ import { WorkStationModel } from '../models/WorkStationModel';
  * Algoritmo que crea la estructura de árbol basándose en dependency_id
  */
 export const buildWorkStationTree = (
-  workStations: WorkStationModel[]
+  workStations: WorkStationModel[],
+  showWarnings: boolean = true
 ): WorkStationModel[] => {
-  // 1. Crear mapa para acceso rápido por ID
   const map = new Map<number, WorkStationModel>();
 
   workStations.forEach(ws => {
     map.set(ws.id, { ...ws, children: [] });
   });
 
-  // 2. Array para almacenar las raíces del árbol
   const roots: WorkStationModel[] = [];
 
-  // 3. Construir relaciones padre-hijo
   workStations.forEach(ws => {
     const node = map.get(ws.id)!;
 
     if (ws.dependencyId === 0) {
-      // Es raíz (no tiene padre)
       roots.push(node);
     } else {
-      // Tiene padre, agregarlo como hijo
       const parent = map.get(ws.dependencyId);
       if (parent) {
         parent.children = parent.children || [];
         parent.children.push(node);
       } else {
-        // Si no encuentra padre, lo marca como raíz huérfana
-        console.warn(`⚠️ WorkStation ${ws.id} (${ws.name}) tiene dependency_id=${ws.dependencyId} pero no existe el padre. Se agregará como raíz.`);
+        if (showWarnings) {
+          console.warn(`⚠️ WorkStation ${ws.id} (${ws.name}) tiene dependency_id=${ws.dependencyId} pero no existe el padre. Se agregará como raíz.`);
+        }
         roots.push(node);
       }
     }

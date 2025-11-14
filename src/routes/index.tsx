@@ -21,11 +21,12 @@ import FilterSumaryInfo from "../modules/Components/Molecules/FilterSumaryInfo/i
 import CrudBasicResponsive from "../modules/Components/Pages/CrudBasicResponsive/index";
 import PageApi from "../modules/Components/PageApi/index";
 
-import Users from "../modules/Security/Users/index";
+import UsersTest from "../modules/Security/Users/index";
 import Roles from "../modules/Security/Roles/index";
 
 // RRHH
 import WorkStations from "../modules/RRHH/WorkStations/index";
+import Users from "../modules/RRHH/Users/index";
 
 // -------------------------------------------------------------
 import Landing from "../pages/Landing/Landing";
@@ -56,7 +57,7 @@ const authProtectedRoutes = [
 
   //Security
   { path: "/security-user", component: User },
-  { path: "/users", component: Users },
+  { path: "/users-test", component: UsersTest },
   { path: "/reservation", component: Reservation },
   { path: "/information", component: Information },
   { path: "/company", component: Company },
@@ -64,6 +65,7 @@ const authProtectedRoutes = [
   { path: "/roles", component: Roles },
 
   // RRHH
+  { path: "/users", component: Users },
   { path: "/workstations", component: WorkStations },
 
   //   // this route should be at the end of all other routes

@@ -225,7 +225,7 @@ const SidebarContent = (props) => {
             <li className="menu-title">Seguridad</li>
 
             <li>
-              <Link to="/users" className=" ">
+              <Link to="/users-test" className=" ">
                 <i className="bx bx-user"></i>
                 <span>Usuarios</span>
               </Link>
@@ -276,6 +276,13 @@ const SidebarContent = (props) => {
             </li>
 
             <li className="menu-title">RRHH</li>
+
+            <li>
+              <Link to="/users" className=" ">
+                <i className="bx bx-sitemap"></i>
+                <span>Usuarios</span>
+              </Link>
+            </li>
 
             <li>
               <Link to="/workstations" className=" ">

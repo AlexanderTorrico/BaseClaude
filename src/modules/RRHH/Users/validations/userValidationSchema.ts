@@ -31,14 +31,7 @@ export const userRegistrationSchema = Yup.object().shape({
   password: Yup.string()
     .required(UserValidationRules.password.messages.required)
     .min(UserValidationRules.password.minLength, UserValidationRules.password.messages.minLength)
-    .max(UserValidationRules.password.maxLength, UserValidationRules.password.messages.maxLength)
-    .test('password-strength', UserValidationRules.password.messages.weak, (value) => {
-      if (!value) return false;
-      const hasUppercase = /[A-Z]/.test(value);
-      const hasLowercase = /[a-z]/.test(value);
-      const hasNumber = /[0-9]/.test(value);
-      return hasUppercase && hasLowercase && hasNumber;
-    }),
+    .max(UserValidationRules.password.maxLength, UserValidationRules.password.messages.maxLength),
 
   repeatPassword: Yup.string()
     .required('Debe confirmar la contraseña')

@@ -1,43 +1,7 @@
 import React from 'react';
 import { Badge, UncontrolledTooltip } from 'reactstrap';
 import { UserModel } from '../models/UserModel';
-
-/**
- * Genera las iniciales del nombre completo
- */
-const getInitials = (fullName?: string): string => {
-  if (!fullName || fullName.trim() === '') {
-    return '??';
-  }
-  const names = fullName.trim().split(' ');
-  if (names.length >= 2) {
-    return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase();
-  }
-  return fullName.charAt(0).toUpperCase();
-};
-
-/**
- * Componente Avatar con iniciales si no hay imagen
- */
-const UserAvatar: React.FC<{ user: UserModel }> = ({ user }) => {
-  if (user.avatar) {
-    return (
-      <img
-        src={user.avatar}
-        alt={user.fullName}
-        className="avatar-xs rounded-circle me-2"
-      />
-    );
-  }
-
-  return (
-    <div className="avatar-xs bg-primary rounded-circle d-flex align-items-center justify-content-center me-2">
-      <span className="text-white font-size-10 fw-bold">
-        {getInitials(user.fullName)}
-      </span>
-    </div>
-  );
-};
+import UserAvatar from '@/components/Common/UserAvatar';
 
 export const userTableColumns = [
   {
@@ -49,7 +13,13 @@ export const userTableColumns = [
     cell: ({ row: { original } }: { row: { original: UserModel } }) => (
       <div className="d-flex flex-column">
         <div className="d-flex align-items-center">
-          <UserAvatar user={original} />
+          <div className="me-2">
+            <UserAvatar
+              fullName={original.fullName || `${original.name} ${original.lastName}`}
+              avatar={original.avatar}
+              size="sm"
+            />
+          </div>
           <span className="fw-medium">{original.fullName || `${original.name} ${original.lastName}`}</span>
         </div>
         <small className="text-muted">{original.email}</small>

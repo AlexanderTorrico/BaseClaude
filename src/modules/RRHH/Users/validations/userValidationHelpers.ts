@@ -198,17 +198,5 @@ export const validatePassword = (password: string): ValidationResult => {
     };
   }
 
-  // Validar fortaleza
-  const hasUppercase = /[A-Z]/.test(password);
-  const hasLowercase = /[a-z]/.test(password);
-  const hasNumber = /[0-9]/.test(password);
-
-  if (!hasUppercase || !hasLowercase || !hasNumber) {
-    return {
-      valid: false,
-      error: UserValidationRules.password.messages.weak
-    };
-  }
-
   return { valid: true };
 };

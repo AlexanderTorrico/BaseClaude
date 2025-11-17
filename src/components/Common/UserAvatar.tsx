@@ -2,7 +2,7 @@ import React from 'react';
 
 interface UserAvatarProps {
   fullName: string;
-  avatar?: string | undefined;
+  avatar?: string | null | undefined;
   size?: 'sm' | 'md' | 'lg';
 }
 
@@ -18,16 +18,39 @@ const getInitials = (fullName: string): string => {
 };
 
 /**
+ * Construye la URL completa del avatar
+ * Si avatar es una ruta relativa, la concatena con VITE_API_BASE_URL
+ * Si avatar es una URL absoluta (http/https), la retorna tal cual
+ */
+const getAvatarUrl = (avatar: string): string => {
+  // Si ya es una URL absoluta (http:// o https://), retornarla tal cual
+  if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
+    return avatar;
+  }
+
+  // Si es una ruta relativa, concatenar con la base URL
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+
+  // Normalizar las barras diagonales
+  const normalizedBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const normalizedAvatar = avatar.startsWith('/') ? avatar : `/${avatar}`;
+
+  return `${normalizedBase}${normalizedAvatar}`;
+};
+
+/**
  * Componente Avatar reutilizable
  * Muestra la imagen del usuario o sus iniciales si no tiene avatar
  */
 const UserAvatar: React.FC<UserAvatarProps> = ({ fullName, avatar, size = 'md' }) => {
   const sizeClass = size === 'lg' ? 'avatar-lg' : size === 'md' ? 'avatar-md' : 'avatar-sm';
 
-  if (avatar) {
+  if (avatar && avatar.trim() !== '') {
+    const avatarUrl = getAvatarUrl(avatar);
+
     return (
       <img
-        src={avatar}
+        src={avatarUrl}
         alt={fullName}
         className={`${sizeClass} rounded-circle`}
       />

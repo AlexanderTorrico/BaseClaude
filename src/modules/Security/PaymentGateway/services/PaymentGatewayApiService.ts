@@ -9,7 +9,7 @@ type SetStateFn = (loading: boolean) => void;
 export class PaymentGatewayApiService implements IPaymentGatewayService {
   async getAll(setLoading?: SetStateFn): Promise<ApiResponse<PaymentGatewayModel[]>> {
     const res = await httpRequestWithAuth.get<ApiResponse<any>>(
-      `/paymentgateway`,
+      `/api/paymentgateway`,
       setLoading
     );
 

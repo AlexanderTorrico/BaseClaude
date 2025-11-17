@@ -59,6 +59,10 @@ const config = [
     skipFile: true
   },
   {
+    folder: 'validations',
+    skipFile: true
+  },
+  {
     folder: '__tests__',
     template: 'test.template.js',
     multiple: true,
@@ -185,6 +189,7 @@ const create = async () => {
     console.log(`   ├── models/ (${moduleNameOnly}Model.ts)`);
     console.log(`   ├── services/ (I${moduleNameOnly}Service.ts, ${moduleNameOnly}ApiService.ts, ${moduleNameOnly}MockService.ts)`);
     console.log(`   ├── slices/ (${moduleNameOnly.toLowerCase()}Slice.ts)`);
+    console.log(`   ├── validations/`);
     console.log(`   └── index.tsx`);
 
   } catch (error) {

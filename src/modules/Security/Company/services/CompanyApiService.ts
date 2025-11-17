@@ -9,7 +9,7 @@ type SetStateFn = (loading: boolean) => void;
 export class CompanyApiService implements ICompanyService {
   async getAll(setLoading?: SetStateFn): Promise<ApiResponse<CompanyModel[]>> {
     const res = await httpRequestWithAuth.get<ApiResponse<any>>(
-      `/company`,
+      `/api/company`,
       setLoading
     );
 

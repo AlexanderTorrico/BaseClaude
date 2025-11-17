@@ -9,7 +9,7 @@ type SetStateFn = (loading: boolean) => void;
 export class InformationApiService implements IInformationService {
   async getAll(setLoading?: SetStateFn): Promise<ApiResponse<InformationModel[]>> {
     const res = await httpRequestWithAuth.get<ApiResponse<any>>(
-      `/information`,
+      `/api/information`,
       setLoading
     );
 

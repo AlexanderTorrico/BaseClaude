@@ -56,15 +56,10 @@ export const UserValidationRules = {
   password: {
     minLength: 8,
     maxLength: 50,
-    requireUppercase: true,
-    requireLowercase: true,
-    requireNumber: true,
-    requireSpecialChar: false,
     messages: {
       required: 'La contraseña es requerida',
       minLength: 'La contraseña debe tener al menos 8 caracteres',
       maxLength: 'La contraseña no puede exceder 50 caracteres',
-      weak: 'La contraseña debe contener mayúsculas, minúsculas y números',
     }
   },
 

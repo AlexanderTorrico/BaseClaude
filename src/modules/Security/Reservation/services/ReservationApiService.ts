@@ -9,7 +9,7 @@ type SetStateFn = (loading: boolean) => void;
 export class ReservationApiService implements IReservationService {
   async getAll(setLoading?: SetStateFn): Promise<ApiResponse<ReservationModel[]>> {
     const res = await httpRequestWithAuth.get<ApiResponse<any>>(
-      `/reservation`,
+      `/api/reservation`,
       setLoading
     );
 

@@ -53,6 +53,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ fullName, avatar, size = 'md' }
         src={avatarUrl}
         alt={fullName}
         className={`${sizeClass} rounded-circle`}
+        style={{ objectFit: 'cover', display: 'block' }}
       />
     );
   }

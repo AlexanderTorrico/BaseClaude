@@ -9,7 +9,7 @@ export class UserApiService implements IUserService {
 
   async getUsersByCompany( companyId: number, setLoading?: SetStateFn ): Promise<ApiResponse<UserModel[]>> {
     const res = await httpRequestWithAuth.get<ApiResponse<any>>(`/api/rrhh/by_company_id/${companyId}`, setLoading);
-    return transformApiData(res, (data) => adaptUsersArrayToUserModels(data.data ?? []) );
+    return transformApiData(res, (data) => adaptUsersArrayToUserModels(data?.data ?? []) );
   }
 
   async registerUser(formData: FormData, setLoading?: SetStateFn): Promise<ApiResponse<UserModel>> {

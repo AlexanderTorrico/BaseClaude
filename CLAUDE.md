@@ -277,6 +277,193 @@ const handleAvatarChange = (event) => {
 - **Cambios centralizados**: Modificar una regla afecta todo automáticamente
 - **Consistencia garantizada**: Imposible tener reglas diferentes en distintos componentes
 
+#### Validaciones Condicionales para CRUD
+
+**Caso de uso**: Cuando se necesita validación diferente entre creación y edición (ej: contraseña requerida en creación, opcional en edición).
+
+**Patrón recomendado**: Múltiples schemas en mismo archivo
+
+```typescript
+// ✅ validations/userValidationSchema.ts
+import * as Yup from 'yup';
+import { UserValidationRules } from './userValidationRules';
+
+/**
+ * Schema para registro de usuarios
+ * Contraseña es REQUERIDA
+ */
+export const userRegistrationSchema = Yup.object().shape({
+  name: Yup.string()
+    .required(UserValidationRules.name.messages.required)
+    .min(UserValidationRules.name.minLength, UserValidationRules.name.messages.minLength)
+    .max(UserValidationRules.name.maxLength, UserValidationRules.name.messages.maxLength)
+    .matches(UserValidationRules.name.pattern, UserValidationRules.name.messages.pattern),
+
+  email: Yup.string()
+    .required(UserValidationRules.email.messages.required)
+    .matches(UserValidationRules.email.pattern, UserValidationRules.email.messages.invalid),
+
+  password: Yup.string()
+    .required(UserValidationRules.password.messages.required)
+    .min(UserValidationRules.password.minLength, UserValidationRules.password.messages.minLength)
+    .max(UserValidationRules.password.maxLength, UserValidationRules.password.messages.maxLength),
+
+  repeatPassword: Yup.string()
+    .required('Debe confirmar la contraseña')
+    .oneOf([Yup.ref('password')], 'Las contraseñas deben coincidir'),
+
+  avatar: Yup.mixed().nullable().optional(),
+});
+
+/**
+ * Schema para edición de usuarios
+ * Contraseña es OPCIONAL - solo se valida si el usuario la ingresa
+ */
+export const userEditSchema = Yup.object().shape({
+  name: Yup.string()
+    .required(UserValidationRules.name.messages.required)
+    .min(UserValidationRules.name.minLength, UserValidationRules.name.messages.minLength)
+    .max(UserValidationRules.name.maxLength, UserValidationRules.name.messages.maxLength)
+    .matches(UserValidationRules.name.pattern, UserValidationRules.name.messages.pattern),
+
+  email: Yup.string()
+    .required(UserValidationRules.email.messages.required)
+    .matches(UserValidationRules.email.pattern, UserValidationRules.email.messages.invalid),
+
+  // ✅ Contraseña OPCIONAL en edición
+  password: Yup.string()
+    .min(UserValidationRules.password.minLength, UserValidationRules.password.messages.minLength)
+    .max(UserValidationRules.password.maxLength, UserValidationRules.password.messages.maxLength)
+    .optional(),
+
+  // ✅ repeatPassword CONDICIONAL usando .when()
+  repeatPassword: Yup.string()
+    .oneOf([Yup.ref('password')], 'Las contraseñas deben coincidir')
+    .when('password', {
+      is: (password: string) => password && password.length > 0,
+      then: (schema) => schema.required('Debe confirmar la contraseña'),
+      otherwise: (schema) => schema.optional(),
+    }),
+
+  avatar: Yup.mixed().nullable().optional(),
+});
+```
+
+**Uso en Modal Dual-Mode (crear/editar)**:
+
+```typescript
+// components/modals/UserRegisterModal.tsx
+import { userRegistrationSchema, userEditSchema } from '../../validations/userValidationSchema';
+
+interface UserRegisterModalProps {
+  userToEdit?: UserModel | null;  // Si existe, modo edición
+  onRegister: (dto: RegisterUserDto) => Promise<{ success: boolean; message: string }>;
+  onUpdate?: (dto: UpdateUserDto) => Promise<{ success: boolean; message: string }>;
+}
+
+const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
+  userToEdit,
+  onRegister,
+  onUpdate
+}) => {
+  // ✅ Detectar modo dinámicamente
+  const isEditMode = !!userToEdit;
+
+  // ✅ Usar schema apropiado según modo
+  const validationSchema = isEditMode ? userEditSchema : userRegistrationSchema;
+
+  return (
+    <Formik
+      validationSchema={validationSchema}
+      enableReinitialize={true}  // Importante para pre-cargar datos en edición
+      // ...
+    >
+      {/*
+        Placeholder dinámico en password:
+        - Creación: "Ingrese contraseña"
+        - Edición: "Dejar vacío para no cambiar"
+      */}
+    </Formik>
+  );
+};
+```
+
+#### DTOs para CRUD
+
+**Patrón recomendado**: DTOs separados para Create y Update
+
+```typescript
+// ✅ models/RegisterUserDto.ts (CREATE)
+export interface RegisterUserDto {
+  name: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password: string;           // REQUERIDO
+  repeatPassword: string;     // REQUERIDO
+  gbl_company_id: string;
+  avatar?: File | null;       // OPCIONAL
+}
+
+// ✅ models/UpdateUserDto.ts (UPDATE)
+export interface UpdateUserDto {
+  id: number;                 // ID es REQUERIDO en update
+  name: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password?: string;          // OPCIONAL - solo si cambia
+  repeatPassword?: string;    // OPCIONAL - solo si cambia password
+  gbl_company_id: string;
+  avatar?: File | null;       // OPCIONAL
+}
+```
+
+**Hook con lógica condicional para password**:
+
+```typescript
+// hooks/useUsersFetch.ts
+const updateUserData = async (dto: UpdateUserDto): Promise<{ success: boolean; message: string }> => {
+  const formData = new FormData();
+  formData.append('id', dto.id.toString());
+  formData.append('name', dto.name);
+  formData.append('lastName', dto.lastName);
+  formData.append('email', dto.email);
+  formData.append('phone', dto.phone);
+  formData.append('gbl_company_id', dto.gbl_company_id);
+
+  // ✅ Solo agregar contraseña si fue proporcionada
+  if (dto.password && dto.password.trim() !== '') {
+    formData.append('password', dto.password);
+    formData.append('repeatPassword', dto.repeatPassword || '');
+  }
+
+  // ✅ Solo agregar avatar si fue proporcionado
+  if (dto.avatar) {
+    formData.append('avatar', dto.avatar);
+  }
+
+  const result = await service.updateUser(formData, setLoading);
+
+  if (result.status !== 200) {
+    return { success: false, message: result.message || 'Error al actualizar' };
+  }
+
+  if (result.data) {
+    store.dispatch(updateUserAction(result.data));
+  }
+
+  return { success: true, message: 'Usuario actualizado exitosamente' };
+};
+```
+
+**Principios clave**:
+1. ✅ **Schemas separados**: Un schema por caso de uso (create vs edit)
+2. ✅ **DTOs separados**: RegisterUserDto (campos requeridos) vs UpdateUserDto (campos opcionales)
+3. ✅ **Validación condicional**: Usar `.when()` para campos que dependen de otros
+4. ✅ **Hook inteligente**: Lógica condicional en hook para enviar solo datos necesarios
+5. ✅ **Modal dual-mode**: Un solo modal que detecta modo y adapta UI/validación
+
 ### Authentication
 - Uses fake backend authentication by default (`fakeBackend()` in App.jsx)
 - Firebase authentication is available but commented out
@@ -774,6 +961,109 @@ const Users: React.FC = () => {
   );
 };
 ```
+
+**F. index.tsx (Versión CRUD Completa con Edición)**
+
+Para módulos que requieren funcionalidad CRUD completa (crear + editar), usar este patrón avanzado:
+
+```typescript
+import React, { useEffect, useState } from 'react';
+import { Container, Row, Col } from 'reactstrap';
+import { useUsers } from './hooks/useUsers';
+import { useUsersFetch } from './hooks/useUsersFetch';
+import AzFilterSummary from '../../../components/aziende/AzFilterSummary';
+import { userTableColumns } from './config/tableColumns';
+import Header from './components/Header';
+import ContentTable from './components/ContentTable';
+import ContentCards from './components/ContentCards';
+import { UserApiService } from './services/UserApiService';
+import { UserModel } from './models/UserModel';
+
+const userService = new UserApiService();
+
+const Users: React.FC = () => {
+  const { currentView, users } = useUsers();
+  const { loading, fetchUsersByCompany, registerUser, updateUserData } = useUsersFetch(userService);
+
+  // Estado local para manejo de edición
+  const [userToEdit, setUserToEdit] = useState<UserModel | null>(null);
+
+  useEffect(() => {
+    fetchUsersByCompany(1);
+  }, []);
+
+  // Función para manejar la edición
+  const handleEditUser = (userId: number) => {
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      setUserToEdit(user);
+    }
+  };
+
+  return (
+    <div className="page-content" style={{ overflowX: 'clip' }}>
+      <Container fluid style={{ overflowX: 'clip' }}>
+        <Header
+          loading={loading}
+          onRefresh={fetchUsersByCompany}
+          onRegisterUser={registerUser}
+          onUpdateUser={updateUserData}
+          userToEdit={userToEdit}
+          onCloseEditModal={() => setUserToEdit(null)}
+        />
+
+        <AzFilterSummary
+          data={users}
+          columns={userTableColumns}
+          alwaysVisible={true}
+          showCount="always"
+          countPosition="top"
+        >
+          {({ filteredData, filters, sorting, onFilterChange, onSortChange }) => (
+            <>
+              {currentView === '0' && (
+                <Row>
+                  <Col xl={12}>
+                    <ContentTable
+                      filteredUsers={filteredData}
+                      filters={filters}
+                      sorting={sorting}
+                      onFilterChange={onFilterChange}
+                      onSortChange={onSortChange}
+                      loading={loading}
+                      onRefresh={fetchUsersByCompany}
+                      onEdit={handleEditUser}
+                    />
+                  </Col>
+                </Row>
+              )}
+
+              {currentView === '1' && (
+                <ContentCards
+                  filteredUsers={filteredData}
+                  onRefresh={fetchUsersByCompany}
+                  onEdit={handleEditUser}
+                />
+              )}
+            </>
+          )}
+        </AzFilterSummary>
+      </Container>
+    </div>
+  );
+};
+
+export default Users;
+```
+
+**Diferencias clave en versión CRUD completa:**
+1. ✅ **Estado local**: `userToEdit` para manejar el usuario seleccionado para editar
+2. ✅ **Función handleEditUser**: Busca el usuario en el estado y lo establece para edición
+3. ✅ **Props adicionales al Header**: `onUpdateUser`, `userToEdit`, `onCloseEditModal`
+4. ✅ **Props onEdit**: Pasada a ContentTable y ContentCards para habilitar edición
+5. ✅ **Hooks completos**: Usa `registerUser` y `updateUserData` del hook fetch
+6. ✅ **Row/Col wrapper**: Necesario en tabla cuando se usa con edición
+7. ✅ **overflowX: 'clip'**: Aplicado cuando sea necesario para evitar scroll horizontal
 
 **IMPORTANT NOTES:**
 - **NO apply `overflowX: 'clip'`** - Only if specifically needed

@@ -4,6 +4,8 @@
 export interface WorkStationModel {
   id: number;
   name: string | null;
-  level: number;
-  dependencyId: number;
+  level?: number;
+  dependencyId?: number;
+  department?: string;
+  description?: string;
 }

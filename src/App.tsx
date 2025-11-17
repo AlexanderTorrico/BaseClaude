@@ -30,7 +30,7 @@ const backendType = import.meta.env.VITE_APP_DEFAULTAUTH === 'fake'
 
 BackendServiceFactory.initialize({
   type: backendType,
-  baseURL: import.meta.env.VITE_APP_API_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
 });
 

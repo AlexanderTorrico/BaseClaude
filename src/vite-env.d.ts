@@ -2,7 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_APP_DEFAULTAUTH: string;
-  readonly VITE_APP_API_URL: string;
+  readonly VITE_API_BASE_URL: string;
   readonly VITE_PUBLIC_URL: string;
   readonly MODE: string;
 }

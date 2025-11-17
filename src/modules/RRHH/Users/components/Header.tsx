@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from 'reactstrap';
 import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 import AzHeaderCardViews from '../../../../components/aziende/AzHeader/AzHeaderCardViews';
+import UserRegisterModal from './modals/UserRegisterModal';
 import { useUsers } from '../hooks/useUsers';
 import { setCurrentView } from '../slices/userSlice';
+import { RegisterUserDto } from '../models/RegisterUserDto';
 
 interface HeaderProps {
   loading: boolean;
   onRefresh: (companyId: number) => Promise<void>;
+  onRegisterUser: (dto: RegisterUserDto) => Promise<{ success: boolean; message: string }>;
 }
 
-const Header: React.FC<HeaderProps> = ({ loading, onRefresh }) => {
+const Header: React.FC<HeaderProps> = ({ loading, onRefresh, onRegisterUser }) => {
   const dispatch = useDispatch();
   const { getTotalUsers, currentView } = useUsers();
 
   // Estado local para detectar tamaño de pantalla
   const [responsiveView, setResponsiveView] = useState<string>('0');
   const [isManualOverride, setIsManualOverride] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Detectar tamaño de pantalla y ajustar vista automáticamente
   useEffect(() => {
@@ -42,8 +47,16 @@ const Header: React.FC<HeaderProps> = ({ loading, onRefresh }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, [dispatch, isManualOverride]);
 
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
   const handleCreateUser = () => {
-    console.log('Crear nuevo usuario');
+    setIsModalOpen(true);
+  };
+
+  const handleRegisterSuccess = () => {
+    toast.success('Usuario registrado exitosamente');
   };
 
   const handleRefresh = async () => {
@@ -57,47 +70,57 @@ const Header: React.FC<HeaderProps> = ({ loading, onRefresh }) => {
   };
 
   return (
-    <AzHeaderCardViews
-      title="Gestión de Usuarios"
-      description="Administra los usuarios del sistema"
-      badge={{
-        count: getTotalUsers(),
-        total: getTotalUsers(),
-        color: 'primary'
-      }}
-      currentView={currentView}
-      onViewChange={handleViewChange}
-      views={[
-        { key: '0', name: 'Tabla', icon: 'mdi-table', title: 'Vista Tabla' },
-        { key: '1', name: 'Cards', icon: 'mdi-card-multiple', title: 'Vista Cards' }
-      ]}
-      contentTopRight={
-        <div className="d-flex gap-2">
-          <Button
-            color="light"
-            onClick={handleRefresh}
-            className="d-flex align-items-center"
-            disabled={loading}
-            title="Actualizar datos"
-          >
-            <i className={`mdi mdi-refresh ${loading ? 'mdi-spin' : ''} me-1`}></i>
-            Actualizar
-          </Button>
-          <Button
-            color="warning"
-            onClick={handleCreateUser}
-            className="d-flex align-items-center"
-            disabled={loading}
-          >
-            <i className="mdi mdi-plus me-1"></i>
-            Nuevo Usuario
-          </Button>
-        </div>
-      }
-      responsiveMode={!isManualOverride}
-      responsiveView={responsiveView}
-      isManualOverride={isManualOverride}
-    />
+    <>
+      <AzHeaderCardViews
+        title="Gestión de Usuarios"
+        description="Administra los usuarios del sistema"
+        badge={{
+          count: getTotalUsers(),
+          total: getTotalUsers(),
+          color: 'primary'
+        }}
+        currentView={currentView}
+        onViewChange={handleViewChange}
+        views={[
+          { key: '0', name: 'Tabla', icon: 'mdi-table', title: 'Vista Tabla' },
+          { key: '1', name: 'Cards', icon: 'mdi-card-multiple', title: 'Vista Cards' }
+        ]}
+        contentTopRight={
+          <div className="d-flex gap-2">
+            <Button
+              color="light"
+              onClick={handleRefresh}
+              className="d-flex align-items-center"
+              disabled={loading}
+              title="Actualizar datos"
+            >
+              <i className={`mdi mdi-refresh ${loading ? 'mdi-spin' : ''} me-1`}></i>
+              Actualizar
+            </Button>
+            <Button
+              color="warning"
+              onClick={handleCreateUser}
+              className="d-flex align-items-center"
+              disabled={loading}
+            >
+              <i className="mdi mdi-plus me-1"></i>
+              Nuevo Usuario
+            </Button>
+          </div>
+        }
+        responsiveMode={!isManualOverride}
+        responsiveView={responsiveView}
+        isManualOverride={isManualOverride}
+      />
+
+      <UserRegisterModal
+        isOpen={isModalOpen}
+        toggle={toggleModal}
+        onSuccess={handleRegisterSuccess}
+        onRegister={onRegisterUser}
+        companyId="1"
+      />
+    </>
   );
 };
 

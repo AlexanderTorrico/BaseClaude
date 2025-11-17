@@ -8,12 +8,13 @@ import Header from './components/Header';
 import ContentTable from './components/ContentTable';
 import ContentCards from './components/ContentCards';
 import { UserApiService } from './services/UserApiService';
+//import { UserMockService } from './services/UserMockService';
 
 const userService = new UserApiService();
 
 const Users: React.FC = () => {
   const { currentView, users } = useUsers();
-  const { loading, fetchUsersByCompany } = useUsersFetch(userService);
+  const { loading, fetchUsersByCompany, registerUser } = useUsersFetch(userService);
 
   useEffect(() => {
     fetchUsersByCompany(1);
@@ -22,7 +23,11 @@ const Users: React.FC = () => {
   return (
     <div className="page-content" style={{ overflowX: 'clip' }}>
       <Container fluid style={{ overflowX: 'clip' }}>
-        <Header loading={loading} onRefresh={fetchUsersByCompany} />
+        <Header
+          loading={loading}
+          onRefresh={fetchUsersByCompany}
+          onRegisterUser={registerUser}
+        />
 
         <AzFilterSummary
           data={users}

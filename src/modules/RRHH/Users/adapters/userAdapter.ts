@@ -40,3 +40,36 @@ export const adaptUserResponseToUserModel = (apiUser: any): UserModel => {
 export const adaptUsersArrayToUserModels = (apiUsers: any): UserModel[] => {
   return apiUsers.map(adaptUserResponseToUserModel);
 };
+
+/**
+ * Adapta los datos del formulario de registro al modelo UserModel
+ * Combina datos del FormData y respuesta de la API
+ */
+export const adaptRegisterResponseToUserModel = (
+  formData: FormData,
+  apiData: any
+): UserModel => {
+  return {
+    id: apiData?.id || Date.now(),
+    fullName: `${formData.get('name')} ${formData.get('lastName')}`.trim(),
+    name: formData.get('name') as string,
+    lastName: formData.get('lastName') as string,
+    email: formData.get('email') as string,
+    phone: formData.get('phone') as string,
+    avatar: apiData?.avatar || null,
+    workStation: apiData?.workStation
+      ? adaptWorkStation(apiData.workStation)
+      : apiData?.work_station
+        ? adaptWorkStation(apiData.work_station)
+        : {
+            id: 0,
+            name: 'Sin asignar',
+            level: 0,
+            dependencyId: 0
+          },
+    roleIds: apiData?.roleIds || apiData?.role_ids || [],
+    roles: apiData?.roles || [],
+    permissionIds: apiData?.permissionIds || apiData?.permission_ids || [],
+    permissions: apiData?.permissions || [],
+  };
+};

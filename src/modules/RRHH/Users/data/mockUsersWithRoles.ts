@@ -1,6 +1,6 @@
 import { UserModel } from '../models/UserModel';
-import { MOCK_ROLES } from '../../Roles/data/mockRoles';
-import { MOCK_PERMISSIONS } from '../../Roles/data/mockPermissions';
+import { MOCK_ROLES } from '@/modules/Security/Roles/data/mockRoles';
+import { MOCK_PERMISSIONS } from '@/modules/Security/Roles/data/mockPermissions';
 
 /**
  * Datos mockeados de usuarios con roles y permisos asignados

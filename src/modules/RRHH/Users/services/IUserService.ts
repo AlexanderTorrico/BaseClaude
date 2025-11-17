@@ -14,4 +14,13 @@ export interface IUserService {
    * @returns {status: 4xx/5xx, message: string, data: []} en error
    */
   getUsersByCompany( companyId: number, setLoading?: SetStateFn): Promise<ApiResponse<UserModel[]>>;
+
+  /**
+   * Registra un nuevo usuario
+   * @param formData - FormData con los campos del usuario (incluye avatar)
+   * @param setLoading - Opcional callback para estado de carga
+   * @returns {status: 200, message: 'Success', data: UserModel} en éxito
+   * @returns {status: 4xx/5xx, message: string, data: null} en error
+   */
+  registerUser(formData: FormData, setLoading?: SetStateFn): Promise<ApiResponse<UserModel>>;
 }

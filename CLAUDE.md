@@ -124,6 +124,58 @@ UI Component ← Hook (Sync) ← Redux Store (useSelector)
 - Hooks handle async logic and dispatch to slices
 - NO loading/error in slices - handled at component level
 
+### Service Layer Guidelines
+
+**REGLA IMPORTANTE: Los servicios (ApiService y MockService) deben ser lo más simples posible.**
+
+**Principios:**
+- ✅ **Servicios**: Solo reciben datos preparados (ej: FormData, IDs, objetos simples) y hacen la llamada HTTP
+- ✅ **Hooks**: Manejan la lógica compleja (crear FormData, transformaciones, validaciones previas)
+- ✅ **Adapters**: Transforman datos de API (snake_case) a modelos UI (camelCase)
+- ✅ **transformApiData**: Usar helper para transformar la respuesta en el servicio
+- ❌ **NO crear FormData dentro del servicio** - esto debe hacerse en el hook
+- ❌ **NO agregar lógica de negocio en servicios** - mantenerlos como puente HTTP simple
+
+**Patrón estándar para servicios:**
+
+```typescript
+// ✅ 1. Hook maneja la complejidad (crear FormData, validaciones)
+const registerUser = async (dto: RegisterUserDto) => {
+  const formData = new FormData();
+  formData.append('name', dto.name);
+  formData.append('email', dto.email);
+  if (dto.avatar) formData.append('avatar', dto.avatar);
+
+  const result = await service.registerUser(formData, setLoading);
+  if (result.data) store.dispatch(addUser(result.data));
+};
+
+// ✅ 2. Servicio usa transformApiData + adapter
+async registerUser(formData: FormData, setLoading?: SetStateFn): Promise<ApiResponse<UserModel>> {
+  const res = await httpRequestWithAuth.postFormData<ApiResponse<any>>('/users', formData, setLoading);
+  return transformApiData(res, (data) => adaptRegisterResponseToUserModel(formData, data));
+}
+
+// ✅ 3. Adapter centraliza la transformación
+export const adaptRegisterResponseToUserModel = (formData: FormData, apiData: any): UserModel => {
+  return {
+    id: apiData?.id || Date.now(),
+    name: formData.get('name') as string,
+    email: formData.get('email') as string,
+    avatar: apiData?.avatar || null,
+    // ... resto de campos
+  };
+};
+```
+
+**Beneficios:**
+- **Servicios ultraligeros**: Solo 2 líneas (llamada HTTP + transformApiData)
+- **Adapters reutilizables**: La lógica de transformación está centralizada
+- **Type-safe**: transformApiData maneja los tipos correctamente
+- **Fácil testing**: Cada capa se puede testear independientemente
+
+**Razón**: Mantener los servicios simples facilita el testing, reutilización y mantenimiento. La lógica compleja pertenece a los hooks que orquestan el flujo.
+
 ### Authentication
 - Uses fake backend authentication by default (`fakeBackend()` in App.jsx)
 - Firebase authentication is available but commented out

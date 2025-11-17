@@ -78,3 +78,15 @@ export async function del(url, config = {}) {
     .delete(url, { ...config })
     .then((response) => response.data);
 }
+
+export async function postFormData(url, formData, config = {}) {
+  return axiosApi
+    .post(url, formData, {
+      ...config,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        ...config.headers,
+      },
+    })
+    .then((response) => response.data);
+}

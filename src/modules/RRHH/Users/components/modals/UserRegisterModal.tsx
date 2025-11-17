@@ -1,0 +1,336 @@
+import React, { useState } from 'react';
+import { Modal, ModalHeader, ModalBody, Button, Form, FormGroup, Label, Input, FormFeedback, Spinner, Alert, Row, Col } from 'reactstrap';
+import { Formik, FormikHelpers } from 'formik';
+import * as Yup from 'yup';
+import { RegisterUserDto } from '../../models/RegisterUserDto';
+
+interface UserRegisterModalProps {
+  isOpen: boolean;
+  toggle: () => void;
+  onSuccess: () => void;
+  onRegister: (dto: RegisterUserDto) => Promise<{ success: boolean; message: string }>;
+  companyId?: string;
+}
+
+const validationSchema = Yup.object().shape({
+  name: Yup.string()
+    .required('El nombre es obligatorio')
+    .min(2, 'El nombre debe tener al menos 2 caracteres'),
+  lastName: Yup.string()
+    .required('El apellido es obligatorio')
+    .min(2, 'El apellido debe tener al menos 2 caracteres'),
+  email: Yup.string()
+    .email('Email inválido')
+    .required('El email es obligatorio'),
+  phone: Yup.string()
+    .required('El teléfono es obligatorio')
+    .min(6, 'El teléfono debe tener al menos 6 caracteres'),
+  password: Yup.string()
+    .required('La contraseña es obligatoria')
+    .min(8, 'La contraseña debe tener al menos 8 caracteres'),
+  repeatPassword: Yup.string()
+    .required('Debe confirmar la contraseña')
+    .oneOf([Yup.ref('password')], 'Las contraseñas no coinciden'),
+  avatar: Yup.mixed().nullable(),
+});
+
+const getInitialValues = (companyId: string): RegisterUserDto => ({
+  name: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  password: '',
+  repeatPassword: '',
+  gbl_company_id: companyId,
+  avatar: null,
+});
+
+const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
+  isOpen,
+  toggle,
+  onSuccess,
+  onRegister,
+  companyId = '1',
+}) => {
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setServerError('El avatar debe ser menor a 5MB');
+        return;
+      }
+
+      setAvatarFile(file);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setAvatarFile(null);
+      setAvatarPreview(null);
+    }
+  };
+
+  const handleSubmit = async (
+    values: RegisterUserDto,
+    { setSubmitting, resetForm }: FormikHelpers<RegisterUserDto>
+  ) => {
+    setServerError(null);
+
+    const dto: RegisterUserDto = {
+      ...values,
+      avatar: avatarFile,
+    };
+
+    const result = await onRegister(dto);
+
+    if (result.success) {
+      resetForm();
+      setAvatarPreview(null);
+      setAvatarFile(null);
+      onSuccess();
+      toggle();
+    } else {
+      setServerError(result.message);
+    }
+
+    setSubmitting(false);
+  };
+
+  return (
+    <Modal isOpen={isOpen} toggle={toggle} size="lg">
+      <ModalHeader toggle={toggle}>
+        <i className="mdi mdi-account-plus text-primary me-2"></i>
+        Registrar Nuevo Usuario
+      </ModalHeader>
+      <ModalBody>
+        <Formik
+          initialValues={getInitialValues(companyId)}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting, setFieldValue }) => (
+            <Form onSubmit={handleSubmit}>
+              {serverError && (
+                <Alert color="danger" className="mb-3">
+                  <i className="mdi mdi-alert-circle me-2"></i>
+                  {serverError}
+                </Alert>
+              )}
+
+              {/* Avatar + Nombre/Apellido Section */}
+              <Row className="mb-3">
+                {/* Avatar a la izquierda */}
+                <Col md={3} className="d-flex flex-column align-items-center justify-content-start">
+                  <div className="position-relative">
+                    {avatarPreview ? (
+                      <img
+                        src={avatarPreview}
+                        alt="Avatar"
+                        className="rounded-circle shadow-sm"
+                        style={{ width: '120px', height: '120px', objectFit: 'cover', border: '3px solid #f8f9fa' }}
+                      />
+                    ) : (
+                      <div
+                        className="rounded-circle bg-light d-flex align-items-center justify-content-center shadow-sm"
+                        style={{ width: '120px', height: '120px', border: '3px solid #f8f9fa' }}
+                      >
+                        <i className="mdi mdi-camera text-muted" style={{ fontSize: '48px' }}></i>
+                      </div>
+                    )}
+                    <Label
+                      for="avatar"
+                      className="position-absolute bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        bottom: '0',
+                        right: '0',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                      }}
+                      title="Seleccionar avatar"
+                    >
+                      <i className="mdi mdi-pencil"></i>
+                    </Label>
+                    <Input
+                      id="avatar"
+                      name="avatar"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarChange}
+                      disabled={isSubmitting}
+                      className="d-none"
+                    />
+                  </div>
+                  <div className="mt-2 text-center">
+                    <small className="text-muted">JPG, PNG o GIF<br />(max 5MB)</small>
+                  </div>
+                </Col>
+
+                {/* Nombre y Apellido a la derecha (en columnas) */}
+                <Col md={9}>
+                  {/* Nombre */}
+                  <FormGroup>
+                    <Label for="name">Nombre <span className="text-danger">*</span></Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      type="text"
+                      placeholder="Ingrese el nombre"
+                      value={values.name}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      invalid={touched.name && !!errors.name}
+                      disabled={isSubmitting}
+                    />
+                    {touched.name && errors.name && (
+                      <FormFeedback>{errors.name}</FormFeedback>
+                    )}
+                  </FormGroup>
+
+                  {/* Apellido */}
+                  <FormGroup>
+                    <Label for="lastName">Apellido <span className="text-danger">*</span></Label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      type="text"
+                      placeholder="Ingrese el apellido"
+                      value={values.lastName}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      invalid={touched.lastName && !!errors.lastName}
+                      disabled={isSubmitting}
+                    />
+                    {touched.lastName && errors.lastName && (
+                      <FormFeedback>{errors.lastName}</FormFeedback>
+                    )}
+                  </FormGroup>
+                </Col>
+              </Row>
+
+              <Row>
+                {/* Email */}
+                <Col md={6}>
+                  <FormGroup>
+                    <Label for="email">Email <span className="text-danger">*</span></Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="correo@ejemplo.com"
+                      value={values.email}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      invalid={touched.email && !!errors.email}
+                      disabled={isSubmitting}
+                    />
+                    {touched.email && errors.email && (
+                      <FormFeedback>{errors.email}</FormFeedback>
+                    )}
+                  </FormGroup>
+                </Col>
+
+                {/* Teléfono */}
+                <Col md={6}>
+                  <FormGroup>
+                    <Label for="phone">Teléfono <span className="text-danger">*</span></Label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      type="text"
+                      placeholder="+591 777-12345"
+                      value={values.phone}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      invalid={touched.phone && !!errors.phone}
+                      disabled={isSubmitting}
+                    />
+                    {touched.phone && errors.phone && (
+                      <FormFeedback>{errors.phone}</FormFeedback>
+                    )}
+                  </FormGroup>
+                </Col>
+              </Row>
+
+              <Row>
+                {/* Contraseña */}
+                <Col md={6}>
+                  <FormGroup>
+                    <Label for="password">Contraseña <span className="text-danger">*</span></Label>
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      placeholder="Mínimo 8 caracteres"
+                      value={values.password}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      invalid={touched.password && !!errors.password}
+                      disabled={isSubmitting}
+                    />
+                    {touched.password && errors.password && (
+                      <FormFeedback>{errors.password}</FormFeedback>
+                    )}
+                  </FormGroup>
+                </Col>
+
+                {/* Confirmar Contraseña */}
+                <Col md={6}>
+                  <FormGroup>
+                    <Label for="repeatPassword">Confirmar Contraseña <span className="text-danger">*</span></Label>
+                    <Input
+                      id="repeatPassword"
+                      name="repeatPassword"
+                      type="password"
+                      placeholder="Repita la contraseña"
+                      value={values.repeatPassword}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      invalid={touched.repeatPassword && !!errors.repeatPassword}
+                      disabled={isSubmitting}
+                    />
+                    {touched.repeatPassword && errors.repeatPassword && (
+                      <FormFeedback>{errors.repeatPassword}</FormFeedback>
+                    )}
+                  </FormGroup>
+                </Col>
+              </Row>
+
+              {/* Buttons */}
+              <div className="d-flex gap-2 justify-content-end mt-4 pt-3 border-top">
+                <Button color="light" onClick={toggle} disabled={isSubmitting}>
+                  <i className="mdi mdi-close me-1"></i>
+                  Cancelar
+                </Button>
+                <Button color="primary" type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Spinner size="sm" className="me-2" />
+                      Registrando...
+                    </>
+                  ) : (
+                    <>
+                      <i className="mdi mdi-check me-1"></i>
+                      Registrar Usuario
+                    </>
+                  )}
+                </Button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </ModalBody>
+    </Modal>
+  );
+};
+
+export default UserRegisterModal;

@@ -9,17 +9,32 @@ export interface HttpConfig {
 }
 
 export const createApiInstance = (config?: HttpConfig): AxiosInstance => {
-  const baseURL = config?.baseURL ||
-                 import.meta.env.VITE_APP_API_URL ||
-                 import.meta.env.VITE_API_BASE_URL;
+  const baseURL = config?.baseURL || import.meta.env.VITE_API_BASE_URL;
 
-  return axios.create({
+  const instance = axios.create({
     baseURL,
     timeout: config?.timeout || 10000,
     headers: {
       'Content-Type': 'application/json',
     },
   });
+
+  // Interceptor para manejar FormData correctamente
+  instance.interceptors.request.use((config) => {
+    if (config.data instanceof FormData) {
+      // Eliminar Content-Type para que axios genere automáticamente multipart/form-data con boundary
+      if (config.headers) {
+        delete config.headers['Content-Type'];
+        delete config.headers['content-type'];
+        config.headers['Content-Type'] = undefined;
+      }
+    }
+    return config;
+  }, (error) => {
+    return Promise.reject(error);
+  });
+
+  return instance;
 };
 
 export const handleRequest = async <T>(
@@ -186,6 +201,25 @@ export const httpRequestWithAuth = {
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> => {
     return executeRequest<T>(defaultApiInstance, 'POST', url, data, createAuthHeaders(config), setLoading);
+  },
+
+  postFormData: async <T>(
+    url: string,
+    formData: FormData,
+    setLoading?: SetStateFn,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<T>> => {
+    const token = getAuthToken();
+
+    const formDataConfig: AxiosRequestConfig = {
+      ...config,
+      headers: {
+        ...config?.headers,
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    };
+
+    return executeRequest<T>(defaultApiInstance, 'POST', url, formData, formDataConfig, setLoading);
   },
 
   put: async <T>(

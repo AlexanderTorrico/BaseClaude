@@ -6,7 +6,7 @@ import { http, HttpResponse } from 'msw';
  */
 
 // URL base del API (ajustar según tu configuración)
-const API_BASE_URL = import.meta.env.VITE_APP_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 // Mock data de usuarios
 const mockApiUsers = [

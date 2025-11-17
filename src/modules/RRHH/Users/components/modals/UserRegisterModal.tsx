@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, ModalHeader, ModalBody, Button, Form, FormGroup, Label, Input, FormFeedback, Spinner, Alert, Row, Col } from 'reactstrap';
 import { Formik, FormikHelpers } from 'formik';
 import { RegisterUserDto } from '../../models/RegisterUserDto';
-import { userRegistrationSchema } from '../../validations/userValidationSchema';
+import { UpdateUserDto } from '../../models/UpdateUserDto';
+import { UserModel } from '../../models/UserModel';
+import { userRegistrationSchema, userEditSchema } from '../../validations/userValidationSchema';
 import { validateAvatar } from '../../validations/userValidationHelpers';
 
 interface UserRegisterModalProps {
@@ -10,31 +12,66 @@ interface UserRegisterModalProps {
   toggle: () => void;
   onSuccess: () => void;
   onRegister: (dto: RegisterUserDto) => Promise<{ success: boolean; message: string }>;
+  onUpdate?: (dto: UpdateUserDto) => Promise<{ success: boolean; message: string }>;
+  userToEdit?: UserModel | null;
   companyId?: string;
 }
 
+type FormValues = RegisterUserDto | UpdateUserDto;
 
-const getInitialValues = (companyId: string): RegisterUserDto => ({
-  name: '',
-  lastName: '',
-  email: '',
-  phone: '',
-  password: '',
-  repeatPassword: '',
-  gbl_company_id: companyId,
-  avatar: null,
-});
+const getInitialValues = (companyId: string, userToEdit?: UserModel | null): FormValues => {
+  if (userToEdit) {
+    // Modo edición: pre-cargar datos del usuario, contraseñas vacías
+    return {
+      id: userToEdit.id,
+      name: userToEdit.name,
+      lastName: userToEdit.lastName,
+      email: userToEdit.email,
+      phone: userToEdit.phone || '',
+      password: '',
+      repeatPassword: '',
+      gbl_company_id: companyId,
+      avatar: null,
+    };
+  }
+
+  // Modo creación: valores vacíos
+  return {
+    name: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: '',
+    repeatPassword: '',
+    gbl_company_id: companyId,
+    avatar: null,
+  };
+};
 
 const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
   isOpen,
   toggle,
   onSuccess,
   onRegister,
+  onUpdate,
+  userToEdit,
   companyId = '1',
 }) => {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+
+  const isEditMode = !!userToEdit;
+  const validationSchema = isEditMode ? userEditSchema : userRegistrationSchema;
+
+  // Pre-cargar avatar si existe en modo edición
+  useEffect(() => {
+    if (isEditMode && userToEdit?.avatar) {
+      setAvatarPreview(userToEdit.avatar);
+    } else {
+      setAvatarPreview(null);
+    }
+  }, [isEditMode, userToEdit]);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
@@ -65,17 +102,40 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
   };
 
   const handleSubmit = async (
-    values: RegisterUserDto,
-    { setSubmitting, resetForm }: FormikHelpers<RegisterUserDto>
+    values: FormValues,
+    { setSubmitting, resetForm }: FormikHelpers<FormValues>
   ) => {
     setServerError(null);
 
-    const dto: RegisterUserDto = {
-      ...values,
-      avatar: avatarFile,
-    };
+    let result: { success: boolean; message: string };
 
-    const result = await onRegister(dto);
+    if (isEditMode && onUpdate) {
+      // Modo edición: llamar onUpdate
+      const updateDto: UpdateUserDto = {
+        id: (values as UpdateUserDto).id,
+        name: values.name,
+        lastName: values.lastName,
+        email: values.email,
+        phone: values.phone,
+        gbl_company_id: values.gbl_company_id,
+        avatar: avatarFile,
+        // Solo incluir password si se ingresó (opcional en edición)
+        ...(values.password && {
+          password: values.password,
+          repeatPassword: values.repeatPassword,
+        }),
+      };
+
+      result = await onUpdate(updateDto);
+    } else {
+      // Modo creación: llamar onRegister
+      const registerDto: RegisterUserDto = {
+        ...values,
+        avatar: avatarFile,
+      };
+
+      result = await onRegister(registerDto);
+    }
 
     if (result.success) {
       resetForm();
@@ -93,14 +153,15 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
   return (
     <Modal isOpen={isOpen} toggle={toggle} size="lg">
       <ModalHeader toggle={toggle}>
-        <i className="mdi mdi-account-plus text-primary me-2"></i>
-        Registrar Nuevo Usuario
+        <i className={`mdi ${isEditMode ? 'mdi-account-edit' : 'mdi-account-plus'} text-primary me-2`}></i>
+        {isEditMode ? 'Editar Usuario' : 'Registrar Nuevo Usuario'}
       </ModalHeader>
       <ModalBody>
         <Formik
-          initialValues={getInitialValues(companyId)}
-          validationSchema={userRegistrationSchema}
+          initialValues={getInitialValues(companyId, userToEdit)}
+          validationSchema={validationSchema}
           onSubmit={handleSubmit}
+          enableReinitialize
         >
           {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
             <Form onSubmit={handleSubmit}>
@@ -251,12 +312,15 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
                 {/* Contraseña */}
                 <Col md={6}>
                   <FormGroup>
-                    <Label for="password">Contraseña <span className="text-danger">*</span></Label>
+                    <Label for="password">
+                      Contraseña {!isEditMode && <span className="text-danger">*</span>}
+                      {isEditMode && <span className="text-muted">(dejar vacío para no cambiar)</span>}
+                    </Label>
                     <Input
                       id="password"
                       name="password"
                       type="password"
-                      placeholder="Mínimo 8 caracteres"
+                      placeholder={isEditMode ? "Dejar vacío para mantener la actual" : "Mínimo 8 caracteres"}
                       value={values.password}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -272,12 +336,14 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
                 {/* Confirmar Contraseña */}
                 <Col md={6}>
                   <FormGroup>
-                    <Label for="repeatPassword">Confirmar Contraseña <span className="text-danger">*</span></Label>
+                    <Label for="repeatPassword">
+                      Confirmar Contraseña {!isEditMode && <span className="text-danger">*</span>}
+                    </Label>
                     <Input
                       id="repeatPassword"
                       name="repeatPassword"
                       type="password"
-                      placeholder="Repita la contraseña"
+                      placeholder={isEditMode ? "Confirmar nueva contraseña" : "Repita la contraseña"}
                       value={values.repeatPassword}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -301,12 +367,12 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
                   {isSubmitting ? (
                     <>
                       <Spinner size="sm" className="me-2" />
-                      Registrando...
+                      {isEditMode ? 'Guardando...' : 'Registrando...'}
                     </>
                   ) : (
                     <>
                       <i className="mdi mdi-check me-1"></i>
-                      Registrar Usuario
+                      {isEditMode ? 'Guardar Cambios' : 'Registrar Usuario'}
                     </>
                   )}
                 </Button>

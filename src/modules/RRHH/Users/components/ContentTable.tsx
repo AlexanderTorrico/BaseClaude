@@ -13,6 +13,7 @@ interface ContentTableProps {
   onSortChange?: (config: { field: string; direction: string }) => void;
   loading: boolean;
   onRefresh: (companyId: number) => Promise<void>;
+  onEdit: (userId: number) => void;
 }
 
 const ContentTable: React.FC<ContentTableProps> = ({
@@ -23,6 +24,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
   onSortChange,
   loading,
   onRefresh,
+  onEdit,
 }) => {
   const [isRolesPermissionsModalOpen, setIsRolesPermissionsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
@@ -39,10 +41,6 @@ const ContentTable: React.FC<ContentTableProps> = ({
     setIsRolesPermissionsModalOpen(false);
     setSelectedUser(null);
     onRefresh(1);
-  };
-
-  const handleEditUser = (userId: number) => {
-    console.log('Editar usuario:', userId);
   };
 
   const handleDeleteUser = (userId: number) => {
@@ -99,7 +97,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
                 outline
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
-                  handleEditUser(rowData.id);
+                  onEdit(rowData.id);
                 }}
                 title="Editar usuario"
               >

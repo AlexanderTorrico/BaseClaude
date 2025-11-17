@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import { useUsers } from './hooks/useUsers';
 import { useUsersFetch } from './hooks/useUsersFetch';
@@ -8,17 +8,26 @@ import Header from './components/Header';
 import ContentTable from './components/ContentTable';
 import ContentCards from './components/ContentCards';
 import { UserApiService } from './services/UserApiService';
+import { UserModel } from './models/UserModel';
 //import { UserMockService } from './services/UserMockService';
 
 const userService = new UserApiService();
 
 const Users: React.FC = () => {
   const { currentView, users } = useUsers();
-  const { loading, fetchUsersByCompany, registerUser } = useUsersFetch(userService);
+  const { loading, fetchUsersByCompany, registerUser, updateUserData } = useUsersFetch(userService);
+  const [userToEdit, setUserToEdit] = useState<UserModel | null>(null);
 
   useEffect(() => {
     fetchUsersByCompany(1);
   }, []);
+
+  const handleEditUser = (userId: number) => {
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      setUserToEdit(user);
+    }
+  };
 
   return (
     <div className="page-content" style={{ overflowX: 'clip' }}>
@@ -27,6 +36,9 @@ const Users: React.FC = () => {
           loading={loading}
           onRefresh={fetchUsersByCompany}
           onRegisterUser={registerUser}
+          onUpdateUser={updateUserData}
+          userToEdit={userToEdit}
+          onCloseEditModal={() => setUserToEdit(null)}
         />
 
         <AzFilterSummary
@@ -49,6 +61,7 @@ const Users: React.FC = () => {
                       onSortChange={onSortChange}
                       loading={loading}
                       onRefresh={fetchUsersByCompany}
+                      onEdit={handleEditUser}
                     />
                   </Col>
                 </Row>
@@ -58,6 +71,7 @@ const Users: React.FC = () => {
                 <ContentCards
                   filteredUsers={filteredData}
                   onRefresh={fetchUsersByCompany}
+                  onEdit={handleEditUser}
                 />
               )}
             </>

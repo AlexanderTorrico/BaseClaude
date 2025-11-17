@@ -23,4 +23,14 @@ export interface IUserService {
    * @returns {status: 4xx/5xx, message: string, data: null} en error
    */
   registerUser(formData: FormData, setLoading?: SetStateFn): Promise<ApiResponse<UserModel>>;
+
+  /**
+   * Actualiza un usuario existente
+   * @param formData - FormData con los campos del usuario (incluye id y avatar)
+   * La contraseña solo se incluye si el usuario desea cambiarla
+   * @param setLoading - Opcional callback para estado de carga
+   * @returns {status: 200, message: 'Success', data: UserModel} en éxito
+   * @returns {status: 4xx/5xx, message: string, data: null} en error
+   */
+  updateUser(formData: FormData, setLoading?: SetStateFn): Promise<ApiResponse<UserModel>>;
 }

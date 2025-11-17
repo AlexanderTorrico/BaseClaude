@@ -16,4 +16,9 @@ export class UserApiService implements IUserService {
     const res = await httpRequestWithAuth.postFormData<ApiResponse<any>>('/api/rrhh/save', formData, setLoading);
     return transformApiData(res, (data) => adaptRegisterResponseToUserModel(formData, data) );
   }
+
+  async updateUser(formData: FormData, setLoading?: SetStateFn): Promise<ApiResponse<UserModel>> {
+    const res = await httpRequestWithAuth.postFormData<ApiResponse<any>>('/api/rrhh/update', formData, setLoading);
+    return transformApiData(res, (data) => adaptRegisterResponseToUserModel(formData, data) );
+  }
 }

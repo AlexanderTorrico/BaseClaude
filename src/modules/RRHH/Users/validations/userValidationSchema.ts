@@ -45,7 +45,8 @@ export const userRegistrationSchema = Yup.object().shape({
 });
 
 /**
- * Schema para edición de usuarios (sin contraseñas)
+ * Schema para edición de usuarios
+ * Las contraseñas son opcionales - solo se validan si el usuario las ingresa
  */
 export const userEditSchema = Yup.object().shape({
   name: Yup.string()
@@ -69,4 +70,24 @@ export const userEditSchema = Yup.object().shape({
     .min(UserValidationRules.phone.minLength, UserValidationRules.phone.messages.minLength)
     .max(UserValidationRules.phone.maxLength, UserValidationRules.phone.messages.maxLength)
     .matches(UserValidationRules.phone.pattern, UserValidationRules.phone.messages.pattern),
+
+  // Contraseñas opcionales en edición - solo se validan si se ingresan
+  password: Yup.string()
+    .min(UserValidationRules.password.minLength, UserValidationRules.password.messages.minLength)
+    .max(UserValidationRules.password.maxLength, UserValidationRules.password.messages.maxLength)
+    .optional(),
+
+  repeatPassword: Yup.string()
+    .oneOf([Yup.ref('password')], 'Las contraseñas deben coincidir')
+    .when('password', {
+      is: (password: string) => password && password.length > 0,
+      then: (schema) => schema.required('Debe confirmar la contraseña'),
+      otherwise: (schema) => schema.optional(),
+    }),
+
+  gbl_company_id: Yup.string()
+    .required('La compañía es requerida'),
+
+  // Avatar es opcional
+  avatar: Yup.mixed().nullable().optional(),
 });

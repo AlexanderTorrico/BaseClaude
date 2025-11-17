@@ -11,45 +11,17 @@ export const userTableColumns = [
     filterable: true,
     filterType: "text",
     cell: ({ row: { original } }: { row: { original: UserModel } }) => (
-      <div className="d-flex flex-column">
-        <div className="d-flex align-items-center">
-          <div className="me-2">
-            <UserAvatar
-              fullName={original.fullName || `${original.name} ${original.lastName}`}
-              avatar={original.avatar}
-              size="sm"
-            />
-          </div>
+      <div className="d-flex align-items-center gap-3">
+        <UserAvatar
+          fullName={original.fullName || `${original.name} ${original.lastName}`}
+          avatar={original.avatar}
+          size="sm"
+        />
+        <div className="d-flex flex-column">
           <span className="fw-medium">{original.fullName || `${original.name} ${original.lastName}`}</span>
+          <small className="text-muted">{original.email}</small>
         </div>
-        <small className="text-muted">{original.email}</small>
       </div>
-    )
-  },
-  {
-    key: "name",
-    header: "Nombre",
-    sortable: true,
-    filterable: true,
-    filterType: "text",
-    cell: ({ row: { original } }: { row: { original: UserModel } }) => original.name
-  },
-  {
-    key: "lastName",
-    header: "Apellido",
-    sortable: true,
-    filterable: true,
-    filterType: "text",
-    cell: ({ row: { original } }: { row: { original: UserModel } }) => original.lastName
-  },
-  {
-    key: "email",
-    header: "Correo Electrónico",
-    sortable: true,
-    filterable: true,
-    filterType: "text",
-    cell: ({ row: { original } }: { row: { original: UserModel } }) => (
-      <span className="text-muted">{original.email}</span>
     )
   },
   {

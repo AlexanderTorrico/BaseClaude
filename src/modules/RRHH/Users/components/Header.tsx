@@ -7,14 +7,26 @@ import UserRegisterModal from './modals/UserRegisterModal';
 import { useUsers } from '../hooks/useUsers';
 import { setCurrentView } from '../slices/userSlice';
 import { RegisterUserDto } from '../models/RegisterUserDto';
+import { UpdateUserDto } from '../models/UpdateUserDto';
+import { UserModel } from '../models/UserModel';
 
 interface HeaderProps {
   loading: boolean;
   onRefresh: (companyId: number) => Promise<void>;
   onRegisterUser: (dto: RegisterUserDto) => Promise<{ success: boolean; message: string }>;
+  onUpdateUser: (dto: UpdateUserDto) => Promise<{ success: boolean; message: string }>;
+  userToEdit: UserModel | null;
+  onCloseEditModal: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ loading, onRefresh, onRegisterUser }) => {
+const Header: React.FC<HeaderProps> = ({
+  loading,
+  onRefresh,
+  onRegisterUser,
+  onUpdateUser,
+  userToEdit,
+  onCloseEditModal
+}) => {
   const dispatch = useDispatch();
   const { getTotalUsers, currentView } = useUsers();
 
@@ -47,16 +59,31 @@ const Header: React.FC<HeaderProps> = ({ loading, onRefresh, onRegisterUser }) =
     return () => window.removeEventListener('resize', handleResize);
   }, [dispatch, isManualOverride]);
 
+  // Abrir modal cuando se selecciona un usuario para editar
+  useEffect(() => {
+    if (userToEdit) {
+      setIsModalOpen(true);
+    }
+  }, [userToEdit]);
+
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
+    if (isModalOpen && userToEdit) {
+      onCloseEditModal();
+    }
   };
 
   const handleCreateUser = () => {
     setIsModalOpen(true);
   };
 
-  const handleRegisterSuccess = () => {
-    toast.success('Usuario registrado exitosamente');
+  const handleSuccess = () => {
+    if (userToEdit) {
+      toast.success('Usuario actualizado exitosamente');
+    } else {
+      toast.success('Usuario registrado exitosamente');
+    }
+    onCloseEditModal();
   };
 
   const handleRefresh = async () => {
@@ -116,8 +143,10 @@ const Header: React.FC<HeaderProps> = ({ loading, onRefresh, onRegisterUser }) =
       <UserRegisterModal
         isOpen={isModalOpen}
         toggle={toggleModal}
-        onSuccess={handleRegisterSuccess}
+        onSuccess={handleSuccess}
         onRegister={onRegisterUser}
+        onUpdate={onUpdateUser}
+        userToEdit={userToEdit}
         companyId="1"
       />
     </>

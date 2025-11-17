@@ -154,9 +154,10 @@ const UserCard: React.FC<{
 interface ContentCardsProps {
   filteredUsers: UserModel[];
   onRefresh: (companyId: number) => Promise<void>;
+  onEdit: (userId: number) => void;
 }
 
-const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, onRefresh }) => {
+const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, onRefresh, onEdit }) => {
   const [isRolesPermissionsModalOpen, setIsRolesPermissionsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
 
@@ -174,10 +175,6 @@ const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, onRefresh })
     onRefresh(1);
   };
 
-  const handleEditUser = (userId: number) => {
-    console.log('Editar usuario:', userId);
-  };
-
   return (
     <>
       {/* Grid de Cards */}
@@ -186,7 +183,7 @@ const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, onRefresh })
           <Col key={user.id} xs={12} sm={6} lg={4} xl={3} className="mb-4">
             <UserCard
               user={user}
-              onEdit={handleEditUser}
+              onEdit={onEdit}
               onManageRolesPermissions={handleManageRolesPermissions}
             />
           </Col>

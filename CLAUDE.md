@@ -86,6 +86,7 @@ src/modules/[Area]/[Module]/
 ├── slices/             # Redux state slices
 ├── config/             # Configuration files (tableColumns)
 ├── data/               # Mock data for development (used by MockService)
+├── validations/        # Validation rules, schemas, and helpers
 └── __tests__/          # Tests (fixtures, unit, integration)
 ```
 
@@ -175,6 +176,106 @@ export const adaptRegisterResponseToUserModel = (formData: FormData, apiData: an
 - **Fácil testing**: Cada capa se puede testear independientemente
 
 **Razón**: Mantener los servicios simples facilita el testing, reutilización y mantenimiento. La lógica compleja pertenece a los hooks que orquestan el flujo.
+
+### Validation Layer
+
+**REGLA IMPORTANTE: Las validaciones deben estar centralizadas en la carpeta `validations/` dentro de cada módulo.**
+
+**Estructura:**
+```
+src/modules/[Module]/
+└── validations/
+    ├── [module]ValidationRules.ts    # Reglas reutilizables (constantes)
+    ├── [module]ValidationSchema.ts   # Schemas de Yup (para Formik)
+    └── [module]ValidationHelpers.ts  # Helpers para inputs independientes
+```
+
+**Principios:**
+- ✅ **ValidationRules**: Constantes con reglas, patrones y mensajes reutilizables
+- ✅ **ValidationSchema**: Schemas de Yup que usan las rules (para formularios completos con Formik)
+- ✅ **ValidationHelpers**: Funciones helper que retornan `{ valid: boolean, error?: string }` (para inputs individuales)
+- ✅ **UI Components**: Solo importan y usan los schemas/helpers, NO definen validaciones inline
+- ✅ **Testing**: Validaciones testeables independientemente del UI
+- ❌ **NO definir validaciones inline** en componentes
+- ❌ **NO duplicar reglas** entre componentes
+
+**Ejemplo completo:**
+```typescript
+// ✅ validations/userValidationRules.ts
+export const UserValidationRules = {
+  avatar: {
+    maxSize: 5 * 1024 * 1024,
+    acceptedFormats: ['image/jpeg', 'image/png', 'image/gif'],
+    messages: {
+      maxSize: 'El avatar debe ser menor a 5MB',
+      invalidFormat: 'El avatar debe ser JPG, PNG o GIF'
+    }
+  },
+  name: {
+    minLength: 2,
+    maxLength: 50,
+    pattern: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+    messages: {
+      required: 'El nombre es requerido',
+      minLength: 'El nombre debe tener al menos 2 caracteres'
+    }
+  }
+};
+
+// ✅ validations/userValidationSchema.ts
+import * as Yup from 'yup';
+import { UserValidationRules } from './userValidationRules';
+
+export const userRegistrationSchema = Yup.object().shape({
+  name: Yup.string()
+    .required(UserValidationRules.name.messages.required)
+    .min(UserValidationRules.name.minLength, UserValidationRules.name.messages.minLength),
+  // ...
+});
+
+// ✅ validations/userValidationHelpers.ts
+import { UserValidationRules } from './userValidationRules';
+
+export const validateAvatar = (file: File | null): { valid: boolean; error?: string } => {
+  if (!file) return { valid: true };
+
+  if (file.size > UserValidationRules.avatar.maxSize) {
+    return { valid: false, error: UserValidationRules.avatar.messages.maxSize };
+  }
+
+  if (!UserValidationRules.avatar.acceptedFormats.includes(file.type)) {
+    return { valid: false, error: UserValidationRules.avatar.messages.invalidFormat };
+  }
+
+  return { valid: true };
+};
+
+// ✅ components/modals/UserRegisterModal.tsx
+import { userRegistrationSchema } from '../../validations/userValidationSchema';
+import { validateAvatar } from '../../validations/userValidationHelpers';
+
+// Uso con Formik (formulario completo)
+<Formik validationSchema={userRegistrationSchema} ... />
+
+// Uso con input independiente
+const handleAvatarChange = (event) => {
+  const file = event.target.files?.[0] || null;
+  const validation = validateAvatar(file);
+
+  if (!validation.valid) {
+    setError(validation.error);
+    return;
+  }
+  // Procesar archivo...
+};
+```
+
+**Beneficios:**
+- **Desacoplamiento total**: UI no conoce las reglas, solo usa schemas/helpers
+- **Reutilización máxima**: Mismas reglas en formularios Formik, inputs individuales, y tests
+- **Testing independiente**: Las validaciones se pueden testear sin UI
+- **Cambios centralizados**: Modificar una regla afecta todo automáticamente
+- **Consistencia garantizada**: Imposible tener reglas diferentes en distintos componentes
 
 ### Authentication
 - Uses fake backend authentication by default (`fakeBackend()` in App.jsx)

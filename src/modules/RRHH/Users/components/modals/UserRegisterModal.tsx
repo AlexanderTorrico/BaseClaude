@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Modal, ModalHeader, ModalBody, Button, Form, FormGroup, Label, Input, FormFeedback, Spinner, Alert, Row, Col } from 'reactstrap';
 import { Formik, FormikHelpers } from 'formik';
-import * as Yup from 'yup';
 import { RegisterUserDto } from '../../models/RegisterUserDto';
+import { userRegistrationSchema } from '../../validations/userValidationSchema';
+import { validateAvatar } from '../../validations/userValidationHelpers';
 
 interface UserRegisterModalProps {
   isOpen: boolean;
@@ -12,27 +13,6 @@ interface UserRegisterModalProps {
   companyId?: string;
 }
 
-const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .required('El nombre es obligatorio')
-    .min(2, 'El nombre debe tener al menos 2 caracteres'),
-  lastName: Yup.string()
-    .required('El apellido es obligatorio')
-    .min(2, 'El apellido debe tener al menos 2 caracteres'),
-  email: Yup.string()
-    .email('Email inválido')
-    .required('El email es obligatorio'),
-  phone: Yup.string()
-    .required('El teléfono es obligatorio')
-    .min(6, 'El teléfono debe tener al menos 6 caracteres'),
-  password: Yup.string()
-    .required('La contraseña es obligatoria')
-    .min(8, 'La contraseña debe tener al menos 8 caracteres'),
-  repeatPassword: Yup.string()
-    .required('Debe confirmar la contraseña')
-    .oneOf([Yup.ref('password')], 'Las contraseñas no coinciden'),
-  avatar: Yup.mixed().nullable(),
-});
 
 const getInitialValues = (companyId: string): RegisterUserDto => ({
   name: '',
@@ -57,21 +37,27 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const file = event.target.files?.[0] || null;
 
+    // Validar usando el helper centralizado
+    const validation = validateAvatar(file);
+
+    if (!validation.valid) {
+      setServerError(validation.error || 'Error al validar el avatar');
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      return;
+    }
+
+    // Si pasa la validación, procesar el archivo
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setServerError('El avatar debe ser menor a 5MB');
-        return;
-      }
-
       setAvatarFile(file);
-
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatarPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+      setServerError(null);
     } else {
       setAvatarFile(null);
       setAvatarPreview(null);
@@ -113,10 +99,10 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
       <ModalBody>
         <Formik
           initialValues={getInitialValues(companyId)}
-          validationSchema={validationSchema}
+          validationSchema={userRegistrationSchema}
           onSubmit={handleSubmit}
         >
-          {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting, setFieldValue }) => (
+          {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
             <Form onSubmit={handleSubmit}>
               {serverError && (
                 <Alert color="danger" className="mb-3">

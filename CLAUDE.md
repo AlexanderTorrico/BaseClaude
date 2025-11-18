@@ -1277,6 +1277,7 @@ export const userTableColumns = [
 8. **Service Pattern**: Interface + MockService (ApiService created later)
 9. **Adapters**: Always convert snake_case (API) → camelCase (UI)
 10. **Code Readability**: Keep it simple - complex logic is in shared components
+11. **NO Documentation in Code**: Hooks y Services NO necesitan comentarios de documentación - el código es autoexplicativo y debe ser intuitivo por sí mismo
 
 The codebase follows React functional component patterns with hooks and uses modern TypeScript/ES6+ features throughout.
 

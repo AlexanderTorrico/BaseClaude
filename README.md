@@ -26,11 +26,9 @@ npm run test:coverage
 
 ## 📚 Documentation
 
-- **[PROJECT_GUIDE.md](./PROJECT_GUIDE.md)** - Complete architecture and development guide
+- **[CLAUDE.md](./CLAUDE.md)** - Complete architecture guide and AI assistant reference
 - **[TESTING.md](./TESTING.md)** - Testing strategy and examples
-- **[CLAUDE.md](./CLAUDE.md)** - AI assistant guidance (for Claude Code)
-- **[API_INTEGRATION.md](./API_INTEGRATION.md)** - API integration patterns
-- **[AUTH_CONFIG.md](./AUTH_CONFIG.md)** - Authentication configuration
+- **[API_CONFIGURATION.md](./API_CONFIGURATION.md)** - API setup and configuration
 
 ## 🏗️ Architecture
 
@@ -39,20 +37,24 @@ This project follows a **layered modular architecture** for maximum scalability 
 ```
 src/modules/[Area]/[Module]/
 ├── components/          # UI components (Header, ContentTable, etc.)
-├── hooks/              # Custom hooks (state + controller calls)
-├── controllers/        # Business logic + Redux dispatch
-├── services/           # HTTP calls (Axios)
-├── adapters/           # API ↔ UI data mapping
-├── models/             # TypeScript interfaces
+├── hooks/              # Custom hooks (useModule, useModuleFetch)
+├── services/           # HTTP calls (Interface + ApiService + MockService)
+├── adapters/           # API ↔ UI data mapping (snake_case → camelCase)
+├── models/             # TypeScript interfaces (camelCase)
 ├── slices/             # Redux state slices
-├── config/             # Configuration files
-└── __tests__/          # Tests (unit, integration, api)
+├── config/             # Configuration files (tableColumns)
+├── validations/        # Validation rules, schemas, and helpers
+└── __tests__/          # Tests (fixtures, unit, integration)
 ```
 
 ### Data Flow Pattern
 
 ```
-UI Component → Hook → Controller → [Service, Adapter, Slice] → Redux Store
+UI Component → Hook → Service → Adapter → Redux Slice
+                ↓
+           Redux Store (dispatch)
+                ↓
+UI Component ← Hook ← Redux Store (useSelector)
 ```
 
 ### Reference Implementation
@@ -61,11 +63,12 @@ The **`Security/Users`** module ([src/modules/Security/Users/](./src/modules/Sec
 - ✅ Complete layered architecture
 - ✅ TypeScript models with type safety
 - ✅ Redux Toolkit slice with standard structure
-- ✅ Controller with ControllerResponse pattern
-- ✅ Adapter for API-to-UI mapping
-- ✅ Hook with intelligent caching
-- ✅ Comprehensive testing (unit, integration, API)
-- ✅ AZ components integration (AzTable, AzHeaderCard)
+- ✅ Two-hook pattern (useUsers sync + useUsersFetch async)
+- ✅ Service pattern (Interface + ApiService + MockService)
+- ✅ Adapter for API-to-UI mapping (snake_case → camelCase)
+- ✅ Centralized validation layer
+- ✅ Comprehensive testing (unit, integration)
+- ✅ AZ components integration (AzTable, AzHeaderCardViews, AzFilterSummary)
 
 ## 🧪 Testing
 
@@ -91,9 +94,9 @@ npm run test:coverage
 |-------|-----------|-----------------|
 | Adapters | Unit | 100% |
 | Slices | Unit | 100% |
-| Services | API | 90% |
-| Controllers | Integration | 85% |
-| Hooks | Integration | 80% |
+| Services | Integration | 90% |
+| Hooks | Integration | 85% |
+| Components | Component | 70% |
 
 ## 🛠️ Tech Stack
 

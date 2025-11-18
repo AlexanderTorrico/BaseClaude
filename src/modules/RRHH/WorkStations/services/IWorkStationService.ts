@@ -8,42 +8,10 @@ import { ApiResponse } from '@/shared/types';
  */
 export interface IWorkStationService {
   /**
-   * Obtener todos los puestos de trabajo
+   * Obtener puestos de trabajo por compañía
    */
-  getWorkStations(
+  getWorkStationsByCompany(
+    companyId: number,
     setLoading?: SetStateFn
   ): Promise<ApiResponse<WorkStationModel[]>>;
-
-  /**
-   * Obtener un puesto de trabajo por ID
-   */
-  getWorkStationById(
-    id: number,
-    setLoading?: SetStateFn
-  ): Promise<ApiResponse<WorkStationModel>>;
-
-  /**
-   * Crear un nuevo puesto de trabajo
-   */
-  createWorkStation(
-    data: Partial<WorkStationModel>,
-    setLoading?: SetStateFn
-  ): Promise<ApiResponse<WorkStationModel>>;
-
-  /**
-   * Actualizar un puesto de trabajo existente
-   */
-  updateWorkStation(
-    id: number,
-    data: Partial<WorkStationModel>,
-    setLoading?: SetStateFn
-  ): Promise<ApiResponse<WorkStationModel>>;
-
-  /**
-   * Eliminar un puesto de trabajo
-   */
-  deleteWorkStation(
-    id: number,
-    setLoading?: SetStateFn
-  ): Promise<ApiResponse<void>>;
 }

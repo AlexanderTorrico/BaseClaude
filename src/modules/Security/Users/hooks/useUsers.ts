@@ -3,8 +3,8 @@ import { RootState } from '@/store';
 import { UserModel } from '../models/UserModel';
 
 export const useUsers = () => {
-  const users = useSelector((state: RootState) => state.users.list);
-  const currentView = useSelector((state: RootState) => state.users.currentView);
+  const users = useSelector((state: RootState) => state.security_user.list);
+  const currentView = useSelector((state: RootState) => state.security_user.currentView);
 
   const findUserByEmail = (email: string): UserModel | undefined => {
     return users.find(user => user.email === email);

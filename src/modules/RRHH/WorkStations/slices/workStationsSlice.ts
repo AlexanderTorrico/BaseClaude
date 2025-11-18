@@ -43,7 +43,7 @@ const initialState: WorkStationState = {
 };
 
 const workStationsSlice = createSlice({
-  name: 'workStations',
+  name: 'rrhh_workStation',
   initialState,
   reducers: {
     // =====================================================================

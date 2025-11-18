@@ -15,7 +15,7 @@ const initialState: UserState = {
 };
 
 export const userSlice = createSlice({
-  name: 'users',
+  name: 'security_user',
   initialState,
   reducers: {
     setUsers: (state, action: PayloadAction<UserModel[]>) => {

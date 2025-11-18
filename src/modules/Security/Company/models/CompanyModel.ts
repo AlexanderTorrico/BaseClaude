@@ -1,64 +1,67 @@
-export interface SocialNetwork {
-  id: number;
-  platform: string;
-  url: string;
-  active: boolean;
-}
-
-export interface Website {
-  id: number;
-  url: string;
-  description: string;
-  active: boolean;
-}
-
-export interface Branch {
+/**
+ * Modelo de Sucursal (Branch)
+ */
+export interface BranchModel {
   id: number;
   name: string;
   email: string | null;
-  detail: string | null;
-  address: string;
   phone: string;
-  schedules: string | null;
+  address: string;
   lat: number | null;
   lng: number | null;
-  active: boolean;
-  timeZone: string | null;
-  companyId: number;
+  active: number;
+  gblCompanyId: number;
   createdAt: string;
   updatedAt: string;
 }
 
+/**
+ * Modelo de Compañía
+ */
 export interface CompanyModel {
   id: number;
   name: string;
-  detail: string;
-  whatDoWeDo: string;
-  howDoWeHelpOurCustomers: string;
-  openingDateCompany: string;
-  phone: string[];
+  detail: number; // ID del rubro/industria
+  openingDateCompany: string; // Fecha de apertura
+  phone: string[]; // [código país, número]
   email: string;
-  activation: number;
   logo: string;
-  latitude: number | null;
-  longitude: number | null;
   timeZone: string;
-  colorTextOne: string;
-  colorTextTwo: string;
-  colorButtonOne: string;
-  colorButtonTwo: string;
-  colorFondoOne: string;
-  colorFondoTwo: string;
-  companySize: string;
-  language: string;
-  active: boolean;
+  companySize: string; // "2-9", "10-49", etc.
+  language: string; // "es", "en", etc.
+  active: number;
   userId: number;
-  companyBranchId: number | null;
   createdAt: string;
   updatedAt: string;
-  modulesId: number[];
-  references: any[];
-  branches: Branch[];
-  socialNetworks: SocialNetwork[];
-  websites: Website[];
+  // Relaciones
+  sucursales: BranchModel[];
+}
+
+/**
+ * DTO para crear/actualizar Compañía
+ */
+export interface CompanyDto {
+  name: string;
+  detail?: number; // ID del rubro/industria
+  openingDateCompany: string;
+  phone: string[]; // [código país, número]
+  email: string;
+  logo?: File | null;
+  timeZone: string;
+  companySize: string;
+  language: string;
+}
+
+/**
+ * DTO para crear/actualizar Sucursal
+ */
+export interface BranchDto {
+  id?: number; // Opcional para creación
+  name: string;
+  email?: string;
+  phone: string;
+  address: string;
+  lat: number | null;
+  lng: number | null;
+  gblCompanyId: number;
 }

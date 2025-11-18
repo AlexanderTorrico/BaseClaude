@@ -1,4 +1,4 @@
-import { CompanyModel, Branch } from '../models/CompanyModel';
+import { CompanyModel, BranchModel } from '../models/CompanyModel';
 import { SetStateFn } from '@/shared/types/commonTypes';
 import { ApiResponse } from '@/shared/types';
 
@@ -9,56 +9,53 @@ import { ApiResponse } from '@/shared/types';
  */
 export interface ICompanyService {
   /**
-   * Obtiene la información de la compañía
-   * @returns {status: 200, message: 'Success', data: CompanyModel} en éxito
-   * @returns {status: 4xx/5xx, message: string, data: null} en error
-   */
-  getCompany(setLoading?: SetStateFn): Promise<ApiResponse<CompanyModel>>;
-
-  /**
-   * Actualiza la información de la compañía
-   * @param data - Datos de la compañía a actualizar
-   * @returns {status: 200, message: 'Success', data: CompanyModel} en éxito
-   * @returns {status: 4xx/5xx, message: string, data: null} en error
-   */
-  updateCompany(
-    data: Partial<CompanyModel>,
-    setLoading?: SetStateFn
-  ): Promise<ApiResponse<CompanyModel>>;
-
-  /**
-   * Obtiene las sucursales de la compañía
-   * @returns {status: 200, message: 'Success', data: Branch[]} en éxito
+   * Obtiene todas las compañías
+   * @returns {status: 200, message: 'Success', data: CompanyModel[]} en éxito
    * @returns {status: 4xx/5xx, message: string, data: []} en error
    */
-  getBranches(setLoading?: SetStateFn): Promise<ApiResponse<Branch[]>>;
+  getAll(setLoading?: SetStateFn): Promise<ApiResponse<CompanyModel[]>>;
 
   /**
-   * Crea una nueva sucursal
-   * @param data - Datos de la sucursal a crear
-   * @returns {status: 200, message: 'Success', data: Branch} en éxito
-   * @returns {status: 4xx/5xx, message: string, data: null} en error
+   * Crea una nueva compañía
+   * @param formData - FormData con los datos de la compañía (incluyendo logo)
+   * @returns {status: 200, message: 'Success', data: CompanyModel} en éxito
    */
-  createBranch(data: Omit<Branch, 'id' | 'createdAt' | 'updatedAt'>, setLoading?: SetStateFn): Promise<ApiResponse<Branch>>;
+  create(formData: FormData, setLoading?: SetStateFn): Promise<ApiResponse<CompanyModel>>;
+
+  /**
+   * Actualiza una compañía existente
+   * @param formData - FormData con los datos actualizados
+   * @returns {status: 200, message: 'Success', data: CompanyModel} en éxito
+   */
+  update(formData: FormData, setLoading?: SetStateFn): Promise<ApiResponse<CompanyModel>>;
+
+  /**
+   * Elimina una compañía
+   * @param id - ID de la compañía
+   * @returns {status: 200, message: 'Success', data: null} en éxito
+   */
+  delete(id: number, setLoading?: SetStateFn): Promise<ApiResponse<null>>;
+
+  /**
+   * Agrega una nueva sucursal a una compañía
+   * @param companyId - ID de la compañía
+   * @param branchData - Datos de la sucursal
+   * @returns {status: 200, message: 'Success', data: BranchModel} en éxito
+   */
+  addBranch(companyId: number, branchData: any, setLoading?: SetStateFn): Promise<ApiResponse<BranchModel>>;
 
   /**
    * Actualiza una sucursal existente
-   * @param id - ID de la sucursal
-   * @param data - Datos a actualizar
-   * @returns {status: 200, message: 'Success', data: Branch} en éxito
-   * @returns {status: 4xx/5xx, message: string, data: null} en error
+   * @param branchId - ID de la sucursal
+   * @param branchData - Datos actualizados
+   * @returns {status: 200, message: 'Success', data: BranchModel} en éxito
    */
-  updateBranch(
-    id: number,
-    data: Partial<Branch>,
-    setLoading?: SetStateFn
-  ): Promise<ApiResponse<Branch>>;
+  updateBranch(branchId: number, branchData: any, setLoading?: SetStateFn): Promise<ApiResponse<BranchModel>>;
 
   /**
    * Elimina una sucursal
-   * @param id - ID de la sucursal a eliminar
-   * @returns {status: 200, message: 'Success', data: true} en éxito
-   * @returns {status: 4xx/5xx, message: string, data: false} en error
+   * @param branchId - ID de la sucursal
+   * @returns {status: 200, message: 'Success', data: null} en éxito
    */
-  deleteBranch(id: number, setLoading?: SetStateFn): Promise<ApiResponse<boolean>>;
+  deleteBranch(branchId: number, setLoading?: SetStateFn): Promise<ApiResponse<null>>;
 }

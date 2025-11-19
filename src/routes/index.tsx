@@ -34,6 +34,8 @@ import Information from "@/modules/Security/Information";
 import PaymentGateway from "@/modules/Security/PaymentGateway";
 import Reservation from "@/modules/Security/Reservation";
 import Company from "@/modules/Security/Company";
+import MyPages from "@/modules/WebSites/MyPages";
+import CreatePage from "@/modules/WebSites/CreatePage";
 // -------------------------------------------------------------
 
 
@@ -45,7 +47,11 @@ const authProtectedRoutes = [
   { path: "/crud_v1", component: CrudV1 },
   { path: "/crud_v2", component: CrudV2 },
 
-  // Molecules
+  // Web site
+  { path: "/createpages", component: CreatePage },
+  { path: "/mypages", component: MyPages },
+
+  // Molecules  
   { path: "/header_view_type", component: HeaderViewType },
   { path: "/table", component: Table },
   { path: "/molecules/filter-sumary-info", component: FilterSumaryInfo },

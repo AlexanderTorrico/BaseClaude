@@ -42,10 +42,10 @@ export const useCompanyFetch = (service: ICompanyService) => {
   const createCompany = async (dto: CompanyDto): Promise<{ success: boolean; message: string }> => {
     const formData = new FormData();
     formData.append('name', dto.name);
-    formData.append('detail', dto.detail || '');
-    formData.append('openingDateCompany', dto.openingDateCompany);
-    formData.append('phoneCountryCode', dto.phone[0]);
-    formData.append('phoneNumber', dto.phone[1]);
+    formData.append('detail', dto.detail?.toString() || '');
+    formData.append('openingDateCompany', dto.openingDateCompany || '');
+    formData.append('phoneCountryCode', dto.phone[0] || '');
+    formData.append('phoneNumber', dto.phone[1] || '');
     formData.append('email', dto.email);
     formData.append('timeZone', dto.timeZone);
     formData.append('companySize', dto.companySize);
@@ -104,23 +104,32 @@ export const useCompanyFetch = (service: ICompanyService) => {
     }
 
     // Sucursales como JSON string (array completo con todos los campos en snake_case)
-    const sucursalesFormatted = sucursales.map(branch => ({
-      id: branch.id,
-      name: branch.name,
-      email: branch.email,
-      detail: null,
-      long: null,
-      address: branch.address,
-      phone: branch.phone,
-      schedules: null,
-      lat: branch.lat,
-      lng: branch.lng,
-      active: branch.active,
-      time_zone: null,
-      gbl_company_id: branch.gblCompanyId,
-      created_at: branch.createdAt || new Date().toISOString(),
-      updated_at: branch.updatedAt || new Date().toISOString(),
-    }));
+    const sucursalesFormatted = sucursales.map(branch => {
+      const branchData: any = {
+        name: branch.name,
+        email: branch.email,
+        detail: null,
+        long: null,
+        address: branch.address,
+        phone: branch.phone,
+        schedules: null,
+        lat: branch.lat,
+        lng: branch.lng,
+        active: branch.active,
+        time_zone: null,
+        gbl_company_id: branch.gblCompanyId,
+        created_at: branch.createdAt || new Date().toISOString(),
+        updated_at: branch.updatedAt || new Date().toISOString(),
+      };
+
+      // Solo incluir ID si es positivo (sucursal existente del servidor)
+      // IDs negativos son sucursales nuevas creadas localmente
+      if (branch.id > 0) {
+        branchData.id = branch.id;
+      }
+
+      return branchData;
+    });
 
     const sucursalesJSON = JSON.stringify(sucursalesFormatted);
     console.log('📤 Sucursales a enviar:', sucursalesJSON);
@@ -166,9 +175,10 @@ export const useCompanyFetch = (service: ICompanyService) => {
     companyId: number,
     dto: BranchDto
   ): Promise<{ success: boolean; message: string; data?: BranchModel }> => {
-    // Crear nueva sucursal con ID temporal negativo (para diferenciar de las que vienen del servidor)
+    // Crear nueva sucursal con ID temporal NEGATIVO (para diferenciar de las que vienen del servidor)
+    // Los IDs negativos indican que es una sucursal nueva que aún no existe en el servidor
     const newBranch: BranchModel = {
-      id: Date.now(), // ID temporal hasta que se guarde en el servidor
+      id: -Date.now(), // ID temporal NEGATIVO - no se enviará al backend
       name: dto.name,
       email: dto.email || null,
       phone: dto.phone,

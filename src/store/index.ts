@@ -9,6 +9,7 @@ import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Ho
 import usersReducer from '../modules/Security/Users/slices/userSlice';
 import companyReducer from '../modules/Security/Company/slices/companySlice';
 import workStationsReducer from '../modules/RRHH/WorkStations/slices/workStationsSlice';
+import mypagesReducer from '../modules/WebSites/MyPages/slices/mypagesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
     users: usersReducer,
     workStations: workStationsReducer,
     company: companyReducer,
+    mypages: mypagesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

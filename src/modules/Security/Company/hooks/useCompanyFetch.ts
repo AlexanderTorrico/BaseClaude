@@ -2,16 +2,17 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { ICompanyService } from '../services/ICompanyService';
 import {
-  setCompany,
-  updateCompanyData,
-  setBranches,
-  addBranch,
-  updateBranch,
-  removeBranch,
-  setError,
+  setCompanys,
+  addCompany,
+  updateCompany,
+  removeCompany,
+  addBranchToCompany,
+  updateBranchInCompany,
+  removeBranchFromCompany,
 } from '../slices/companySlice';
-import { CompanyModel, Branch } from '../models/CompanyModel';
+import { CompanyDto, BranchDto, BranchModel, CompanyModel } from '../models/CompanyModel';
 import { toast } from 'react-toastify';
+import { store } from '@/store';
 
 /**
  * Hook para operaciones async de Company (fetch, create, update, delete)
@@ -21,117 +22,232 @@ export const useCompanyFetch = (service: ICompanyService) => {
   const [loading, setLoading] = useState(false);
 
   /**
-   * Obtener información de la compañía
+   * Obtener todas las compañías
    */
-  const fetchCompany = async (): Promise<void> => {
-    const result = await service.getCompany(setLoading);
+  const fetchAll = async (): Promise<void> => {
+    const result = await service.getAll(setLoading);
 
     if (result.status !== 200) {
-      const errorMsg = `Error al obtener la compañía: ${result.message}`;
-      console.error(`❌ ${errorMsg}`);
-      dispatch(setError(errorMsg));
-      toast.error(errorMsg);
+      console.error(`❌ Error fetching companies: [${result.status}] ${result.message}`);
+      toast.error(result.message || 'Error al obtener compañías');
       return;
     }
 
-    dispatch(setCompany(result.data));
+    dispatch(setCompanys(result.data));
   };
 
   /**
-   * Actualizar información de la compañía
+   * Crear nueva compañía
    */
-  const updateCompany = async (data: Partial<CompanyModel>): Promise<boolean> => {
-    const result = await service.updateCompany(data, setLoading);
+  const createCompany = async (dto: CompanyDto): Promise<{ success: boolean; message: string }> => {
+    const formData = new FormData();
+    formData.append('name', dto.name);
+    formData.append('detail', dto.detail || '');
+    formData.append('openingDateCompany', dto.openingDateCompany);
+    formData.append('phoneCountryCode', dto.phone[0]);
+    formData.append('phoneNumber', dto.phone[1]);
+    formData.append('email', dto.email);
+    formData.append('timeZone', dto.timeZone);
+    formData.append('companySize', dto.companySize);
+    formData.append('language', dto.language);
 
-    if (result.status !== 200) {
-      const errorMsg = `Error al actualizar la compañía: ${result.message}`;
-      console.error(`❌ ${errorMsg}`);
-      toast.error(errorMsg);
-      return false;
+    if (dto.logo) {
+      formData.append('logo', dto.logo);
     }
 
-    dispatch(updateCompanyData(result.data));
-    toast.success('Compañía actualizada exitosamente');
-    return true;
-  };
-
-  /**
-   * Obtener sucursales
-   */
-  const fetchBranches = async (): Promise<void> => {
-    const result = await service.getBranches(setLoading);
+    const result = await service.create(formData, setLoading);
 
     if (result.status !== 200) {
-      const errorMsg = `Error al obtener sucursales: ${result.message}`;
-      console.error(`❌ ${errorMsg}`);
-      toast.error(errorMsg);
-      return;
+      toast.error(result.message || 'Error al crear compañía');
+      return { success: false, message: result.message };
     }
 
-    dispatch(setBranches(result.data));
+    if (result.data) {
+      dispatch(addCompany(result.data));
+      toast.success('Compañía creada exitosamente');
+    }
+
+    return { success: true, message: 'Compañía creada exitosamente' };
   };
 
   /**
-   * Crear nueva sucursal
+   * Actualizar compañía existente
+   * Incluye toda la información de la compañía y sus sucursales
+   */
+  const updateCompanyData = async (
+    id: number,
+    dto: CompanyDto,
+    sucursales: BranchModel[]
+  ): Promise<{ success: boolean; message: string }> => {
+    const formData = new FormData();
+
+    // ID de la compañía
+    formData.append('id', id.toString());
+
+    // Campos básicos
+    formData.append('name', dto.name);
+    formData.append('opening_date_conpany', dto.openingDateCompany); // Nota: "conpany" con error tipográfico del backend
+    formData.append('email', dto.email);
+    formData.append('time_zone', dto.timeZone);
+    formData.append('company_size', dto.companySize);
+    formData.append('language', dto.language);
+
+    // Rubro como array JSON: [6]
+    formData.append('modules_id', JSON.stringify([dto.detail]));
+
+    // Teléfono como JSON string: ["591","783648261"]
+    formData.append('phone', JSON.stringify(dto.phone));
+
+    // Logo (imagen en binario)
+    if (dto.logo) {
+      formData.append('image', dto.logo);
+    }
+
+    // Sucursales como JSON string (array completo con todos los campos en snake_case)
+    const sucursalesFormatted = sucursales.map(branch => ({
+      id: branch.id,
+      name: branch.name,
+      email: branch.email,
+      detail: null,
+      long: null,
+      address: branch.address,
+      phone: branch.phone,
+      schedules: null,
+      lat: branch.lat,
+      lng: branch.lng,
+      active: branch.active,
+      time_zone: null,
+      gbl_company_id: branch.gblCompanyId,
+      created_at: branch.createdAt || new Date().toISOString(),
+      updated_at: branch.updatedAt || new Date().toISOString(),
+    }));
+
+    const sucursalesJSON = JSON.stringify(sucursalesFormatted);
+    console.log('📤 Sucursales a enviar:', sucursalesJSON);
+    formData.append('sucursales', sucursalesJSON);
+
+    const result = await service.update(formData, setLoading);
+
+    if (result.status !== 200) {
+      toast.error(result.message || 'Error al actualizar compañía');
+      return { success: false, message: result.message };
+    }
+
+    if (result.data) {
+      dispatch(updateCompany(result.data));
+      toast.success('Compañía actualizada exitosamente');
+    }
+
+    return { success: true, message: 'Compañía actualizada exitosamente' };
+  };
+
+  /**
+   * Eliminar compañía
+   */
+  const deleteCompany = async (id: number): Promise<{ success: boolean; message: string }> => {
+    const result = await service.delete(id, setLoading);
+
+    if (result.status !== 200) {
+      toast.error(result.message || 'Error al eliminar compañía');
+      return { success: false, message: result.message };
+    }
+
+    dispatch(removeCompany(id));
+    toast.success('Compañía eliminada exitosamente');
+
+    return { success: true, message: 'Compañía eliminada exitosamente' };
+  };
+
+  /**
+   * Agregar sucursal a compañía (SOLO LOCAL - no hace petición HTTP)
+   * Los cambios se guardarán cuando se actualice la compañía completa
    */
   const createBranch = async (
-    data: Omit<Branch, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<boolean> => {
-    const result = await service.createBranch(data, setLoading);
+    companyId: number,
+    dto: BranchDto
+  ): Promise<{ success: boolean; message: string; data?: BranchModel }> => {
+    // Crear nueva sucursal con ID temporal negativo (para diferenciar de las que vienen del servidor)
+    const newBranch: BranchModel = {
+      id: Date.now(), // ID temporal hasta que se guarde en el servidor
+      name: dto.name,
+      email: dto.email || null,
+      phone: dto.phone,
+      address: dto.address,
+      lat: dto.lat,
+      lng: dto.lng,
+      active: 1,
+      gblCompanyId: companyId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
 
-    if (result.status !== 200) {
-      const errorMsg = `Error al crear sucursal: ${result.message}`;
-      console.error(`❌ ${errorMsg}`);
-      toast.error(errorMsg);
-      return false;
-    }
+    // Solo actualizar Redux localmente
+    dispatch(addBranchToCompany({ companyId, branch: newBranch }));
+    toast.success('Sucursal agregada (pendiente de guardar)');
 
-    dispatch(addBranch(result.data));
-    toast.success('Sucursal creada exitosamente');
-    return true;
+    return { success: true, message: 'Sucursal agregada localmente', data: newBranch };
   };
 
   /**
-   * Actualizar sucursal existente
+   * Actualizar sucursal existente (SOLO LOCAL - no hace petición HTTP)
+   * Los cambios se guardarán cuando se actualice la compañía completa
    */
-  const updateBranchData = async (id: number, data: Partial<Branch>): Promise<boolean> => {
-    const result = await service.updateBranch(id, data, setLoading);
-
-    if (result.status !== 200) {
-      const errorMsg = `Error al actualizar sucursal: ${result.message}`;
-      console.error(`❌ ${errorMsg}`);
-      toast.error(errorMsg);
-      return false;
+  const updateBranchData = async (
+    companyId: number,
+    dto: BranchDto
+  ): Promise<{ success: boolean; message: string }> => {
+    if (!dto.id) {
+      return { success: false, message: 'ID de sucursal no proporcionado' };
     }
 
-    dispatch(updateBranch(result.data));
-    toast.success('Sucursal actualizada exitosamente');
-    return true;
+    // Obtener la sucursal actual del store para preservar createdAt
+    const currentState = store.getState() as any;
+    const company = currentState.company.list.find((c: CompanyModel) => c.id === companyId);
+    const existingBranch = company?.sucursales.find((b: BranchModel) => b.id === dto.id);
+
+    // Crear branch actualizado
+    const updatedBranch: BranchModel = {
+      id: dto.id,
+      name: dto.name,
+      email: dto.email || null,
+      phone: dto.phone,
+      address: dto.address,
+      lat: dto.lat,
+      lng: dto.lng,
+      active: 1,
+      gblCompanyId: companyId,
+      createdAt: existingBranch?.createdAt || new Date().toISOString(), // Preservar createdAt original
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Solo actualizar Redux localmente
+    dispatch(updateBranchInCompany({ companyId, branch: updatedBranch }));
+    toast.success('Sucursal actualizada (pendiente de guardar)');
+
+    return { success: true, message: 'Sucursal actualizada localmente' };
   };
 
   /**
-   * Eliminar sucursal
+   * Eliminar sucursal (SOLO LOCAL - no hace petición HTTP)
+   * Los cambios se guardarán cuando se actualice la compañía completa
    */
-  const deleteBranch = async (id: number): Promise<boolean> => {
-    const result = await service.deleteBranch(id, setLoading);
+  const deleteBranch = async (
+    companyId: number,
+    branchId: number
+  ): Promise<{ success: boolean; message: string }> => {
+    // Solo actualizar Redux localmente
+    dispatch(removeBranchFromCompany({ companyId, branchId }));
+    toast.success('Sucursal eliminada (pendiente de guardar)');
 
-    if (result.status !== 200) {
-      const errorMsg = `Error al eliminar sucursal: ${result.message}`;
-      console.error(`❌ ${errorMsg}`);
-      toast.error(errorMsg);
-      return false;
-    }
-
-    dispatch(removeBranch(id));
-    toast.success('Sucursal eliminada exitosamente');
-    return true;
+    return { success: true, message: 'Sucursal eliminada localmente' };
   };
 
   return {
     loading,
-    fetchCompany,
-    updateCompany,
-    fetchBranches,
+    fetchAll,
+    createCompany,
+    updateCompanyData,
+    deleteCompany,
     createBranch,
     updateBranchData,
     deleteBranch,

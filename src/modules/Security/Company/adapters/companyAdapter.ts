@@ -1,149 +1,77 @@
-import { CompanyModel, Branch, SocialNetwork, Website } from '../models/CompanyModel';
+import { CompanyModel, BranchModel } from '../models/CompanyModel';
 
 /**
- * Adapter para convertir datos de la API (snake_case) a modelo interno (camelCase)
+ * Adapta una sucursal de la API (snake_case) al modelo UI (camelCase)
  */
-
-interface ApiSocialNetwork {
-  id: number;
-  platform: string;
-  url: string;
-  active: number;
-}
-
-interface ApiWebsite {
-  id: number;
-  url: string;
-  description: string;
-  active: number;
-}
-
-interface ApiBranch {
-  id: number;
-  name: string;
-  email: string | null;
-  detail: string | null;
-  address: string;
-  phone: string;
-  schedules: string | null;
-  lat: number | null;
-  lng: number | null;
-  active: number;
-  time_zone: string | null;
-  gbl_company_id: number;
-  created_at: string;
-  updated_at: string;
-}
-
-interface ApiCompany {
-  id: number;
-  name: string;
-  detail: string;
-  what_do_we_do: string;
-  how_do_we_help_our_customers: string;
-  opening_date_conpany: string;
-  phone: string[];
-  email: string;
-  activation: number;
-  logo: string;
-  latitude: number | null;
-  longitude: number | null;
-  time_zone: string;
-  color_text_one: string;
-  color_text_two: string;
-  color_button_one: string;
-  color_button_two: string;
-  color_fondo_one: string;
-  color_fondo_two: string;
-  company_size: string;
-  language: string;
-  active: number;
-  user_id: number;
-  gbl_company_branch_id: number | null;
-  created_at: string;
-  updated_at: string;
-  modules_id: number[];
-  references: any[];
-  sucursales: ApiBranch[];
-  social_networks: ApiSocialNetwork[];
-  web_sites: ApiWebsite[];
-}
-
-export const adaptBranch = (apiBranch: ApiBranch): Branch => {
+export const adaptBranchResponseToBranchModel = (apiData: any): BranchModel => {
   return {
-    id: apiBranch.id,
-    name: apiBranch.name,
-    email: apiBranch.email,
-    detail: apiBranch.detail,
-    address: apiBranch.address,
-    phone: apiBranch.phone,
-    schedules: apiBranch.schedules,
-    lat: apiBranch.lat,
-    lng: apiBranch.lng,
-    active: apiBranch.active === 1,
-    timeZone: apiBranch.time_zone,
-    companyId: apiBranch.gbl_company_id,
-    createdAt: apiBranch.created_at,
-    updatedAt: apiBranch.updated_at,
+    id: apiData.id,
+    name: apiData.name || '',
+    email: apiData.email || null,
+    phone: apiData.phone || '',
+    address: apiData.address || '',
+    lat: apiData.lat !== undefined && apiData.lat !== null ? Number(apiData.lat) : null,
+    lng: apiData.lng !== undefined && apiData.lng !== null ? Number(apiData.lng) : null,
+    active: apiData.active || 1,
+    gblCompanyId: apiData.gbl_company_id,
+    createdAt: apiData.created_at || '',
+    updatedAt: apiData.updated_at || '',
   };
 };
 
-export const adaptSocialNetwork = (apiSocialNetwork: ApiSocialNetwork): SocialNetwork => {
+/**
+ * Adapta una compañía de la API (snake_case) al modelo UI (camelCase)
+ */
+export const adaptCompanyResponseToCompanyModel = (apiData: any): CompanyModel => {
+  // Extraer el ID del rubro desde modules_id (viene como array: [6])
+  let detailId = 6; // Default: Tecnologic
+  if (apiData.modules_id) {
+    if (Array.isArray(apiData.modules_id) && apiData.modules_id.length > 0) {
+      detailId = Number(apiData.modules_id[0]);
+    } else if (typeof apiData.modules_id === 'number') {
+      detailId = apiData.modules_id;
+    }
+  } else if (apiData.detail) {
+    detailId = Number(apiData.detail);
+  }
+
+  // Parsear phone si viene como string JSON
+  let phoneArray = ['591', ''];
+  if (typeof apiData.phone === 'string') {
+    try {
+      phoneArray = JSON.parse(apiData.phone);
+    } catch (e) {
+      console.warn('Error parsing phone:', e);
+    }
+  } else if (Array.isArray(apiData.phone)) {
+    phoneArray = apiData.phone;
+  }
+
   return {
-    id: apiSocialNetwork.id,
-    platform: apiSocialNetwork.platform,
-    url: apiSocialNetwork.url,
-    active: apiSocialNetwork.active === 1,
+    id: apiData.id,
+    name: apiData.name || '',
+    detail: detailId,
+    openingDateCompany: apiData.opening_date_conpany || apiData.opening_date_company || '', // Note: typo en API "conpany"
+    phone: phoneArray,
+    email: apiData.email || '',
+    logo: apiData.image || apiData.logo || '',
+    timeZone: apiData.time_zone || 'America/La_Paz',
+    companySize: apiData.company_size || '2-9',
+    language: apiData.language || 'es',
+    active: apiData.active || 1,
+    userId: apiData.user_id || 0,
+    createdAt: apiData.created_at || '',
+    updatedAt: apiData.updated_at || '',
+    // Adaptar sucursales
+    sucursales: Array.isArray(apiData.sucursales)
+      ? apiData.sucursales.map(adaptBranchResponseToBranchModel)
+      : [],
   };
 };
 
-export const adaptWebsite = (apiWebsite: ApiWebsite): Website => {
-  return {
-    id: apiWebsite.id,
-    url: apiWebsite.url,
-    description: apiWebsite.description,
-    active: apiWebsite.active === 1,
-  };
-};
-
-export const adaptCompany = (apiCompany: ApiCompany): CompanyModel => {
-  return {
-    id: apiCompany.id,
-    name: apiCompany.name,
-    detail: apiCompany.detail,
-    whatDoWeDo: apiCompany.what_do_we_do,
-    howDoWeHelpOurCustomers: apiCompany.how_do_we_help_our_customers,
-    openingDateCompany: apiCompany.opening_date_conpany,
-    phone: apiCompany.phone,
-    email: apiCompany.email,
-    activation: apiCompany.activation,
-    logo: apiCompany.logo,
-    latitude: apiCompany.latitude,
-    longitude: apiCompany.longitude,
-    timeZone: apiCompany.time_zone,
-    colorTextOne: apiCompany.color_text_one,
-    colorTextTwo: apiCompany.color_text_two,
-    colorButtonOne: apiCompany.color_button_one,
-    colorButtonTwo: apiCompany.color_button_two,
-    colorFondoOne: apiCompany.color_fondo_one,
-    colorFondoTwo: apiCompany.color_fondo_two,
-    companySize: apiCompany.company_size,
-    language: apiCompany.language,
-    active: apiCompany.active === 1,
-    userId: apiCompany.user_id,
-    companyBranchId: apiCompany.gbl_company_branch_id,
-    createdAt: apiCompany.created_at,
-    updatedAt: apiCompany.updated_at,
-    modulesId: apiCompany.modules_id,
-    references: apiCompany.references,
-    branches: apiCompany.sucursales.map(adaptBranch),
-    socialNetworks: apiCompany.social_networks.map(adaptSocialNetwork),
-    websites: apiCompany.web_sites.map(adaptWebsite),
-  };
-};
-
-// Mantener compatibilidad con nombres anteriores
-export const adaptCompanyResponseToCompanyModel = adaptCompany;
+/**
+ * Adapta un array de compañías
+ */
 export const adaptCompanyArrayToCompanyModels = (apiDataArray: any[]): CompanyModel[] => {
-  return apiDataArray.map(adaptCompany);
+  return apiDataArray.map(adaptCompanyResponseToCompanyModel);
 };

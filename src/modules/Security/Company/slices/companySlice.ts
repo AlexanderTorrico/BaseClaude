@@ -1,78 +1,82 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CompanyModel, Branch } from '../models/CompanyModel';
+import { CompanyModel, BranchModel } from '../models/CompanyModel';
 
 interface CompanyState {
-  company: CompanyModel | null;
-  branches: Branch[];
-  currentView: 'info' | 'branches';
-  loading: boolean;
-  error: string | null;
+  list: CompanyModel[];
+  currentView: string; // '0' = tabla, '1' = cards (para sucursales)
+  selectedCompanyId: number | null; // Compañía seleccionada para edición
 }
 
 const initialState: CompanyState = {
-  company: null,
-  branches: [],
-  currentView: 'info',
-  loading: false,
-  error: null,
+  list: [],
+  currentView: '0',
+  selectedCompanyId: null,
 };
 
 export const companySlice = createSlice({
   name: 'company',
   initialState,
   reducers: {
-    setCompany: (state, action: PayloadAction<CompanyModel>) => {
-      state.company = action.payload;
-      state.branches = action.payload.branches || [];
+    setCompanys: (state, action: PayloadAction<CompanyModel[]>) => {
+      state.list = action.payload;
     },
-    updateCompanyData: (state, action: PayloadAction<Partial<CompanyModel>>) => {
-      if (state.company) {
-        state.company = { ...state.company, ...action.payload };
-      }
+    clearCompanys: (state) => {
+      state.list = [];
     },
-    setBranches: (state, action: PayloadAction<Branch[]>) => {
-      state.branches = action.payload;
+    addCompany: (state, action: PayloadAction<CompanyModel>) => {
+      state.list.push(action.payload);
     },
-    addBranch: (state, action: PayloadAction<Branch>) => {
-      state.branches.push(action.payload);
-    },
-    updateBranch: (state, action: PayloadAction<Branch>) => {
-      const index = state.branches.findIndex(b => b.id === action.payload.id);
+    updateCompany: (state, action: PayloadAction<CompanyModel>) => {
+      const index = state.list.findIndex(item => item.id === action.payload.id);
       if (index !== -1) {
-        state.branches[index] = action.payload;
+        state.list[index] = action.payload;
       }
     },
-    removeBranch: (state, action: PayloadAction<number>) => {
-      state.branches = state.branches.filter(b => b.id !== action.payload);
+    removeCompany: (state, action: PayloadAction<number>) => {
+      state.list = state.list.filter(item => item.id !== action.payload);
     },
-    setCurrentView: (state, action: PayloadAction<'info' | 'branches'>) => {
+    setCurrentView: (state, action: PayloadAction<string>) => {
       state.currentView = action.payload;
     },
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload;
+    setSelectedCompanyId: (state, action: PayloadAction<number | null>) => {
+      state.selectedCompanyId = action.payload;
     },
-    setError: (state, action: PayloadAction<string | null>) => {
-      state.error = action.payload;
+    // Acciones para Sucursales
+    addBranchToCompany: (state, action: PayloadAction<{ companyId: number; branch: BranchModel }>) => {
+      const company = state.list.find(c => c.id === action.payload.companyId);
+      if (company) {
+        company.sucursales.push(action.payload.branch);
+      }
     },
-    clearCompany: (state) => {
-      state.company = null;
-      state.branches = [];
-      state.error = null;
+    updateBranchInCompany: (state, action: PayloadAction<{ companyId: number; branch: BranchModel }>) => {
+      const company = state.list.find(c => c.id === action.payload.companyId);
+      if (company) {
+        const branchIndex = company.sucursales.findIndex(b => b.id === action.payload.branch.id);
+        if (branchIndex !== -1) {
+          company.sucursales[branchIndex] = action.payload.branch;
+        }
+      }
     },
-  },
+    removeBranchFromCompany: (state, action: PayloadAction<{ companyId: number; branchId: number }>) => {
+      const company = state.list.find(c => c.id === action.payload.companyId);
+      if (company) {
+        company.sucursales = company.sucursales.filter(b => b.id !== action.payload.branchId);
+      }
+    },
+  }
 });
 
 export const {
-  setCompany,
-  updateCompanyData,
-  setBranches,
-  addBranch,
-  updateBranch,
-  removeBranch,
+  setCompanys,
+  clearCompanys,
+  addCompany,
+  updateCompany,
+  removeCompany,
   setCurrentView,
-  setLoading,
-  setError,
-  clearCompany,
+  setSelectedCompanyId,
+  addBranchToCompany,
+  updateBranchInCompany,
+  removeBranchFromCompany,
 } = companySlice.actions;
 
 export default companySlice.reducer;

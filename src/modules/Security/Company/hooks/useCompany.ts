@@ -1,54 +1,50 @@
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
-import { Branch } from '../models/CompanyModel';
+import { CompanyModel } from '../models/CompanyModel';
 
 /**
  * Hook para acceder al estado de Company (solo lectura + helpers síncronos)
  */
 export const useCompany = () => {
-  const company = useSelector((state: RootState) => state.company.company);
-  const branches = useSelector((state: RootState) => state.company.branches);
+  const companies = useSelector((state: RootState) => state.company.list);
   const currentView = useSelector((state: RootState) => state.company.currentView);
-  const loading = useSelector((state: RootState) => state.company.loading);
-  const error = useSelector((state: RootState) => state.company.error);
+  const selectedCompanyId = useSelector((state: RootState) => state.company.selectedCompanyId);
 
   /**
-   * Buscar sucursal por ID
+   * Buscar compañía por ID
    */
-  const findBranchById = (id: number): Branch | undefined => {
-    return branches.find(b => b.id === id);
+  const findById = (id: number): CompanyModel | undefined => {
+    return companies.find(item => item.id === id);
   };
 
   /**
-   * Obtener total de sucursales
+   * Obtener compañía seleccionada
    */
-  const getBranchesTotal = (): number => {
-    return branches.length;
+  const getSelectedCompany = (): CompanyModel | undefined => {
+    return selectedCompanyId ? findById(selectedCompanyId) : undefined;
   };
 
   /**
-   * Obtener sucursales activas
+   * Obtener total de compañías
    */
-  const getActiveBranches = (): Branch[] => {
-    return branches.filter(b => b.active);
+  const getTotal = (): number => {
+    return companies.length;
   };
 
   /**
-   * Obtener sucursales inactivas
+   * Verificar si hay compañías
    */
-  const getInactiveBranches = (): Branch[] => {
-    return branches.filter(b => !b.active);
+  const hasCompanies = (): boolean => {
+    return companies.length > 0;
   };
 
   return {
-    company,
-    branches,
+    companies,
     currentView,
-    loading,
-    error,
-    findBranchById,
-    getBranchesTotal,
-    getActiveBranches,
-    getInactiveBranches,
+    selectedCompanyId,
+    findById,
+    getSelectedCompany,
+    getTotal,
+    hasCompanies,
   };
 };

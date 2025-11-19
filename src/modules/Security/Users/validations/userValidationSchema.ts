@@ -1,10 +1,6 @@
 import * as Yup from 'yup';
 import { UserValidationRules } from './userValidationRules';
 
-/**
- * Schema de validación para registro de usuarios
- * Usa las reglas definidas en userValidationRules
- */
 export const userRegistrationSchema = Yup.object().shape({
   name: Yup.string()
     .required(UserValidationRules.name.messages.required)
@@ -37,22 +33,13 @@ export const userRegistrationSchema = Yup.object().shape({
     .required('Debe confirmar la contraseña')
     .oneOf([Yup.ref('password')], 'Las contraseñas deben coincidir'),
 
-  gbl_company_id: Yup.string()
-    .required('La compañía es requerida'),
-
   workStationId: Yup.number()
     .required(UserValidationRules.workStation.messages.required)
-    .positive(UserValidationRules.workStation.messages.invalid)
-    .integer(UserValidationRules.workStation.messages.invalid),
+    .positive(UserValidationRules.workStation.messages.invalid),
 
-  // Avatar es opcional, se valida en el componente por ser File
   avatar: Yup.mixed().nullable().optional(),
 });
 
-/**
- * Schema para edición de usuarios
- * Las contraseñas son opcionales - solo se validan si el usuario las ingresa
- */
 export const userEditSchema = Yup.object().shape({
   name: Yup.string()
     .required(UserValidationRules.name.messages.required)
@@ -76,7 +63,6 @@ export const userEditSchema = Yup.object().shape({
     .max(UserValidationRules.phone.maxLength, UserValidationRules.phone.messages.maxLength)
     .matches(UserValidationRules.phone.pattern, UserValidationRules.phone.messages.pattern),
 
-  // Contraseñas opcionales en edición - solo se validan si se ingresan
   password: Yup.string()
     .min(UserValidationRules.password.minLength, UserValidationRules.password.messages.minLength)
     .max(UserValidationRules.password.maxLength, UserValidationRules.password.messages.maxLength)
@@ -90,14 +76,9 @@ export const userEditSchema = Yup.object().shape({
       otherwise: (schema) => schema.optional(),
     }),
 
-  gbl_company_id: Yup.string()
-    .required('La compañía es requerida'),
-
   workStationId: Yup.number()
     .required(UserValidationRules.workStation.messages.required)
-    .positive(UserValidationRules.workStation.messages.invalid)
-    .integer(UserValidationRules.workStation.messages.invalid),
+    .positive(UserValidationRules.workStation.messages.invalid),
 
-  // Avatar es opcional
   avatar: Yup.mixed().nullable().optional(),
 });

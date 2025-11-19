@@ -6,6 +6,7 @@ import { UpdateUserDto } from '../../models/UpdateUserDto';
 import { UserModel } from '../../models/UserModel';
 import { userRegistrationSchema, userEditSchema } from '../../validations/userValidationSchema';
 import { validateAvatar } from '../../validations/userValidationHelpers';
+import { useWorkStations } from '@/modules/RRHH/WorkStations/hooks/useWorkStations';
 
 interface UserRegisterModalProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ const getInitialValues = (companyId: string, userToEdit?: UserModel | null): For
       password: '',
       repeatPassword: '',
       gbl_company_id: companyId,
+      workStationId: userToEdit.workStation?.id || 0,
       avatar: null,
     };
   }
@@ -44,6 +46,7 @@ const getInitialValues = (companyId: string, userToEdit?: UserModel | null): For
     password: '',
     repeatPassword: '',
     gbl_company_id: companyId,
+    workStationId: 0,
     avatar: null,
   };
 };
@@ -60,7 +63,9 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [showWorkStationPicker, setShowWorkStationPicker] = useState(false);
 
+  const { workStations } = useWorkStations();
   const isEditMode = !!userToEdit;
   const validationSchema = isEditMode ? userEditSchema : userRegistrationSchema;
 
@@ -352,6 +357,81 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
                     />
                     {touched.repeatPassword && errors.repeatPassword && (
                       <FormFeedback>{errors.repeatPassword}</FormFeedback>
+                    )}
+                  </FormGroup>
+                </Col>
+              </Row>
+
+              {/* WorkStation Picker - Collapser en la parte inferior */}
+              <Row className="mt-3">
+                <Col md={12}>
+                  <FormGroup>
+                    <Label>
+                      Puesto de Trabajo <span className="text-danger">*</span>
+                    </Label>
+                    <div
+                      className={`border rounded p-2 d-flex align-items-center justify-content-between ${
+                        touched.workStationId && errors.workStationId ? 'border-danger' : ''
+                      }`}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => setShowWorkStationPicker(!showWorkStationPicker)}
+                    >
+                      <span className={values.workStationId === 0 ? 'text-muted' : ''}>
+                        {values.workStationId === 0
+                          ? 'Selecciona un puesto de trabajo'
+                          : workStations.find(ws => ws.id === values.workStationId)?.name || 'Selecciona un puesto de trabajo'}
+                      </span>
+                      <i
+                        className={`mdi mdi-chevron-${showWorkStationPicker ? 'up' : 'down'}`}
+                      ></i>
+                    </div>
+
+                    {showWorkStationPicker && (
+                      <div
+                        className="border rounded mt-2 p-2"
+                        style={{ maxHeight: '250px', overflowY: 'auto' }}
+                      >
+                        {workStations.length === 0 ? (
+                          <div className="text-center text-muted p-3">
+                            No hay puestos de trabajo disponibles
+                          </div>
+                        ) : (
+                          workStations.map((ws) => (
+                            <div
+                              key={ws.id}
+                              className={`p-2 rounded mb-1 ${
+                                values.workStationId === ws.id
+                                  ? 'bg-primary text-white'
+                                  : 'hover-bg-light'
+                              }`}
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => {
+                                setFieldValue('workStationId', ws.id);
+                                setShowWorkStationPicker(false);
+                              }}
+                            >
+                              <div className="fw-medium">{ws.name}</div>
+                              {ws.description && (
+                                <small
+                                  className={
+                                    values.workStationId === ws.id
+                                      ? 'text-white-50'
+                                      : 'text-muted'
+                                  }
+                                >
+                                  {ws.description}
+                                </small>
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+
+                    {touched.workStationId && errors.workStationId && (
+                      <div className="text-danger font-size-12 mt-1">
+                        {errors.workStationId}
+                      </div>
                     )}
                   </FormGroup>
                 </Col>

@@ -1,11 +1,8 @@
-/**
- * DTO para el registro de nuevos usuarios
- */
 export interface RegisterUserDto {
   name: string;
   lastName: string;
-  phone: string;
   email: string;
+  phone: string;
   password: string;
   repeatPassword: string;
   gbl_company_id: string;

@@ -9,6 +9,7 @@ export interface UpdateUserDto {
   phone: string;
   email: string;
   gbl_company_id: string;
+  workStationId: number;
   avatar?: File | null;
   password?: string;
   repeatPassword?: string;

@@ -1,10 +1,12 @@
-/**
- * Reglas de validación reutilizables para usuarios
- * Estas reglas pueden usarse en Yup, validaciones manuales, o tests
- */
-
 export const UserValidationRules = {
-  // Reglas de nombre
+  avatar: {
+    maxSize: 5 * 1024 * 1024,
+    acceptedFormats: ['image/jpeg', 'image/png', 'image/gif'],
+    messages: {
+      maxSize: 'El avatar debe ser menor a 5MB',
+      invalidFormat: 'El avatar debe ser JPG, PNG o GIF',
+    },
+  },
   name: {
     minLength: 2,
     maxLength: 50,
@@ -14,10 +16,8 @@ export const UserValidationRules = {
       minLength: 'El nombre debe tener al menos 2 caracteres',
       maxLength: 'El nombre no puede exceder 50 caracteres',
       pattern: 'El nombre solo puede contener letras y espacios',
-    }
+    },
   },
-
-  // Reglas de apellido
   lastName: {
     minLength: 2,
     maxLength: 50,
@@ -27,57 +27,39 @@ export const UserValidationRules = {
       minLength: 'El apellido debe tener al menos 2 caracteres',
       maxLength: 'El apellido no puede exceder 50 caracteres',
       pattern: 'El apellido solo puede contener letras y espacios',
-    }
+    },
   },
-
-  // Reglas de email
   email: {
-    pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+    pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
     messages: {
       required: 'El email es requerido',
-      invalid: 'El formato del email no es válido',
-    }
+      invalid: 'El email no es válido',
+    },
   },
-
-  // Reglas de teléfono
   phone: {
-    minLength: 8,
+    minLength: 7,
     maxLength: 15,
     pattern: /^[0-9+\-\s()]+$/,
     messages: {
       required: 'El teléfono es requerido',
-      minLength: 'El teléfono debe tener al menos 8 caracteres',
+      minLength: 'El teléfono debe tener al menos 7 caracteres',
       maxLength: 'El teléfono no puede exceder 15 caracteres',
-      pattern: 'El teléfono solo puede contener números, +, -, (), y espacios',
-    }
+      pattern: 'El teléfono solo puede contener números, espacios, +, -, ( )',
+    },
   },
-
-  // Reglas de contraseña
   password: {
-    minLength: 8,
+    minLength: 6,
     maxLength: 50,
     messages: {
       required: 'La contraseña es requerida',
-      minLength: 'La contraseña debe tener al menos 8 caracteres',
+      minLength: 'La contraseña debe tener al menos 6 caracteres',
       maxLength: 'La contraseña no puede exceder 50 caracteres',
-    }
+    },
   },
-
-  // Reglas de avatar
-  avatar: {
-    maxSize: 5 * 1024 * 1024, // 5MB
-    acceptedFormats: ['image/jpeg', 'image/png', 'image/gif'],
-    messages: {
-      maxSize: 'El avatar debe ser menor a 5MB',
-      invalidFormat: 'El avatar debe ser JPG, PNG o GIF',
-    }
-  },
-
-  // Reglas de puesto de trabajo
   workStation: {
     messages: {
       required: 'El puesto de trabajo es requerido',
       invalid: 'El puesto de trabajo seleccionado no es válido',
-    }
+    },
   },
 };

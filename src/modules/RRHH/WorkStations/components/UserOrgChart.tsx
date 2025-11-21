@@ -96,13 +96,14 @@ const UserOrgChart: React.FC<UserOrgChartProps> = ({
     const isExpanded = expandedNodes.has(nodeId);
     const isSelected = selectedNodeId === user.id;
     const levelConfig = getLevelColor(user.workStation?.level || level);
-    const indentPx = level * 16; // 16px por nivel de indentación
+    const indentPx = level * 20; // 20px por nivel de indentación
 
     return (
-      <div key={user.id} className="user-node-wrapper" style={{ marginLeft: `${indentPx}px` }}>
+      <div key={user.id} className="user-node-wrapper">
         <div
           className={`user-node ${isSelected ? 'selected' : ''}`}
           style={{
+            marginLeft: `${indentPx}px`,
             borderLeft: `3px solid ${levelConfig.bg}`,
             backgroundColor: isSelected ? '#f0f7ff' : 'transparent',
             transition: 'all 0.2s ease',
@@ -173,6 +174,12 @@ const UserOrgChart: React.FC<UserOrgChartProps> = ({
               </div>
             </div>
 
+            {/* Contador de personas a cargo */}
+            <span className="text-muted d-flex align-items-center gap-1" style={{ fontSize: '11px' }}>
+              <i className="mdi mdi-account-group"></i>
+              {user.children?.length || 0}
+            </span>
+
             {/* Badge de nivel */}
             <Badge
               style={{
@@ -185,14 +192,6 @@ const UserOrgChart: React.FC<UserOrgChartProps> = ({
             >
               N{user.workStation?.level || level}
             </Badge>
-
-            {/* Contador de subordinados */}
-            {hasChildren && (
-              <span className="text-muted d-flex align-items-center gap-1" style={{ fontSize: '11px' }}>
-                <i className="mdi mdi-account-group"></i>
-                {user.children?.length}
-              </span>
-            )}
 
             {/* Menú de acciones */}
             <UncontrolledDropdown>

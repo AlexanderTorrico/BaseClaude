@@ -75,9 +75,12 @@ export const UserValidationRules = {
 
   // Reglas de puesto de trabajo
   workStation: {
+    minLength: 2,
+    maxLength: 100,
     messages: {
-      required: 'El puesto de trabajo es requerido',
-      invalid: 'El puesto de trabajo seleccionado no es válido',
+      required: 'El nombre del puesto de trabajo es requerido',
+      minLength: 'El nombre del puesto debe tener al menos 2 caracteres',
+      maxLength: 'El nombre del puesto no puede exceder 100 caracteres',
     }
   },
 };

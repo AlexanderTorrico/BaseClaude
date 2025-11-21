@@ -8,6 +8,8 @@ import { userRegistrationSchema, userEditSchema } from '../../validations/userVa
 import { validateAvatar } from '../../validations/userValidationHelpers';
 import { useSharedWorkStations } from '@/modules/RRHH/shared/hooks/useSharedWorkStations';
 import { useSharedWorkStationsFetch } from '@/modules/RRHH/shared/hooks/useSharedWorkStationsFetch';
+import { WorkStationApiService } from '@/modules/RRHH/WorkStations/services/WorkStationApiService';
+import { useUsers } from '../../hooks/useUsers';
 
 interface UserRegisterModalProps {
   isOpen: boolean;
@@ -21,9 +23,31 @@ interface UserRegisterModalProps {
 
 type FormValues = RegisterUserDto | UpdateUserDto;
 
-const getInitialValues = (companyId: string, userToEdit?: UserModel | null): FormValues => {
+interface FormValuesInternal {
+  name: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password: string;
+  repeatPassword: string;
+  gbl_company_id: string;
+  workStationName: string;
+  selectedDependencyUserId: number | null;
+  avatar: File | null;
+  id?: number;
+}
+
+const getInitialValues = (companyId: string, userToEdit?: UserModel | null): FormValuesInternal => {
   if (userToEdit) {
-    // Modo edición: pre-cargar datos del usuario, contraseñas vacías
+    // Modo edición: pre-cargar datos del usuario
+    let workStationName = '';
+    let dependencyUserId = null;
+
+    if (userToEdit.workStation) {
+      workStationName = userToEdit.workStation.name || '';
+      dependencyUserId = userToEdit.workStation.dependencyId || null;
+    }
+
     return {
       id: userToEdit.id,
       name: userToEdit.name,
@@ -33,7 +57,8 @@ const getInitialValues = (companyId: string, userToEdit?: UserModel | null): For
       password: '',
       repeatPassword: '',
       gbl_company_id: companyId,
-      workStationId: userToEdit.workStation?.id || 0,
+      workStationName,
+      selectedDependencyUserId: dependencyUserId,
       avatar: null,
     };
   }
@@ -47,7 +72,8 @@ const getInitialValues = (companyId: string, userToEdit?: UserModel | null): For
     password: '',
     repeatPassword: '',
     gbl_company_id: companyId,
-    workStationId: 0,
+    workStationName: '',
+    selectedDependencyUserId: null,
     avatar: null,
   };
 };
@@ -64,12 +90,18 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [showWorkStationPicker, setShowWorkStationPicker] = useState(false);
+  const [showWorkStationSection, setShowWorkStationSection] = useState(false);
+  const [showWorkStationSuggestions, setShowWorkStationSuggestions] = useState(false);
+  const [showDependencyPicker, setShowDependencyPicker] = useState(false);
 
+  const workStationService = new WorkStationApiService();
   const { workStationsForPicker } = useSharedWorkStations();
-  const { loading: loadingWS, fetchWorkStations, workStationsLoaded } = useSharedWorkStationsFetch();
+  const { loading: loadingWS, fetchWorkStations, workStationsLoaded } = useSharedWorkStationsFetch(workStationService);
+  const { users } = useUsers();
   const isEditMode = !!userToEdit;
   const validationSchema = isEditMode ? userEditSchema : userRegistrationSchema;
+
+  const usersWithWorkStations = users.filter(user => user.workStation && user.workStation.name);
 
   // Pre-cargar avatar si existe en modo edición
   useEffect(() => {
@@ -116,22 +148,29 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
   };
 
   const handleSubmit = async (
-    values: FormValues,
-    { setSubmitting, resetForm }: FormikHelpers<FormValues>
+    values: FormValuesInternal,
+    { setSubmitting, resetForm }: FormikHelpers<FormValuesInternal>
   ) => {
     setServerError(null);
+
+    // Construir workStation JSON string
+    const workStationJson = JSON.stringify({
+      name: values.workStationName.trim(),
+      dependency_id: values.selectedDependencyUserId || null,
+    });
 
     let result: { success: boolean; message: string };
 
     if (isEditMode && onUpdate) {
       // Modo edición: llamar onUpdate
       const updateDto: UpdateUserDto = {
-        id: (values as UpdateUserDto).id,
+        id: values.id!,
         name: values.name,
         lastName: values.lastName,
         email: values.email,
         phone: values.phone,
         gbl_company_id: values.gbl_company_id,
+        workStation: workStationJson,
         avatar: avatarFile,
         // Solo incluir password si se ingresó (opcional en edición)
         ...(values.password && {
@@ -144,7 +183,14 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
     } else {
       // Modo creación: llamar onRegister
       const registerDto: RegisterUserDto = {
-        ...values,
+        name: values.name,
+        lastName: values.lastName,
+        email: values.email,
+        phone: values.phone,
+        password: values.password,
+        repeatPassword: values.repeatPassword,
+        gbl_company_id: values.gbl_company_id,
+        workStation: workStationJson,
         avatar: avatarFile,
       };
 
@@ -371,83 +417,291 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
                 </Col>
               </Row>
 
-              {/* WorkStation Picker - Collapser en la parte inferior */}
+              {/* WorkStation Section - Acordeón (Opcional) */}
               <Row className="mt-3">
                 <Col md={12}>
                   <FormGroup>
-                    <Label>
-                      Puesto de Trabajo <span className="text-danger">*</span>
-                    </Label>
+                    {/* Header del acordeón con título y botón collapse */}
                     <div
-                      className={`border rounded p-2 d-flex align-items-center justify-content-between ${
-                        touched.workStationId && errors.workStationId ? 'border-danger' : ''
-                      }`}
+                      className="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom"
                       style={{ cursor: 'pointer' }}
-                      onClick={() => setShowWorkStationPicker(!showWorkStationPicker)}
+                      onClick={() => setShowWorkStationSection(!showWorkStationSection)}
                     >
-                      {loadingWS ? (
-                        <span className="text-muted">
-                          <Spinner size="sm" className="me-2" />
-                          Cargando puestos de trabajo...
-                        </span>
-                      ) : (
-                        <span className={values.workStationId === 0 ? 'text-muted' : ''}>
-                          {values.workStationId === 0
-                            ? 'Selecciona un puesto de trabajo'
-                            : workStationsForPicker.find(ws => ws.id === values.workStationId)?.name || 'Selecciona un puesto de trabajo'}
-                        </span>
-                      )}
-                      <i
-                        className={`mdi mdi-chevron-${showWorkStationPicker ? 'up' : 'down'}`}
-                      ></i>
+                      <Label className="mb-0 d-flex align-items-center">
+                        <i className="mdi mdi-briefcase-outline me-2 text-muted"></i>
+                        <span className="fw-medium">Puesto de Trabajo</span>
+                        <span className="text-muted ms-2">(opcional)</span>
+                        {values.workStationName && (
+                          <span className="badge bg-soft-success text-success ms-2 font-size-10">
+                            <i className="mdi mdi-check-circle me-1"></i>
+                            Asignado
+                          </span>
+                        )}
+                      </Label>
+                      <Button
+                        color="light"
+                        size="sm"
+                        className="border-0 p-1"
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowWorkStationSection(!showWorkStationSection);
+                        }}
+                      >
+                        <i className={`mdi mdi-chevron-${showWorkStationSection ? 'up' : 'down'} font-size-16`}></i>
+                      </Button>
                     </div>
 
-                    {showWorkStationPicker && !loadingWS && (
-                      <div
-                        className="border rounded mt-2 p-2"
-                        style={{ maxHeight: '250px', overflowY: 'auto' }}
-                      >
-                        {workStationsForPicker.length === 0 ? (
-                          <div className="text-center text-muted p-3">
-                            <i className="mdi mdi-information-outline me-2"></i>
-                            No hay puestos de trabajo disponibles
-                          </div>
-                        ) : (
-                          workStationsForPicker.map((ws) => (
-                            <div
-                              key={ws.id}
-                              className={`p-2 rounded mb-1 ${
-                                values.workStationId === ws.id
-                                  ? 'bg-primary text-white'
-                                  : 'hover-bg-light'
-                              }`}
-                              style={{ cursor: 'pointer' }}
-                              onClick={() => {
-                                setFieldValue('workStationId', ws.id);
-                                setShowWorkStationPicker(false);
-                              }}
-                            >
-                              <div className="fw-medium">{ws.name}</div>
-                              {ws.description && (
-                                <small
-                                  className={
-                                    values.workStationId === ws.id
-                                      ? 'text-white-50'
-                                      : 'text-muted'
-                                  }
-                                >
-                                  {ws.description}
-                                </small>
-                              )}
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    )}
+                    {/* Panel desplegable con inputs de WorkStation */}
+                    {showWorkStationSection && (
+                      <div className="border rounded mt-2 p-3 bg-light">
+                        <Row>
+                          {/* Input 1: Nombre del Puesto de Trabajo (Autocomplete) */}
+                          <Col md={6}>
+                            <FormGroup>
+                              <Label for="workStationName" className="fw-medium">
+                                Nombre del Puesto
+                              </Label>
+                              <div className="position-relative">
+                                <Input
+                                  id="workStationName"
+                                  name="workStationName"
+                                  type="text"
+                                  placeholder="Ej: Analista RRHH, Gerente de Ventas..."
+                                  value={values.workStationName}
+                                  onChange={(e) => {
+                                    handleChange(e);
+                                    setShowWorkStationSuggestions(e.target.value.length > 0);
+                                  }}
+                                  onBlur={(e) => {
+                                    handleBlur(e);
+                                    setTimeout(() => setShowWorkStationSuggestions(false), 200);
+                                  }}
+                                  onFocus={() => {
+                                    if (values.workStationName.length > 0) {
+                                      setShowWorkStationSuggestions(true);
+                                    }
+                                  }}
+                                  disabled={isSubmitting || loadingWS}
+                                />
 
-                    {touched.workStationId && errors.workStationId && (
-                      <div className="text-danger font-size-12 mt-1">
-                        {errors.workStationId}
+                                {/* Sugerencias de WorkStations existentes */}
+                                {showWorkStationSuggestions && workStationsForPicker.length > 0 && (
+                                  <div
+                                    className="position-absolute w-100 border rounded shadow-sm bg-white"
+                                    style={{
+                                      top: '100%',
+                                      left: 0,
+                                      zIndex: 1000,
+                                      maxHeight: '200px',
+                                      overflowY: 'auto',
+                                      marginTop: '2px'
+                                    }}
+                                  >
+                                    {workStationsForPicker
+                                      .filter(ws =>
+                                        ws.name.toLowerCase().includes(values.workStationName.toLowerCase())
+                                      )
+                                      .slice(0, 5)
+                                      .map((ws) => (
+                                        <div
+                                          key={ws.id}
+                                          className="p-2 border-bottom"
+                                          style={{
+                                            cursor: 'pointer',
+                                            transition: 'background-color 0.2s'
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            e.currentTarget.style.backgroundColor = '#f8f9fa';
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            e.currentTarget.style.backgroundColor = '#fff';
+                                          }}
+                                          onMouseDown={() => {
+                                            setFieldValue('workStationName', ws.name);
+                                            setShowWorkStationSuggestions(false);
+                                          }}
+                                        >
+                                          <div className="d-flex align-items-center">
+                                            <i className="mdi mdi-briefcase-outline text-muted me-2"></i>
+                                            <div>
+                                              <div className="fw-medium">{ws.name}</div>
+                                              {ws.description && (
+                                                <small className="text-muted">{ws.description}</small>
+                                              )}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))}
+                                  </div>
+                                )}
+                              </div>
+                            </FormGroup>
+                          </Col>
+
+                          {/* Input 2: De quién depende (Selector de Usuario) */}
+                          <Col md={6}>
+                            <FormGroup className="position-relative">
+                              <Label className="fw-medium">
+                                Depende de
+                              </Label>
+                              <div
+                                className="form-control d-flex align-items-center justify-content-between"
+                                style={{
+                                  cursor: 'pointer',
+                                  minHeight: '38px',
+                                  paddingRight: '8px'
+                                }}
+                                onClick={() => setShowDependencyPicker(!showDependencyPicker)}
+                              >
+                                <div className="d-flex align-items-center flex-grow-1">
+                                  {values.selectedDependencyUserId ? (
+                                    <>
+                                      <i className="mdi mdi-account-supervisor-circle me-2 text-primary"></i>
+                                      <span className="text-dark me-2">
+                                        {usersWithWorkStations.find(u => u.workStation?.id === values.selectedDependencyUserId)?.fullName || 'Usuario no encontrado'}
+                                      </span>
+                                      <span className="badge bg-soft-primary text-primary font-size-10">
+                                        <i className="mdi mdi-briefcase me-1"></i>
+                                        {usersWithWorkStations.find(u => u.workStation?.id === values.selectedDependencyUserId)?.workStation?.name || ''}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <i className="mdi mdi-account-supervisor-circle me-2 text-muted"></i>
+                                      <span className="text-muted">Seleccionar usuario</span>
+                                    </>
+                                  )}
+                                </div>
+                                <Button
+                                  color="light"
+                                  size="sm"
+                                  className="border-0 p-1"
+                                  style={{
+                                    width: '28px',
+                                    height: '28px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                  }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowDependencyPicker(!showDependencyPicker);
+                                  }}
+                                >
+                                  <i className={`mdi mdi-chevron-${showDependencyPicker ? 'up' : 'down'} font-size-16`}></i>
+                                </Button>
+                              </div>
+
+                              {/* Panel desplegable con usuarios */}
+                              {showDependencyPicker && (
+                                <div
+                                  className="position-absolute border rounded mt-2 shadow-sm"
+                                  style={{
+                                    maxHeight: '250px',
+                                    overflowY: 'auto',
+                                    backgroundColor: '#fff',
+                                    zIndex: 1050,
+                                    top: '100%',
+                                    left: 0,
+                                    right: 0
+                                  }}
+                                >
+                                  {usersWithWorkStations.length === 0 ? (
+                                    <div className="text-center text-muted p-4">
+                                      <i className="mdi mdi-information-outline font-size-24 d-block mb-2"></i>
+                                      <span>No hay usuarios con puestos de trabajo</span>
+                                    </div>
+                                  ) : (
+                                    <div className="p-2">
+                                      {/* Opción para limpiar selección */}
+                                      <div
+                                        className="p-2 rounded mb-2 bg-light border"
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={() => {
+                                          setFieldValue('selectedDependencyUserId', null);
+                                          setShowDependencyPicker(false);
+                                        }}
+                                      >
+                                        <div className="d-flex align-items-center">
+                                          <i className="mdi mdi-close-circle text-muted me-2"></i>
+                                          <span className="text-muted">Sin dependencia</span>
+                                        </div>
+                                      </div>
+
+                                      {usersWithWorkStations.map((user) => (
+                                        <div
+                                          key={user.id}
+                                          className={`p-3 rounded mb-2 ${
+                                            values.selectedDependencyUserId === user.workStation?.id
+                                              ? 'bg-primary text-white'
+                                              : 'bg-light'
+                                          }`}
+                                          style={{
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            border: values.selectedDependencyUserId === user.workStation?.id
+                                              ? '2px solid #556ee6'
+                                              : '1px solid #eff2f7'
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            if (values.selectedDependencyUserId !== user.workStation?.id) {
+                                              e.currentTarget.style.backgroundColor = '#f8f9fa';
+                                              e.currentTarget.style.borderColor = '#d1d5db';
+                                            }
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            if (values.selectedDependencyUserId !== user.workStation?.id) {
+                                              e.currentTarget.style.backgroundColor = '#f8f9fa';
+                                              e.currentTarget.style.borderColor = '#eff2f7';
+                                            }
+                                          }}
+                                          onClick={() => {
+                                            setFieldValue('selectedDependencyUserId', user.workStation?.id || null);
+                                            setShowDependencyPicker(false);
+                                          }}
+                                        >
+                                          <div className="d-flex align-items-center justify-content-between">
+                                            <div className="flex-grow-1">
+                                              <div className={`fw-medium mb-1 ${
+                                                values.selectedDependencyUserId === user.workStation?.id
+                                                  ? 'text-white'
+                                                  : 'text-dark'
+                                              }`}>
+                                                {user.fullName}
+                                              </div>
+                                              <div className="d-flex align-items-center gap-2">
+                                                <span
+                                                  className={`badge ${
+                                                    values.selectedDependencyUserId === user.workStation?.id
+                                                      ? 'bg-white text-primary'
+                                                      : 'bg-soft-primary text-primary'
+                                                  } font-size-10`}
+                                                >
+                                                  <i className="mdi mdi-briefcase me-1"></i>
+                                                  {user.workStation?.name}
+                                                </span>
+                                              </div>
+                                            </div>
+                                            {values.selectedDependencyUserId === user.workStation?.id && (
+                                              <i className="mdi mdi-check-circle font-size-20 text-white"></i>
+                                            )}
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </FormGroup>
+                          </Col>
+                        </Row>
                       </div>
                     )}
                   </FormGroup>

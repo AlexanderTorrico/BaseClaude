@@ -40,10 +40,12 @@ export const userRegistrationSchema = Yup.object().shape({
   gbl_company_id: Yup.string()
     .required('La compañía es requerida'),
 
-  workStationId: Yup.number()
-    .required(UserValidationRules.workStation.messages.required)
-    .positive(UserValidationRules.workStation.messages.invalid)
-    .integer(UserValidationRules.workStation.messages.invalid),
+  workStationName: Yup.string()
+    .min(UserValidationRules.workStation.minLength, UserValidationRules.workStation.messages.minLength)
+    .max(UserValidationRules.workStation.maxLength, UserValidationRules.workStation.messages.maxLength)
+    .optional(),
+
+  selectedDependencyUserId: Yup.number().nullable().optional(),
 
   // Avatar es opcional, se valida en el componente por ser File
   avatar: Yup.mixed().nullable().optional(),
@@ -93,10 +95,12 @@ export const userEditSchema = Yup.object().shape({
   gbl_company_id: Yup.string()
     .required('La compañía es requerida'),
 
-  workStationId: Yup.number()
-    .required(UserValidationRules.workStation.messages.required)
-    .positive(UserValidationRules.workStation.messages.invalid)
-    .integer(UserValidationRules.workStation.messages.invalid),
+  workStationName: Yup.string()
+    .min(UserValidationRules.workStation.minLength, UserValidationRules.workStation.messages.minLength)
+    .max(UserValidationRules.workStation.maxLength, UserValidationRules.workStation.messages.maxLength)
+    .optional(),
+
+  selectedDependencyUserId: Yup.number().nullable().optional(),
 
   // Avatar es opcional
   avatar: Yup.mixed().nullable().optional(),

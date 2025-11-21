@@ -22,7 +22,7 @@ export const useUsersFetch = (service: IUserService) => {
     formData.append('password', dto.password);
     formData.append('repeatPassword', dto.repeatPassword);
     formData.append('gbl_company_id', dto.gbl_company_id);
-    formData.append('workStationId', dto.workStationId.toString());
+    formData.append('workStation', dto.workStation);
 
     if (dto.avatar) {
       formData.append('avatar', dto.avatar);
@@ -56,7 +56,7 @@ export const useUsersFetch = (service: IUserService) => {
     formData.append('phone', dto.phone);
     formData.append('email', dto.email);
     formData.append('gbl_company_id', dto.gbl_company_id);
-    formData.append('workStationId', dto.workStationId.toString());
+    formData.append('workStation', dto.workStation);
 
     // Solo agregar contraseña si fue proporcionada
     if (dto.password && dto.password.trim() !== '') {

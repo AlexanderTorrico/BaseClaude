@@ -9,7 +9,7 @@ export interface UpdateUserDto {
   phone: string;
   email: string;
   gbl_company_id: string;
-  workStationId: number;
+  workStation: string;  // JSON string: '{"name":"Puesto","dependency_id":1}'
   avatar?: File | null;
   password?: string;
   repeatPassword?: string;

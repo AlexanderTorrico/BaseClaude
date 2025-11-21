@@ -7,11 +7,13 @@ import UserDetailsPanel from './UserDetailsPanel';
 interface OrganizationChartViewProps {
   userOrgTree: UserOrgNode[];
   loading?: boolean;
+  onRefresh?: () => void;
 }
 
 const OrganizationChartView: React.FC<OrganizationChartViewProps> = ({
   userOrgTree,
-  loading = false
+  loading = false,
+  onRefresh
 }) => {
   const [selectedUser, setSelectedUser] = useState<UserOrgNode | null>(null);
 
@@ -65,7 +67,7 @@ const OrganizationChartView: React.FC<OrganizationChartViewProps> = ({
       </Col>
 
       <Col lg={8} md={7} sm={12}>
-        <UserDetailsPanel user={selectedUser} />
+        <UserDetailsPanel user={selectedUser} onRefresh={onRefresh} />
       </Col>
     </Row>
   );

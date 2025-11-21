@@ -18,12 +18,16 @@ const WorkStations: React.FC = () => {
   const { workStations } = useWorkStations();
   const { fetchWorkStationsByCompany } = useWorkStationsFetch(workStationService);
   const { userOrgTree, usersWithWorkStation } = useSharedUsers();
-  const { fetchUsers } = useSharedUsersFetch(userService);
+  const { forceRefreshUsers } = useSharedUsersFetch(userService);
 
   useEffect(() => {
     fetchWorkStationsByCompany(1);
-    fetchUsers(1);
+    forceRefreshUsers(1);
   }, []);
+
+  const handleRefresh = () => {
+    fetchWorkStationsByCompany(1);
+  };
 
   useEffect(() => {
     console.log('🔄 WorkStations actualizados en Redux:', workStations);
@@ -46,7 +50,7 @@ const WorkStations: React.FC = () => {
 
           <Row>
             <Col xs="12">
-              <OrganizationChartView userOrgTree={userOrgTree} />
+              <OrganizationChartView userOrgTree={userOrgTree} onRefresh={handleRefresh} />
             </Col>
           </Row>
         </Container>

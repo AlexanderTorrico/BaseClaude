@@ -1,13 +1,38 @@
-import React from 'react';
-import { Card, CardBody, Badge } from 'reactstrap';
+import React, { useState } from 'react';
+import { Card, CardBody, Badge, Input, Button, Spinner } from 'reactstrap';
 import { UserOrgNode } from '@/modules/RRHH/shared/hooks/useSharedUsers';
 import UserAvatar from '@/components/Common/UserAvatar';
+import { WorkStationApiService } from '../services/WorkStationApiService';
+import { useWorkStations } from '../hooks/useWorkStations';
+import { toast } from 'react-toastify';
 
 interface UserDetailsPanelProps {
   user: UserOrgNode | null;
+  onRefresh?: () => void;
 }
 
-const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({ user }) => {
+const workStationService = new WorkStationApiService();
+
+const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({ user, onRefresh }) => {
+  const [newRequirement, setNewRequirement] = useState('');
+  const [newResponsability, setNewResponsability] = useState('');
+  const [loadingRequirement, setLoadingRequirement] = useState(false);
+  const [loadingResponsability, setLoadingResponsability] = useState(false);
+  const [showRequirementInput, setShowRequirementInput] = useState(false);
+  const [showResponsabilityInput, setShowResponsabilityInput] = useState(false);
+
+  const { workStations } = useWorkStations();
+
+  // Obtener el workStation completo del slice por ID
+  const fullWorkStation = user?.workStation?.id
+    ? workStations.find(ws => ws.id === user.workStation?.id)
+    : null;
+
+  // Debug: verificar datos
+  console.log('👤 Usuario seleccionado:', user?.fullName, 'WorkStation ID:', user?.workStation?.id);
+  console.log('📋 WorkStations en Redux:', workStations.length);
+  console.log('🎯 FullWorkStation encontrado:', fullWorkStation?.name, 'Requirements:', fullWorkStation?.requirements?.length, 'Responsabilities:', fullWorkStation?.responsabilities?.length);
+
   if (!user) {
     return (
       <Card className="h-100">
@@ -26,6 +51,93 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({ user }) => {
     const colors = ['primary', 'success', 'warning', 'info', 'danger'];
     return colors[level % colors.length];
   };
+
+  const handleAddRequirement = async () => {
+    if (!newRequirement.trim() || !user.workStation?.id) return;
+
+    setLoadingRequirement(true);
+    try {
+      const result = await workStationService.addRequirement({
+        description: newRequirement.trim(),
+        workStationId: user.workStation.id
+      });
+
+      if (result.status === 200 || result.status === 201) {
+        toast.success('Requisito agregado exitosamente');
+        setNewRequirement('');
+        setShowRequirementInput(false);
+        onRefresh?.();
+      } else {
+        toast.error(result.message || 'Error al agregar requisito');
+      }
+    } catch {
+      toast.error('Error al agregar requisito');
+    } finally {
+      setLoadingRequirement(false);
+    }
+  };
+
+  const handleAddResponsability = async () => {
+    if (!newResponsability.trim() || !user.workStation?.id) return;
+
+    setLoadingResponsability(true);
+    try {
+      const result = await workStationService.addResponsability({
+        description: newResponsability.trim(),
+        workStationId: user.workStation.id
+      });
+
+      if (result.status === 200 || result.status === 201) {
+        toast.success('Responsabilidad agregada exitosamente');
+        setNewResponsability('');
+        setShowResponsabilityInput(false);
+        onRefresh?.();
+      } else {
+        toast.error(result.message || 'Error al agregar responsabilidad');
+      }
+    } catch {
+      toast.error('Error al agregar responsabilidad');
+    } finally {
+      setLoadingResponsability(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent, type: 'requirement' | 'responsability') => {
+    if (e.key === 'Enter') {
+      if (type === 'requirement') {
+        handleAddRequirement();
+      } else {
+        handleAddResponsability();
+      }
+    } else if (e.key === 'Escape') {
+      if (type === 'requirement') {
+        setShowRequirementInput(false);
+        setNewRequirement('');
+      } else {
+        setShowResponsabilityInput(false);
+        setNewResponsability('');
+      }
+    }
+  };
+
+  const handleCancelRequirement = () => {
+    setShowRequirementInput(false);
+    setNewRequirement('');
+  };
+
+  const handleCancelResponsability = () => {
+    setShowResponsabilityInput(false);
+    setNewResponsability('');
+  };
+
+  // Filtrar requirements y responsabilities visibles (no ocultos ni eliminados)
+  const visibleRequirements = fullWorkStation?.requirements?.filter(
+    r => r.isHidden === 0 && r.isDelete === 0
+  ) || [];
+
+  const visibleResponsabilities = fullWorkStation?.responsabilities?.filter(
+    r => r.isHidden === 0 && r.isDelete === 0
+  ) || [];
 
   return (
     <Card className="h-100">
@@ -64,30 +176,160 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({ user }) => {
               </Badge>
             </div>
 
-            {user.workStation.description && (
+            {(fullWorkStation?.description || user.workStation.description) && (
               <div className="mb-3">
                 <span className="text-muted d-block mb-1">Descripción:</span>
                 <p className="mb-0 bg-light p-2 rounded">
-                  {user.workStation.description}
+                  {fullWorkStation?.description || user.workStation.description}
                 </p>
               </div>
             )}
+          </div>
+        )}
 
-            {user.workStation.requirements && (
+        {/* Requisitos */}
+        {user.workStation && (
+          <div className="mb-4">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h6 className="text-uppercase text-muted mb-0">
+                <i className="mdi mdi-clipboard-check-outline me-2"></i>
+                Requisitos ({visibleRequirements.length})
+              </h6>
+              {!showRequirementInput && (
+                <Button
+                  color="primary"
+                  size="sm"
+                  outline
+                  onClick={() => setShowRequirementInput(true)}
+                >
+                  <i className="mdi mdi-plus me-1"></i>
+                  Agregar
+                </Button>
+              )}
+            </div>
+
+            {visibleRequirements.length > 0 ? (
               <div className="mb-3">
-                <span className="text-muted d-block mb-1">Requisitos:</span>
-                <p className="mb-0 bg-light p-2 rounded">
-                  {user.workStation.requirements}
-                </p>
+                {visibleRequirements.map(req => (
+                  <div key={req.id} className="d-flex align-items-center mb-2 bg-light p-2 rounded">
+                    <i className="mdi mdi-check-circle text-primary me-2"></i>
+                    <span>{req.description}</span>
+                  </div>
+                ))}
               </div>
+            ) : (
+              !showRequirementInput && (
+                <p className="text-muted mb-3 fst-italic">Sin requisitos definidos</p>
+              )
             )}
 
-            {user.workStation.responsabilities && (
+            {/* Input para agregar requisito */}
+            {showRequirementInput && (
+              <div className="d-flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Escribir requisito..."
+                  value={newRequirement}
+                  onChange={(e) => setNewRequirement(e.target.value)}
+                  onKeyDown={(e) => handleKeyPress(e, 'requirement')}
+                  className="form-control-sm"
+                  disabled={loadingRequirement}
+                  autoFocus
+                />
+                <Button
+                  color="primary"
+                  size="sm"
+                  onClick={handleAddRequirement}
+                  disabled={!newRequirement.trim() || loadingRequirement}
+                >
+                  {loadingRequirement ? (
+                    <Spinner size="sm" />
+                  ) : (
+                    <i className="mdi mdi-content-save"></i>
+                  )}
+                </Button>
+                <Button
+                  color="light"
+                  size="sm"
+                  onClick={handleCancelRequirement}
+                  disabled={loadingRequirement}
+                >
+                  <i className="mdi mdi-close"></i>
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Responsabilidades */}
+        {user.workStation && (
+          <div className="mb-4">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h6 className="text-uppercase text-muted mb-0">
+                <i className="mdi mdi-account-check-outline me-2"></i>
+                Responsabilidades ({visibleResponsabilities.length})
+              </h6>
+              {!showResponsabilityInput && (
+                <Button
+                  color="success"
+                  size="sm"
+                  outline
+                  onClick={() => setShowResponsabilityInput(true)}
+                >
+                  <i className="mdi mdi-plus me-1"></i>
+                  Agregar
+                </Button>
+              )}
+            </div>
+
+            {visibleResponsabilities.length > 0 ? (
               <div className="mb-3">
-                <span className="text-muted d-block mb-1">Responsabilidades:</span>
-                <p className="mb-0 bg-light p-2 rounded">
-                  {user.workStation.responsabilities}
-                </p>
+                {visibleResponsabilities.map(resp => (
+                  <div key={resp.id} className="d-flex align-items-center mb-2 bg-light p-2 rounded">
+                    <i className="mdi mdi-check-circle text-success me-2"></i>
+                    <span>{resp.description}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              !showResponsabilityInput && (
+                <p className="text-muted mb-3 fst-italic">Sin responsabilidades definidas</p>
+              )
+            )}
+
+            {/* Input para agregar responsabilidad */}
+            {showResponsabilityInput && (
+              <div className="d-flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Escribir responsabilidad..."
+                  value={newResponsability}
+                  onChange={(e) => setNewResponsability(e.target.value)}
+                  onKeyDown={(e) => handleKeyPress(e, 'responsability')}
+                  className="form-control-sm"
+                  disabled={loadingResponsability}
+                  autoFocus
+                />
+                <Button
+                  color="success"
+                  size="sm"
+                  onClick={handleAddResponsability}
+                  disabled={!newResponsability.trim() || loadingResponsability}
+                >
+                  {loadingResponsability ? (
+                    <Spinner size="sm" />
+                  ) : (
+                    <i className="mdi mdi-content-save"></i>
+                  )}
+                </Button>
+                <Button
+                  color="light"
+                  size="sm"
+                  onClick={handleCancelResponsability}
+                  disabled={loadingResponsability}
+                >
+                  <i className="mdi mdi-close"></i>
+                </Button>
               </div>
             )}
           </div>

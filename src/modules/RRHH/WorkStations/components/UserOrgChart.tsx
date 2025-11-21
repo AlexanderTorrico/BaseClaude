@@ -112,13 +112,14 @@ const UserOrgChart: React.FC<UserOrgChartProps> = ({
           }}
           onClick={() => onSelectNode && onSelectNode(user)}
         >
-          <div className="d-flex align-items-center gap-2">
+          <div className="d-flex align-items-center gap-2" style={{ flexWrap: 'nowrap' }}>
             {/* Botón expand/collapse */}
             {hasChildren ? (
               <button
                 className="btn btn-sm p-0"
                 style={{
                   width: '20px',
+                  minWidth: '20px',
                   height: '20px',
                   border: 'none',
                   background: 'transparent',
@@ -126,7 +127,8 @@ const UserOrgChart: React.FC<UserOrgChartProps> = ({
                   fontSize: '16px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  flexShrink: 0
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -136,18 +138,20 @@ const UserOrgChart: React.FC<UserOrgChartProps> = ({
                 <i className={`mdi ${isExpanded ? 'mdi-chevron-down' : 'mdi-chevron-right'}`}></i>
               </button>
             ) : (
-              <div style={{ width: '20px' }}></div>
+              <div style={{ width: '20px', minWidth: '20px', flexShrink: 0 }}></div>
             )}
 
             {/* Avatar del usuario */}
-            <UserAvatar
-              fullName={user.fullName}
-              avatar={user.avatar}
-              size="sm"
-            />
+            <div style={{ flexShrink: 0 }}>
+              <UserAvatar
+                fullName={user.fullName}
+                avatar={user.avatar}
+                size="sm"
+              />
+            </div>
 
             {/* Información del usuario */}
-            <div className="flex-grow-1" style={{ minWidth: 0 }}>
+            <div className="flex-grow-1" style={{ minWidth: 0, overflow: 'hidden' }}>
               <div
                 className="fw-medium"
                 style={{
@@ -175,7 +179,7 @@ const UserOrgChart: React.FC<UserOrgChartProps> = ({
             </div>
 
             {/* Contador de personas a cargo */}
-            <span className="text-muted d-flex align-items-center gap-1" style={{ fontSize: '11px' }}>
+            <span className="text-muted d-flex align-items-center gap-1" style={{ fontSize: '11px', flexShrink: 0, whiteSpace: 'nowrap' }}>
               <i className="mdi mdi-account-group"></i>
               {user.children?.length || 0}
             </span>
@@ -186,7 +190,8 @@ const UserOrgChart: React.FC<UserOrgChartProps> = ({
                 backgroundColor: levelConfig.bg,
                 color: levelConfig.text,
                 fontSize: '9px',
-                padding: '2px 6px'
+                padding: '2px 6px',
+                flexShrink: 0
               }}
               pill
             >

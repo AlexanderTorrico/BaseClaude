@@ -1,4 +1,4 @@
-import { WorkStationModel } from '../models/WorkStationModel';
+import { WorkStationModel } from '@/modules/RRHH/shared/models/WorkStationModel';
 import { LEVEL_COLORS, DEFAULT_LEVEL_COLOR, LevelColorConfig } from '../config/levelColors';
 
 /**

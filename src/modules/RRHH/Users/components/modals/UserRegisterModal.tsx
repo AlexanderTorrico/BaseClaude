@@ -6,7 +6,8 @@ import { UpdateUserDto } from '../../models/UpdateUserDto';
 import { UserModel } from '../../models/UserModel';
 import { userRegistrationSchema, userEditSchema } from '../../validations/userValidationSchema';
 import { validateAvatar } from '../../validations/userValidationHelpers';
-import { useWorkStations } from '@/modules/RRHH/WorkStations/hooks/useWorkStations';
+import { useSharedWorkStations } from '@/modules/RRHH/shared/hooks/useSharedWorkStations';
+import { useSharedWorkStationsFetch } from '@/modules/RRHH/shared/hooks/useSharedWorkStationsFetch';
 
 interface UserRegisterModalProps {
   isOpen: boolean;
@@ -65,7 +66,8 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [showWorkStationPicker, setShowWorkStationPicker] = useState(false);
 
-  const { workStations } = useWorkStations();
+  const { workStationsForPicker } = useSharedWorkStations();
+  const { loading: loadingWS, fetchWorkStations, workStationsLoaded } = useSharedWorkStationsFetch();
   const isEditMode = !!userToEdit;
   const validationSchema = isEditMode ? userEditSchema : userRegistrationSchema;
 
@@ -77,6 +79,13 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
       setAvatarPreview(null);
     }
   }, [isEditMode, userToEdit]);
+
+  // Cargar WorkStations al abrir modal si no existen
+  useEffect(() => {
+    if (isOpen && !workStationsLoaded) {
+      fetchWorkStations(parseInt(companyId));
+    }
+  }, [isOpen, workStationsLoaded, companyId]);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
@@ -168,7 +177,7 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
           onSubmit={handleSubmit}
           enableReinitialize
         >
-          {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
+          {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting, setFieldValue }) => (
             <Form onSubmit={handleSubmit}>
               {serverError && (
                 <Alert color="danger" className="mb-3">
@@ -376,27 +385,35 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
                       style={{ cursor: 'pointer' }}
                       onClick={() => setShowWorkStationPicker(!showWorkStationPicker)}
                     >
-                      <span className={values.workStationId === 0 ? 'text-muted' : ''}>
-                        {values.workStationId === 0
-                          ? 'Selecciona un puesto de trabajo'
-                          : workStations.find(ws => ws.id === values.workStationId)?.name || 'Selecciona un puesto de trabajo'}
-                      </span>
+                      {loadingWS ? (
+                        <span className="text-muted">
+                          <Spinner size="sm" className="me-2" />
+                          Cargando puestos de trabajo...
+                        </span>
+                      ) : (
+                        <span className={values.workStationId === 0 ? 'text-muted' : ''}>
+                          {values.workStationId === 0
+                            ? 'Selecciona un puesto de trabajo'
+                            : workStationsForPicker.find(ws => ws.id === values.workStationId)?.name || 'Selecciona un puesto de trabajo'}
+                        </span>
+                      )}
                       <i
                         className={`mdi mdi-chevron-${showWorkStationPicker ? 'up' : 'down'}`}
                       ></i>
                     </div>
 
-                    {showWorkStationPicker && (
+                    {showWorkStationPicker && !loadingWS && (
                       <div
                         className="border rounded mt-2 p-2"
                         style={{ maxHeight: '250px', overflowY: 'auto' }}
                       >
-                        {workStations.length === 0 ? (
+                        {workStationsForPicker.length === 0 ? (
                           <div className="text-center text-muted p-3">
+                            <i className="mdi mdi-information-outline me-2"></i>
                             No hay puestos de trabajo disponibles
                           </div>
                         ) : (
-                          workStations.map((ws) => (
+                          workStationsForPicker.map((ws) => (
                             <div
                               key={ws.id}
                               className={`p-2 rounded mb-1 ${

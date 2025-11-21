@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useMemo } from 'react';
 import { RootState } from '@/store';
-import { WorkStationModel } from '../models/WorkStationModel';
+import { WorkStationModel } from '@/modules/RRHH/shared/models/WorkStationModel';
 import { buildWorkStationTree } from '../utils/treeHelpers';
 import { filterByLevel, getUniqueLevels, getLevelStatistics } from '../utils/levelHelpers';
 import {

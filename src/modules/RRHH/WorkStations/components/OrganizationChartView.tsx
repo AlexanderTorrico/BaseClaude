@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Row, Col, Spinner, Card, CardBody } from 'reactstrap';
-import { WorkStationModel } from '../models/WorkStationModel';
+import { WorkStationModel } from '@/modules/RRHH/shared/models/WorkStationModel';
 import { useWorkStations } from '../hooks/useWorkStations';
 import VerticalOrgChart from './VerticalOrgChart';
 import WorkStationDetailsPanel from './WorkStationDetailsPanel';

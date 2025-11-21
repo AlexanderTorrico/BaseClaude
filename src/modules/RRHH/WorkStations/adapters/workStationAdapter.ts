@@ -1,5 +1,5 @@
 import { WorkStationResponseModel } from '../models/WorkStationResponseModel';
-import { WorkStationModel } from '../models/WorkStationModel';
+import { WorkStationModel } from '@/modules/RRHH/shared/models/WorkStationModel';
 import { mockEmployeeCountByWorkStation } from '../data/mockWorkStations';
 import { mockRequirements } from '../data/mockRequirements';
 import { getDependencyName } from '../utils/treeHelpers';

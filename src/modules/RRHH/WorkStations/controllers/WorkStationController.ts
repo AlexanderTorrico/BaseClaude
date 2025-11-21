@@ -1,5 +1,5 @@
 import { ControllerResponse } from '@/shared/controllers/ControllerResponse';
-import { WorkStationModel } from '../models/WorkStationModel';
+import { WorkStationModel } from '@/modules/RRHH/shared/models/WorkStationModel';
 import { RequirementModel } from '../models/RequirementModel';
 import * as WorkStationServices from '../services/workStationServices';
 import * as WorkStationAdapter from '../adapters/workStationAdapter';

@@ -1,5 +1,5 @@
 import { UserModel } from '../models/UserModel';
-import { WorkStationModel } from '../models/WorkStationModel';
+import { WorkStationModel } from '@/modules/RRHH/shared/models/WorkStationModel';
 
 /**
  * Adapta WorkStation de la API al modelo de la UI

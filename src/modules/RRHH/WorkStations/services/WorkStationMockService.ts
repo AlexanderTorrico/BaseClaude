@@ -1,5 +1,5 @@
 import { IWorkStationService } from './IWorkStationService';
-import { WorkStationModel } from '../models/WorkStationModel';
+import { WorkStationModel } from '@/modules/RRHH/shared/models/WorkStationModel';
 import { adaptWorkStationsFromApi } from '../adapters/workStationApiAdapter';
 import { SetStateFn } from '@/shared/types/commonTypes';
 import { ApiResponse } from '@/shared/types';

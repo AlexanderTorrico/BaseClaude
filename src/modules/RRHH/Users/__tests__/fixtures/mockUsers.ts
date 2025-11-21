@@ -1,5 +1,5 @@
 import { UserModel } from '../../models/UserModel';
-import { WorkStationModel } from '../../models/WorkStationModel';
+import { WorkStationModel } from '@/modules/RRHH/shared/models/WorkStationModel';
 
 // ==================== LISTA DE WORKSTATIONS ====================
 const WS_DEVELOPER: WorkStationModel = { id: 1, name: 'Developer', level: 2, dependencyId: 5 };

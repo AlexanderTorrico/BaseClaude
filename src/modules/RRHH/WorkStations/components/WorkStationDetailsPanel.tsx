@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardBody, Badge, Row, Col } from 'reactstrap';
-import { WorkStationModel } from '../models/WorkStationModel';
+import { WorkStationModel } from '@/modules/RRHH/shared/models/WorkStationModel';
 import { getLevelColor } from '../utils/levelHelpers';
 
 /**

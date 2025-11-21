@@ -10,6 +10,7 @@ import securityUsersReducer from '../modules/Security/Users/slices/userSlice';
 import rrhhUsersReducer from '../modules/RRHH/Users/slices/userSlice';
 import companyReducer from '../modules/Security/Company/slices/companySlice';
 import workStationsReducer from '../modules/RRHH/WorkStations/slices/workStationsSlice';
+import mypagesReducer from '../modules/WebSites/MyPages/slices/mypagesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     users: rrhhUsersReducer,
     rrhh_workStation: workStationsReducer,
     company: companyReducer,
+    mypages: mypagesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

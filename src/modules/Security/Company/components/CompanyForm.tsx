@@ -224,6 +224,8 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onSubmit, loading = 
                               onBlur={handleBlur}
                               invalid={touched.phoneCountryCode && !!errors.phoneCountryCode}
                             >
+                              <option value="39">+39 (Italia)</option>
+                              <option value="34">+34 (España)</option>
                               <option value="591">+591 (Bolivia)</option>
                               <option value="54">+54 (Argentina)</option>
                               <option value="56">+56 (Chile)</option>
@@ -233,7 +235,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onSubmit, loading = 
                               <option value="55">+55 (Brasil)</option>
                               <option value="52">+52 (México)</option>
                               <option value="1">+1 (USA/Canadá)</option>
-                              <option value="34">+34 (España)</option>
                             </Input>
                             <FormFeedback>{errors.phoneCountryCode}</FormFeedback>
                           </Col>
@@ -304,10 +305,9 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onSubmit, loading = 
                     >
                       <option value="1">1 empleado</option>
                       <option value="2-9">2-9 empleados</option>
-                      <option value="10-49">10-49 empleados</option>
-                      <option value="50-199">50-199 empleados</option>
-                      <option value="200-499">200-499 empleados</option>
-                      <option value="500+">500+ empleados</option>
+                      <option value="10-99">10-99 empleados</option>
+                      <option value="100-299">100-299 empleados</option>
+                      <option value="300+">300+ empleados</option>
                     </Input>
                     <FormFeedback>{errors.companySize}</FormFeedback>
                   </FormGroup>

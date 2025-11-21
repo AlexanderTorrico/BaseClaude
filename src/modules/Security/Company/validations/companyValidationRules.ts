@@ -58,7 +58,7 @@ export const CompanyValidationRules = {
     },
   },
   companySize: {
-    options: ['1', '2-9', '10-49', '50-199', '200-499', '500+'],
+    options: ['1', '2-9', '10-99', '100-299', '300+'],
     messages: {
       required: 'El tamaño de la empresa es requerido',
     },

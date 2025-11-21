@@ -168,7 +168,24 @@ const SidebarContent = (props) => {
 
               </ul>
             </li>
+            {/* ----------------------------------- */}
+            <li className="menu-title">Web Site</li>
+            <li>
+              <Link to="/createpages" className=" ">
+                <i className="bx bx-user"></i>
+                <span>Crear Paginas</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/mypages" className=" ">
+                <i className="bx bx-user"></i>
+                <span>Mis paginas</span>
+              </Link>
+            </li>
+            {/* ----------------------------------- */}
             <li className="menu-title">Az Component</li>
+
+
 
             <li>
               <Link to="/#" className="has-arrow ">

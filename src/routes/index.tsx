@@ -7,8 +7,8 @@ import ForgetPwd from "../pages/Authentication/ForgetPassword";
 import UserProfile from "../pages/Authentication/user-profile";
 
 // // Dashboard
-import Dashboard from "../pages/Dashboard/index";
-import CrudBasic from "../pages/CrudBasic/index";
+// import Dashboard from "../pages/Dashboard/index";
+// import CrudBasic from "../pages/CrudBasic/index";
 import CrudModern from "../pages/CrudModern/index";
 import CrudV1 from "../pages/CrudV1/index";
 import CrudV2 from "../pages/CrudV2/index";
@@ -18,11 +18,6 @@ import HeaderViewType from "../modules/Components/Molecules/HeaderViewType/index
 import Table from "../modules/Components/Molecules/Table/index";
 import FilterSumaryInfo from "../modules/Components/Molecules/FilterSumaryInfo/index";
 
-import CrudBasicResponsive from "../modules/Components/Pages/CrudBasicResponsive/index";
-import PageApi from "../modules/Components/PageApi/index";
-
-import UsersTest from "../modules/Security/Users/index";
-import Roles from "../modules/Security/Roles/index";
 
 // RRHH
 import WorkStations from "../modules/RRHH/WorkStations/index";
@@ -40,9 +35,7 @@ import CreatePage from "@/modules/WebSites/CreatePage";
 
 
 const authProtectedRoutes = [
-  { path: "/dashboard", component: Dashboard },
   { path: "/profile", component: UserProfile },
-  { path: "/crud_basic", component: CrudBasic },
   { path: "/crud_modern", component: CrudModern },
   { path: "/crud_v1", component: CrudV1 },
   { path: "/crud_v2", component: CrudV2 },
@@ -56,19 +49,14 @@ const authProtectedRoutes = [
   { path: "/table", component: Table },
   { path: "/molecules/filter-sumary-info", component: FilterSumaryInfo },
 
-  // Pages
-  { path: "/pages/crud-basic-responsive", component: CrudBasicResponsive },
-
-  { path: "/page-api", component: PageApi },
 
   //Security
   { path: "/security-user", component: User },
-  { path: "/users-test", component: UsersTest },
+
   { path: "/reservation", component: Reservation },
   { path: "/information", component: Information },
   { path: "/company", component: Company },
   { path: "/paymentgateway", component: PaymentGateway },
-  { path: "/roles", component: Roles },
 
   // RRHH
   { path: "/users", component: Users },

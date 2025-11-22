@@ -5,8 +5,8 @@ import layoutReducer from './layoutSlice';
 import { authReducer } from '../pages/Authentication/index';
 import { userReducer } from '../pages/Login/slices';
 import { registerReducer } from '../pages/Register/index';
-import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Hooks/crudBasicSlice';
-import securityUsersReducer from '../modules/Security/Users/slices/userSlice';
+// import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Hooks/crudBasicSlice';
+// import securityUsersReducer from '../modules/Security/Users/slices/userSlice';
 import rrhhUsersReducer from '../modules/RRHH/Users/slices/userSlice';
 import companyReducer from '../modules/Security/Company/slices/companySlice';
 import workStationsReducer from '../modules/RRHH/WorkStations/slices/workStationsSlice';
@@ -18,8 +18,8 @@ export const store = configureStore({
     user: userReducer,
     register: registerReducer,
     layout: layoutReducer,
-    crudBasic: crudBasicReducer,
-    security_user: securityUsersReducer,
+    // crudBasic: crudBasicReducer,
+    // security_user: securityUsersReducer,
     users: rrhhUsersReducer,
     rrhh_workStation: workStationsReducer,
     company: companyReducer,

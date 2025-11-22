@@ -77,20 +77,6 @@ export const menuConfig: MenuConfig = {
           labelKey: "Crud Moderno",
           path: "/crud_modern"
         },
-        {
-          id: "tutorial-crud-v1",
-          type: "link",
-          label: "CRUD V1",
-          labelKey: "CRUD V1",
-          path: "/crud_v1"
-        },
-        {
-          id: "tutorial-crud-v2",
-          type: "link",
-          label: "CRUD V2",
-          labelKey: "CRUD V2",
-          path: "/crud_v2"
-        }
       ]
     },
     {

@@ -6,12 +6,7 @@ import { RegisterPage } from "../pages/Register";
 import ForgetPwd from "../pages/Authentication/ForgetPassword";
 import UserProfile from "../pages/Authentication/user-profile";
 
-// // Dashboard
-// import Dashboard from "../pages/Dashboard/index";
-// import CrudBasic from "../pages/CrudBasic/index";
 import CrudModern from "../pages/CrudModern/index";
-import CrudV1 from "../pages/CrudV1/index";
-import CrudV2 from "../pages/CrudV2/index";
 
 import User from "../pages/security/user/index";
 import HeaderViewType from "../modules/Components/Molecules/HeaderViewType/index";
@@ -37,8 +32,6 @@ import CreatePage from "@/modules/WebSites/CreatePage";
 const authProtectedRoutes = [
   { path: "/profile", component: UserProfile },
   { path: "/crud_modern", component: CrudModern },
-  { path: "/crud_v1", component: CrudV1 },
-  { path: "/crud_v2", component: CrudV2 },
 
   // Web site
   { path: "/createpages", component: CreatePage },

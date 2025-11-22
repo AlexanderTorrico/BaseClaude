@@ -17,6 +17,10 @@ const NavbarMenuRenderer: React.FC<NavbarMenuRendererProps> = ({ items, t }) => 
     setOpenDropdowns(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const closeDropdown = (id: string) => {
+    setOpenDropdowns(prev => ({ ...prev, [id]: false }));
+  };
+
   const renderMenuItem = (item: MenuItem): JSX.Element | null => {
     if (item.hidden || item.type === 'section') return null;
 
@@ -40,7 +44,11 @@ const NavbarMenuRenderer: React.FC<NavbarMenuRendererProps> = ({ items, t }) => 
 
       case 'dropdown':
         return (
-          <li key={item.id} className="nav-item dropdown">
+          <li
+            key={item.id}
+            className="nav-item dropdown"
+            onMouseLeave={() => closeDropdown(item.id)}
+          >
             <Link
               className="nav-link dropdown-toggle arrow-none"
               to={item.path || '/#'}

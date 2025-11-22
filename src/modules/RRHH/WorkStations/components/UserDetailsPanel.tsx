@@ -151,13 +151,32 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({ user, onRefresh }) 
           />
           <div className="ms-3">
             <h5 className="mb-1">{user.fullName}</h5>
-            <p className="text-muted mb-1">{user.email}</p>
             {user.workStation && (
               <Badge color={getLevelColor(user.workStation.level)} pill className="px-3 py-1">
                 <i className="mdi mdi-briefcase me-1"></i>
                 {user.workStation.name}
               </Badge>
             )}
+          </div>
+        </div>
+
+        {/* Información de Contacto */}
+        <div className="mb-4">
+          <h6 className="text-uppercase text-muted mb-3">
+            <i className="mdi mdi-card-account-details-outline me-2"></i>
+            Información de Contacto
+          </h6>
+
+          {user.phone && (
+            <div className="d-flex align-items-center mb-2">
+              <i className="mdi mdi-phone text-muted me-2"></i>
+              <span>{user.phone}</span>
+            </div>
+          )}
+
+          <div className="d-flex align-items-center mb-2">
+            <i className="mdi mdi-email text-muted me-2"></i>
+            <span>{user.email}</span>
           </div>
         </div>
 
@@ -334,26 +353,6 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({ user, onRefresh }) 
             )}
           </div>
         )}
-
-        {/* Información de Contacto */}
-        <div className="mb-4">
-          <h6 className="text-uppercase text-muted mb-3">
-            <i className="mdi mdi-card-account-details-outline me-2"></i>
-            Información de Contacto
-          </h6>
-
-          {user.phone && (
-            <div className="d-flex align-items-center mb-2">
-              <i className="mdi mdi-phone text-muted me-2"></i>
-              <span>{user.phone}</span>
-            </div>
-          )}
-
-          <div className="d-flex align-items-center mb-2">
-            <i className="mdi mdi-email text-muted me-2"></i>
-            <span>{user.email}</span>
-          </div>
-        </div>
 
         {/* Subordinados */}
         {user.children && user.children.length > 0 && (

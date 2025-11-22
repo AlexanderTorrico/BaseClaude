@@ -3,6 +3,12 @@ import { MenuConfig } from './types/MenuTypes';
 export const menuConfig: MenuConfig = {
   version: "1.0",
   menus: [
+    {
+      id: "section-security",
+      type: "section",
+      label: "Seguridad",
+      labelKey: "Secciones"
+    },
     // PÁGINAS WEB ═══════════════════════════════════════════════════════════════════
     {
       id: "design-website",
@@ -57,29 +63,6 @@ export const menuConfig: MenuConfig = {
     },
 
     {
-      id: "section-azcomponent",
-      type: "section",
-      label: "Az Component",
-      labelKey: "Az Component"
-    },
-    {
-      id: "azcomponent-tutorial",
-      type: "dropdown",
-      label: "Tutoria",
-      labelKey: "Tutoria",
-      icon: "bx bx-user-circle",
-      path: "/#",
-      children: [
-        {
-          id: "tutorial-crud-modern",
-          type: "link",
-          label: "Crud Moderno",
-          labelKey: "Crud Moderno",
-          path: "/crud_modern"
-        },
-      ]
-    },
-    {
       id: "azcomponent-molecules",
       type: "dropdown",
       label: "Moleculas",
@@ -107,33 +90,19 @@ export const menuConfig: MenuConfig = {
           label: "Filter Sumary Info",
           labelKey: "Filter Sumary Info",
           path: "/molecules/filter-sumary-info"
-        }
-      ]
-    },
-    {
-      id: "azcomponent-pages",
-      type: "dropdown",
-      label: "Pages",
-      labelKey: "Pages",
-      icon: "bx bx-user-circle",
-      path: "/#",
-      children: [
+        },
         {
-          id: "pages-crud-basic-responsive",
+          id: "tutorial-crud-modern",
           type: "link",
-          label: "Crud basic responsive",
-          labelKey: "Crud basic responsive",
-          path: "/pages/crud-basic-responsive"
-        }
+          label: "Crud Moderno",
+          labelKey: "Crud Moderno",
+          path: "/crud_modern"
+        },
       ]
     },
+
     // SEGURIDAD ══════════════════════════════════════════════════════════════════
-    {
-      id: "section-security",
-      type: "section",
-      label: "Seguridad",
-      labelKey: "Seguridad"
-    },
+    
     {
       id: "security-company",
       type: "link",

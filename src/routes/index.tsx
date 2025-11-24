@@ -30,12 +30,18 @@ import Users from "../modules/RRHH/Users/index";
 
 // -------------------------------------------------------------
 import Landing from "../pages/Landing/Landing";
+import LegalTerms from "../pages/Landing/Links/LegalTerms";
+import LegalPrivacy from "../pages/Landing/Links/LegalPrivacy";
+import LegalCookies from "../pages/Landing/Links/LegalCookies";
+import LegalAcceptableUse from "../pages/Landing/Links/LegalAcceptableUse";
+import LegalLicense from "../pages/Landing/Links/LegalLicense";
 import Information from "@/modules/Security/Information";
 import PaymentGateway from "@/modules/Security/PaymentGateway";
 import Reservation from "@/modules/Security/Reservation";
 import Company from "@/modules/Security/Company";
 import MyPages from "@/modules/WebSites/MyPages";
 import CreatePage from "@/modules/WebSites/CreatePage";
+import Vault from "@/modules/Security/Vault";
 // -------------------------------------------------------------
 
 
@@ -69,6 +75,7 @@ const authProtectedRoutes = [
   { path: "/company", component: Company },
   { path: "/paymentgateway", component: PaymentGateway },
   { path: "/roles", component: Roles },
+  { path: "/vault", component: Vault },
 
   // RRHH
   { path: "/users", component: Users },
@@ -84,6 +91,11 @@ const publicRoutes = [
   { path: "/forgot-password", component: ForgetPwd },
   { path: "/register", component: RegisterPage },
   { path: "/", component: Landing },
+  { path: "/terms", component: LegalTerms },
+  { path: "/privacy", component: LegalPrivacy },
+  { path: "/cookies-policy", component: LegalCookies },
+  { path: "/acceptable-use", component: LegalAcceptableUse },
+  { path: "/license", component: LegalLicense },
 ];
 
 // export { authProtectedRoutes, publicRoutes };

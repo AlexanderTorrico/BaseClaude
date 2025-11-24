@@ -266,6 +266,12 @@ const SidebarContent = (props) => {
               </Link>
             </li>
             <li>
+              <Link to="/vault" className=" ">
+                <i className="bx bx-user"></i>
+                <span>Vault</span>
+              </Link>
+            </li>
+            <li>
               <Link to="/paymentgateway" className=" ">
                 <i className="bx bx-user"></i>
                 <span>Payment gateway</span>

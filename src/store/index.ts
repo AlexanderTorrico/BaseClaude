@@ -10,6 +10,7 @@ import usersReducer from '../modules/Security/Users/slices/userSlice';
 import companyReducer from '../modules/Security/Company/slices/companySlice';
 import workStationsReducer from '../modules/RRHH/WorkStations/slices/workStationsSlice';
 import mypagesReducer from '../modules/WebSites/MyPages/slices/mypagesSlice';
+import vaultReducer from '../modules/Security/Vault/slices/vaultSlice';
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     workStations: workStationsReducer,
     company: companyReducer,
     mypages: mypagesReducer,
+    vault: vaultReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

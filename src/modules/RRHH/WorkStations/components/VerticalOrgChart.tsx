@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardBody, Badge, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-import { WorkStationModel } from '../models/WorkStationModel';
+import { WorkStationModel } from '@/modules/RRHH/shared/models/WorkStationModel';
 import { getLevelColor } from '../utils/levelHelpers';
 
 /**

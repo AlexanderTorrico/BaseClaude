@@ -32,9 +32,13 @@
       "Bash(del OPTIMIZACIONES_TESTS.md)",
       "Bash(del \"e:\\skote\\Skote_React_4.3.0\\Skote_Vite_v4.3.0\\Starterkit - ts\\src\\modules\\Security\\Users\\RESPONSIVE_IMPLEMENTATION.md\")",
       "Bash(cat:*)",
+<<<<<<< HEAD
       "Bash(\"c:\\Luis\\aziende\\BaseClaude\\src\\modules\\Security\\Vault\\models\\VaultModel.ts\")",
       "Bash(echo:*)",
       "Bash(del \"c:\\Luis\\aziende\\BaseClaude\\src\\modules\\Security\\Company\\components\\EmptyState.tsx\")"
+=======
+      "Bash(del AUTH_CONFIG.md PROJECT_GUIDE.md API_INTEGRATION.md)"
+>>>>>>> 02d444949584236ca6f062ab235ca6a578c2e099
     ],
     "deny": []
   }

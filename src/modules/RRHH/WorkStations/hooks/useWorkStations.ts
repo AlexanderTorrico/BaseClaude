@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useMemo } from 'react';
 import { RootState } from '@/store';
-import { WorkStationModel } from '../models/WorkStationModel';
+import { WorkStationModel } from '@/modules/RRHH/shared/models/WorkStationModel';
 import { buildWorkStationTree } from '../utils/treeHelpers';
 import { filterByLevel, getUniqueLevels, getLevelStatistics } from '../utils/levelHelpers';
 import {
@@ -27,13 +27,13 @@ export const useWorkStations = () => {
   // SELECTORES (Sync - desde Redux)
   // =========================================================================
 
-  const workStations = useSelector((state: RootState) => state.workStations.list);
-  const currentView = useSelector((state: RootState) => state.workStations.currentView);
-  const selectedLevel = useSelector((state: RootState) => state.workStations.selectedLevel);
-  const selectedWorkStation = useSelector((state: RootState) => state.workStations.selectedWorkStation);
-  const isSidebarOpen = useSelector((state: RootState) => state.workStations.isSidebarOpen);
-  const requirements = useSelector((state: RootState) => state.workStations.requirements);
-  const loadingRequirements = useSelector((state: RootState) => state.workStations.loadingRequirements);
+  const workStations = useSelector((state: RootState) => state.rrhh_workStation.list);
+  const currentView = useSelector((state: RootState) => state.rrhh_workStation.currentView);
+  const selectedLevel = useSelector((state: RootState) => state.rrhh_workStation.selectedLevel);
+  const selectedWorkStation = useSelector((state: RootState) => state.rrhh_workStation.selectedWorkStation);
+  const isSidebarOpen = useSelector((state: RootState) => state.rrhh_workStation.isSidebarOpen);
+  const requirements = useSelector((state: RootState) => state.rrhh_workStation.requirements);
+  const loadingRequirements = useSelector((state: RootState) => state.rrhh_workStation.loadingRequirements);
 
   // =========================================================================
   // DATOS CALCULADOS (useMemo para optimización)

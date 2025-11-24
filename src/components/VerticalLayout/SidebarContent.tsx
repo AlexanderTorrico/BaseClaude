@@ -1,22 +1,26 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 
 // //Import Scrollbar
 import SimpleBar from "simplebar-react";
 
 // MetisMenu
 import MetisMenu from "metismenujs";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import withRouter from "../Common/withRouter";
 
 //i18n
 import { withTranslation } from "react-i18next";
-import { useCallback } from "react";
 
-const SidebarContent = (props) => {
-  const ref = useRef();
+// Menu Config
+import { useMenuConfig } from "@/config/hooks/useMenuConfig";
+import MenuRenderer from "./MenuRenderer";
+
+const SidebarContent: React.FC = () => {
+  const ref = useRef<any>();
   const path = useLocation();
+  const menuItems = useMenuConfig([]);
 
-  const activateParentDropdown = useCallback((item) => {
+  const activateParentDropdown = useCallback((item: HTMLElement) => {
     item.classList.add("active");
     const parent = item.parentElement;
     const parent2El = parent.childNodes[1];
@@ -54,7 +58,7 @@ const SidebarContent = (props) => {
     return false;
   }, []);
 
-  const removeActivation = (items) => {
+  const removeActivation = (items: HTMLCollectionOf<HTMLAnchorElement>) => {
     for (var i = 0; i < items.length; ++i) {
       var item = items[i];
       const parent = items[i].parentElement;
@@ -99,8 +103,10 @@ const SidebarContent = (props) => {
 
   const activeMenu = useCallback(() => {
     const pathName = path.pathname;
-    let matchingMenuItem = null;
+    let matchingMenuItem: HTMLAnchorElement | null = null;
     const ul = document.getElementById("side-menu");
+    if (!ul) return;
+
     const items = ul.getElementsByTagName("a");
     removeActivation(items);
 
@@ -116,7 +122,7 @@ const SidebarContent = (props) => {
   }, [path.pathname, activateParentDropdown]);
 
   useEffect(() => {
-    ref.current.recalculate();
+    ref.current?.recalculate();
   }, []);
 
   // useEffect(() => {
@@ -138,8 +144,8 @@ const SidebarContent = (props) => {
     activeMenu();
   }, [activeMenu]);
 
-  function scrollElement(item) {
-    if (item) {
+  function scrollElement(item: HTMLElement) {
+    if (item && ref.current) {
       const currentPosition = item.offsetTop;
       if (currentPosition > window.innerHeight) {
         ref.current.getScrollElement().scrollTop = currentPosition - 300;
@@ -152,235 +158,7 @@ const SidebarContent = (props) => {
       <SimpleBar className="h-100" ref={ref}>
         <div id="sidebar-menu">
           <ul className="metismenu list-unstyled" id="side-menu">
-            <li className="menu-title">{props.t("Menu")} </li>
-            <li>
-              <Link to="/#" className="has-arrow">
-                <i className="bx bx-home-circle"></i>
-                <span>{props.t("Dashboards")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/dashboard">{props.t("Default")}</Link>
-                </li>
-                <li>
-                  <Link to="/crud_basic">Crud Basic</Link>
-                </li>
-
-              </ul>
-            </li>
-            {/* ----------------------------------- */}
-            <li className="menu-title">Web Site</li>
-            <li>
-              <Link to="/createpages" className=" ">
-                <i className="bx bx-user"></i>
-                <span>Crear Paginas</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/mypages" className=" ">
-                <i className="bx bx-user"></i>
-                <span>Mis paginas</span>
-              </Link>
-            </li>
-            {/* ----------------------------------- */}
-            <li className="menu-title">Az Component</li>
-
-
-
-            <li>
-              <Link to="/#" className="has-arrow ">
-                <i className="bx bx-user-circle"></i>
-                <span>Tutoria</span>
-              </Link>
-              <ul className="sub-menu">
-                <li>
-                  <Link to="/crud_modern">Crud Moderno</Link>
-                </li>
-                <li>
-                  <Link to="/crud_v1">CRUD V1</Link>
-                </li>
-                <li>
-                  <Link to="/crud_v2">CRUD V2</Link>
-                </li>
-
-              </ul>
-            </li>
-
-
-            <li>
-              <Link to="/#" className="has-arrow ">
-                <i className="bx bx-user-circle"></i>
-                <span>Moleculas</span>
-              </Link>
-              <ul className="sub-menu">
-                <li>
-                  <Link to="/header_view_type">Headers</Link>
-                </li>
-                <li>
-                  <Link to="/table">Table</Link>
-                </li>
-                <li>
-                  <Link to="/molecules/filter-sumary-info">Filter Sumary Info</Link>
-                </li>
-
-              </ul>
-            </li>
-
-            <li>
-              <Link to="/#" className="has-arrow ">
-                <i className="bx bx-user-circle"></i>
-                <span>Pages</span>
-              </Link>
-              <ul className="sub-menu">
-                <li>
-                  <Link to="/pages/crud-basic-responsive">Crud basic responsive</Link>
-                </li>
-
-              </ul>
-            </li>
-
-            <li className="menu-title">Seguridad</li>
-
-            <li>
-              <Link to="/users-test" className=" ">
-                <i className="bx bx-user"></i>
-                <span>Usuarios</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/company" className=" ">
-                <i className="bx bx-user"></i>
-                <span>company</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/reservation" className=" ">
-                <i className="bx bx-user"></i>
-                <span>Reservation</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/information" className=" ">
-                <i className="bx bx-user"></i>
-                <span>Information</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/vault" className=" ">
-                <i className="bx bx-user"></i>
-                <span>Vault</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/paymentgateway" className=" ">
-                <i className="bx bx-user"></i>
-                <span>Payment gateway</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/roles" className=" ">
-                <i className="bx bx-user"></i>
-                <span>Roles</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/test" className=" ">
-                <i className="bx bx-user"></i>
-                <span>Page Test</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/page-api" className=" ">
-                <i className="bx bx-calendar"></i>
-                <span>Page Api</span>
-              </Link>
-            </li>
-
-            <li className="menu-title">RRHH</li>
-
-            <li>
-              <Link to="/users" className=" ">
-                <i className="bx bx-sitemap"></i>
-                <span>Usuarios</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/workstations" className=" ">
-                <i className="bx bx-sitemap"></i>
-                <span>Puestos de Trabajo</span>
-              </Link>
-            </li>
-
-            <li className="menu-title">{props.t("Components")}</li>
-
-            <li>
-              <Link to="/#" className="">
-                <i className="bx bxs-eraser"></i>
-                <span className="badge rounded-pill bg-danger float-end">
-                  10
-                </span>
-                <span>{props.t("Forms")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="#">{props.t("Form Elements")}</Link>
-                </li>
-                <li>
-                  <Link to="#">{props.t("Form Layouts")}</Link>
-                </li>
-                <li>
-                  <Link to="#">
-                    {props.t("Form Validation")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="#">{props.t("Form Advanced")}</Link>
-                </li>
-                <li>
-                  <Link to="#">{props.t("Form Editors")}</Link>
-                </li>
-                <li>
-                  <Link to="#">{props.t("Form File Upload")} </Link>
-                </li>
-                <li>
-                  <Link to="#">{props.t("Form Repeater")}</Link>
-                </li>
-                <li>
-                  <Link to="#">{props.t("Form Wizard")}</Link>
-                </li>
-                <li>
-                  <Link to="#">{props.t("Form Mask")}</Link>
-                </li>
-              </ul>
-            </li>
-
-            <li>
-              <Link to="/#" className="has-arrow ">
-                <i className="bx bx-share-alt"></i>
-                <span>{props.t("Multi Level")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="true">
-                <li>
-                  <Link to="/#">{props.t("Level 1.1")}</Link>
-                </li>
-                <li>
-                  <Link to="/#" className="has-arrow">
-                    {props.t("Level 1.2")}
-                  </Link>
-                  <ul className="sub-menu" aria-expanded="true">
-                    <li>
-                      <Link to="/#">{props.t("Level 2.1")}</Link>
-                    </li>
-                    <li>
-                      <Link to="/#">{props.t("Level 2.2")}</Link>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
+            <MenuRenderer items={menuItems} />
           </ul>
         </div>
       </SimpleBar>
@@ -388,6 +166,6 @@ const SidebarContent = (props) => {
   );
 };
 
-export default withRouter(withTranslation()(SidebarContent));
+export default withTranslation()(withRouter(SidebarContent));
 
 

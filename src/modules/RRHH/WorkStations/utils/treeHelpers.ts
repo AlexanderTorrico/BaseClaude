@@ -1,4 +1,4 @@
-import { WorkStationModel } from '../models/WorkStationModel';
+import { WorkStationModel } from '@/modules/RRHH/shared/models/WorkStationModel';
 
 /**
  * Construir árbol jerárquico vertical a partir de lista plana

@@ -65,7 +65,7 @@ export const loginHttpCall = (
   const controller = loadAbort();
 
   return {
-    call: api.post<ApiResponse>('/login', {
+    call: api.post<ApiResponse>('api/login', {
       email: credentials.email,
       password: credentials.password,
       remember_me: credentials.rememberMe

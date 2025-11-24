@@ -5,12 +5,14 @@ import layoutReducer from './layoutSlice';
 import { authReducer } from '../pages/Authentication/index';
 import { userReducer } from '../pages/Login/slices';
 import { registerReducer } from '../pages/Register/index';
-import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Hooks/crudBasicSlice';
-import usersReducer from '../modules/Security/Users/slices/userSlice';
+// import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Hooks/crudBasicSlice';
+// import securityUsersReducer from '../modules/Security/Users/slices/userSlice';
+import rrhhUsersReducer from '../modules/RRHH/Users/slices/userSlice';
 import companyReducer from '../modules/Security/Company/slices/companySlice';
 import workStationsReducer from '../modules/RRHH/WorkStations/slices/workStationsSlice';
 import mypagesReducer from '../modules/WebSites/MyPages/slices/mypagesSlice';
 import vaultReducer from '../modules/Security/Vault/slices/vaultSlice';
+import tableLayoutReducer from '../modules/Reservation/TableLayout/slices/tablelayoutSlice';
 
 export const store = configureStore({
   reducer: {
@@ -18,12 +20,14 @@ export const store = configureStore({
     user: userReducer,
     register: registerReducer,
     layout: layoutReducer,
-    crudBasic: crudBasicReducer,
-    users: usersReducer,
-    workStations: workStationsReducer,
+    // crudBasic: crudBasicReducer,
+    // security_user: securityUsersReducer,
+    users: rrhhUsersReducer,
+    rrhh_workStation: workStationsReducer,
     company: companyReducer,
     mypages: mypagesReducer,
     vault: vaultReducer,
+    reservation_tableLayout: tableLayoutReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

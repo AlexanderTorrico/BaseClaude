@@ -1,4 +1,4 @@
-import { WorkStationModel } from './WorkStationModel';
+import { WorkStationModel } from '@/modules/RRHH/shared/models/WorkStationModel';
 import { RoleModel } from '../../Roles/models/RoleModel';
 import { PermissionModel } from '../../Roles/models/PermissionModel';
 

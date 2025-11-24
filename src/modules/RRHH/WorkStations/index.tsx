@@ -3,18 +3,40 @@ import { Container, Row, Col } from 'reactstrap';
 import Header from './components/Header';
 import OrganizationChartView from './components/OrganizationChartView';
 import RequirementsSidebar from './components/RequirementsSidebar';
+import { useWorkStations } from './hooks/useWorkStations';
 import { useWorkStationsFetch } from './hooks/useWorkStationsFetch';
-import { WorkStationMockService } from './services/WorkStationMockService';
+import { WorkStationApiService } from './services/WorkStationApiService';
+import { useSharedUsers } from '@/modules/RRHH/shared/hooks/useSharedUsers';
+import { useSharedUsersFetch } from '@/modules/RRHH/shared/hooks/useSharedUsersFetch';
+import { UserApiService } from '@/modules/RRHH/Users/services/UserApiService';
 import './styles/organizationChart.scss';
 
-const workStationService = new WorkStationMockService();
+const workStationService = new WorkStationApiService();
+const userService = new UserApiService();
 
 const WorkStations: React.FC = () => {
-  const { fetchWorkStations } = useWorkStationsFetch(workStationService);
+  const { workStations } = useWorkStations();
+  const { fetchWorkStationsByCompany } = useWorkStationsFetch(workStationService);
+  const { userOrgTree, usersWithWorkStation } = useSharedUsers();
+  const { forceRefreshUsers } = useSharedUsersFetch(userService);
 
   useEffect(() => {
-    fetchWorkStations();
+    fetchWorkStationsByCompany(1);
+    forceRefreshUsers(1);
   }, []);
+
+  const handleRefresh = () => {
+    fetchWorkStationsByCompany(1);
+  };
+
+  useEffect(() => {
+    console.log('🔄 WorkStations actualizados en Redux:', workStations);
+  }, [workStations]);
+
+  useEffect(() => {
+    console.log('👥 Usuarios con WorkStation:', usersWithWorkStation);
+    console.log('🌳 Árbol de organigrama (usuarios):', userOrgTree);
+  }, [usersWithWorkStation, userOrgTree]);
 
   return (
     <>
@@ -28,7 +50,7 @@ const WorkStations: React.FC = () => {
 
           <Row>
             <Col xs="12">
-              <OrganizationChartView />
+              <OrganizationChartView userOrgTree={userOrgTree} onRefresh={handleRefresh} />
             </Col>
           </Row>
         </Container>

@@ -105,6 +105,10 @@ UI Component ← Hook (Sync) ← Redux Store (useSelector)
 ### Directory Structure
 - `src/modules/` - Feature modules organized by business domain
   - Example: `Security/Users/` - User management module (REFERENCE IMPLEMENTATION)
+  - `RRHH/shared/` - Shared resources across RRHH modules
+    - `models/` - Shared models (WorkStationModel)
+    - `services/` - Singleton services (WorkStationService)
+    - `hooks/` - Shared hooks (useSharedWorkStations, useSharedWorkStationsFetch)
 - `src/components/` - Reusable UI components
   - `aziende/` - Custom high-level components (AzTable, AzHeaderCardViews, AzFilterSummary)
   - `Common/` - Shared components (UserAvatar, Breadcrumb, Spinner)
@@ -124,6 +128,72 @@ UI Component ← Hook (Sync) ← Redux Store (useSelector)
 - Each module has its own slice with standard structure: `{ list, currentView }`
 - Hooks handle async logic and dispatch to slices
 - NO loading/error in slices - handled at component level
+
+### Hook Layer Guidelines
+
+**REGLA CRÍTICA: Los hooks deben ser ultraligeros - solo llamar al servicio y hacer dispatch.**
+
+**Principios:**
+- ✅ **Hooks fetch simples**: Solo llamada al servicio + dispatch, SIN validaciones de status
+- ✅ **Hooks con retorno (register/update)**: Pueden validar `result.data` antes de dispatch para legibilidad
+- ✅ **httpRequestWithAuth**: Maneja TODOS los errores, try/catch, console.log internamente
+- ❌ **NO agregar try/catch en hooks** - ya está en httpRequestWithAuth
+- ❌ **NO agregar console.log en hooks** - ya está en httpRequestWithAuth
+- ❌ **NO validar `result.status` en hooks fetch** - confiar en el servicio
+
+**Patrón estándar para hooks:**
+
+```typescript
+// ✅ 1. Hook fetch simple - Ultraligero (sin validaciones)
+const fetchUsersByCompany = async (companyId: number): Promise<void> => {
+  const result = await service.getUsersByCompany(companyId, setLoading);
+  store.dispatch(setUsers(result.data));
+};
+
+// ✅ 2. Hook con retorno - Validar result.data para legibilidad
+const registerUser = async (dto: RegisterUserDto): Promise<{ success: boolean; message: string }> => {
+  const formData = new FormData();
+  formData.append('name', dto.name);
+  formData.append('email', dto.email);
+  if (dto.avatar) formData.append('avatar', dto.avatar);
+
+  const result = await service.registerUser(formData, setLoading);
+
+  if (result.data) {
+    store.dispatch(addUser(result.data));
+  }
+
+  return { success: result.status === 200, message: result.message };
+};
+
+// ❌ NO hacer esto - Hooks NO deben tener try/catch ni validaciones de status
+const fetchUsersByCompany = async (companyId: number): Promise<void> => {
+  try {  // ← NO: httpRequestWithAuth ya maneja esto
+    const result = await service.getUsersByCompany(companyId, setLoading);
+
+    if (result.status !== 200) {  // ← NO: confiar en el servicio
+      console.error('Error...');  // ← NO: logs están en httpRequestWithAuth
+      return;
+    }
+
+    store.dispatch(setUsers(result.data));
+  } catch (error) {  // ← NO: ya manejado en httpRequestWithAuth
+    console.error(error);
+  }
+};
+```
+
+**Responsabilidades por capa:**
+- **httpRequestWithAuth**: try/catch, logging, manejo de errores, retornar ApiResponse válido
+- **Service**: transformApiData + adapter, siempre retorna ApiResponse
+- **Hook**: preparar datos (FormData), llamar servicio, dispatch a Redux
+- **Component**: manejar UI, llamar hooks, mostrar resultados
+
+**Beneficios:**
+- **Hooks limpios y legibles**: Fácil de entender qué hace cada función
+- **Logging centralizado**: Un solo lugar para logs (httpRequestWithAuth)
+- **Menos código duplicado**: No repetir try/catch en cada hook
+- **Consistencia**: Todos los hooks siguen el mismo patrón simple
 
 ### Service Layer Guidelines
 
@@ -1131,6 +1201,116 @@ Security/Users/
 └── index.tsx                                  # Main component with AzFilterSummary
 ```
 
+### Shared Resources Pattern (RRHH/shared/)
+
+**REGLA CRÍTICA: `shared/` SOLO contiene hooks compartidos. Models y services están en sus módulos respectivos.**
+
+**Estructura correcta:**
+
+```
+src/modules/RRHH/
+├── Users/
+│   ├── services/
+│   │   ├── IUserService.ts
+│   │   ├── UserApiService.ts
+│   │   └── UserMockService.ts
+│   ├── models/
+│   │   └── UserModel.ts
+│   └── hooks/
+│       └── useUsersFetch.ts         # Recibe service como parámetro
+├── WorkStations/
+│   ├── services/
+│   │   ├── IWorkStationService.ts
+│   │   ├── WorkStationApiService.ts
+│   │   └── WorkStationMockService.ts
+│   ├── models/
+│   │   └── WorkStationModel.ts      # ← Modelo REAL está aquí
+│   └── hooks/
+│       └── useWorkStationsFetch.ts  # Recibe service como parámetro
+└── shared/
+    └── hooks/                        # ← SOLO hooks compartidos
+        ├── useSharedWorkStations.ts
+        └── useSharedWorkStationsFetch.ts  # Recibe service como parámetro
+
+    ❌ NO: models/ (usar el del módulo original)
+    ❌ NO: services/ (ya están en el módulo respectivo)
+```
+
+**Hook compartido - Recibe service como parámetro:**
+```typescript
+// src/modules/RRHH/shared/hooks/useSharedWorkStationsFetch.ts
+import { IWorkStationService } from '@/modules/RRHH/WorkStations/services/IWorkStationService';
+import { WorkStationModel } from '@/modules/RRHH/WorkStations/models/WorkStationModel';
+
+export const useSharedWorkStationsFetch = (service: IWorkStationService) => {
+  const [loading, setLoading] = useState(false);
+
+  const workStationsLoaded = (): boolean => {
+    const state = store.getState();
+    return state.rrhh_workStation.list.length > 0;
+  };
+
+  const fetchWorkStations = async (companyId: number = 1): Promise<void> => {
+    if (workStationsLoaded()) return;
+
+    // ✅ Ultraligero - Solo llamada + dispatch
+    const result = await service.getWorkStationsByCompany(companyId, setLoading);
+    store.dispatch(setWorkStations(result.data));
+  };
+
+  return { loading, fetchWorkStations, workStationsLoaded: workStationsLoaded() };
+};
+```
+
+**Uso en múltiples módulos:**
+```typescript
+// En RRHH/Users/components/modals/UserRegisterModal.tsx
+import { WorkStationApiService } from '@/modules/RRHH/WorkStations/services/WorkStationApiService';
+import { useSharedWorkStations } from '@/modules/RRHH/shared/hooks/useSharedWorkStations';
+import { useSharedWorkStationsFetch } from '@/modules/RRHH/shared/hooks/useSharedWorkStationsFetch';
+
+const workStationService = new WorkStationApiService();
+
+const UserRegisterModal = () => {
+  const { workStationsForPicker } = useSharedWorkStations();
+  const { fetchWorkStations } = useSharedWorkStationsFetch(workStationService);
+
+  useEffect(() => {
+    fetchWorkStations(1); // Solo carga si no están en cache
+  }, []);
+
+  return (
+    <select>
+      {workStationsForPicker.map(ws => (
+        <option key={ws.id} value={ws.id}>{ws.name}</option>
+      ))}
+    </select>
+  );
+};
+```
+
+**Principios de `shared/`:**
+- ✅ **SOLO hooks compartidos**: Hooks que son usados por 2+ módulos del área
+- ✅ **Hook recibe service**: Igual que hooks normales, recibe service como parámetro
+- ✅ **Imports desde módulos**: Models y services se importan desde el módulo dueño
+- ✅ **Sin lógica de negocio**: Solo orquestación de llamadas y dispatch
+- ❌ **NO models**: Los modelos viven en el módulo que los define
+- ❌ **NO services**: Los servicios viven en el módulo que los implementa
+- ❌ **NO singletons**: No usar patrón singleton, instanciar en componentes
+
+**Ventajas del patrón:**
+- ✅ **Reutilización de lógica**: Hooks compartidos evitan duplicación
+- ✅ **Caché automático**: Los datos se cargan una sola vez (Redux)
+- ✅ **Type-safe**: Importar models desde su módulo original
+- ✅ **Sin acoplamiento**: Cada módulo mantiene sus services independientes
+- ✅ **Testeable**: Hooks pueden recibir mock services en tests
+
+**Cuándo usar `shared/`:**
+- ✅ Cuando 2+ módulos dentro del mismo área necesitan la misma lógica de hook
+- ✅ Para hooks que orquestan llamadas a servicios de otros módulos
+- ❌ NO usar para resources globales de toda la app (usar `src/shared/` en ese caso)
+- ❌ NO crear `shared/` si solo 1 módulo usa el hook
+
 ### Shared Components (AZ)
 
 #### AzTable - Data Table
@@ -1277,6 +1457,7 @@ export const userTableColumns = [
 8. **Service Pattern**: Interface + MockService (ApiService created later)
 9. **Adapters**: Always convert snake_case (API) → camelCase (UI)
 10. **Code Readability**: Keep it simple - complex logic is in shared components
+11. **NO Documentation in Code**: Hooks y Services NO necesitan comentarios de documentación - el código es autoexplicativo y debe ser intuitivo por sí mismo
 
 The codebase follows React functional component patterns with hooks and uses modern TypeScript/ES6+ features throughout.
 

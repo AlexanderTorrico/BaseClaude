@@ -10,12 +10,6 @@ export const useUsersFetch = (service: IUserService) => {
 
   const fetchUsersByCompany = async (companyId: number): Promise<void> => {
     const result = await service.getUsersByCompany(companyId, setLoading);
-
-    if (result.status !== 200) {
-      console.error(`❌ Error fetching users: [${result.status}] ${result.message}`);
-      return;
-    }
-
     store.dispatch(setUsers(result.data));
   };
 
@@ -28,6 +22,7 @@ export const useUsersFetch = (service: IUserService) => {
     formData.append('password', dto.password);
     formData.append('repeatPassword', dto.repeatPassword);
     formData.append('gbl_company_id', dto.gbl_company_id);
+    formData.append('workStation', dto.workStation);
 
     if (dto.avatar) {
       formData.append('avatar', dto.avatar);
@@ -61,6 +56,7 @@ export const useUsersFetch = (service: IUserService) => {
     formData.append('phone', dto.phone);
     formData.append('email', dto.email);
     formData.append('gbl_company_id', dto.gbl_company_id);
+    formData.append('workStation', dto.workStation);
 
     // Solo agregar contraseña si fue proporcionada
     if (dto.password && dto.password.trim() !== '') {

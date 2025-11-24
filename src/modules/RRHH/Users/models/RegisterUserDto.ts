@@ -9,5 +9,6 @@ export interface RegisterUserDto {
   password: string;
   repeatPassword: string;
   gbl_company_id: string;
+  workStation: string;  // JSON string: '{"name":"Puesto","dependency_id":1}'
   avatar?: File | null;
 }

@@ -32,7 +32,9 @@ import Company from "@/modules/Security/Company";
 import MyPages from "@/modules/WebSites/MyPages";
 import CreatePage from "@/modules/WebSites/CreatePage";
 import Vault from "@/modules/Security/Vault";
+import Orders from "@/modules/Security/Orders";
 import TableLayout from "@/modules/Reservation/TableLayout";
+import Reservations from "@/modules/Reservation/Reservations";
 // -------------------------------------------------------------
 
 
@@ -59,12 +61,14 @@ const authProtectedRoutes = [
   { path: "/paymentgateway", component: PaymentGateway },
   // { path: "/roles", component: Roles },
   { path: "/vault", component: Vault },
+  { path: "/orders", component: Orders },
 
   // RRHH
   { path: "/users", component: Users },
   { path: "/workstations", component: WorkStations },
   // RESERVATION
   { path: "/tablelayout", component: TableLayout },
+  { path: "/reservations", component: Reservations },
 
   //   // this route should be at the end of all other routes
   //   // eslint-disable-next-line react/display-name

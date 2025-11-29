@@ -40,6 +40,18 @@ const ZoneTreeView: React.FC<ZoneTreeViewProps> = ({
     }
   };
 
+  const getShapeColor = (shape: string): string => {
+    switch (shape) {
+      case 'circle':
+        return '#10b981';
+      case 'rectangle':
+        return '#f59e0b';
+      case 'square':
+      default:
+        return '#3b82f6';
+    }
+  };
+
   return (
     <Card className="h-100">
       <CardBody>
@@ -117,7 +129,7 @@ const ZoneTreeView: React.FC<ZoneTreeViewProps> = ({
                             transition: 'all 0.15s ease-in-out'
                           }}
                         >
-                          <i className={`mdi ${getShapeIcon(table.shape)} text-success me-2`}></i>
+                          <i className={`mdi ${getShapeIcon(table.shape)} me-2`} style={{ color: getShapeColor(table.shape) }}></i>
                           <span className="flex-grow-1">{table.number}</span>
                           <Badge color="light" className="text-muted">
                             <i className="mdi mdi-account-multiple me-1"></i>

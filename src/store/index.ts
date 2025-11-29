@@ -13,6 +13,7 @@ import workStationsReducer from '../modules/RRHH/WorkStations/slices/workStation
 import mypagesReducer from '../modules/WebSites/MyPages/slices/mypagesSlice';
 import vaultReducer from '../modules/Security/Vault/slices/vaultSlice';
 import tableLayoutReducer from '../modules/Reservation/TableLayout/slices/tablelayoutSlice';
+import securityOrdersReducer from '../modules/Security/Orders/slices/orderSlice';
 
 export const store = configureStore({
   reducer: {
@@ -28,6 +29,7 @@ export const store = configureStore({
     mypages: mypagesReducer,
     vault: vaultReducer,
     reservation_tableLayout: tableLayoutReducer,
+    security_orders: securityOrdersReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -116,8 +116,25 @@ export const menuConfig: MenuConfig = {
           label: "Disposicion de Mesas",
           labelKey: "Disposicion de Mesas",
           path: "/tablelayout"
+        },
+        {
+          id: "reservation-reservations",
+          type: "link",
+          label: "Reservaciones",
+          labelKey: "Reservaciones",
+          path: "/reservations"
         }
       ]
+    },
+    // ORDENES ═══════════════════════════════════════════════════════════════════
+
+    {
+      id: "security-orders",
+      type: "link",
+      label: "Pedidos Web",
+      labelKey: "Pedidos Web",
+      icon: "bx bx-package",
+      path: "/orders"
     },
 
     // SEGURIDAD ══════════════════════════════════════════════════════════════════

@@ -1,13 +1,18 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 
-const Authmiddleware = (props) => {
-  if (!localStorage.getItem("authUser")) {
-    return (
-      <Navigate to={{ pathname: "/login", state: { from: props.location } }} />
-    );
+interface AuthmiddlewareProps {
+  children: React.ReactNode;
+}
+
+const Authmiddleware: React.FC<AuthmiddlewareProps> = ({ children }) => {
+  const isFakeAuth = import.meta.env.VITE_APP_DEFAULTAUTH === 'fake';
+
+  if (!localStorage.getItem("authUser") && !isFakeAuth) {
+    return <Navigate to="/login" />;
   }
-  return <React.Fragment>{props.children}</React.Fragment>;
+
+  return <React.Fragment>{children}</React.Fragment>;
 };
 
 export default Authmiddleware;

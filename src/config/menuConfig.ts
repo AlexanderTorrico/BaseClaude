@@ -137,6 +137,17 @@ export const menuConfig: MenuConfig = {
       path: "/orders"
     },
 
+    // E-COMMERCE ═════════════════════════════════════════════════════════════════
+
+    {
+      id: "security-ecommerce",
+      type: "link",
+      label: "E-commerce",
+      labelKey: "E-commerce",
+      icon: "bx bx-store",
+      path: "/ecommerce"
+    },
+
     // SEGURIDAD ══════════════════════════════════════════════════════════════════
 
     {

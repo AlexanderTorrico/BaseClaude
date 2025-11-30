@@ -35,6 +35,7 @@ import Vault from "@/modules/Security/Vault";
 import Orders from "@/modules/Security/Orders";
 import TableLayout from "@/modules/Reservation/TableLayout";
 import Reservations from "@/modules/Reservation/Reservations";
+import Ecommerce from "@/pages/ecommerce";
 // -------------------------------------------------------------
 
 
@@ -62,6 +63,7 @@ const authProtectedRoutes = [
   // { path: "/roles", component: Roles },
   { path: "/vault", component: Vault },
   { path: "/orders", component: Orders },
+  { path: "/ecommerce", component: Ecommerce },
 
   // RRHH
   { path: "/users", component: Users },

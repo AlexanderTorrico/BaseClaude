@@ -1,0 +1,83 @@
+import { ZoneModel } from '../models/TableLayoutModel';
+
+export const MOCK_ZONES: ZoneModel[] = [
+  {
+    id: 1,
+    name: 'Zona 1',
+    active: 1,
+    gblCompanyId: 1,
+    booTables: [
+      {
+        id: 1,
+        number: 'Mesa1',
+        capacity: 4,
+        automaticReservationLevel: 0,
+        booZoneId: 1,
+        position: { x: 11, y: 102 },
+        shape: 'square',
+        active: 1,
+        gblCompanyId: 1,
+      },
+      {
+        id: 2,
+        number: 'Mesa2',
+        capacity: 4,
+        automaticReservationLevel: 0,
+        booZoneId: 1,
+        position: { x: 137, y: 146 },
+        shape: 'square',
+        active: 1,
+        gblCompanyId: 1,
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Zona 2',
+    active: 1,
+    gblCompanyId: 1,
+    booTables: [
+      {
+        id: 3,
+        number: 'Mesa1_z2',
+        capacity: 4,
+        automaticReservationLevel: 0,
+        booZoneId: 2,
+        position: { x: 181, y: 183 },
+        shape: 'square',
+        active: 1,
+        gblCompanyId: 1,
+      },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Zona 3',
+    active: 1,
+    gblCompanyId: 1,
+    booTables: [
+      {
+        id: 4,
+        number: 'Mesa1_z3',
+        capacity: 6,
+        automaticReservationLevel: 0,
+        booZoneId: 3,
+        position: { x: 50, y: 50 },
+        shape: 'circle',
+        active: 1,
+        gblCompanyId: 1,
+      },
+      {
+        id: 5,
+        number: 'Mesa2_z3',
+        capacity: 2,
+        automaticReservationLevel: 0,
+        booZoneId: 3,
+        position: { x: 200, y: 100 },
+        shape: 'rectangle',
+        active: 1,
+        gblCompanyId: 1,
+      },
+    ],
+  },
+];

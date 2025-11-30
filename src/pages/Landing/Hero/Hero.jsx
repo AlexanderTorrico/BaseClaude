@@ -1,10 +1,26 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import "./hero.css"
 
 const Hero = () => {
 
     const { t } = useTranslation();
+
+    const socialLinks = [
+        { icon: 'bxl bx-facebook-circle', url: '#', name: 'Facebook' },
+        { icon: 'bxl-instagram', url: '#', name: 'Instagram' },
+        { icon: 'bxl bx-twitter-x', url: '#', name: 'X' },
+        { icon: 'bxl-linkedin-square', url: '#', name: 'LinkedIn' },
+        { icon: 'bxl-whatsapp', url: '#', name: 'WhatsApp' },
+    ];
+    const legalLinks = [
+        { key: 'landing_hero_legal_terms', path: '/terms' },
+        { key: 'landing_hero_legal_privacy', path: '/privacy' },
+        { key: 'landing_hero_legal_cookies', path: '/cookies-policy' },
+        { key: 'landing_hero_legal_acceptable_use', path: '/acceptable-use' },
+        { key: 'landing_hero_legal_license', path: '/license' },
+    ];
     const [userInput, setUserInput] = useState('');
     const [placeholder, setPlaceholder] = useState('');
 
@@ -67,6 +83,41 @@ const Hero = () => {
                     </svg>
                 </button>
             </form>
+
+            {/* Footer Section */}
+            <div className="hero-footer">
+                {/* Social Links */}
+                <div className="hero-social">
+                    {socialLinks.map((social, index) => (
+                        <a
+                            key={index}
+                            href={social.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title={social.name}
+                        >
+                            <i className={social.icon}></i>
+                        </a>
+                    ))}
+                </div>
+
+                {/* Credits */}
+                <p className="hero-credits">
+                    {t('landing_hero_credits')}
+                </p>
+
+                {/* Legal Links */}
+                <div className="hero-legal">
+                    {legalLinks.map((link, index) => (
+                        <React.Fragment key={link.key}>
+                            <Link to={link.path}>
+                                {t(link.key)}
+                            </Link>
+                            {index < legalLinks.length - 1 && <span className="separator">|</span>}
+                        </React.Fragment>
+                    ))}
+                </div>
+            </div>
         </div>
     )
 }

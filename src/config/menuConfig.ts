@@ -36,7 +36,7 @@ export const menuConfig: MenuConfig = {
     },
 
     // RRHH ═══════════════════════════════════════════════════════════════════════════
-    
+
     {
       id: "section-rrhh",
       type: "dropdown",
@@ -101,8 +101,44 @@ export const menuConfig: MenuConfig = {
       ]
     },
 
+    // RESERVA ═══════════════════════════════════════════════════════════════════
+    {
+      id: "section-reservation",
+      type: "dropdown",
+      label: "Reservacion",
+      labelKey: "Reservacion",
+      icon: "bx bx-user-circle",
+      path: "/reservation",
+      children: [
+        {
+          id: "reservation-tablelayout",
+          type: "link",
+          label: "Disposicion de Mesas",
+          labelKey: "Disposicion de Mesas",
+          path: "/tablelayout"
+        },
+        {
+          id: "reservation-reservations",
+          type: "link",
+          label: "Reservaciones",
+          labelKey: "Reservaciones",
+          path: "/reservations"
+        }
+      ]
+    },
+    // ORDENES ═══════════════════════════════════════════════════════════════════
+
+    {
+      id: "security-orders",
+      type: "link",
+      label: "Pedidos Web",
+      labelKey: "Pedidos Web",
+      icon: "bx bx-package",
+      path: "/orders"
+    },
+
     // SEGURIDAD ══════════════════════════════════════════════════════════════════
-    
+
     {
       id: "security-company",
       type: "link",
@@ -135,9 +171,17 @@ export const menuConfig: MenuConfig = {
       icon: "bx bx-user",
       path: "/paymentgateway"
     },
+    {
+      id: "security-vault",
+      type: "link",
+      label: "Vault",
+      labelKey: "Vault",
+      icon: "bx bx-user",
+      path: "/vault"
+    },
 
 
-    
+
 
   ]
 } as const;

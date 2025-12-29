@@ -89,5 +89,4 @@ const publicRoutes = [
   { path: "/license", component: LegalLicense },
 ];
 
-// export { authProtectedRoutes, publicRoutes };
 export { authProtectedRoutes, publicRoutes }

@@ -18,4 +18,19 @@ export default defineConfig({
       '@/shared/__tests__': resolve(__dirname, './src/shared/__tests__'),
     },
   },
+  build: {
+    outDir: 'dist',
+  },
+  server: {
+    port: 5000,
+    host: true,
+    proxy: {
+      // Proxy /editor al servidor del Editor (puerto 5001)
+      '/editor': {
+        target: 'http://localhost:5001',
+        changeOrigin: true,
+        rewrite: (path) => path,
+      },
+    },
+  },
 })

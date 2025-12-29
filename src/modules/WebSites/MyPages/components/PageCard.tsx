@@ -74,6 +74,15 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
     }
   };
 
+  /**
+   * Navega al editor guardando el pageId en localStorage
+   */
+  const handleEditPage = () => {
+    localStorage.setItem('pageId', String(page.id));
+    // Navegacion a la app del Editor (subruta estatica, no React Router)
+    window.location.href = '/editor/';
+  };
+
   return (
     <Card className="border shadow-sm mb-3">
       <CardBody className="p-3">
@@ -257,7 +266,7 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                   <i className="mdi mdi-share-variant me-1"></i>
                   Compartir
                 </Button>
-                <Button color="warning" size="sm" disabled>
+                <Button color="warning" size="sm" onClick={handleEditPage}>
                   <i className="mdi mdi-pencil me-1"></i>
                   Editar
                 </Button>

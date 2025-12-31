@@ -1,4 +1,4 @@
-import React from 'react';
+// JSX pragma needed for TSX
 import { Badge, UncontrolledTooltip } from 'reactstrap';
 import { UserModel } from '../models/UserModel';
 import UserAvatar from '@/components/Common/UserAvatar';
@@ -80,7 +80,8 @@ export const userTableColumns = [
     sortable: false,
     filterable: false,
     cell: ({ row: { original } }: { row: { original: UserModel } }) => {
-      const directPermissionCount = original.permissionIds?.length || 0;
+      const directPermissions = original.permissions || [];
+      const directPermissionCount = directPermissions.length;
 
       // Calcular permisos heredados de roles
       const inheritedPermissionCount = original.roles?.reduce((acc, role) => {
@@ -108,17 +109,24 @@ export const userTableColumns = [
             <div className="text-start">
               {directPermissionCount > 0 && (
                 <div>
-                  <strong>Directos:</strong> {directPermissionCount}
+                  <strong>Permisos Directos:</strong>
+                  {directPermissions.slice(0, 5).map((perm) => (
+                    <div key={perm.id} className="ms-2">
+                      • {perm.namePublic || perm.name}
+                    </div>
+                  ))}
+                  {directPermissionCount > 5 && (
+                    <div className="ms-2 text-muted">
+                      +{directPermissionCount - 5} más...
+                    </div>
+                  )}
                 </div>
               )}
               {inheritedPermissionCount > 0 && (
-                <div>
-                  <strong>Heredados:</strong> {inheritedPermissionCount}
+                <div className="mt-1">
+                  <strong>Heredados de roles:</strong> {inheritedPermissionCount}
                 </div>
               )}
-              <div className="mt-1 pt-1 border-top">
-                <strong>Total:</strong> {totalPermissions}
-              </div>
             </div>
           </UncontrolledTooltip>
         </div>

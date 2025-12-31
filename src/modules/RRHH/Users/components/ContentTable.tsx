@@ -4,6 +4,7 @@ import AzTable from '../../../../components/aziende/AzTable';
 import { userTableColumns } from '../config/tableColumns';
 import { UserModel } from '../models/UserModel';
 import UserRolesPermissionsModal from './UserRolesPermissionsModal';
+import UserDetailsModal from './modals/UserDetailsModal';
 
 interface ContentTableProps {
   filteredUsers: UserModel[];
@@ -27,6 +28,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
   onEdit,
 }) => {
   const [isRolesPermissionsModalOpen, setIsRolesPermissionsModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
 
   const handleManageRolesPermissions = (userId: number) => {
@@ -48,7 +50,11 @@ const ContentTable: React.FC<ContentTableProps> = ({
   };
 
   const handleViewUser = (userId: number) => {
-    console.log('Ver detalles usuario:', userId);
+    const user = filteredUsers.find(u => u.id === userId);
+    if (user) {
+      setSelectedUser(user);
+      setIsDetailsModalOpen(true);
+    }
   };
 
   return (
@@ -127,6 +133,15 @@ const ContentTable: React.FC<ContentTableProps> = ({
           toggle={() => setIsRolesPermissionsModalOpen(false)}
           user={selectedUser}
           onSuccess={handleRolesPermissionsUpdated}
+        />
+      )}
+
+      {/* Modal para ver detalles del usuario */}
+      {selectedUser && (
+        <UserDetailsModal
+          isOpen={isDetailsModalOpen}
+          toggle={() => setIsDetailsModalOpen(false)}
+          user={selectedUser}
         />
       )}
     </>

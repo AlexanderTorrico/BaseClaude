@@ -8,6 +8,8 @@ import { registerReducer } from '../pages/Register/index';
 // import crudBasicReducer from '../modules/Components/Pages/CrudBasicResponsive/Hooks/crudBasicSlice';
 // import securityUsersReducer from '../modules/Security/Users/slices/userSlice';
 import rrhhUsersReducer from '../modules/RRHH/Users/slices/userSlice';
+import rrhhRolesReducer from '../modules/RRHH/Roles/slices/roleSlice';
+import rrhhPermissionsReducer from '../modules/RRHH/Permissions/slices/permissionSlice';
 import companyReducer from '../modules/Security/Company/slices/companySlice';
 import workStationsReducer from '../modules/RRHH/WorkStations/slices/workStationsSlice';
 import mypagesReducer from '../modules/WebSites/MyPages/slices/mypagesSlice';
@@ -25,6 +27,8 @@ export const store = configureStore({
     // crudBasic: crudBasicReducer,
     // security_user: securityUsersReducer,
     users: rrhhUsersReducer,
+    roles: rrhhRolesReducer,
+    permissions: rrhhPermissionsReducer,
     rrhh_workStation: workStationsReducer,
     company: companyReducer,
     mypages: mypagesReducer,

@@ -17,6 +17,8 @@ import FilterSumaryInfo from "../modules/Components/Molecules/FilterSumaryInfo/i
 // RRHH
 import WorkStations from "../modules/RRHH/WorkStations/index";
 import Users from "../modules/RRHH/Users/index";
+import Roles from "../modules/RRHH/Roles/index";
+import Permissions from "../modules/RRHH/Permissions/index";
 
 // -------------------------------------------------------------
 import Landing from "../pages/Landing/Landing";
@@ -60,7 +62,6 @@ const authProtectedRoutes = [
   { path: "/information", component: Information },
   { path: "/company", component: Company },
   { path: "/paymentgateway", component: PaymentGateway },
-  // { path: "/roles", component: Roles },
   { path: "/vault", component: Vault },
   { path: "/orders", component: Orders },
   { path: "/ecommerce", component: Ecommerce },
@@ -68,6 +69,8 @@ const authProtectedRoutes = [
   // RRHH
   { path: "/users", component: Users },
   { path: "/workstations", component: WorkStations },
+  { path: "/roles", component: Roles },
+  { path: "/permissions", component: Permissions },
   // RESERVATION
   { path: "/tablelayout", component: TableLayout },
   { path: "/reservations", component: Reservations },

@@ -12,10 +12,17 @@ import {
   TabPane,
   Badge,
   Alert,
+  Input,
+  Collapse,
+  Spinner,
+  FormGroup,
+  Label,
 } from 'reactstrap';
 import classnames from 'classnames';
 import { toast } from 'react-toastify';
 import { UserModel } from '../models/UserModel';
+import { PermissionModel } from '../../Permissions/models/PermissionModel';
+import { PermissionApiService } from '../../Permissions/services/PermissionApiService';
 
 interface UserRolesPermissionsModalProps {
   isOpen: boolean;
@@ -23,6 +30,20 @@ interface UserRolesPermissionsModalProps {
   user: UserModel;
   onSuccess?: () => void;
 }
+
+interface GroupedPermissions {
+  [moduleName: string]: {
+    module: {
+      id: number;
+      name: string;
+      description?: string;
+      icon?: string;
+    };
+    permissions: PermissionModel[];
+  };
+}
+
+const permissionService = new PermissionApiService();
 
 /**
  * Modal para asignar roles y permisos a un usuario
@@ -36,21 +57,134 @@ const UserRolesPermissionsModal: React.FC<UserRolesPermissionsModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'roles' | 'permissions'>('roles');
   const [saving, setSaving] = useState(false);
+  const [loadingPermissions, setLoadingPermissions] = useState(false);
 
-  // TODO: Estados para cuando se configuren roles y permisos
+  // Estados para roles y permisos
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<number[]>([]);
 
+  // Permisos agrupados por módulo
+  const [allPermissions, setAllPermissions] = useState<PermissionModel[]>([]);
+  const [groupedPermissions, setGroupedPermissions] = useState<GroupedPermissions>({});
+  const [expandedModules, setExpandedModules] = useState<string[]>([]);
+
   /**
-   * Inicializar estados con los datos actuales del usuario
+   * Cargar permisos cuando se abre el modal
    */
   useEffect(() => {
     if (isOpen) {
       setSelectedRoleIds(user.roleIds || []);
       setSelectedPermissionIds(user.permissionIds || []);
       setActiveTab('roles');
+      fetchPermissions();
     }
   }, [isOpen, user]);
+
+  /**
+   * Obtener todos los permisos y agruparlos por módulo
+   */
+  const fetchPermissions = async () => {
+    setLoadingPermissions(true);
+    try {
+      const result = await permissionService.getAllPermissions();
+      if (result.data) {
+        setAllPermissions(result.data);
+        groupPermissionsByModule(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching permissions:', error);
+      toast.error('Error al cargar los permisos');
+    } finally {
+      setLoadingPermissions(false);
+    }
+  };
+
+  /**
+   * Agrupar permisos por módulo
+   */
+  const groupPermissionsByModule = (permissions: PermissionModel[]) => {
+    const grouped: GroupedPermissions = {};
+
+    permissions.forEach(permission => {
+      const moduleName = permission.module?.name || 'Sin Módulo';
+
+      if (!grouped[moduleName]) {
+        grouped[moduleName] = {
+          module: {
+            id: permission.module?.id || 0,
+            name: moduleName,
+            description: permission.module?.description,
+            icon: permission.module?.icon || 'mdi mdi-folder',
+          },
+          permissions: [],
+        };
+      }
+
+      grouped[moduleName].permissions.push(permission);
+    });
+
+    setGroupedPermissions(grouped);
+  };
+
+  /**
+   * Toggle expansión de un módulo
+   */
+  const toggleModule = (moduleName: string) => {
+    setExpandedModules(prev =>
+      prev.includes(moduleName)
+        ? prev.filter(m => m !== moduleName)
+        : [...prev, moduleName]
+    );
+  };
+
+  /**
+   * Toggle un permiso individual
+   */
+  const togglePermission = (permissionId: number) => {
+    setSelectedPermissionIds(prev =>
+      prev.includes(permissionId)
+        ? prev.filter(id => id !== permissionId)
+        : [...prev, permissionId]
+    );
+  };
+
+  /**
+   * Toggle todos los permisos de un módulo
+   */
+  const toggleAllModulePermissions = (moduleName: string, checked: boolean) => {
+    const modulePermissionIds = groupedPermissions[moduleName]?.permissions.map(p => p.id) || [];
+
+    if (checked) {
+      setSelectedPermissionIds(prev => [...new Set([...prev, ...modulePermissionIds])]);
+    } else {
+      setSelectedPermissionIds(prev => prev.filter(id => !modulePermissionIds.includes(id)));
+    }
+  };
+
+  /**
+   * Verificar si todos los permisos de un módulo están seleccionados
+   */
+  const isModuleFullySelected = (moduleName: string): boolean => {
+    const modulePermissionIds = groupedPermissions[moduleName]?.permissions.map(p => p.id) || [];
+    return modulePermissionIds.length > 0 && modulePermissionIds.every(id => selectedPermissionIds.includes(id));
+  };
+
+  /**
+   * Verificar si algunos permisos de un módulo están seleccionados
+   */
+  const isModulePartiallySelected = (moduleName: string): boolean => {
+    const modulePermissionIds = groupedPermissions[moduleName]?.permissions.map(p => p.id) || [];
+    const selectedCount = modulePermissionIds.filter(id => selectedPermissionIds.includes(id)).length;
+    return selectedCount > 0 && selectedCount < modulePermissionIds.length;
+  };
+
+  /**
+   * Contar permisos seleccionados de un módulo
+   */
+  const getModuleSelectedCount = (moduleName: string): number => {
+    const modulePermissionIds = groupedPermissions[moduleName]?.permissions.map(p => p.id) || [];
+    return modulePermissionIds.filter(id => selectedPermissionIds.includes(id)).length;
+  };
 
   /**
    * Guardar cambios
@@ -59,16 +193,15 @@ const UserRolesPermissionsModal: React.FC<UserRolesPermissionsModalProps> = ({
     setSaving(true);
 
     try {
-      // Simular guardado en backend
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Calcular cambios en permisos
+      const currentPermissionIds = user.permissionIds || [];
+      const addedPermissions = selectedPermissionIds.filter(id => !currentPermissionIds.includes(id));
+      const removedPermissions = currentPermissionIds.filter(id => !selectedPermissionIds.includes(id));
 
-      // Calcular cambios
+      // Calcular cambios en roles (para el futuro)
       const addedRoles = selectedRoleIds.filter(id => !(user.roleIds || []).includes(id));
       const removedRoles = (user.roleIds || []).filter(id => !selectedRoleIds.includes(id));
-      const addedPermissions = selectedPermissionIds.filter(id => !(user.permissionIds || []).includes(id));
-      const removedPermissions = (user.permissionIds || []).filter(id => !selectedPermissionIds.includes(id));
 
-      // Mostrar resumen de cambios
       const totalChanges = addedRoles.length + removedRoles.length + addedPermissions.length + removedPermissions.length;
 
       if (totalChanges === 0) {
@@ -76,19 +209,38 @@ const UserRolesPermissionsModal: React.FC<UserRolesPermissionsModalProps> = ({
           position: 'top-right',
           autoClose: 2000,
         });
-      } else {
-        toast.success(
-          `✅ Asignación actualizada: ${selectedRoleIds.length} rol(es), ${selectedPermissionIds.length} permiso(s) directo(s)`,
-          {
-            position: 'top-right',
-            autoClose: 3000,
-          }
-        );
+        toggle();
+        return;
       }
+
+      // Asignar nuevos permisos
+      for (const permissionId of addedPermissions) {
+        const result = await permissionService.assignPermissionToUser(user.id, permissionId, false);
+        if (result.status !== 200 && result.status !== 201) {
+          console.error(`Error asignando permiso ${permissionId}:`, result.message);
+        }
+      }
+
+      // Remover permisos quitados
+      for (const permissionId of removedPermissions) {
+        const result = await permissionService.removePermissionFromUser(user.id, permissionId);
+        if (result.status !== 200 && result.status !== 201) {
+          console.error(`Error removiendo permiso ${permissionId}:`, result.message);
+        }
+      }
+
+      toast.success(
+        `✅ Permisos actualizados: +${addedPermissions.length} asignados, -${removedPermissions.length} removidos`,
+        {
+          position: 'top-right',
+          autoClose: 3000,
+        }
+      );
 
       onSuccess?.();
       toggle();
     } catch (error) {
+      console.error('Error al guardar permisos:', error);
       toast.error('❌ Error al guardar. Intente nuevamente.', {
         position: 'top-right',
         autoClose: 3000,
@@ -197,11 +349,107 @@ const UserRolesPermissionsModal: React.FC<UserRolesPermissionsModalProps> = ({
               </p>
             </div>
 
-            {/* TODO: Mostrar permisos cuando se configuren */}
-            <div className="text-center py-4">
-              <i className="mdi mdi-key-off-outline display-4 text-muted"></i>
-              <p className="text-muted mt-2">Permisos pendientes de configuración</p>
-            </div>
+            {loadingPermissions ? (
+              <div className="text-center py-4">
+                <Spinner color="primary" />
+                <p className="text-muted mt-2">Cargando permisos...</p>
+              </div>
+            ) : Object.keys(groupedPermissions).length === 0 ? (
+              <div className="text-center py-4">
+                <i className="mdi mdi-key-off-outline display-4 text-muted"></i>
+                <p className="text-muted mt-2">No hay permisos disponibles</p>
+              </div>
+            ) : (
+              <div className="permissions-accordion">
+                {Object.entries(groupedPermissions).map(([moduleName, moduleData]) => {
+                  const isExpanded = expandedModules.includes(moduleName);
+                  const isFullySelected = isModuleFullySelected(moduleName);
+                  const isPartiallySelected = isModulePartiallySelected(moduleName);
+                  const selectedCount = getModuleSelectedCount(moduleName);
+                  const totalCount = moduleData.permissions.length;
+
+                  return (
+                    <div key={moduleName} className="border rounded mb-2">
+                      {/* Module Header */}
+                      <div
+                        className="d-flex align-items-center p-3 bg-light"
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <FormGroup check className="mb-0 me-3">
+                          <Input
+                            type="checkbox"
+                            checked={isFullySelected}
+                            ref={(input) => {
+                              if (input) {
+                                input.indeterminate = isPartiallySelected;
+                              }
+                            }}
+                            onChange={(e) => toggleAllModulePermissions(moduleName, e.target.checked)}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </FormGroup>
+                        <div
+                          className="d-flex align-items-center flex-grow-1"
+                          onClick={() => toggleModule(moduleName)}
+                        >
+                          <i className={`${moduleData.module.icon} font-size-18 me-2 text-primary`}></i>
+                          <div className="flex-grow-1">
+                            <span className="fw-medium">{moduleName}</span>
+                            {moduleData.module.description && (
+                              <small className="d-block text-muted" style={{ fontSize: '0.75rem' }}>
+                                {moduleData.module.description.substring(0, 60)}
+                                {moduleData.module.description.length > 60 ? '...' : ''}
+                              </small>
+                            )}
+                          </div>
+                          <Badge color={selectedCount > 0 ? 'primary' : 'secondary'} className="me-2">
+                            {selectedCount}/{totalCount}
+                          </Badge>
+                          <i className={`mdi ${isExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down'} font-size-18`}></i>
+                        </div>
+                      </div>
+
+                      {/* Permissions List */}
+                      <Collapse isOpen={isExpanded}>
+                        <div className="p-3 pt-0">
+                          {moduleData.permissions.map(permission => {
+                            const isSelected = selectedPermissionIds.includes(permission.id);
+
+                            return (
+                              <div
+                                key={permission.id}
+                                className={`d-flex align-items-start p-2 rounded mb-1 ${isSelected ? 'bg-primary bg-opacity-10' : 'hover-bg-light'}`}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => togglePermission(permission.id)}
+                              >
+                                <FormGroup check className="mb-0 me-3">
+                                  <Input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={() => { }}
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                </FormGroup>
+                                <div className="flex-grow-1">
+                                  <div className="d-flex align-items-center">
+                                    <span className="fw-medium">{permission.namePublic || permission.name}</span>
+                                  </div>
+                                  {permission.description && (
+                                    <small className="text-muted d-block mt-1">
+                                      {permission.description}
+                                    </small>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </Collapse>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </TabPane>
         </TabContent>
 

@@ -59,6 +59,20 @@ export const menuConfig: MenuConfig = {
           labelKey: "Puestos de Trabajo",
           path: "/workstations"
         },
+        {
+          id: "rrhh-roles",
+          type: "link",
+          label: "Roles",
+          labelKey: "Roles",
+          path: "/roles"
+        },
+        {
+          id: "rrhh-permissions",
+          type: "link",
+          label: "Permisos",
+          labelKey: "Permisos",
+          path: "/permissions"
+        },
       ]
     },
 

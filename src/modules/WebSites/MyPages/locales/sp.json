@@ -1,0 +1,9 @@
+{
+  "myPages.title": "Mis Páginas Web",
+  "myPages.subtitle": "Gestiona tus sitios web creados",
+  "myPages.loading": "Cargando páginas...",
+  "myPages.empty": "No tienes páginas creadas",
+  "myPages.emptyHint": "Crea tu primera página web para comenzar",
+  "myPages.page": "página",
+  "myPages.pages": "páginas"
+}

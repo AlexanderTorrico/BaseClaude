@@ -8,22 +8,27 @@ import translationRS from "./locales/rs/translation.json"
 import translationSP from "./locales/sp/translation.json"
 import translationENG from "./locales/eng/translation.json"
 
+// Traducciones del módulo MyPages
+import myPagesENG from "./modules/WebSites/MyPages/locales/eng.json"
+import myPagesSP from "./modules/WebSites/MyPages/locales/sp.json"
+import myPagesIT from "./modules/WebSites/MyPages/locales/it.json"
+
 // the translations
 const resources = {
   gr: {
     translation: translationGr,
   },
   it: {
-    translation: translationIT,
+    translation: { ...translationIT, ...myPagesIT },
   },
   rs: {
     translation: translationRS,
   },
   sp: {
-    translation: translationSP,
+    translation: { ...translationSP, ...myPagesSP },
   },
   eng: {
-    translation: translationENG,
+    translation: { ...translationENG, ...myPagesENG },
   },
 }
 

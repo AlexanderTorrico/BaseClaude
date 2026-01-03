@@ -63,6 +63,16 @@ const config = [
     skipFile: true
   },
   {
+    folder: 'locales',
+    template: 'locales.template.js',
+    multiple: true,
+    files: [
+      { fileName: 'en.json', generator: 'generateLocaleEN', fixedName: true },
+      { fileName: 'es.json', generator: 'generateLocaleES', fixedName: true },
+      { fileName: 'it.json', generator: 'generateLocaleIT', fixedName: true }
+    ]
+  },
+  {
     folder: '__tests__',
     template: 'test.template.js',
     multiple: true,
@@ -144,9 +154,15 @@ const create = async () => {
           }
           const content = generator(moduleNameOnly);
 
-          const prefix = file.prefix || '';
-          const modulePart = file.useLowerCase ? moduleNameOnly.toLowerCase() : moduleNameOnly;
-          const fileName = prefix + modulePart + file.fileName;
+          // Si fixedName es true, usar fileName directamente sin prefijo ni moduleName
+          let fileName;
+          if (file.fixedName) {
+            fileName = file.fileName;
+          } else {
+            const prefix = file.prefix || '';
+            const modulePart = file.useLowerCase ? moduleNameOnly.toLowerCase() : moduleNameOnly;
+            fileName = prefix + modulePart + file.fileName;
+          }
           const filePath = path.join(folderPath, fileName);
 
           fs.writeFileSync(filePath, content);
@@ -186,6 +202,7 @@ const create = async () => {
     console.log(`   ├── config/ (table${moduleNameOnly}Columns.tsx)`);
     console.log(`   ├── data/ (mock${moduleNameOnly}WithRoles.ts)`);
     console.log(`   ├── hooks/ (use${moduleNameOnly}.ts, use${moduleNameOnly}Fetch.ts)`);
+    console.log(`   ├── locales/ (en.json, es.json, it.json)`);
     console.log(`   ├── models/ (${moduleNameOnly}Model.ts)`);
     console.log(`   ├── services/ (I${moduleNameOnly}Service.ts, ${moduleNameOnly}ApiService.ts, ${moduleNameOnly}MockService.ts)`);
     console.log(`   ├── slices/ (${moduleNameOnly.toLowerCase()}Slice.ts)`);

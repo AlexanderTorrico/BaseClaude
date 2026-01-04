@@ -13,22 +13,27 @@ import myPagesENG from "./modules/WebSites/MyPages/locales/eng.json"
 import myPagesSP from "./modules/WebSites/MyPages/locales/sp.json"
 import myPagesIT from "./modules/WebSites/MyPages/locales/it.json"
 
+// Traducciones del módulo CreatePage
+import createPageENG from "./modules/WebSites/CreatePage/locales/eng.json"
+import createPageSP from "./modules/WebSites/CreatePage/locales/sp.json"
+import createPageIT from "./modules/WebSites/CreatePage/locales/it.json"
+
 // the translations
 const resources = {
   gr: {
     translation: translationGr,
   },
   it: {
-    translation: { ...translationIT, ...myPagesIT },
+    translation: { ...translationIT, ...myPagesIT, ...createPageIT },
   },
   rs: {
     translation: translationRS,
   },
   sp: {
-    translation: { ...translationSP, ...myPagesSP },
+    translation: { ...translationSP, ...myPagesSP, ...createPageSP },
   },
   eng: {
-    translation: { ...translationENG, ...myPagesENG },
+    translation: { ...translationENG, ...myPagesENG, ...createPageENG },
   },
 }
 

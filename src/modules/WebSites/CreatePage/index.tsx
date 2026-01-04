@@ -16,6 +16,7 @@ import {
   Label,
   FormGroup
 } from 'reactstrap';
+import { useTranslation } from 'react-i18next';
 
 // Tipos para templates
 interface PageTemplate {
@@ -29,37 +30,38 @@ interface PageTemplate {
 
 // Mock data de templates organizados por categoría
 const TEMPLATE_CATEGORIES = [
-  { id: 'landing', name: 'Landing Pages', icon: 'mdi-rocket-launch' },
-  { id: 'business', name: 'Negocios', icon: 'mdi-briefcase' },
-  { id: 'ecommerce', name: 'E-Commerce', icon: 'mdi-cart' },
-  { id: 'portfolio', name: 'Portfolio', icon: 'mdi-palette' },
-  { id: 'blog', name: 'Blog', icon: 'mdi-post' },
+  { id: 'landing', nameKey: 'createPage.categories.landing', icon: 'mdi-rocket-launch' },
+  { id: 'business', nameKey: 'createPage.categories.business', icon: 'mdi-briefcase' },
+  { id: 'ecommerce', nameKey: 'createPage.categories.ecommerce', icon: 'mdi-cart' },
+  { id: 'portfolio', nameKey: 'createPage.categories.portfolio', icon: 'mdi-palette' },
+  { id: 'blog', nameKey: 'createPage.categories.blog', icon: 'mdi-post' },
 ];
 
 const MOCK_TEMPLATES: PageTemplate[] = [
   // Landing Pages
-  { id: 'lp-1', name: 'Startup Modern', description: 'Landing page moderna para startups tecnológicas', thumbnail: 'https://via.placeholder.com/400x300/667eea/ffffff?text=Startup+Modern', category: 'landing' },
-  { id: 'lp-2', name: 'App Showcase', description: 'Ideal para presentar aplicaciones móviles', thumbnail: 'https://via.placeholder.com/400x300/764ba2/ffffff?text=App+Showcase', category: 'landing' },
-  { id: 'lp-3', name: 'SaaS Product', description: 'Landing page para productos SaaS', thumbnail: 'https://via.placeholder.com/400x300/f093fb/ffffff?text=SaaS+Product', category: 'landing' },
+  { id: 'lp-1', name: 'createPage.templates.startupModern', description: 'createPage.templates.startupModernDesc', thumbnail: 'https://via.placeholder.com/400x300/667eea/ffffff?text=Startup+Modern', category: 'landing' },
+  { id: 'lp-2', name: 'createPage.templates.appShowcase', description: 'createPage.templates.appShowcaseDesc', thumbnail: 'https://via.placeholder.com/400x300/764ba2/ffffff?text=App+Showcase', category: 'landing' },
+  { id: 'lp-3', name: 'createPage.templates.saasProduct', description: 'createPage.templates.saasProductDesc', thumbnail: 'https://via.placeholder.com/400x300/f093fb/ffffff?text=SaaS+Product', category: 'landing' },
 
   // Business
-  { id: 'biz-1', name: 'Corporate Pro', description: 'Diseño corporativo profesional', thumbnail: 'https://via.placeholder.com/400x300/4facfe/ffffff?text=Corporate+Pro', category: 'business' },
-  { id: 'biz-2', name: 'Consulting Agency', description: 'Para agencias de consultoría', thumbnail: 'https://via.placeholder.com/400x300/00f2fe/ffffff?text=Consulting', category: 'business' },
+  { id: 'biz-1', name: 'createPage.templates.corporatePro', description: 'createPage.templates.corporateProDesc', thumbnail: 'https://via.placeholder.com/400x300/4facfe/ffffff?text=Corporate+Pro', category: 'business' },
+  { id: 'biz-2', name: 'createPage.templates.consultingAgency', description: 'createPage.templates.consultingAgencyDesc', thumbnail: 'https://via.placeholder.com/400x300/00f2fe/ffffff?text=Consulting', category: 'business' },
 
   // E-Commerce
-  { id: 'shop-1', name: 'Fashion Store', description: 'Tienda online de moda', thumbnail: 'https://via.placeholder.com/400x300/43e97b/ffffff?text=Fashion+Store', category: 'ecommerce' },
-  { id: 'shop-2', name: 'Tech Shop', description: 'E-commerce de tecnología', thumbnail: 'https://via.placeholder.com/400x300/38f9d7/ffffff?text=Tech+Shop', category: 'ecommerce' },
+  { id: 'shop-1', name: 'createPage.templates.fashionStore', description: 'createPage.templates.fashionStoreDesc', thumbnail: 'https://via.placeholder.com/400x300/43e97b/ffffff?text=Fashion+Store', category: 'ecommerce' },
+  { id: 'shop-2', name: 'createPage.templates.techShop', description: 'createPage.templates.techShopDesc', thumbnail: 'https://via.placeholder.com/400x300/38f9d7/ffffff?text=Tech+Shop', category: 'ecommerce' },
 
   // Portfolio
-  { id: 'port-1', name: 'Creative Portfolio', description: 'Portfolio para diseñadores creativos', thumbnail: 'https://via.placeholder.com/400x300/fa709a/ffffff?text=Creative', category: 'portfolio' },
-  { id: 'port-2', name: 'Developer Portfolio', description: 'Portfolio para desarrolladores', thumbnail: 'https://via.placeholder.com/400x300/fee140/ffffff?text=Developer', category: 'portfolio' },
+  { id: 'port-1', name: 'createPage.templates.creativePortfolio', description: 'createPage.templates.creativePortfolioDesc', thumbnail: 'https://via.placeholder.com/400x300/fa709a/ffffff?text=Creative', category: 'portfolio' },
+  { id: 'port-2', name: 'createPage.templates.developerPortfolio', description: 'createPage.templates.developerPortfolioDesc', thumbnail: 'https://via.placeholder.com/400x300/fee140/ffffff?text=Developer', category: 'portfolio' },
 
   // Blog
-  { id: 'blog-1', name: 'Minimal Blog', description: 'Blog minimalista y elegante', thumbnail: 'https://via.placeholder.com/400x300/30cfd0/ffffff?text=Minimal+Blog', category: 'blog' },
-  { id: 'blog-2', name: 'Magazine Style', description: 'Estilo revista para blogs', thumbnail: 'https://via.placeholder.com/400x300/330867/ffffff?text=Magazine', category: 'blog' },
+  { id: 'blog-1', name: 'createPage.templates.minimalBlog', description: 'createPage.templates.minimalBlogDesc', thumbnail: 'https://via.placeholder.com/400x300/30cfd0/ffffff?text=Minimal+Blog', category: 'blog' },
+  { id: 'blog-2', name: 'createPage.templates.magazineStyle', description: 'createPage.templates.magazineStyleDesc', thumbnail: 'https://via.placeholder.com/400x300/330867/ffffff?text=Magazine', category: 'blog' },
 ];
 
 const CreatePage: React.FC = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<string>('landing');
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
 
@@ -118,14 +120,14 @@ const CreatePage: React.FC = () => {
           <Col xs={12}>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                <h4 className="mb-1">Crear Nueva Página</h4>
+                <h4 className="mb-1">{t("createPage.title")}</h4>
                 <p className="text-muted mb-0">
-                  Selecciona un template o crea una página con IA
+                  {t("createPage.subtitle")}
                 </p>
               </div>
               <Button color="primary" size="lg" onClick={handleCreateWithAI}>
                 <i className="mdi mdi-auto-fix me-2"></i>
-                Crear con IA
+                {t("createPage.createWithAI")}
               </Button>
             </div>
           </Col>
@@ -141,7 +143,7 @@ const CreatePage: React.FC = () => {
                   <FormGroup className="mb-0">
                     <Label for="category-select" className="fw-medium mb-2">
                       <i className="mdi mdi-view-grid me-2"></i>
-                      Categoría
+                      {t("createPage.category")}
                     </Label>
                     <Input
                       type="select"
@@ -152,7 +154,7 @@ const CreatePage: React.FC = () => {
                     >
                       {TEMPLATE_CATEGORIES.map(category => (
                         <option key={category.id} value={category.id}>
-                          {category.name} ({getTemplateCount(category.id)})
+                          {t(category.nameKey)} ({getTemplateCount(category.id)})
                         </option>
                       ))}
                     </Input>
@@ -169,7 +171,7 @@ const CreatePage: React.FC = () => {
                         style={{ cursor: 'pointer' }}
                       >
                         <i className={`mdi ${category.icon} me-2`}></i>
-                        {category.name}
+                        {t(category.nameKey)}
                         <Badge color="light" className="ms-2" pill>
                           {getTemplateCount(category.id)}
                         </Badge>
@@ -185,7 +187,7 @@ const CreatePage: React.FC = () => {
                       <div className="text-center py-5">
                         <i className="mdi mdi-package-variant display-4 text-muted"></i>
                         <p className="text-muted mt-3">
-                          No hay templates disponibles en esta categoría
+                          {t("createPage.noTemplates")}
                         </p>
                       </div>
                     ) : (
@@ -265,7 +267,7 @@ const CreatePage: React.FC = () => {
                                     }}
                                   >
                                     <i className="mdi mdi-check me-1"></i>
-                                    Seleccionar
+                                    {t("createPage.select")}
                                   </Button>
                                   <Button
                                     color="light"
@@ -276,10 +278,10 @@ const CreatePage: React.FC = () => {
                                       e.stopPropagation();
                                       console.log('Vista previa:', template.id);
                                     }}
-                                    title="Vista previa"
+                                    title={t("createPage.preview")}
                                   >
                                     <i className="mdi mdi-eye me-1"></i>
-                                    Preview
+                                    {t("createPage.preview")}
                                   </Button>
                                 </div>
                               </div>
@@ -303,9 +305,9 @@ const CreatePage: React.FC = () => {
                 <CardBody className="py-3">
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
-                      <h5 className="mb-1">Template seleccionado</h5>
+                      <h5 className="mb-1">{t("createPage.templateSelected")}</h5>
                       <p className="text-muted mb-0">
-                        {MOCK_TEMPLATES.find(t => t.id === selectedTemplate)?.name}
+                        {t(MOCK_TEMPLATES.find(tpl => tpl.id === selectedTemplate)?.name || '')}
                       </p>
                     </div>
                     <div className="d-flex gap-2">
@@ -313,11 +315,11 @@ const CreatePage: React.FC = () => {
                         color="light"
                         onClick={() => setSelectedTemplate(null)}
                       >
-                        Cancelar
+                        {t("createPage.cancel")}
                       </Button>
                       <Button color="success">
                         <i className="mdi mdi-check me-1"></i>
-                        Continuar con este template
+                        {t("createPage.continueWithTemplate")}
                       </Button>
                     </div>
                   </div>

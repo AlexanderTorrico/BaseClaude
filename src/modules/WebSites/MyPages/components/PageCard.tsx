@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardBody, Button, Row, Col, Input } from 'reactstrap';
+import { useTranslation } from 'react-i18next';
 import { MyPagesModel } from '../models/MyPagesModel';
 
 interface PageCardProps {
@@ -8,6 +9,7 @@ interface PageCardProps {
 }
 
 const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
+  const { t } = useTranslation();
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(page.name);
   const [isSaving, setIsSaving] = useState(false);
@@ -75,12 +77,12 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
   };
 
   /**
-   * Navega al editor guardando el pageId en localStorage
+   * Abre el editor en una nueva pestaña guardando el pageId en localStorage
    */
   const handleEditPage = () => {
     localStorage.setItem('pageId', String(page.id));
-    // Navegacion a la app del Editor (subruta estatica, no React Router)
-    window.location.href = '/editor/';
+    // Abre el Editor en una nueva pestaña
+    window.open('/editor/', '_blank');
   };
 
   return (
@@ -152,7 +154,7 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                       size="sm"
                       className="p-1"
                       onClick={handleStartEdit}
-                      title="Editar nombre"
+                      title={t("myPages.editName")}
                     >
                       <i className="mdi mdi-pencil font-size-14"></i>
                     </Button>
@@ -171,7 +173,7 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                 ) : (
                   <span className="text-muted">
                     <i className="mdi mdi-link-off me-1"></i>
-                    Sin dominio
+                    {t("myPages.noDomain")}
                   </span>
                 )}
               </div>
@@ -182,7 +184,7 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                   <div className="d-flex align-items-center">
                     <i className="mdi mdi-eye text-info me-2 font-size-20"></i>
                     <div>
-                      <div className="text-muted font-size-12">Visitas</div>
+                      <div className="text-muted font-size-12">{t("myPages.visits")}</div>
                       <div className="fw-medium">{visits.toLocaleString()}</div>
                     </div>
                   </div>
@@ -191,7 +193,7 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                   <div className="d-flex align-items-center">
                     <i className="mdi mdi-calendar-check text-success me-2 font-size-20"></i>
                     <div>
-                      <div className="text-muted font-size-12">Reservas</div>
+                      <div className="text-muted font-size-12">{t("myPages.reservations")}</div>
                       <div className="fw-medium">{reservations.toLocaleString()}</div>
                     </div>
                   </div>
@@ -200,7 +202,7 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
 
               {/* Paleta de colores */}
               <div className="mb-3">
-                <div className="text-muted font-size-12 mb-2">Paleta de colores</div>
+                <div className="text-muted font-size-12 mb-2">{t("myPages.colorPalette")}</div>
                 <div className="d-flex gap-2 align-items-center">
                   {/* Color de acento */}
                   {page.palette.ac && (
@@ -212,7 +214,7 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                         backgroundColor: page.palette.ac,
                         cursor: 'pointer'
                       }}
-                      title={`Acento: ${page.palette.ac}`}
+                      title={`${t("myPages.accent")}: ${page.palette.ac}`}
                     />
                   )}
                   {/* Color de fondo */}
@@ -225,7 +227,7 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                         backgroundColor: page.palette.bg,
                         cursor: 'pointer'
                       }}
-                      title={`Fondo: ${page.palette.bg}`}
+                      title={`${t("myPages.background")}: ${page.palette.bg}`}
                     />
                   )}
                   {/* Color de texto */}
@@ -238,7 +240,7 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                         backgroundColor: page.palette.tx,
                         cursor: 'pointer'
                       }}
-                      title={`Texto: ${page.palette.tx}`}
+                      title={`${t("myPages.text")}: ${page.palette.tx}`}
                     />
                   )}
                 </div>
@@ -248,15 +250,15 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
               <div className="d-flex flex-wrap gap-2 mt-auto">
                 <Button color="light" size="sm" disabled>
                   <i className="mdi mdi-magnify me-1"></i>
-                  SEO
+                  {t("myPages.seo")}
                 </Button>
                 <Button color="light" size="sm" disabled>
                   <i className="mdi mdi-chart-line me-1"></i>
-                  Analíticas
+                  {t("myPages.analytics")}
                 </Button>
                 <Button color="light" size="sm" disabled>
                   <i className="mdi mdi-server me-1"></i>
-                  Hospedaje y Dominio
+                  {t("myPages.hosting")}
                 </Button>
                 <Button
                   color="primary"
@@ -264,11 +266,11 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                   onClick={() => window.open(shareUrl, '_blank')}
                 >
                   <i className="mdi mdi-share-variant me-1"></i>
-                  Compartir
+                  {t("myPages.share")}
                 </Button>
                 <Button color="warning" size="sm" onClick={handleEditPage}>
                   <i className="mdi mdi-pencil me-1"></i>
-                  Editar
+                  {t("myPages.edit")}
                 </Button>
               </div>
             </div>

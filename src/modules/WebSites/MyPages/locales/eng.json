@@ -5,5 +5,19 @@
   "myPages.empty": "You don't have any pages created",
   "myPages.emptyHint": "Create your first web page to get started",
   "myPages.page": "page",
-  "myPages.pages": "pages"
+  "myPages.pages": "pages",
+  "myPages.editName": "Edit name",
+  "myPages.noDomain": "No domain",
+  "myPages.noPreview": "No preview",
+  "myPages.visits": "Visits",
+  "myPages.reservations": "Reservations",
+  "myPages.colorPalette": "Color palette",
+  "myPages.accent": "Accent",
+  "myPages.background": "Background",
+  "myPages.text": "Text",
+  "myPages.seo": "SEO",
+  "myPages.analytics": "Analytics",
+  "myPages.hosting": "Hosting & Domain",
+  "myPages.share": "Share",
+  "myPages.edit": "Edit"
 }

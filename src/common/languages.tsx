@@ -3,11 +3,11 @@ import spain from "../assets/images/flags/spain.jpg"
 import italy from "../assets/images/flags/italy.jpg"
 
 const languages = {
-  eng: {
+  en: {
     label: "English",
     flag: usFlag,
   },
-  sp: {
+  es: {
     label: "Spanish",
     flag: spain,
   },

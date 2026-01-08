@@ -21,7 +21,7 @@ const LanguageDropdown = () => {
 
   useEffect(() => {
     const currentLanguage = localStorage.getItem("I18N_LANGUAGE");
-    setSelectedLang(currentLanguage || "eng");
+    setSelectedLang(currentLanguage || "en");
   }, [])
 
   const changeLanguageAction = async (lang: string) => {

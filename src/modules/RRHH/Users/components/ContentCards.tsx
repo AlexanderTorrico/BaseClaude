@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Row, Col, Card, CardBody, Button, Badge, UncontrolledTooltip } from 'reactstrap';
 import { UserModel } from '../models/UserModel';
-import UserRolesPermissionsModal from './UserRolesPermissionsModal';
+import UserPermissionsModal from './UserPermissionsModal';
+import UserRolesModal from './UserRolesModal';
 import UserAvatar from '../../../../components/Common/UserAvatar';
 
 /**
@@ -15,8 +16,9 @@ const safeId = (uuid: string): string => uuid.replace(/[^a-zA-Z0-9]/g, '');
 const UserCard: React.FC<{
   user: UserModel;
   onEdit: (userUuid: string) => void;
-  onManageRolesPermissions: (userUuid: string) => void;
-}> = ({ user, onEdit, onManageRolesPermissions }) => {
+  onManageRoles: (userUuid: string) => void;
+  onManagePermissions: (userUuid: string) => void;
+}> = ({ user, onEdit, onManageRoles, onManagePermissions }) => {
   const roleCount = user.roleIds?.length || 0;
   const directPermissionCount = user.permissionIds?.length || 0;
 
@@ -125,16 +127,26 @@ const UserCard: React.FC<{
         {/* Divider */}
         <hr className="my-3" />
 
-        {/* Acciones - Solo Editar según especificación */}
-        <div className="d-flex gap-2 justify-content-center">
+        {/* Acciones */}
+        <div className="d-flex gap-2 justify-content-center flex-wrap">
+          <Button
+            color="warning"
+            size="sm"
+            onClick={() => onManageRoles(user.uuid)}
+            title="Gestionar roles"
+          >
+            <i className="mdi mdi-shield-crown me-1"></i>
+            Roles
+          </Button>
+
           <Button
             color="success"
             size="sm"
-            onClick={() => onManageRolesPermissions(user.uuid)}
-            title="Gestionar roles y permisos"
+            onClick={() => onManagePermissions(user.uuid)}
+            title="Gestionar permisos"
           >
-            <i className="mdi mdi-shield-account me-1"></i>
-            Roles/Permisos
+            <i className="mdi mdi-key-variant me-1"></i>
+            Permisos
           </Button>
 
           <Button
@@ -163,19 +175,34 @@ interface ContentCardsProps {
 }
 
 const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, onRefresh, onEdit }) => {
-  const [isRolesPermissionsModalOpen, setIsRolesPermissionsModalOpen] = useState(false);
+  const [isPermissionsModalOpen, setIsPermissionsModalOpen] = useState(false);
+  const [isRolesModalOpen, setIsRolesModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
 
-  const handleManageRolesPermissions = (userUuid: string) => {
+  const handleManageRoles = (userUuid: string) => {
     const user = filteredUsers.find(u => u.uuid === userUuid);
     if (user) {
       setSelectedUser(user);
-      setIsRolesPermissionsModalOpen(true);
+      setIsRolesModalOpen(true);
     }
   };
 
-  const handleRolesPermissionsUpdated = () => {
-    setIsRolesPermissionsModalOpen(false);
+  const handleManagePermissions = (userUuid: string) => {
+    const user = filteredUsers.find(u => u.uuid === userUuid);
+    if (user) {
+      setSelectedUser(user);
+      setIsPermissionsModalOpen(true);
+    }
+  };
+
+  const handlePermissionsUpdated = () => {
+    setIsPermissionsModalOpen(false);
+    setSelectedUser(null);
+    onRefresh(1);
+  };
+
+  const handleRolesUpdated = () => {
+    setIsRolesModalOpen(false);
     setSelectedUser(null);
     onRefresh(1);
   };
@@ -189,7 +216,8 @@ const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, onRefresh, o
             <UserCard
               user={user}
               onEdit={onEdit}
-              onManageRolesPermissions={handleManageRolesPermissions}
+              onManageRoles={handleManageRoles}
+              onManagePermissions={handleManagePermissions}
             />
           </Col>
         ))}
@@ -208,13 +236,23 @@ const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, onRefresh, o
         )}
       </Row>
 
-      {/* Modal para gestionar roles y permisos */}
+      {/* Modal para gestionar permisos */}
       {selectedUser && (
-        <UserRolesPermissionsModal
-          isOpen={isRolesPermissionsModalOpen}
-          toggle={() => setIsRolesPermissionsModalOpen(false)}
+        <UserPermissionsModal
+          isOpen={isPermissionsModalOpen}
+          toggle={() => setIsPermissionsModalOpen(false)}
           user={selectedUser}
-          onSuccess={handleRolesPermissionsUpdated}
+          onSuccess={handlePermissionsUpdated}
+        />
+      )}
+
+      {/* Modal para gestionar roles */}
+      {selectedUser && (
+        <UserRolesModal
+          isOpen={isRolesModalOpen}
+          toggle={() => setIsRolesModalOpen(false)}
+          user={selectedUser}
+          onSuccess={handleRolesUpdated}
         />
       )}
     </>

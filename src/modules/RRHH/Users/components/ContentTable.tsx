@@ -3,7 +3,8 @@ import { Row, Col, Button } from 'reactstrap';
 import AzTable from '../../../../components/aziende/AzTable';
 import { userTableColumns } from '../config/tableColumns';
 import { UserModel } from '../models/UserModel';
-import UserRolesPermissionsModal from './UserRolesPermissionsModal';
+import UserPermissionsModal from './UserPermissionsModal';
+import UserRolesModal from './UserRolesModal';
 import UserDetailsModal from './modals/UserDetailsModal';
 
 interface ContentTableProps {
@@ -27,20 +28,35 @@ const ContentTable: React.FC<ContentTableProps> = ({
   onRefresh,
   onEdit,
 }) => {
-  const [isRolesPermissionsModalOpen, setIsRolesPermissionsModalOpen] = useState(false);
+  const [isPermissionsModalOpen, setIsPermissionsModalOpen] = useState(false);
+  const [isRolesModalOpen, setIsRolesModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
 
-  const handleManageRolesPermissions = (userUuid: string) => {
+  const handleManageRoles = (userUuid: string) => {
     const user = filteredUsers.find(u => u.uuid === userUuid);
     if (user) {
       setSelectedUser(user);
-      setIsRolesPermissionsModalOpen(true);
+      setIsRolesModalOpen(true);
     }
   };
 
-  const handleRolesPermissionsUpdated = () => {
-    setIsRolesPermissionsModalOpen(false);
+  const handleManagePermissions = (userUuid: string) => {
+    const user = filteredUsers.find(u => u.uuid === userUuid);
+    if (user) {
+      setSelectedUser(user);
+      setIsPermissionsModalOpen(true);
+    }
+  };
+
+  const handlePermissionsUpdated = () => {
+    setIsPermissionsModalOpen(false);
+    setSelectedUser(null);
+    onRefresh(1);
+  };
+
+  const handleRolesUpdated = () => {
+    setIsRolesModalOpen(false);
     setSelectedUser(null);
     onRefresh(1);
   };
@@ -73,17 +89,31 @@ const ContentTable: React.FC<ContentTableProps> = ({
             loading={loading}
           >
             <AzTable.Actions>
+              {/* Botón Roles */}
+              <Button
+                size="sm"
+                color="warning"
+                outline
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
+                  handleManageRoles(rowData.uuid);
+                }}
+                title="Gestionar roles"
+              >
+                <i className="mdi mdi-account-group"></i>
+              </Button>
+              {/* Botón Permisos */}
               <Button
                 size="sm"
                 color="success"
                 outline
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
-                  handleManageRolesPermissions(rowData.uuid);
+                  handleManagePermissions(rowData.uuid);
                 }}
-                title="Gestionar roles y permisos"
+                title="Gestionar permisos"
               >
-                <i className="mdi mdi-shield-account"></i>
+                <i className="mdi mdi-key-variant"></i>
               </Button>
               <Button
                 size="sm"
@@ -126,13 +156,23 @@ const ContentTable: React.FC<ContentTableProps> = ({
         </Col>
       </Row>
 
-      {/* Modal para gestionar roles y permisos */}
+      {/* Modal para gestionar permisos */}
       {selectedUser && (
-        <UserRolesPermissionsModal
-          isOpen={isRolesPermissionsModalOpen}
-          toggle={() => setIsRolesPermissionsModalOpen(false)}
+        <UserPermissionsModal
+          isOpen={isPermissionsModalOpen}
+          toggle={() => setIsPermissionsModalOpen(false)}
           user={selectedUser}
-          onSuccess={handleRolesPermissionsUpdated}
+          onSuccess={handlePermissionsUpdated}
+        />
+      )}
+
+      {/* Modal para gestionar roles */}
+      {selectedUser && (
+        <UserRolesModal
+          isOpen={isRolesModalOpen}
+          toggle={() => setIsRolesModalOpen(false)}
+          user={selectedUser}
+          onSuccess={handleRolesUpdated}
         />
       )}
 

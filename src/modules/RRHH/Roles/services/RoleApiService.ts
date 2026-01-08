@@ -33,4 +33,28 @@ export class RoleApiService implements IRoleService {
         const res = await httpRequestWithAuth.delete<ApiResponse<any>>(`${BASE_URL}/${roleId}`, setLoading);
         return transformApiData(res, () => res.status === 200);
     }
+
+    /**
+     * Asignar un rol a un usuario
+     */
+    async assignRoleToUser(roleId: number, userId: number, setLoading?: SetStateFn): Promise<ApiResponse<any>> {
+        const res = await httpRequestWithAuth.post<ApiResponse<any>>(
+            '/api/role-permission/role-users/assign',
+            { gbl_role_id: roleId, gbl_user_id: userId },
+            setLoading
+        );
+        return res;
+    }
+
+    /**
+     * Remover un rol de un usuario
+     */
+    async removeRoleFromUser(roleId: number, userId: number, setLoading?: SetStateFn): Promise<ApiResponse<any>> {
+        const res = await httpRequestWithAuth.post<ApiResponse<any>>(
+            '/api/role-permission/role-users/remove',
+            { gbl_role_id: roleId, gbl_user_id: userId },
+            setLoading
+        );
+        return res;
+    }
 }

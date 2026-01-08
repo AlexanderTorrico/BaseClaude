@@ -11,6 +11,7 @@ import { connect } from "react-redux";
 // Menu Config
 import { useMenuConfig } from "@/config/hooks/useMenuConfig";
 import NavbarMenuRenderer from "./NavbarMenuRenderer";
+import { useUserPermissions } from "@/core/auth";
 
 interface NavbarProps {
   leftMenu: boolean;
@@ -19,7 +20,8 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = (props) => {
-  const menuItems = useMenuConfig([]);
+  const { permissionNames } = useUserPermissions();
+  const menuItems = useMenuConfig([], permissionNames);
 
   useEffect(() => {
     let matchingMenuItem: HTMLAnchorElement | null = null;

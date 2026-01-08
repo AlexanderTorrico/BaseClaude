@@ -23,29 +23,67 @@ export class PermissionApiService implements IPermissionService {
         return transformApiData(res, (data) => data ? adaptPermissionResponseToModel(data?.data ?? data) : null);
     }
 
-    async assignPermissionToUser(userId: number, permissionId: number, isCompany: boolean = false, setLoading?: SetStateFn): Promise<ApiResponse<any>> {
+    /**
+     * Asignar múltiples permisos a un usuario
+     * @param userUuid - UUID del usuario (string)
+     */
+    async assignPermissionsToUser(userUuid: string, permissionIds: number[], setLoading?: SetStateFn): Promise<ApiResponse<any>> {
         const body = {
-            user_id: userId,
-            gbl_permission_id: permissionId,
-            is_company: isCompany
+            permission_ids: permissionIds
         };
 
-        const res = await httpRequestWithAuth.post<ApiResponse<any>>(`${BASE_URL}/assign-to-user`, body, setLoading);
+        const res = await httpRequestWithAuth.post<ApiResponse<any>>(`${BASE_URL}/user/${userUuid}/assign`, body, setLoading);
         return res;
     }
 
-    async removePermissionFromUser(userId: number, permissionId: number, setLoading?: SetStateFn): Promise<ApiResponse<any>> {
+    /**
+     * Remover múltiples permisos de un usuario
+     * @param userUuid - UUID del usuario (string)
+     */
+    async removePermissionsFromUser(userUuid: string, permissionIds: number[], setLoading?: SetStateFn): Promise<ApiResponse<any>> {
         const body = {
-            user_id: userId,
-            gbl_permission_id: permissionId
+            permission_ids: permissionIds
         };
 
-        const res = await httpRequestWithAuth.post<ApiResponse<any>>(`${BASE_URL}/remove-from-user`, body, setLoading);
+        const res = await httpRequestWithAuth.post<ApiResponse<any>>(`${BASE_URL}/user/${userUuid}/remove`, body, setLoading);
         return res;
     }
 
-    async getUserPermissions(userId: number, setLoading?: SetStateFn): Promise<ApiResponse<PermissionModel[]>> {
-        const res = await httpRequestWithAuth.get<ApiResponse<any>>(`${BASE_URL}/user/${userId}`, setLoading);
+    /**
+     * Sincronizar permisos de un usuario (reemplazar todos los permisos actuales)
+     * @param userUuid - UUID del usuario (string)
+     */
+    async syncPermissionsForUser(userUuid: string, permissionIds: number[], setLoading?: SetStateFn): Promise<ApiResponse<any>> {
+        const body = {
+            permission_ids: permissionIds
+        };
+
+        const res = await httpRequestWithAuth.put<ApiResponse<any>>(`${BASE_URL}/user/${userUuid}/sync`, body, setLoading);
+        return res;
+    }
+
+    /**
+     * Obtener permisos de un usuario
+     * @param userUuid - UUID del usuario (string)
+     */
+    async getUserPermissions(userUuid: string, setLoading?: SetStateFn): Promise<ApiResponse<PermissionModel[]>> {
+        const res = await httpRequestWithAuth.get<ApiResponse<any>>(`${BASE_URL}/user/${userUuid}`, setLoading);
         return transformApiData(res, (data) => adaptUserPermissionsResponse(data?.data ?? data ?? []));
+    }
+
+    // ============ MÉTODOS LEGACY (compatibilidad) ============
+
+    /**
+     * @deprecated Use assignPermissionsToUser instead
+     */
+    async assignPermissionToUser(userUuid: string, permissionId: number, isCompany: boolean = false, setLoading?: SetStateFn): Promise<ApiResponse<any>> {
+        return this.assignPermissionsToUser(userUuid, [permissionId], setLoading);
+    }
+
+    /**
+     * @deprecated Use removePermissionsFromUser instead
+     */
+    async removePermissionFromUser(userUuid: string, permissionId: number, setLoading?: SetStateFn): Promise<ApiResponse<any>> {
+        return this.removePermissionsFromUser(userUuid, [permissionId], setLoading);
     }
 }

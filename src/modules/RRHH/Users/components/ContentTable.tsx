@@ -14,7 +14,7 @@ interface ContentTableProps {
   onSortChange?: (config: { field: string; direction: string }) => void;
   loading: boolean;
   onRefresh: (companyId: number) => Promise<void>;
-  onEdit: (userId: number) => void;
+  onEdit: (userUuid: string) => void;
 }
 
 const ContentTable: React.FC<ContentTableProps> = ({
@@ -31,8 +31,8 @@ const ContentTable: React.FC<ContentTableProps> = ({
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
 
-  const handleManageRolesPermissions = (userId: number) => {
-    const user = filteredUsers.find(u => u.id === userId);
+  const handleManageRolesPermissions = (userUuid: string) => {
+    const user = filteredUsers.find(u => u.uuid === userUuid);
     if (user) {
       setSelectedUser(user);
       setIsRolesPermissionsModalOpen(true);
@@ -45,12 +45,12 @@ const ContentTable: React.FC<ContentTableProps> = ({
     onRefresh(1);
   };
 
-  const handleDeleteUser = (userId: number) => {
-    console.log('Eliminar usuario:', userId);
+  const handleDeleteUser = (userUuid: string) => {
+    console.log('Eliminar usuario:', userUuid);
   };
 
-  const handleViewUser = (userId: number) => {
-    const user = filteredUsers.find(u => u.id === userId);
+  const handleViewUser = (userUuid: string) => {
+    const user = filteredUsers.find(u => u.uuid === userUuid);
     if (user) {
       setSelectedUser(user);
       setIsDetailsModalOpen(true);
@@ -79,7 +79,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
                 outline
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
-                  handleManageRolesPermissions(rowData.id);
+                  handleManageRolesPermissions(rowData.uuid);
                 }}
                 title="Gestionar roles y permisos"
               >
@@ -91,7 +91,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
                 outline
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
-                  handleViewUser(rowData.id);
+                  handleViewUser(rowData.uuid);
                 }}
                 title="Ver detalles"
               >
@@ -103,7 +103,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
                 outline
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
-                  onEdit(rowData.id);
+                  onEdit(rowData.uuid);
                 }}
                 title="Editar usuario"
               >
@@ -115,7 +115,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
                 outline
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
-                  handleDeleteUser(rowData.id);
+                  handleDeleteUser(rowData.uuid);
                 }}
                 title="Eliminar usuario"
               >

@@ -34,17 +34,21 @@ const adaptWorkStation = (workStation: any): WorkStationModel => {
 
 /**
  * Adapta la respuesta de la API al modelo de la UI
+ * El backend ahora devuelve 'uuid' en lugar de 'id' numérico
  */
 export const adaptUserResponseToUserModel = (apiUser: any): UserModel => {
   return {
-    id: apiUser.id,
-    fullName: `${apiUser.name} ${apiUser.lastName}`.trim(),
+    uuid: apiUser.uuid || apiUser.id?.toString() || '',  // UUID como identificador principal
+    id: apiUser.id,  // Mantener id numérico si está disponible
+    fullName: `${apiUser.name} ${apiUser.lastName || apiUser.last_name || ''}`.trim(),
     name: apiUser.name,
-    lastName: apiUser.lastName,
+    lastName: apiUser.lastName || apiUser.last_name || '',
     email: apiUser.email,
     phone: apiUser.phone,
     avatar: apiUser.avatar,
-    workStation: adaptWorkStation(apiUser.workStation),
+    workStation: apiUser.workStation ? adaptWorkStation(apiUser.workStation)
+      : apiUser.work_station ? adaptWorkStation(apiUser.work_station)
+        : createDefaultWorkStation(),
     // Roles y permisos (opcionales)
     roleIds: apiUser.roleIds || apiUser.role_ids || [],
     roles: apiUser.roles || [],
@@ -104,6 +108,7 @@ export const adaptRegisterResponseToUserModel = (
   }
 
   return {
+    uuid: userData?.uuid || userData?.id?.toString() || `temp-${Date.now()}`,
     id: userData?.id || Date.now(),
     fullName: `${formData.get('name')} ${formData.get('lastName')}`.trim(),
     name: formData.get('name') as string,

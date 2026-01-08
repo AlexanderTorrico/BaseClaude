@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback, useState } from "react";
 
 // //Import Scrollbar
 import SimpleBar from "simplebar-react";
@@ -14,53 +14,59 @@ import { withTranslation } from "react-i18next";
 // Menu Config
 import { useMenuConfig } from "@/config/hooks/useMenuConfig";
 import MenuRenderer from "./MenuRenderer";
+import { useUserPermissions } from "@/core/auth";
 
 const SidebarContent: React.FC = () => {
   const ref = useRef<any>();
+  const metisMenuRef = useRef<MetisMenu | null>(null);
+  const isInitialized = useRef(false);
   const path = useLocation();
-  const menuItems = useMenuConfig([]);
+  const { permissionNames, loading } = useUserPermissions();
+  const menuItems = useMenuConfig([], permissionNames);
+  const [menuKey, setMenuKey] = useState(0);
 
   const activateParentDropdown = useCallback((item: HTMLElement) => {
     item.classList.add("active");
     const parent = item.parentElement;
-    const parent2El = parent.childNodes[1];
+    if (!parent) return false;
+
+    const parent2El = parent.childNodes[1] as HTMLElement | undefined;
     if (parent2El && parent2El.id !== "side-menu") {
       parent2El.classList.add("mm-show");
     }
 
-    if (parent) {
-      parent.classList.add("mm-active");
-      const parent2 = parent.parentElement;
+    parent.classList.add("mm-active");
+    const parent2 = parent.parentElement;
 
-      if (parent2) {
-        parent2.classList.add("mm-show"); // ul tag
+    if (parent2) {
+      parent2.classList.add("mm-show"); // ul tag
 
-        const parent3 = parent2.parentElement; // li tag
+      const parent3 = parent2.parentElement; // li tag
 
-        if (parent3) {
-          parent3.classList.add("mm-active"); // li
-          parent3.childNodes[0].classList.add("mm-active"); //a
-          const parent4 = parent3.parentElement; // ul
-          if (parent4) {
-            parent4.classList.add("mm-show"); // ul
-            const parent5 = parent4.parentElement;
-            if (parent5) {
-              parent5.classList.add("mm-show"); // li
-              parent5.childNodes[0].classList.add("mm-active"); // a tag
-            }
+      if (parent3) {
+        parent3.classList.add("mm-active"); // li
+        const firstChild = parent3.childNodes[0] as HTMLElement | undefined;
+        if (firstChild) firstChild.classList.add("mm-active"); //a
+
+        const parent4 = parent3.parentElement; // ul
+        if (parent4) {
+          parent4.classList.add("mm-show"); // ul
+          const parent5 = parent4.parentElement;
+          if (parent5) {
+            parent5.classList.add("mm-show"); // li
+            const p5Child = parent5.childNodes[0] as HTMLElement | undefined;
+            if (p5Child) p5Child.classList.add("mm-active"); // a tag
           }
         }
       }
-      scrollElement(item);
-      return false;
     }
     scrollElement(item);
     return false;
   }, []);
 
   const removeActivation = (items: HTMLCollectionOf<HTMLAnchorElement>) => {
-    for (var i = 0; i < items.length; ++i) {
-      var item = items[i];
+    for (let i = 0; i < items.length; ++i) {
+      const item = items[i];
       const parent = items[i].parentElement;
 
       if (item && item.classList.contains("active")) {
@@ -68,8 +74,8 @@ const SidebarContent: React.FC = () => {
       }
       if (parent) {
         const parent2El =
-          parent.childNodes && parent.childNodes.lenght && parent.childNodes[1]
-            ? parent.childNodes[1]
+          parent.childNodes && parent.childNodes.length && parent.childNodes[1]
+            ? parent.childNodes[1] as HTMLElement
             : null;
         if (parent2El && parent2El.id !== "side-menu") {
           parent2El.classList.remove("mm-show");
@@ -84,7 +90,8 @@ const SidebarContent: React.FC = () => {
           const parent3 = parent2.parentElement;
           if (parent3) {
             parent3.classList.remove("mm-active"); // li
-            parent3.childNodes[0].classList.remove("mm-active");
+            const p3Child = parent3.childNodes[0] as HTMLElement | undefined;
+            if (p3Child) p3Child.classList.remove("mm-active");
 
             const parent4 = parent3.parentElement; // ul
             if (parent4) {
@@ -92,7 +99,8 @@ const SidebarContent: React.FC = () => {
               const parent5 = parent4.parentElement;
               if (parent5) {
                 parent5.classList.remove("mm-show"); // li
-                parent5.childNodes[0].classList.remove("mm-active"); // a tag
+                const p5Child = parent5.childNodes[0] as HTMLElement | undefined;
+                if (p5Child) p5Child.classList.remove("mm-active"); // a tag
               }
             }
           }
@@ -125,24 +133,47 @@ const SidebarContent: React.FC = () => {
     ref.current?.recalculate();
   }, []);
 
-  // useEffect(() => {
-  //   new MetisMenu("#side-menu");
-  //   activeMenu();
-  // }, []);
+  // Inicializar MetisMenu después de que los permisos se carguen y el menú esté renderizado
   useEffect(() => {
-    const metisMenu = new MetisMenu("#side-menu");
-    activeMenu();
+    if (loading) return; // Esperar a que los permisos se carguen
 
-    // Cleanup on component unmount
+    // Usar un pequeño delay para asegurar que el DOM esté listo
+    const timer = setTimeout(() => {
+      // Limpiar instancia anterior si existe
+      if (metisMenuRef.current) {
+        try {
+          metisMenuRef.current.dispose();
+        } catch (e) {
+          // Ignorar errores de dispose
+        }
+      }
+
+      // Crear nueva instancia
+      const sideMenu = document.getElementById("side-menu");
+      if (sideMenu) {
+        metisMenuRef.current = new MetisMenu("#side-menu");
+        activeMenu();
+      }
+    }, 100);
+
     return () => {
-      metisMenu.dispose();
+      clearTimeout(timer);
     };
-  }, []);
+  }, [menuKey, loading]); // Reinicializar cuando cambie el menuKey
 
+  // Cuando cambian los permisos, forzar reinicialización del menú
+  useEffect(() => {
+    if (!loading && permissionNames.length > 0 && !isInitialized.current) {
+      isInitialized.current = true;
+      setMenuKey(prev => prev + 1);
+    }
+  }, [permissionNames, loading]);
+
+  // Actualizar el estado activo cuando cambia la ruta
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     activeMenu();
-  }, [activeMenu]);
+  }, [path.pathname]);
 
   function scrollElement(item: HTMLElement) {
     if (item && ref.current) {
@@ -157,7 +188,7 @@ const SidebarContent: React.FC = () => {
     <React.Fragment>
       <SimpleBar className="h-100" ref={ref}>
         <div id="sidebar-menu">
-          <ul className="metismenu list-unstyled" id="side-menu">
+          <ul className="metismenu list-unstyled" id="side-menu" key={menuKey}>
             <MenuRenderer items={menuItems} />
           </ul>
         </div>
@@ -167,5 +198,3 @@ const SidebarContent: React.FC = () => {
 };
 
 export default withTranslation()(withRouter(SidebarContent));
-
-

@@ -47,7 +47,7 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
     const fetchUserPermissions = async () => {
         setLoadingPermissions(true);
         try {
-            const result = await permissionService.getUserPermissions(user.id);
+            const result = await permissionService.getUserPermissions(user.uuid);
             if (result.data) {
                 setPermissions(result.data);
             }

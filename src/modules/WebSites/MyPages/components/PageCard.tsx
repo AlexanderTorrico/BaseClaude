@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardBody, Button, Row, Col, Input } from 'reactstrap';
 import { MyPagesModel } from '../models/MyPagesModel';
+import { useUserPermissions, WEB_SITES_PERMISSIONS } from '@/core/auth';
 
 interface PageCardProps {
   page: MyPagesModel;
@@ -11,6 +12,14 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(page.name);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Obtener permisos del usuario
+  const { hasPermission } = useUserPermissions();
+
+  // Verificar permisos específicos usando constantes
+  const canEdit = hasPermission(WEB_SITES_PERMISSIONS.EDIT);
+  const canViewHosting = hasPermission(WEB_SITES_PERMISSIONS.HOSTING);
+  const canViewDomain = hasPermission(WEB_SITES_PERMISSIONS.DOMAIN);
 
   // URL base del proyecto (dominio de aziende)
   const PROJECT_DOMAIN = 'http://localhost:5173';
@@ -147,15 +156,18 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                 ) : (
                   <div className="d-flex align-items-center gap-2 mb-1">
                     <h5 className="mb-0 fw-bold">{page.name}</h5>
-                    <Button
-                      color="light"
-                      size="sm"
-                      className="p-1"
-                      onClick={handleStartEdit}
-                      title="Editar nombre"
-                    >
-                      <i className="mdi mdi-pencil font-size-14"></i>
-                    </Button>
+                    {/* Solo mostrar botón de editar nombre si tiene permiso de editar */}
+                    {canEdit && (
+                      <Button
+                        color="light"
+                        size="sm"
+                        className="p-1"
+                        onClick={handleStartEdit}
+                        title="Editar nombre"
+                      >
+                        <i className="mdi mdi-pencil font-size-14"></i>
+                      </Button>
+                    )}
                   </div>
                 )}
                 {hasDomain ? (
@@ -254,10 +266,15 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                   <i className="mdi mdi-chart-line me-1"></i>
                   Analíticas
                 </Button>
-                <Button color="light" size="sm" disabled>
-                  <i className="mdi mdi-server me-1"></i>
-                  Hospedaje y Dominio
-                </Button>
+
+                {/* Solo mostrar Hospedaje y Dominio si tiene permiso */}
+                {(canViewHosting || canViewDomain) && (
+                  <Button color="light" size="sm" disabled>
+                    <i className="mdi mdi-server me-1"></i>
+                    Hospedaje y Dominio
+                  </Button>
+                )}
+
                 <Button
                   color="primary"
                   size="sm"
@@ -266,10 +283,14 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                   <i className="mdi mdi-share-variant me-1"></i>
                   Compartir
                 </Button>
-                <Button color="warning" size="sm" onClick={handleEditPage}>
-                  <i className="mdi mdi-pencil me-1"></i>
-                  Editar
-                </Button>
+
+                {/* Solo mostrar botón Editar si tiene permiso de editar */}
+                {canEdit && (
+                  <Button color="warning" size="sm" onClick={handleEditPage}>
+                    <i className="mdi mdi-pencil me-1"></i>
+                    Editar
+                  </Button>
+                )}
               </div>
             </div>
           </Col>

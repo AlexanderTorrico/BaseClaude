@@ -22,8 +22,8 @@ const Users: React.FC = () => {
     fetchUsersByCompany(1);
   }, []);
 
-  const handleEditUser = (userId: number) => {
-    const user = users.find(u => u.id === userId);
+  const handleEditUser = (userUuid: string) => {
+    const user = users.find(u => u.uuid === userUuid);
     if (user) {
       setUserToEdit(user);
     }

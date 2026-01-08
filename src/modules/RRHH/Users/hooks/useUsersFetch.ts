@@ -25,14 +25,14 @@ export const useUsersFetch = (service: IUserService) => {
         const usersWithPermissions = await Promise.all(
           result.data.map(async (user) => {
             try {
-              const permissionsResult = await permissionService.getUserPermissions(user.id);
+              const permissionsResult = await permissionService.getUserPermissions(user.uuid);
               return {
                 ...user,
                 permissions: permissionsResult.data || [],
                 permissionIds: (permissionsResult.data || []).map(p => p.id)
               };
             } catch (err) {
-              console.warn(`Could not load permissions for user ${user.id}`);
+              console.warn(`Could not load permissions for user ${user.uuid}`);
               return { ...user, permissions: [], permissionIds: [] };
             }
           })

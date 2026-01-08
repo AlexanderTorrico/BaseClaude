@@ -4,7 +4,8 @@ import { PermissionModel } from '../../Permissions/models/PermissionModel';
 
 
 export interface UserModel {
-  id: number;
+  uuid: string;  // Ahora usamos UUID en lugar de id numérico
+  id?: number;   // Mantenemos id como opcional para retrocompatibilidad
   fullName: string;
   name: string;
   lastName: string;

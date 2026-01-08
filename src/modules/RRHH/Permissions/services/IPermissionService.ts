@@ -18,16 +18,19 @@ export interface IPermissionService {
 
     /**
      * Asigna un permiso a un usuario
+     * @param userUuid - UUID del usuario (string)
      */
-    assignPermissionToUser(userId: number, permissionId: number, isCompany?: boolean, setLoading?: SetStateFn): Promise<ApiResponse<any>>;
+    assignPermissionToUser(userUuid: string, permissionId: number, isCompany?: boolean, setLoading?: SetStateFn): Promise<ApiResponse<any>>;
 
     /**
      * Remueve un permiso de un usuario
+     * @param userUuid - UUID del usuario (string)
      */
-    removePermissionFromUser(userId: number, permissionId: number, setLoading?: SetStateFn): Promise<ApiResponse<any>>;
+    removePermissionFromUser(userUuid: string, permissionId: number, setLoading?: SetStateFn): Promise<ApiResponse<any>>;
 
     /**
      * Obtiene los permisos asignados a un usuario
+     * @param userUuid - UUID del usuario (string)
      */
-    getUserPermissions(userId: number, setLoading?: SetStateFn): Promise<ApiResponse<PermissionModel[]>>;
+    getUserPermissions(userUuid: string, setLoading?: SetStateFn): Promise<ApiResponse<PermissionModel[]>>;
 }

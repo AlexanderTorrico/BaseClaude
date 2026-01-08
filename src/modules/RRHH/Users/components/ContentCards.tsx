@@ -5,12 +5,17 @@ import UserRolesPermissionsModal from './UserRolesPermissionsModal';
 import UserAvatar from '../../../../components/Common/UserAvatar';
 
 /**
+ * Genera un ID seguro para usar en HTML (remueve caracteres especiales)
+ */
+const safeId = (uuid: string): string => uuid.replace(/[^a-zA-Z0-9]/g, '');
+
+/**
  * Card individual de usuario
  */
 const UserCard: React.FC<{
   user: UserModel;
-  onEdit: (userId: number) => void;
-  onManageRolesPermissions: (userId: number) => void;
+  onEdit: (userUuid: string) => void;
+  onManageRolesPermissions: (userUuid: string) => void;
 }> = ({ user, onEdit, onManageRolesPermissions }) => {
   const roleCount = user.roleIds?.length || 0;
   const directPermissionCount = user.permissionIds?.length || 0;
@@ -62,7 +67,7 @@ const UserCard: React.FC<{
         <div className="d-flex gap-2 mb-3 flex-wrap justify-content-center">
           {/* Badge de Roles */}
           {roleCount > 0 ? (
-            <Badge color="primary" pill id={`roles-badge-${user.id}`}>
+            <Badge color="primary" pill id={`roles-badge-${safeId(user.uuid)}`}>
               <i className="mdi mdi-shield-crown me-1"></i>
               {roleCount} {roleCount === 1 ? 'rol' : 'roles'}
             </Badge>
@@ -74,7 +79,7 @@ const UserCard: React.FC<{
 
           {/* Badge de Permisos */}
           {totalPermissions > 0 ? (
-            <Badge color="info" pill id={`permissions-badge-${user.id}`}>
+            <Badge color="info" pill id={`permissions-badge-${safeId(user.uuid)}`}>
               <i className="mdi mdi-key-variant me-1"></i>
               {totalPermissions} {totalPermissions === 1 ? 'permiso' : 'permisos'}
             </Badge>
@@ -86,7 +91,7 @@ const UserCard: React.FC<{
 
           {/* Tooltips para roles */}
           {roleCount > 0 && user.roles && (
-            <UncontrolledTooltip placement="top" target={`roles-badge-${user.id}`}>
+            <UncontrolledTooltip placement="top" target={`roles-badge-${safeId(user.uuid)}`} fade={false}>
               {user.roles.map((role, idx) => (
                 <div key={role.id}>
                   {idx + 1}. {role.name}
@@ -97,7 +102,7 @@ const UserCard: React.FC<{
 
           {/* Tooltips para permisos */}
           {totalPermissions > 0 && (
-            <UncontrolledTooltip placement="top" target={`permissions-badge-${user.id}`}>
+            <UncontrolledTooltip placement="top" target={`permissions-badge-${safeId(user.uuid)}`} fade={false}>
               <div className="text-start">
                 {directPermissionCount > 0 && (
                   <div>
@@ -125,7 +130,7 @@ const UserCard: React.FC<{
           <Button
             color="success"
             size="sm"
-            onClick={() => onManageRolesPermissions(user.id)}
+            onClick={() => onManageRolesPermissions(user.uuid)}
             title="Gestionar roles y permisos"
           >
             <i className="mdi mdi-shield-account me-1"></i>
@@ -135,7 +140,7 @@ const UserCard: React.FC<{
           <Button
             color="primary"
             size="sm"
-            onClick={() => onEdit(user.id)}
+            onClick={() => onEdit(user.uuid)}
             title="Editar usuario"
           >
             <i className="mdi mdi-pencil me-1"></i>
@@ -154,15 +159,15 @@ const UserCard: React.FC<{
 interface ContentCardsProps {
   filteredUsers: UserModel[];
   onRefresh: (companyId: number) => Promise<void>;
-  onEdit: (userId: number) => void;
+  onEdit: (userUuid: string) => void;
 }
 
 const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, onRefresh, onEdit }) => {
   const [isRolesPermissionsModalOpen, setIsRolesPermissionsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
 
-  const handleManageRolesPermissions = (userId: number) => {
-    const user = filteredUsers.find(u => u.id === userId);
+  const handleManageRolesPermissions = (userUuid: string) => {
+    const user = filteredUsers.find(u => u.uuid === userUuid);
     if (user) {
       setSelectedUser(user);
       setIsRolesPermissionsModalOpen(true);
@@ -180,7 +185,7 @@ const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, onRefresh, o
       {/* Grid de Cards */}
       <Row>
         {filteredUsers.map(user => (
-          <Col key={user.id} xs={12} sm={6} lg={4} xl={3} className="mb-4">
+          <Col key={user.uuid} xs={12} sm={6} lg={4} xl={3} className="mb-4">
             <UserCard
               user={user}
               onEdit={onEdit}

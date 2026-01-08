@@ -215,7 +215,7 @@ const UserRolesPermissionsModal: React.FC<UserRolesPermissionsModalProps> = ({
 
       // Asignar nuevos permisos
       for (const permissionId of addedPermissions) {
-        const result = await permissionService.assignPermissionToUser(user.id, permissionId, false);
+        const result = await permissionService.assignPermissionToUser(user.uuid, permissionId, false);
         if (result.status !== 200 && result.status !== 201) {
           console.error(`Error asignando permiso ${permissionId}:`, result.message);
         }
@@ -223,7 +223,7 @@ const UserRolesPermissionsModal: React.FC<UserRolesPermissionsModalProps> = ({
 
       // Remover permisos quitados
       for (const permissionId of removedPermissions) {
-        const result = await permissionService.removePermissionFromUser(user.id, permissionId);
+        const result = await permissionService.removePermissionFromUser(user.uuid, permissionId);
         if (result.status !== 200 && result.status !== 201) {
           console.error(`Error removiendo permiso ${permissionId}:`, result.message);
         }
@@ -411,6 +411,7 @@ const UserRolesPermissionsModal: React.FC<UserRolesPermissionsModalProps> = ({
 
                       {/* Permissions List */}
                       <Collapse isOpen={isExpanded}>
+                        <hr className="my-1 mx-3" style={{ borderColor: 'rgba(0,0,0,0.08)' }} />
                         <div className="p-3 pt-0">
                           {moduleData.permissions.map(permission => {
                             const isSelected = selectedPermissionIds.includes(permission.id);

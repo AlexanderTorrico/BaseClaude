@@ -1,7 +1,12 @@
-import React from 'react';
+// JSX pragma needed for TSX
 import { Badge, UncontrolledTooltip } from 'reactstrap';
 import { UserModel } from '../models/UserModel';
 import UserAvatar from '@/components/Common/UserAvatar';
+
+/**
+ * Genera un ID seguro para usar en HTML (remueve caracteres especiales)
+ */
+const safeId = (uuid: string): string => uuid?.replace(/[^a-zA-Z0-9]/g, '') || 'unknown';
 
 export const userTableColumns = [
   {
@@ -53,7 +58,7 @@ export const userTableColumns = [
       }
 
       const firstRole = original.roles?.[0];
-      const tooltipId = `roles-tooltip-${original.id}`;
+      const tooltipId = `roles-tooltip-${safeId(original.uuid)}`;
 
       return (
         <div className="d-flex align-items-center gap-1">
@@ -62,7 +67,7 @@ export const userTableColumns = [
             {roleCount} {roleCount === 1 ? 'rol' : 'roles'}
           </Badge>
           {firstRole && (
-            <UncontrolledTooltip placement="top" target={tooltipId}>
+            <UncontrolledTooltip placement="top" target={tooltipId} fade={false}>
               {original.roles?.map((role, idx) => (
                 <div key={role.id}>
                   {idx + 1}. {role.name}
@@ -80,7 +85,8 @@ export const userTableColumns = [
     sortable: false,
     filterable: false,
     cell: ({ row: { original } }: { row: { original: UserModel } }) => {
-      const directPermissionCount = original.permissionIds?.length || 0;
+      const directPermissions = original.permissions || [];
+      const directPermissionCount = directPermissions.length;
 
       // Calcular permisos heredados de roles
       const inheritedPermissionCount = original.roles?.reduce((acc, role) => {
@@ -88,7 +94,7 @@ export const userTableColumns = [
       }, 0) || 0;
 
       const totalPermissions = directPermissionCount + inheritedPermissionCount;
-      const tooltipId = `permissions-tooltip-${original.id}`;
+      const tooltipId = `permissions-tooltip-${safeId(original.uuid)}`;
 
       if (totalPermissions === 0) {
         return (
@@ -104,21 +110,28 @@ export const userTableColumns = [
             <i className="mdi mdi-key-variant me-1"></i>
             {totalPermissions} {totalPermissions === 1 ? 'permiso' : 'permisos'}
           </Badge>
-          <UncontrolledTooltip placement="top" target={tooltipId}>
+          <UncontrolledTooltip placement="top" target={tooltipId} fade={false}>
             <div className="text-start">
               {directPermissionCount > 0 && (
                 <div>
-                  <strong>Directos:</strong> {directPermissionCount}
+                  <strong>Permisos Directos:</strong>
+                  {directPermissions.slice(0, 5).map((perm) => (
+                    <div key={perm.id} className="ms-2">
+                      • {perm.namePublic || perm.name}
+                    </div>
+                  ))}
+                  {directPermissionCount > 5 && (
+                    <div className="ms-2 text-muted">
+                      +{directPermissionCount - 5} más...
+                    </div>
+                  )}
                 </div>
               )}
               {inheritedPermissionCount > 0 && (
-                <div>
-                  <strong>Heredados:</strong> {inheritedPermissionCount}
+                <div className="mt-1">
+                  <strong>Heredados de roles:</strong> {inheritedPermissionCount}
                 </div>
               )}
-              <div className="mt-1 pt-1 border-top">
-                <strong>Total:</strong> {totalPermissions}
-              </div>
             </div>
           </UncontrolledTooltip>
         </div>

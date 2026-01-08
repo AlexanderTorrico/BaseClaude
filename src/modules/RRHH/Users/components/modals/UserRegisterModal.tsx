@@ -32,24 +32,27 @@ interface FormValuesInternal {
   repeatPassword: string;
   gbl_company_id: string;
   workStationName: string;
+  workStationId?: number;  // ID del puesto para actualizaciones
   selectedDependencyUserId: number | null;
   avatar: File | null;
-  id?: number;
+  uuid?: string;
 }
 
 const getInitialValues = (companyId: string, userToEdit?: UserModel | null): FormValuesInternal => {
   if (userToEdit) {
     // Modo edición: pre-cargar datos del usuario
     let workStationName = '';
+    let workStationId: number | undefined = undefined;
     let dependencyUserId = null;
 
     if (userToEdit.workStation) {
       workStationName = userToEdit.workStation.name || '';
+      workStationId = userToEdit.workStation.id;
       dependencyUserId = userToEdit.workStation.dependencyId || null;
     }
 
     return {
-      id: userToEdit.id,
+      uuid: userToEdit.uuid,
       name: userToEdit.name,
       lastName: userToEdit.lastName,
       email: userToEdit.email,
@@ -58,6 +61,7 @@ const getInitialValues = (companyId: string, userToEdit?: UserModel | null): For
       repeatPassword: '',
       gbl_company_id: companyId,
       workStationName,
+      workStationId,  // ID del puesto para actualizaciones
       selectedDependencyUserId: dependencyUserId,
       avatar: null,
     };
@@ -154,17 +158,25 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
     setServerError(null);
 
     // Construir workStation JSON string
-    const workStationJson = JSON.stringify({
+    // En modo edición, incluir el id del workStation para actualizarlo
+    const workStationData: { name: string; dependency_id: number | null; id?: number } = {
       name: values.workStationName.trim(),
       dependency_id: values.selectedDependencyUserId || null,
-    });
+    };
+
+    // Agregar id solo si existe (modo edición)
+    if (values.workStationId) {
+      workStationData.id = values.workStationId;
+    }
+
+    const workStationJson = JSON.stringify(workStationData);
 
     let result: { success: boolean; message: string };
 
     if (isEditMode && onUpdate) {
       // Modo edición: llamar onUpdate
       const updateDto: UpdateUserDto = {
-        id: values.id!,
+        uuid: values.uuid!,
         name: values.name,
         lastName: values.lastName,
         email: values.email,
@@ -172,10 +184,10 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
         gbl_company_id: values.gbl_company_id,
         workStation: workStationJson,
         avatar: avatarFile,
-        // Solo incluir password si se ingresó (opcional en edición)
-        ...(values.password && {
+        // Solo incluir password si tiene valor válido (mínimo 6 caracteres)
+        // NO incluir repeatPassword - el backend no lo necesita
+        ...(values.password && values.password.length >= 6 && {
           password: values.password,
-          repeatPassword: values.repeatPassword,
         }),
       };
 
@@ -638,11 +650,10 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
                                       {usersWithWorkStations.map((user) => (
                                         <div
                                           key={user.id}
-                                          className={`p-3 rounded mb-2 ${
-                                            values.selectedDependencyUserId === user.workStation?.id
-                                              ? 'bg-primary text-white'
-                                              : 'bg-light'
-                                          }`}
+                                          className={`p-3 rounded mb-2 ${values.selectedDependencyUserId === user.workStation?.id
+                                            ? 'bg-primary text-white'
+                                            : 'bg-light'
+                                            }`}
                                           style={{
                                             cursor: 'pointer',
                                             transition: 'all 0.2s',
@@ -669,20 +680,18 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
                                         >
                                           <div className="d-flex align-items-center justify-content-between">
                                             <div className="flex-grow-1">
-                                              <div className={`fw-medium mb-1 ${
-                                                values.selectedDependencyUserId === user.workStation?.id
-                                                  ? 'text-white'
-                                                  : 'text-dark'
-                                              }`}>
+                                              <div className={`fw-medium mb-1 ${values.selectedDependencyUserId === user.workStation?.id
+                                                ? 'text-white'
+                                                : 'text-dark'
+                                                }`}>
                                                 {user.fullName}
                                               </div>
                                               <div className="d-flex align-items-center gap-2">
                                                 <span
-                                                  className={`badge ${
-                                                    values.selectedDependencyUserId === user.workStation?.id
-                                                      ? 'bg-white text-primary'
-                                                      : 'bg-soft-primary text-primary'
-                                                  } font-size-10`}
+                                                  className={`badge ${values.selectedDependencyUserId === user.workStation?.id
+                                                    ? 'bg-white text-primary'
+                                                    : 'bg-soft-primary text-primary'
+                                                    } font-size-10`}
                                                 >
                                                   <i className="mdi mdi-briefcase me-1"></i>
                                                   {user.workStation?.name}

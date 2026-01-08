@@ -14,6 +14,7 @@ export interface MenuItem {
   path?: string;
   badge?: MenuBadge | null;
   roles?: string[];
+  permissions?: string[];  // Permisos requeridos (ej: ["user.show", "user.create"])
   hidden?: boolean;
   children?: MenuItem[];
   megaMenuColumns?: number;

@@ -27,7 +27,8 @@ export interface LoginResult {
 }
 
 export interface AuthUser {
-  id: string;
+  id: string;  // Este ahora es el uuid para retrocompatibilidad
+  uuid?: string;  // UUID explícito del usuario
   name: string;
   lastName: string;
   email: string;

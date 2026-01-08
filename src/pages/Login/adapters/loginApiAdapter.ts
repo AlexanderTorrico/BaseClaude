@@ -5,19 +5,22 @@
 import type { AuthUser } from '../models';
 
 // Adapt API user response to domain AuthUser
+// El backend ahora devuelve 'uuid' en lugar de 'id'
 export const adaptApiUserToAuthUser = (apiResponse: any): AuthUser => {
   console.log('API Response:', apiResponse);
+  const userData = apiResponse.data.data;
   return {
-    id: apiResponse.data.data.id?.toString() || '',
-    name: apiResponse.data.data.name || '',
-    lastName: apiResponse.data.data.last_name || '',
-    email: apiResponse.data.data.email || '',
+    id: userData.uuid || userData.id?.toString() || '',  // Usar uuid como id
+    uuid: userData.uuid || '',  // Guardar uuid explícitamente
+    name: userData.name || '',
+    lastName: userData.last_name || '',
+    email: userData.email || '',
     token: apiResponse.data.access_token || '',
-    privilege: apiResponse.data.data.privilege || 'user',
-    phone: apiResponse.data.data.phone || '',
-    logo: apiResponse.data.data.logo || '',
-    language: apiResponse.data.data.language || 'es',
-    status: apiResponse.data.data.status === 1 ? 'active' : 'inactive',
+    privilege: userData.privilege || 'user',
+    phone: userData.phone || '',
+    logo: userData.logo || '',
+    language: userData.language || 'es',
+    status: userData.status === 1 ? 'active' : 'inactive',
     modules: apiResponse.data.modules || [],
     roles: apiResponse.data.roles || [],
     permissions: apiResponse.data.direct_permissions || []
@@ -26,7 +29,8 @@ export const adaptApiUserToAuthUser = (apiResponse: any): AuthUser => {
 
 // Adapt social login API response to domain AuthUser
 export const adaptSocialApiUserToAuthUser = (apiResponse: any): AuthUser => ({
-  id: apiResponse.user.id?.toString() || '',
+  id: apiResponse.user.uuid || apiResponse.user.id?.toString() || '',
+  uuid: apiResponse.user.uuid || '',
   name: apiResponse.user.name || '',
   lastName: apiResponse.user.last_name || '',
   email: apiResponse.user.email || '',
@@ -58,7 +62,8 @@ export const isValidSocialLoginResponse = (response: any): boolean => {
 export const saveUserToStorage = (user: AuthUser): void => {
   try {
     localStorage.setItem('authUser', JSON.stringify({
-      id: user.id,
+      id: user.id,  // Este ahora es el uuid
+      uuid: user.uuid || user.id,  // Guardar uuid explícitamente
       name: user.name,
       lastName: user.lastName,
       email: user.email,
@@ -84,6 +89,7 @@ export const getUserFromStorage = (): AuthUser | null => {
     const user = JSON.parse(userData);
     return {
       ...user,
+      uuid: user.uuid || user.id,  // Asegurar que uuid esté presente
       token,
       modules: [],
       roles: [],

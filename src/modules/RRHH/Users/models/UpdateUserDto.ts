@@ -3,7 +3,7 @@
  * La contraseña es opcional - solo se envía si el usuario desea cambiarla
  */
 export interface UpdateUserDto {
-  id: number;
+  uuid: string;  // UUID del usuario a actualizar
   name: string;
   lastName: string;
   phone: string;
@@ -14,3 +14,4 @@ export interface UpdateUserDto {
   password?: string;
   repeatPassword?: string;
 }
+

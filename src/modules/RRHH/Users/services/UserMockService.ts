@@ -5,6 +5,9 @@ import { SetStateFn } from '@/shared/types/commonTypes';
 import { ApiResponse } from '@/shared/types';
 
 export class UserMockService implements IUserService {
+  updateUser(formData: FormData, setLoading?: SetStateFn): Promise<ApiResponse<UserModel>> {
+    throw new Error('Method not implemented.');
+  }
   private mockUsers: UserModel[] = [...MOCK_USERS_WITH_ROLES];
   private nextId: number = 11; // El último ID en mockUsersWithRoles es 10
 

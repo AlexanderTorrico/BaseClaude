@@ -15,6 +15,9 @@ import { authProtectedRoutes, publicRoutes } from "./routes/index";
 // Import all middleware
 import Authmiddleware from "./routes/route";
 
+// Import ProtectedRoute for permission-based access control
+import { ProtectedRoute } from '@/core/auth';
+
 // layouts Format
 import VerticalLayout from "./components/VerticalLayout/";
 import HorizontalLayout from "./components/HorizontalLayout/";
@@ -83,7 +86,15 @@ const App: React.FC = () => {
               path={route.path}
               element={
                 <Authmiddleware>
-                  <Layout><Component /></Layout>
+                  <Layout>
+                    {route.permissions && route.permissions.length > 0 ? (
+                      <ProtectedRoute permissions={route.permissions}>
+                        <Component />
+                      </ProtectedRoute>
+                    ) : (
+                      <Component />
+                    )}
+                  </Layout>
                 </Authmiddleware>
               }
               key={idx}

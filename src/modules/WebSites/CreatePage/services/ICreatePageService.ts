@@ -1,5 +1,7 @@
 import { CreatePageModel } from '../models/CreatePageModel';
+import { GeneratePageDto } from '../models/GeneratePageDto';
 import { SetStateFn } from '@/shared/types/commonTypes';
+
 import { ApiResponse } from '@/shared/types';
 
 /**
@@ -14,4 +16,11 @@ export interface ICreatePageService {
    * @returns {status: 4xx/5xx, message: string, data: []} en error
    */
   getAll(setLoading?: SetStateFn): Promise<ApiResponse<CreatePageModel[]>>;
+
+  /**
+   * Genera una nueva página a partir de un template
+   * @param dto Datos para generar la página
+   */
+  generatePage(dto: GeneratePageDto, setLoading?: SetStateFn): Promise<ApiResponse<any>>;
 }
+

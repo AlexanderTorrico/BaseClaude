@@ -7,9 +7,10 @@ import { useUserPermissions, WEB_SITES_PERMISSIONS } from '@/core/auth';
 interface PageCardProps {
   page: MyPagesModel;
   onUpdateName: (pageId: number, newName: string) => Promise<{ success: boolean; message: string }>;
+  isLatest?: boolean;
 }
 
-const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
+const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName, isLatest = false }) => {
   const { t } = useTranslation();
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(page.name);
@@ -36,6 +37,9 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
 
   // URL completa de la imagen (backend base)
   const imageUrl = `https://backend.aziende.us${page.image}`;
+
+  // Se usa prop isLatest para determinar si mostrar badge
+
 
   /**
    * Inicia el modo de edición
@@ -95,7 +99,7 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
   };
 
   return (
-    <Card className="border shadow-sm mb-3">
+    <Card className="border shadow-sm mb-3 position-relative">
       <CardBody className="p-3">
         <Row>
           {/* Columna izquierda: Preview de imagen */}
@@ -158,15 +162,6 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                 ) : (
                   <div className="d-flex align-items-center gap-2 mb-1">
                     <h5 className="mb-0 fw-bold">{page.name}</h5>
-                    <Button
-                      color="light"
-                      size="sm"
-                      className="p-1"
-                      onClick={handleStartEdit}
-                      title={t("myPages.editName")}
-                    >
-                      <i className="mdi mdi-pencil font-size-14"></i>
-                    </Button>
                     {/* Solo mostrar botón de editar nombre si tiene permiso de editar */}
                     {canEdit && (
                       <Button
@@ -174,7 +169,7 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                         size="sm"
                         className="p-1"
                         onClick={handleStartEdit}
-                        title="Editar nombre"
+                        title={t("myPages.editName")}
                       >
                         <i className="mdi mdi-pencil font-size-14"></i>
                       </Button>
@@ -277,16 +272,12 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                   <i className="mdi mdi-chart-line me-1"></i>
                   {t("myPages.analytics")}
                 </Button>
-                <Button color="light" size="sm" disabled>
-                  <i className="mdi mdi-server me-1"></i>
-                  {t("myPages.hosting")}
-                </Button>
 
                 {/* Solo mostrar Hospedaje y Dominio si tiene permiso */}
                 {(canViewHosting || canViewDomain) && (
                   <Button color="light" size="sm" disabled>
                     <i className="mdi mdi-server me-1"></i>
-                    Hospedaje y Dominio
+                    {t("myPages.hosting")}
                   </Button>
                 )}
 
@@ -298,16 +289,12 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
                   <i className="mdi mdi-share-variant me-1"></i>
                   {t("myPages.share")}
                 </Button>
-                <Button color="warning" size="sm" onClick={handleEditPage}>
-                  <i className="mdi mdi-pencil me-1"></i>
-                  {t("myPages.edit")}
-                </Button>
 
                 {/* Solo mostrar botón Editar si tiene permiso de editar */}
                 {canEdit && (
                   <Button color="warning" size="sm" onClick={handleEditPage}>
                     <i className="mdi mdi-pencil me-1"></i>
-                    Editar
+                    {t("myPages.edit")}
                   </Button>
                 )}
               </div>
@@ -315,6 +302,15 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
           </Col>
         </Row>
       </CardBody>
+      {/* Badge "New" - Visible si es el último creado, posicionado en el Card */}
+      {isLatest && (
+        <div
+          className="position-absolute top-0 end-0 m-3 badge bg-success p-2 font-size-14"
+          style={{ zIndex: 10 }}
+        >
+          New
+        </div>
+      )}
     </Card>
   );
 };

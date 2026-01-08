@@ -14,9 +14,22 @@ import {
   Badge,
   Input,
   Label,
-  FormGroup
+  FormGroup,
+  Spinner,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter
 } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
+import { TemplateModel } from './models/TemplateModel';
+import { GeneratePageDto } from './models/GeneratePageDto';
+import { CreatePageApiService } from './services/CreatePageApiService';
+
+
+// Base URL del backend para las imágenes
+const API_BASE_URL = 'http://localhost:8000';
 
 // Tipos para templates
 interface PageTemplate {
@@ -63,7 +76,35 @@ const MOCK_TEMPLATES: PageTemplate[] = [
 const CreatePage: React.FC = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<string>('landing');
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
+  const [apiTemplates, setApiTemplates] = useState<TemplateModel[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Estado para el modal de creación
+  const [modalOpen, setModalOpen] = useState(false);
+  const [pageName, setPageName] = useState('');
+  const [generating, setGenerating] = useState(false);
+
+  // Cargar templates del API
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      const service = new CreatePageApiService();
+      const response = await service.getTemplates(setLoading);
+      if (response.status === 200 && response.data) {
+        setApiTemplates(response.data);
+      }
+    };
+    fetchTemplates();
+  }, []);
+
+  // Construir URL completa de la imagen
+  const getTemplateImageUrl = (template: TemplateModel): string => {
+    if (!template.url) return 'https://via.placeholder.com/400x300/667eea/ffffff?text=No+Image';
+    // Si la URL ya es absoluta, usarla directamente
+    if (template.url.startsWith('http')) return template.url;
+    // Si no, construir la URL completa
+    return `${API_BASE_URL}/${template.url}`;
+  };
 
   // Agregar estilos para el hover effect
   useEffect(() => {
@@ -93,7 +134,7 @@ const CreatePage: React.FC = () => {
     };
   }, []);
 
-  // Filtrar templates por categoría
+  // Filtrar templates por categoría (para los mock - solo referencia visual si fallara API)
   const filteredTemplates = MOCK_TEMPLATES.filter(t => t.category === activeTab);
 
   // Obtener el conteo de templates por categoría
@@ -106,10 +147,50 @@ const CreatePage: React.FC = () => {
     // Aquí iría la lógica para crear con IA
   };
 
-  const handleSelectTemplate = (templateId: string) => {
+  const handleSelectTemplate = (templateId: number) => {
     setSelectedTemplate(templateId);
-    console.log('Template seleccionado:', templateId);
-    // Aquí iría la lógica para usar el template
+    setPageName('');
+    setModalOpen(true);
+  };
+
+  const toggleModal = () => setModalOpen(!modalOpen);
+
+
+  const handleGenerate = async () => {
+    if (!selectedTemplate || !pageName.trim()) return;
+
+    setGenerating(true);
+    try {
+      const service = new CreatePageApiService();
+      const dto: GeneratePageDto = {
+        conf: {},
+        description: '',
+        gbl_company_id: 1, // Por defecto como solicitado
+        name: pageName,
+        template_page_id: selectedTemplate
+      };
+
+      const res = await service.generatePage(dto);
+      if (res.status === 200 || res.status === 201) {
+        console.log('Page generated successfully:', res.data);
+        toggleModal();
+        toast.success(
+          `✅ Página creada: ${pageName}`,
+          { autoClose: 3000 }
+        );
+        // Aquí se podría redirigir a la edición de la página
+        // history.push(`/pages/edit/${res.data.id}`);
+      }
+    } catch (error) {
+      console.error('Error generating page:', error);
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const getSelectedTemplateName = () => {
+    const template = apiTemplates.find(t => t.id === selectedTemplate);
+    return template ? template.name : '';
   };
 
   return (
@@ -183,7 +264,14 @@ const CreatePage: React.FC = () => {
                 {/* Contenido de Templates - Con scroll vertical únicamente */}
                 <TabContent activeTab={activeTab} style={{ flex: '1', overflowY: 'auto', overflowX: 'hidden' }}>
                   <TabPane tabId={activeTab} style={{ height: '100%' }}>
-                    {filteredTemplates.length === 0 ? (
+                    {loading ? (
+                      <div className="text-center py-5">
+                        <Spinner color="primary" />
+                        <p className="text-muted mt-3">
+                          {t("createPage.loading") || "Cargando templates..."}
+                        </p>
+                      </div>
+                    ) : apiTemplates.length === 0 ? (
                       <div className="text-center py-5">
                         <i className="mdi mdi-package-variant display-4 text-muted"></i>
                         <p className="text-muted mt-3">
@@ -192,12 +280,11 @@ const CreatePage: React.FC = () => {
                       </div>
                     ) : (
                       <Row>
-                        {filteredTemplates.map(template => (
+                        {apiTemplates.map(template => (
                           <Col key={template.id} xs={12} sm={6} lg={4} xl={3} className="mb-4">
                             <Card
-                              className={`border shadow-sm template-card ${
-                                selectedTemplate === template.id ? 'border-primary' : ''
-                              }`}
+                              className={`border shadow-sm template-card ${selectedTemplate === template.id ? 'border-primary' : ''
+                                }`}
                               style={{
                                 cursor: 'pointer',
                                 transition: 'all 0.3s ease',
@@ -211,7 +298,7 @@ const CreatePage: React.FC = () => {
                                 style={{
                                   width: '100%',
                                   paddingTop: '62.5%', // Aspect ratio 16:10 (10/16 = 0.625)
-                                  backgroundImage: `url(${template.thumbnail})`,
+                                  backgroundImage: `url(${getTemplateImageUrl(template)})`,
                                   backgroundSize: 'cover',
                                   backgroundPosition: 'center',
                                   position: 'relative',
@@ -285,6 +372,22 @@ const CreatePage: React.FC = () => {
                                   </Button>
                                 </div>
                               </div>
+                              {/* Nombre del template */}
+                              <CardBody className="p-2">
+                                <h6 className="mb-1 text-truncate" title={template.name}>
+                                  {template.name}
+                                </h6>
+                                <div className="d-flex align-items-center gap-2">
+                                  <small className="text-muted">
+                                    <i className="mdi mdi-star text-warning me-1"></i>
+                                    {template.score}
+                                  </small>
+                                  <small className="text-muted">
+                                    <i className="mdi mdi-download me-1"></i>
+                                    {template.count}
+                                  </small>
+                                </div>
+                              </CardBody>
                             </Card>
                           </Col>
                         ))}
@@ -297,37 +400,47 @@ const CreatePage: React.FC = () => {
           </Col>
         </Row>
 
-        {/* Footer con botón de continuar - Fijo en la parte inferior */}
-        {selectedTemplate && (
-          <Row className="mt-3" style={{ flexShrink: 0 }}>
-            <Col xs={12}>
-              <Card className="border-primary shadow-sm">
-                <CardBody className="py-3">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <h5 className="mb-1">{t("createPage.templateSelected")}</h5>
-                      <p className="text-muted mb-0">
-                        {t(MOCK_TEMPLATES.find(tpl => tpl.id === selectedTemplate)?.name || '')}
-                      </p>
-                    </div>
-                    <div className="d-flex gap-2">
-                      <Button
-                        color="light"
-                        onClick={() => setSelectedTemplate(null)}
-                      >
-                        {t("createPage.cancel")}
-                      </Button>
-                      <Button color="success">
-                        <i className="mdi mdi-check me-1"></i>
-                        {t("createPage.continueWithTemplate")}
-                      </Button>
-                    </div>
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
-        )}
+
+
+        {/* Modal para nombrar la página */}
+        <Modal isOpen={modalOpen} toggle={toggleModal} centered>
+          <ModalHeader toggle={toggleModal}>
+            {"Nombra tu página"}
+          </ModalHeader>
+          <ModalBody>
+            <FormGroup>
+              <Label for="pageName">{"Nombre de la página"}</Label>
+              <Input
+                type="text"
+                id="pageName"
+                placeholder="Ej. Mi Nuevo Sitio"
+                value={pageName}
+                onChange={(e) => setPageName(e.target.value)}
+                autoFocus
+              />
+            </FormGroup>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="secondary" onClick={toggleModal} disabled={generating}>
+              {"Cancelar"}
+            </Button>
+            <Button
+              color="primary"
+              onClick={handleGenerate}
+              disabled={generating || !pageName.trim()}
+            >
+              {generating ? (
+                <>
+                  <Spinner size="sm" className="me-2" />
+                  {"Procesando..."}
+                </>
+              ) : (
+                "Crear"
+              )}
+            </Button>
+          </ModalFooter>
+        </Modal>
+
       </Container>
     </div>
   );

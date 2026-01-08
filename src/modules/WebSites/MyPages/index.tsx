@@ -63,9 +63,25 @@ const MyPages: React.FC = () => {
                 </CardBody>
               </Card>
             ) : (
-              mypagess.map((page: MyPagesModel) => (
-                <PageCard key={page.id} page={page} onUpdateName={updatePageName} />
-              ))
+              (() => {
+                // Encontrar el ID de la página más reciente
+                let latestPageId = -1;
+                if (mypagess.length > 0) {
+                  const sorted = [...mypagess].sort((a, b) =>
+                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                  );
+                  latestPageId = sorted[0].id;
+                }
+
+                return mypagess.map((page: MyPagesModel) => (
+                  <PageCard
+                    key={page.id}
+                    page={page}
+                    onUpdateName={updatePageName}
+                    isLatest={page.id === latestPageId}
+                  />
+                ));
+              })()
             )}
           </Col>
         </Row>

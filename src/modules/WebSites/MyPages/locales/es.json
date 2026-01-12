@@ -19,5 +19,9 @@
   "myPages.analytics": "Analíticas",
   "myPages.hosting": "Hospedaje y Dominio",
   "myPages.share": "Compartir",
-  "myPages.edit": "Editar"
+  "myPages.edit": "Editar",
+  "myPages.refresh": "Actualizar",
+  "myPages.refreshTitle": "Actualizar lista de páginas",
+  "myPages.filters.name": "Nombre",
+  "myPages.filters.domain": "Dominio"
 }

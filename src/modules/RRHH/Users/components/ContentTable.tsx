@@ -66,9 +66,6 @@ const ContentTable: React.FC<ContentTableProps> = ({
     onRefresh(1);
   };
 
-  const handleDeleteUser = (userUuid: string) => {
-    console.log('Eliminar usuario:', userUuid);
-  };
 
   const handleViewUser = (userUuid: string) => {
     const user = filteredUsers.find(u => u.uuid === userUuid);
@@ -143,18 +140,6 @@ const ContentTable: React.FC<ContentTableProps> = ({
                 title={t('users.actions.editTitle')}
               >
                 <i className="mdi mdi-pencil"></i>
-              </Button>
-              <Button
-                size="sm"
-                color="danger"
-                outline
-                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
-                  handleDeleteUser(rowData.uuid);
-                }}
-                title={t('users.actions.deleteTitle')}
-              >
-                <i className="mdi mdi-trash-can"></i>
               </Button>
             </AzTable.Actions>
           </AzTable>

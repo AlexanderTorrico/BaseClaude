@@ -11,7 +11,6 @@ import ContentTable from './components/ContentTable';
 import ContentCards from './components/ContentCards';
 import { UserApiService } from './services/UserApiService';
 import { UserModel } from './models/UserModel';
-//import { UserMockService } from './services/UserMockService';
 
 const userService = new UserApiService();
 const MOBILE_BREAKPOINT = 768;

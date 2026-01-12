@@ -1,90 +1,76 @@
-import React, { useEffect } from 'react';
-import { Container, Row, Col, Card, CardBody, Spinner } from 'reactstrap';
+import React, { useEffect, useMemo } from 'react';
+import { Container, Card, CardBody, Spinner } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
 import { useMyPages } from './hooks/useMyPages';
 import { useMyPagesFetch } from './hooks/useMyPagesFetch';
-// import { MyPagesMockService } from './services/MyPagesMockService';
 import { MyPagesApiService } from './services/MyPagesApiService';
-import { MyPagesModel } from './models/MyPagesModel';
-import PageCard from './components/PageCard';
+import AzFilterSummary from '@/components/aziende/AzFilterSummary';
+import AzMobileFilters from '@/components/aziende/AzMobileFilters';
+import { getMyPagesColumns } from './config/tableMyPagesColumns';
+import Header from './components/Header';
+import ContentCards from './components/ContentCards';
 
 const myPagesService = new MyPagesApiService();
 
 const MyPages: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { mypagess } = useMyPages();
   const { loading, fetchAll, updatePageName } = useMyPagesFetch(myPagesService);
+
+  // Columnas con traducciones
+  const columns = useMemo(() => getMyPagesColumns(t), [t, i18n.language]);
 
   useEffect(() => {
     fetchAll();
   }, []);
 
+  // Loading inicial
+  if (loading && mypagess.length === 0) {
+    return (
+      <div className="page-content" style={{ overflowX: 'clip' }}>
+        <Container fluid style={{ overflowX: 'clip' }}>
+          <Header loading={loading} onRefresh={fetchAll} />
+          <Card className="border">
+            <CardBody className="text-center py-5">
+              <Spinner color="primary" />
+              <p className="text-muted mt-3 mb-0">{t('myPages.loading')}</p>
+            </CardBody>
+          </Card>
+        </Container>
+      </div>
+    );
+  }
+
   return (
-    <div className="page-content">
-      <Container fluid>
-        {/* Header */}
-        <Row className="mb-4">
-          <Col xs={12}>
-            <div className="d-flex justify-content-between align-items-center">
-              <div>
-                <h4 className="mb-1">{t("myPages.title")}</h4>
-                <p className="text-muted mb-0">
-                  {t("myPages.subtitle")}
-                </p>
-              </div>
-              <div className="d-flex gap-2 align-items-center">
-                {loading && <Spinner size="sm" color="primary" />}
-                <span className="badge bg-primary font-size-14">
-                  {mypagess.length} {mypagess.length === 1 ? t("myPages.page") : t("myPages.pages")}
-                </span>
-              </div>
-            </div>
-          </Col>
-        </Row>
+    <div className="page-content" style={{ overflowX: 'clip' }}>
+      <Container fluid style={{ overflowX: 'clip' }}>
+        <Header loading={loading} onRefresh={fetchAll} />
 
-        {/* Content */}
-        <Row>
-          <Col xs={12}>
-            {loading && mypagess.length === 0 ? (
-              <Card className="border">
-                <CardBody className="text-center py-5">
-                  <Spinner color="primary" />
-                  <p className="text-muted mt-3 mb-0">{t("myPages.loading")}</p>
-                </CardBody>
-              </Card>
-            ) : mypagess.length === 0 ? (
-              <Card className="border">
-                <CardBody className="text-center py-5">
-                  <i className="mdi mdi-web-off text-muted font-size-48 mb-3 d-block"></i>
-                  <h5 className="text-muted">{t("myPages.empty")}</h5>
-                  <p className="text-muted mb-0">
-                    {t("myPages.emptyHint")}
-                  </p>
-                </CardBody>
-              </Card>
-            ) : (
-              (() => {
-                // Encontrar el ID de la página más reciente
-                let latestPageId = -1;
-                if (mypagess.length > 0) {
-                  const sorted = [...mypagess].sort((a, b) =>
-                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-                  );
-                  latestPageId = sorted[0].id;
-                }
+        <AzFilterSummary
+          data={mypagess}
+          columns={columns}
+          alwaysVisible={true}
+          showCount="always"
+          countPosition="top"
+        >
+          {({ filteredData, filters, onFilterChange }) => (
+            <>
+              {/* Filtros moviles colapsables */}
+              <AzMobileFilters
+                columns={columns}
+                filters={filters}
+                onFilterChange={onFilterChange}
+                mobileFilterKeys={['name']}
+                className="mb-3"
+              />
 
-                return mypagess.map((page: MyPagesModel) => (
-                  <PageCard
-                    key={page.id}
-                    page={page}
-                    onUpdateName={updatePageName}
-                    isLatest={page.id === latestPageId}
-                  />
-                ));
-              })()
-            )}
-          </Col>
-        </Row>
+              <ContentCards
+                filteredPages={filteredData}
+                onUpdateName={updatePageName}
+              />
+            </>
+          )}
+        </AzFilterSummary>
       </Container>
     </div>
   );

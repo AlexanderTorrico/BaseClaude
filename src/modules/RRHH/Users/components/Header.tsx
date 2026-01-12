@@ -62,7 +62,6 @@ const Header: React.FC<HeaderProps> = ({
 
   const handleRefresh = async () => {
     await onRefresh(1);
-    console.log('🔄 Datos actualizados desde la API');
   };
 
   const handleViewChange = (viewKey: string) => {

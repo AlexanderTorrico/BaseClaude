@@ -80,7 +80,7 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName }) => {
   const handleEditPage = () => {
     localStorage.setItem('pageId', String(page.id));
     // Navegacion a la app del Editor (subruta estatica, no React Router)
-    window.location.href = '/editor/';
+    window.location.href = '/editor';
   };
 
   return (

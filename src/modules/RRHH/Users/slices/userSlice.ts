@@ -28,13 +28,13 @@ export const userSlice = createSlice({
       state.list.push(action.payload);
     },
     updateUser: (state, action: PayloadAction<UserModel>) => {
-      const index = state.list.findIndex(user => user.id === action.payload.id);
+      const index = state.list.findIndex(user => user.uuid === action.payload.uuid);
       if (index !== -1) {
         state.list[index] = action.payload;
       }
     },
-    removeUser: (state, action: PayloadAction<number>) => {
-      state.list = state.list.filter(user => user.id !== action.payload);
+    removeUser: (state, action: PayloadAction<string>) => {
+      state.list = state.list.filter(user => user.uuid !== action.payload);
     },
     setCurrentView: (state, action: PayloadAction<string>) => {
       state.currentView = action.payload;

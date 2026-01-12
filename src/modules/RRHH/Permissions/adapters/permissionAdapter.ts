@@ -58,8 +58,7 @@ export const adaptPermissionsArrayToModels = (apiPermissions: any[]): Permission
  * La respuesta tiene estructura diferente con el permiso anidado en "permission"
  */
 export const adaptUserPermissionsResponse = (apiUserPermissions: any[]): PermissionModel[] => {
-    console.log('📦 adaptUserPermissionsResponse - Input:', apiUserPermissions);
-
+    
     if (!Array.isArray(apiUserPermissions)) {
         console.warn('⚠️ apiUserPermissions is not an array:', apiUserPermissions);
         return [];
@@ -67,7 +66,6 @@ export const adaptUserPermissionsResponse = (apiUserPermissions: any[]): Permiss
 
     const result = apiUserPermissions.map(item => {
         const permission = item.permission || item;
-        console.log('🔑 Processing permission:', permission);
 
         const adapted: PermissionModel = {
             id: permission.id,
@@ -97,6 +95,5 @@ export const adaptUserPermissionsResponse = (apiUserPermissions: any[]): Permiss
         return adapted;
     });
 
-    console.log('✅ adaptUserPermissionsResponse - Output:', result);
     return result;
 };

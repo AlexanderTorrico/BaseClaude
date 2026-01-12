@@ -1,5 +1,17 @@
-import { Badge, UncontrolledTooltip } from 'reactstrap';
+import { Badge } from 'reactstrap';
 import { RoleModel } from '../models/RoleModel';
+
+/**
+ * Genera el texto del tooltip para permisos
+ */
+const getPermissionsTooltipText = (permissions: RoleModel['permissions']): string => {
+    if (!permissions || permissions.length === 0) return '';
+    const lines = permissions.slice(0, 5).map((perm, idx) => `${idx + 1}. ${perm.name}`);
+    if (permissions.length > 5) {
+        lines.push(`+${permissions.length - 5} más...`);
+    }
+    return lines.join('\n');
+};
 
 export const roleTableColumns = [
     {
@@ -42,7 +54,6 @@ export const roleTableColumns = [
         filterable: false,
         cell: ({ row: { original } }: { row: { original: RoleModel } }) => {
             const permissionCount = original.permissionIds?.length || original.permissions?.length || 0;
-            const tooltipId = `permissions-tooltip-${original.id}`;
 
             if (permissionCount === 0) {
                 return (
@@ -52,26 +63,19 @@ export const roleTableColumns = [
                 );
             }
 
+            const tooltipText = getPermissionsTooltipText(original.permissions);
+
             return (
                 <div className="d-flex align-items-center gap-1">
-                    <Badge color="info" pill id={tooltipId}>
+                    <Badge
+                        color="info"
+                        pill
+                        title={tooltipText}
+                        style={{ cursor: 'help' }}
+                    >
                         <i className="mdi mdi-key-variant me-1"></i>
                         {permissionCount} {permissionCount === 1 ? 'permiso' : 'permisos'}
                     </Badge>
-                    {original.permissions && original.permissions.length > 0 && (
-                        <UncontrolledTooltip placement="top" target={tooltipId}>
-                            {original.permissions.slice(0, 5).map((perm, idx) => (
-                                <div key={perm.id}>
-                                    {idx + 1}. {perm.name}
-                                </div>
-                            ))}
-                            {original.permissions.length > 5 && (
-                                <div className="mt-1 pt-1 border-top text-muted">
-                                    +{original.permissions.length - 5} más...
-                                </div>
-                            )}
-                        </UncontrolledTooltip>
-                    )}
                 </div>
             );
         }

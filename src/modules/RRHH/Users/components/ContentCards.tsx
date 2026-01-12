@@ -1,14 +1,38 @@
 import React, { useState } from 'react';
-import { Row, Col, Card, CardBody, Button, Badge, UncontrolledTooltip } from 'reactstrap';
+import { Row, Col, Card, CardBody, Button, Badge } from 'reactstrap';
+import { useTranslation } from 'react-i18next';
 import { UserModel } from '../models/UserModel';
 import UserPermissionsModal from './UserPermissionsModal';
 import UserRolesModal from './UserRolesModal';
 import UserAvatar from '../../../../components/Common/UserAvatar';
 
 /**
- * Genera un ID seguro para usar en HTML (remueve caracteres especiales)
+ * Genera el texto del tooltip para roles
  */
-const safeId = (uuid: string): string => uuid.replace(/[^a-zA-Z0-9]/g, '');
+const getRolesTooltipText = (roles: UserModel['roles']): string => {
+  if (!roles || roles.length === 0) return '';
+  return roles.map((role, idx) => `${idx + 1}. ${role.name}`).join('\n');
+};
+
+/**
+ * Genera el texto del tooltip para permisos
+ */
+const getPermissionsTooltipText = (
+  directCount: number,
+  inheritedCount: number,
+  totalCount: number,
+  t: ReturnType<typeof useTranslation>['t']
+): string => {
+  const parts: string[] = [];
+  if (directCount > 0) {
+    parts.push(`${t('users.permissions.direct')}: ${directCount}`);
+  }
+  if (inheritedCount > 0) {
+    parts.push(`${t('users.permissions.inherited')}: ${inheritedCount}`);
+  }
+  parts.push(`${t('users.permissions.total')}: ${totalCount}`);
+  return parts.join('\n');
+};
 
 /**
  * Card individual de usuario
@@ -19,6 +43,7 @@ const UserCard: React.FC<{
   onManageRoles: (userUuid: string) => void;
   onManagePermissions: (userUuid: string) => void;
 }> = ({ user, onEdit, onManageRoles, onManagePermissions }) => {
+  const { t } = useTranslation();
   const roleCount = user.roleIds?.length || 0;
   const directPermissionCount = user.permissionIds?.length || 0;
 
@@ -27,6 +52,14 @@ const UserCard: React.FC<{
   }, 0) || 0;
 
   const totalPermissions = directPermissionCount + inheritedPermissionCount;
+
+  const rolesTooltip = getRolesTooltipText(user.roles);
+  const permissionsTooltip = getPermissionsTooltipText(
+    directPermissionCount,
+    inheritedPermissionCount,
+    totalPermissions,
+    t
+  );
 
   return (
     <Card className="border shadow-sm h-100">
@@ -58,8 +91,8 @@ const UserCard: React.FC<{
             <div className="d-flex align-items-center mb-2">
               <i className="mdi mdi-briefcase text-primary me-2 font-size-18"></i>
               <div className="d-flex flex-column">
-                <span className="fw-medium">{user.workStation.name || 'N/A'}</span>
-                <small className="text-muted">Nivel {user.workStation.level}</small>
+                <span className="fw-medium">{user.workStation.name || t('users.card.na')}</span>
+                <small className="text-muted">{t('users.card.level')} {user.workStation.level}</small>
               </div>
             </div>
           )}
@@ -69,58 +102,36 @@ const UserCard: React.FC<{
         <div className="d-flex gap-2 mb-3 flex-wrap justify-content-center">
           {/* Badge de Roles */}
           {roleCount > 0 ? (
-            <Badge color="primary" pill id={`roles-badge-${safeId(user.uuid)}`}>
+            <Badge
+              color="primary"
+              pill
+              title={rolesTooltip}
+              style={{ cursor: 'help' }}
+            >
               <i className="mdi mdi-shield-crown me-1"></i>
-              {roleCount} {roleCount === 1 ? 'rol' : 'roles'}
+              {roleCount} {roleCount === 1 ? t('users.roles.role') : t('users.roles.rolesPlural')}
             </Badge>
           ) : (
             <Badge color="light" className="text-muted">
-              Sin roles
+              {t('users.roles.noRoles')}
             </Badge>
           )}
 
           {/* Badge de Permisos */}
           {totalPermissions > 0 ? (
-            <Badge color="info" pill id={`permissions-badge-${safeId(user.uuid)}`}>
+            <Badge
+              color="info"
+              pill
+              title={permissionsTooltip}
+              style={{ cursor: 'help' }}
+            >
               <i className="mdi mdi-key-variant me-1"></i>
-              {totalPermissions} {totalPermissions === 1 ? 'permiso' : 'permisos'}
+              {totalPermissions} {totalPermissions === 1 ? t('users.permissions.permission') : t('users.permissions.permissionsPlural')}
             </Badge>
           ) : (
             <Badge color="light" className="text-muted">
-              Sin permisos
+              {t('users.permissions.noPermissions')}
             </Badge>
-          )}
-
-          {/* Tooltips para roles */}
-          {roleCount > 0 && user.roles && (
-            <UncontrolledTooltip placement="top" target={`roles-badge-${safeId(user.uuid)}`} fade={false}>
-              {user.roles.map((role, idx) => (
-                <div key={role.id}>
-                  {idx + 1}. {role.name}
-                </div>
-              ))}
-            </UncontrolledTooltip>
-          )}
-
-          {/* Tooltips para permisos */}
-          {totalPermissions > 0 && (
-            <UncontrolledTooltip placement="top" target={`permissions-badge-${safeId(user.uuid)}`} fade={false}>
-              <div className="text-start">
-                {directPermissionCount > 0 && (
-                  <div>
-                    <strong>Directos:</strong> {directPermissionCount}
-                  </div>
-                )}
-                {inheritedPermissionCount > 0 && (
-                  <div>
-                    <strong>Heredados:</strong> {inheritedPermissionCount}
-                  </div>
-                )}
-                <div className="mt-1 pt-1 border-top">
-                  <strong>Total:</strong> {totalPermissions}
-                </div>
-              </div>
-            </UncontrolledTooltip>
           )}
         </div>
 
@@ -133,30 +144,30 @@ const UserCard: React.FC<{
             color="warning"
             size="sm"
             onClick={() => onManageRoles(user.uuid)}
-            title="Gestionar roles"
+            title={t('users.roles.manageTitle')}
           >
             <i className="mdi mdi-shield-crown me-1"></i>
-            Roles
+            {t('users.roles.title')}
           </Button>
 
           <Button
             color="success"
             size="sm"
             onClick={() => onManagePermissions(user.uuid)}
-            title="Gestionar permisos"
+            title={t('users.permissions.manageTitle')}
           >
             <i className="mdi mdi-key-variant me-1"></i>
-            Permisos
+            {t('users.permissions.title')}
           </Button>
 
           <Button
             color="primary"
             size="sm"
             onClick={() => onEdit(user.uuid)}
-            title="Editar usuario"
+            title={t('users.actions.editTitle')}
           >
             <i className="mdi mdi-pencil me-1"></i>
-            Editar
+            {t('users.actions.edit')}
           </Button>
         </div>
       </CardBody>
@@ -175,6 +186,7 @@ interface ContentCardsProps {
 }
 
 const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, onRefresh, onEdit }) => {
+  const { t } = useTranslation();
   const [isPermissionsModalOpen, setIsPermissionsModalOpen] = useState(false);
   const [isRolesModalOpen, setIsRolesModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
@@ -227,9 +239,9 @@ const ContentCards: React.FC<ContentCardsProps> = ({ filteredUsers, onRefresh, o
           <Col xs={12}>
             <div className="text-center py-5">
               <i className="mdi mdi-account-off-outline display-4 text-muted"></i>
-              <h5 className="mt-3">No se encontraron usuarios</h5>
+              <h5 className="mt-3">{t('users.empty.title')}</h5>
               <p className="text-muted">
-                Intenta ajustar los filtros o busca con otros criterios
+                {t('users.empty.description')}
               </p>
             </div>
           </Col>

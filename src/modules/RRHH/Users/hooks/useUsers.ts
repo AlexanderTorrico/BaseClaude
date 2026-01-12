@@ -14,15 +14,19 @@ export const useUsers = () => {
     return users.length;
   };
 
-  const findUserById = (userId: number): UserModel | undefined => {
-    return users.find(user => user.id === userId);
+  /**
+   * Busca un usuario por su UUID (identificador único principal)
+   * @param uuid - UUID del usuario
+   */
+  const findUserByUuid = (uuid: string): UserModel | undefined => {
+    return users.find(user => user.uuid === uuid);
   };
 
   return {
     users,
     currentView,
     findUserByEmail,
-    findUserById,
+    findUserByUuid,
     getTotalUsers,
   };
 };

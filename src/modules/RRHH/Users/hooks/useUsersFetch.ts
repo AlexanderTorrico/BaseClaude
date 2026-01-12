@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { store } from '@/store';
 import { IUserService } from '../services/IUserService';
-import { RegisterUserDto } from '../models/RegisterUserDto';
+import { CreateUserDto } from '../models/CreateUserDto';
 import { UpdateUserDto } from '../models/UpdateUserDto';
 import { setUsers, addUser, updateUser as updateUserAction } from '../slices/userSlice';
 import { PermissionApiService } from '../../Permissions/services/PermissionApiService';
@@ -49,7 +49,7 @@ export const useUsersFetch = (service: IUserService) => {
     }
   };
 
-  const registerUser = async (dto: RegisterUserDto): Promise<{ success: boolean; message: string }> => {
+  const createUser = async (dto: CreateUserDto): Promise<{ success: boolean; message: string }> => {
     const formData = new FormData();
     formData.append('name', dto.name);
     formData.append('lastName', dto.lastName);
@@ -142,7 +142,7 @@ export const useUsersFetch = (service: IUserService) => {
   return {
     loading,
     fetchUsersByCompany,
-    registerUser,
+    createUser,
     updateUserData,
   };
 };

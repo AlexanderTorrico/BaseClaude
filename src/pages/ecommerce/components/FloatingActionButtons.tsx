@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Badge, UncontrolledTooltip } from 'reactstrap';
+import { Button, Badge } from 'reactstrap';
 import { useCart } from '../hooks/useCart';
 
 interface FloatingActionButtonsProps {
@@ -32,67 +32,57 @@ const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
       }}
     >
       {totalCompareItems > 0 && (
-        <>
-          <Button
-            color="info"
-            className="rounded-circle shadow-lg position-relative"
-            style={{ width: '56px', height: '56px' }}
-            onClick={onCompareClick}
-            id="compare-fab"
-          >
-            <i className="mdi mdi-compare font-size-20"></i>
-            {totalCompareItems > 0 && (
-              <Badge
-                color="danger"
-                pill
-                className="position-absolute"
-                style={{
-                  top: '-5px',
-                  right: '-5px',
-                  minWidth: '22px',
-                  fontSize: '11px',
-                }}
-              >
-                {totalCompareItems}
-              </Badge>
-            )}
-          </Button>
-          <UncontrolledTooltip placement="left" target="compare-fab">
-            Comparar productos
-          </UncontrolledTooltip>
-        </>
+        <Button
+          color="info"
+          className="rounded-circle shadow-lg position-relative"
+          style={{ width: '56px', height: '56px' }}
+          onClick={onCompareClick}
+          title="Comparar productos"
+        >
+          <i className="mdi mdi-compare font-size-20"></i>
+          {totalCompareItems > 0 && (
+            <Badge
+              color="danger"
+              pill
+              className="position-absolute"
+              style={{
+                top: '-5px',
+                right: '-5px',
+                minWidth: '22px',
+                fontSize: '11px',
+              }}
+            >
+              {totalCompareItems}
+            </Badge>
+          )}
+        </Button>
       )}
 
       {totalWishlistItems > 0 && (
-        <>
-          <Button
-            color="danger"
-            className="rounded-circle shadow-lg position-relative"
-            style={{ width: '56px', height: '56px' }}
-            onClick={onWishlistClick}
-            id="wishlist-fab"
-          >
-            <i className="mdi mdi-heart font-size-20"></i>
-            {totalWishlistItems > 0 && (
-              <Badge
-                color="warning"
-                pill
-                className="position-absolute"
-                style={{
-                  top: '-5px',
-                  right: '-5px',
-                  minWidth: '22px',
-                  fontSize: '11px',
-                }}
-              >
-                {totalWishlistItems}
-              </Badge>
-            )}
-          </Button>
-          <UncontrolledTooltip placement="left" target="wishlist-fab">
-            Lista de deseos
-          </UncontrolledTooltip>
-        </>
+        <Button
+          color="danger"
+          className="rounded-circle shadow-lg position-relative"
+          style={{ width: '56px', height: '56px' }}
+          onClick={onWishlistClick}
+          title="Lista de deseos"
+        >
+          <i className="mdi mdi-heart font-size-20"></i>
+          {totalWishlistItems > 0 && (
+            <Badge
+              color="warning"
+              pill
+              className="position-absolute"
+              style={{
+                top: '-5px',
+                right: '-5px',
+                minWidth: '22px',
+                fontSize: '11px',
+              }}
+            >
+              {totalWishlistItems}
+            </Badge>
+          )}
+        </Button>
       )}
 
       <Button
@@ -100,7 +90,7 @@ const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
         className="rounded-circle shadow-lg position-relative"
         style={{ width: '64px', height: '64px' }}
         onClick={onCartClick}
-        id="cart-fab"
+        title="Carrito de compras"
       >
         <i className="mdi mdi-cart font-size-24"></i>
         {totalCartItems > 0 && (
@@ -120,9 +110,6 @@ const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
           </Badge>
         )}
       </Button>
-      <UncontrolledTooltip placement="left" target="cart-fab">
-        Carrito de compras
-      </UncontrolledTooltip>
     </div>
   );
 };

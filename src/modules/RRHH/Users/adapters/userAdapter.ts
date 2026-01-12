@@ -2,7 +2,20 @@ import { UserModel } from '../models/UserModel';
 import { WorkStationModel } from '@/modules/RRHH/WorkStations/models/WorkStationModel';
 
 /**
- * Crea un WorkStation por defecto
+ * Adaptadores para transformar datos entre la API y los modelos de la UI.
+ *
+ * NOTAS SOBRE FALLBACKS:
+ * El backend tiene inconsistencias en los nombres de campos:
+ * - camelCase vs snake_case (lastName vs last_name)
+ * - idWorkStation vs id
+ * - work_station vs workStation
+ *
+ * Los fallbacks aseguran compatibilidad mientras se normaliza el backend.
+ * TODO: Remover fallbacks cuando el backend use naming consistente.
+ */
+
+/**
+ * Crea un WorkStation por defecto cuando no hay datos disponibles
  */
 const createDefaultWorkStation = (): WorkStationModel => ({
   id: 0,
@@ -17,39 +30,54 @@ const createDefaultWorkStation = (): WorkStationModel => ({
 
 /**
  * Adapta WorkStation de la API al modelo de la UI
+ *
+ * @param workStation - Datos crudos del workStation desde la API
+ * @returns WorkStationModel normalizado
  */
 const adaptWorkStation = (workStation: any): WorkStationModel => {
   return {
-    id: workStation.idWorkStation || workStation.id,  // Backend envía idWorkStation
+    // Backend envía 'idWorkStation' en algunos endpoints, 'id' en otros
+    id: workStation.idWorkStation || workStation.id,
     name: workStation.name || '',
     description: workStation.description || '',
     active: workStation.active ?? 1,
+    // Variación snake_case vs camelCase
     gblCompanyId: workStation.gbl_company_id || workStation.gblCompanyId || 0,
     requirements: workStation.requirements || [],
     responsabilities: workStation.responsabilities || [],
     level: workStation.level,
+    // Variación snake_case vs camelCase
     dependencyId: workStation.dependency_id || workStation.dependencyId
   };
 };
 
 /**
- * Adapta la respuesta de la API al modelo de la UI
- * El backend ahora devuelve 'uuid' en lugar de 'id' numérico
+ * Adapta la respuesta de un usuario individual de la API al modelo de la UI
+ *
+ * UUID es el identificador principal. El id numérico se mantiene por
+ * compatibilidad con código legacy.
+ *
+ * @param apiUser - Datos crudos del usuario desde la API
+ * @returns UserModel normalizado
  */
 export const adaptUserResponseToUserModel = (apiUser: any): UserModel => {
   return {
-    uuid: apiUser.uuid || apiUser.id?.toString() || '',  // UUID como identificador principal
-    id: apiUser.id,  // Mantener id numérico si está disponible
+    // UUID es el identificador principal
+    uuid: apiUser.uuid || apiUser.id?.toString() || '',
+    // ID numérico para compatibilidad legacy
+    id: apiUser.id,
     fullName: `${apiUser.name} ${apiUser.lastName || apiUser.last_name || ''}`.trim(),
     name: apiUser.name,
+    // Backend puede enviar lastName o last_name
     lastName: apiUser.lastName || apiUser.last_name || '',
     email: apiUser.email,
     phone: apiUser.phone,
     avatar: apiUser.avatar,
+    // Backend puede enviar workStation o work_station
     workStation: apiUser.workStation ? adaptWorkStation(apiUser.workStation)
       : apiUser.work_station ? adaptWorkStation(apiUser.work_station)
         : createDefaultWorkStation(),
-    // Roles y permisos (opcionales)
+    // Arrays opcionales con fallback snake_case
     roleIds: apiUser.roleIds || apiUser.role_ids || [],
     roles: apiUser.roles || [],
     permissionIds: apiUser.permissionIds || apiUser.permission_ids || [],
@@ -59,23 +87,33 @@ export const adaptUserResponseToUserModel = (apiUser: any): UserModel => {
 
 /**
  * Adapta un array de usuarios de la API
+ *
+ * @param apiUsers - Array de datos crudos desde la API
+ * @returns Array de UserModel normalizados
  */
-export const adaptUsersArrayToUserModels = (apiUsers: any): UserModel[] => {
+export const adaptUsersArrayToUserModels = (apiUsers: any[]): UserModel[] => {
   return apiUsers.map(adaptUserResponseToUserModel);
 };
 
 /**
- * Adapta los datos del formulario de registro al modelo UserModel
- * Combina datos del FormData y respuesta de la API
+ * Adapta la respuesta de creación/actualización de usuario.
+ * Combina datos del FormData original con la respuesta de la API.
+ *
+ * Se usa cuando la API no devuelve todos los campos en la respuesta
+ * y necesitamos reconstruir el modelo completo.
+ *
+ * @param formData - FormData original enviado al backend
+ * @param apiData - Respuesta de la API (puede venir envuelta en .data)
+ * @returns UserModel completo
  */
 export const adaptRegisterResponseToUserModel = (
   formData: FormData,
   apiData: any
 ): UserModel => {
-  // El apiData puede venir directo o envuelto en .data
+  // La API puede devolver datos directos o envueltos en .data
   const userData = apiData?.data || apiData;
 
-  // Obtener workStation de la respuesta API o del FormData
+  // Obtener workStation: priorizar respuesta API, fallback a FormData
   let workStation: WorkStationModel;
 
   if (userData?.workStation) {
@@ -83,7 +121,7 @@ export const adaptRegisterResponseToUserModel = (
   } else if (userData?.work_station) {
     workStation = adaptWorkStation(userData.work_station);
   } else {
-    // Fallback: intentar parsear desde el FormData
+    // Fallback: reconstruir desde FormData cuando API no devuelve workStation
     const wsJson = formData.get('workStation') as string;
     if (wsJson) {
       try {
@@ -108,6 +146,7 @@ export const adaptRegisterResponseToUserModel = (
   }
 
   return {
+    // UUID generado por backend o temporal para UI
     uuid: userData?.uuid || userData?.id?.toString() || `temp-${Date.now()}`,
     id: userData?.id || Date.now(),
     fullName: `${formData.get('name')} ${formData.get('lastName')}`.trim(),

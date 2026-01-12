@@ -132,7 +132,7 @@ const RoleFormModal: React.FC<RoleFormModalProps> = ({
                     {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
                         <Form onSubmit={handleSubmit}>
                             {serverError && (
-                                <Alert color="danger" className="mb-3">
+                                <Alert color="danger" className="mb-3" fade={false}>
                                     <i className="mdi mdi-alert-circle me-2"></i>
                                     {serverError}
                                 </Alert>

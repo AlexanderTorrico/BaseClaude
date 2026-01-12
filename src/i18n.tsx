@@ -18,22 +18,27 @@ import createPageEN from "./modules/WebSites/CreatePage/locales/en.json"
 import createPageES from "./modules/WebSites/CreatePage/locales/es.json"
 import createPageIT from "./modules/WebSites/CreatePage/locales/it.json"
 
+// Traducciones del módulo Users (RRHH)
+import usersEN from "./modules/RRHH/Users/locales/en.json"
+import usersES from "./modules/RRHH/Users/locales/es.json"
+import usersIT from "./modules/RRHH/Users/locales/it.json"
+
 // the translations
 const resources = {
   gr: {
     translation: translationGr,
   },
   it: {
-    translation: { ...translationIT, ...myPagesIT, ...createPageIT },
+    translation: { ...translationIT, ...myPagesIT, ...createPageIT, ...usersIT },
   },
   rs: {
     translation: translationRS,
   },
   es: {
-    translation: { ...translationES, ...myPagesES, ...createPageES },
+    translation: { ...translationES, ...myPagesES, ...createPageES, ...usersES },
   },
   en: {
-    translation: { ...translationEN, ...myPagesEN, ...createPageEN },
+    translation: { ...translationEN, ...myPagesEN, ...createPageEN, ...usersEN },
   },
 }
 

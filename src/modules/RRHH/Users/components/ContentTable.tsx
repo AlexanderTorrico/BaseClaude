@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Row, Col, Button } from 'reactstrap';
+import { useTranslation } from 'react-i18next';
 import AzTable from '../../../../components/aziende/AzTable';
-import { userTableColumns } from '../config/tableColumns';
+import { getUserTableColumns } from '../config/tableColumns';
 import { UserModel } from '../models/UserModel';
 import UserPermissionsModal from './UserPermissionsModal';
 import UserRolesModal from './UserRolesModal';
@@ -28,10 +29,14 @@ const ContentTable: React.FC<ContentTableProps> = ({
   onRefresh,
   onEdit,
 }) => {
+  const { t, i18n } = useTranslation();
   const [isPermissionsModalOpen, setIsPermissionsModalOpen] = useState(false);
   const [isRolesModalOpen, setIsRolesModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
+
+  // Columnas con traducciones - se regeneran cuando cambia el idioma
+  const columns = useMemo(() => getUserTableColumns(t), [t, i18n.language]);
 
   const handleManageRoles = (userUuid: string) => {
     const user = filteredUsers.find(u => u.uuid === userUuid);
@@ -79,7 +84,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
         <Col xl={12}>
           <AzTable
             data={filteredUsers}
-            columns={userTableColumns}
+            columns={columns}
             pagination={true}
             filters={filters}
             onFilterChange={onFilterChange}
@@ -98,7 +103,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
                   const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
                   handleManageRoles(rowData.uuid);
                 }}
-                title="Gestionar roles"
+                title={t('users.roles.manageTitle')}
               >
                 <i className="mdi mdi-account-group"></i>
               </Button>
@@ -111,7 +116,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
                   const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
                   handleManagePermissions(rowData.uuid);
                 }}
-                title="Gestionar permisos"
+                title={t('users.permissions.manageTitle')}
               >
                 <i className="mdi mdi-key-variant"></i>
               </Button>
@@ -123,7 +128,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
                   const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
                   handleViewUser(rowData.uuid);
                 }}
-                title="Ver detalles"
+                title={t('users.actions.viewTitle')}
               >
                 <i className="mdi mdi-eye"></i>
               </Button>
@@ -135,7 +140,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
                   const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
                   onEdit(rowData.uuid);
                 }}
-                title="Editar usuario"
+                title={t('users.actions.editTitle')}
               >
                 <i className="mdi mdi-pencil"></i>
               </Button>
@@ -147,7 +152,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
                   const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
                   handleDeleteUser(rowData.uuid);
                 }}
-                title="Eliminar usuario"
+                title={t('users.actions.deleteTitle')}
               >
                 <i className="mdi mdi-trash-can"></i>
               </Button>

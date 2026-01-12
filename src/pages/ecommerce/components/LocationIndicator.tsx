@@ -9,7 +9,6 @@ import {
   FormGroup,
   Label,
   Input,
-  UncontrolledTooltip,
 } from 'reactstrap';
 import { LocationModel, LocationChangeDto } from '../models/LocationModel';
 
@@ -90,49 +89,33 @@ const LocationIndicator: React.FC<LocationIndicatorProps> = ({
           {location.city}, {location.region}, {location.country}
         </small>
         {isManualLocation && (
-          <>
-            <i
-              className="mdi mdi-pencil text-info font-size-12"
-              id="manual-location-icon"
-            ></i>
-            <UncontrolledTooltip
-              placement="bottom"
-              target="manual-location-icon"
-            >
-              Ubicación manual
-            </UncontrolledTooltip>
-          </>
+          <i
+            className="mdi mdi-pencil text-info font-size-12"
+            title="Ubicación manual"
+          ></i>
         )}
 
         <div className="d-flex gap-1">
           {isManualLocation && (
-            <>
-              <Button
-                color="light"
-                size="sm"
-                className="p-1 px-2"
-                onClick={onResetLocation}
-                id="reset-location-btn"
-              >
-                <i className="mdi mdi-refresh font-size-14"></i>
-              </Button>
-              <UncontrolledTooltip placement="bottom" target="reset-location-btn">
-                Detectar automáticamente
-              </UncontrolledTooltip>
-            </>
+            <Button
+              color="light"
+              size="sm"
+              className="p-1 px-2"
+              onClick={onResetLocation}
+              title="Detectar automáticamente"
+            >
+              <i className="mdi mdi-refresh font-size-14"></i>
+            </Button>
           )}
           <Button
             color="light"
             size="sm"
             className="p-1 px-2"
             onClick={toggleModal}
-            id="change-location-btn"
+            title="Cambiar ubicación"
           >
             <i className="mdi mdi-pencil font-size-14"></i>
           </Button>
-          <UncontrolledTooltip placement="bottom" target="change-location-btn">
-            Cambiar ubicación
-          </UncontrolledTooltip>
         </div>
       </div>
 

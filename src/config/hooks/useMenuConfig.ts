@@ -9,8 +9,6 @@ import { MenuItem } from '../types/MenuTypes';
  */
 export const useMenuConfig = (userRoles: string[] = [], userPermissions: string[] = []): MenuItem[] => {
 
-  console.log('📋 useMenuConfig - userPermissions:', userPermissions);
-
   const filterMenuByAccess = (items: MenuItem[]): MenuItem[] => {
     return items
       .filter(item => {
@@ -39,7 +37,7 @@ export const useMenuConfig = (userRoles: string[] = [], userPermissions: string[
 
         // Verificar permisos: el usuario debe tener al menos uno de los permisos requeridos
         const hasPermission = item.permissions.some(perm => userPermissions.includes(perm));
-        console.log(`📁 Menu item "${item.label}" requires:`, item.permissions, '| User has:', userPermissions, '| Result:', hasPermission);
+        
 
         return hasPermission;
       })
@@ -63,7 +61,6 @@ export const useMenuConfig = (userRoles: string[] = [], userPermissions: string[
 
   const filteredMenus = useMemo(() => {
     const result = filterMenuByAccess(menuConfig.menus);
-    console.log('✅ Filtered menu items:', result.map(m => m.label));
     return result;
   }, [userRoles, userPermissions]);
 

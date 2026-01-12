@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Container, Row, Col } from 'reactstrap';
+import { useTranslation } from 'react-i18next';
 import { useUsers } from './hooks/useUsers';
 import { useUsersFetch } from './hooks/useUsersFetch';
 import AzFilterSummary from '../../../components/aziende/AzFilterSummary';
-import { userTableColumns } from './config/tableColumns';
+import { getUserTableColumns } from './config/tableColumns';
 import Header from './components/Header';
 import ContentTable from './components/ContentTable';
 import ContentCards from './components/ContentCards';
@@ -14,9 +15,13 @@ import { UserModel } from './models/UserModel';
 const userService = new UserApiService();
 
 const Users: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { currentView, users } = useUsers();
-  const { loading, fetchUsersByCompany, registerUser, updateUserData } = useUsersFetch(userService);
+  const { loading, fetchUsersByCompany, createUser, updateUserData } = useUsersFetch(userService);
   const [userToEdit, setUserToEdit] = useState<UserModel | null>(null);
+
+  // Columnas de tabla con traducciones - se regeneran cuando cambia el idioma
+  const userTableColumns = useMemo(() => getUserTableColumns(t), [t, i18n.language]);
 
   useEffect(() => {
     fetchUsersByCompany(1);
@@ -35,7 +40,7 @@ const Users: React.FC = () => {
         <Header
           loading={loading}
           onRefresh={fetchUsersByCompany}
-          onRegisterUser={registerUser}
+          onRegisterUser={createUser}
           onUpdateUser={updateUserData}
           userToEdit={userToEdit}
           onCloseEditModal={() => setUserToEdit(null)}

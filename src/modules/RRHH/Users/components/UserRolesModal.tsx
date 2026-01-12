@@ -135,7 +135,7 @@ const UserRolesModal: React.FC<UserRolesModalProps> = ({
             </ModalHeader>
 
             <ModalBody>
-                <Alert color="info" className="mb-3">
+                <Alert color="info" className="mb-3" fade={false}>
                     <i className="mdi mdi-information me-2"></i>
                     Selecciona los roles que deseas asignar a este usuario. Los permisos de cada rol se heredarán automáticamente.
                 </Alert>
@@ -194,7 +194,7 @@ const UserRolesModal: React.FC<UserRolesModalProps> = ({
                 )}
 
                 {rolesChanged && (
-                    <Alert color="warning" className="mt-3 mb-0">
+                    <Alert color="warning" className="mt-3 mb-0" fade={false}>
                         <i className="mdi mdi-alert-outline me-2"></i>
                         <strong>Cambios pendientes:</strong>{' '}
                         Roles: {user.roleIds?.length || 0} → {selectedRoleIds.length}

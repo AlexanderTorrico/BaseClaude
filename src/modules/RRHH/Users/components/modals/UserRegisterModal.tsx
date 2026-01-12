@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, ModalHeader, ModalBody, Button, Form, FormGroup, Label, Input, FormFeedback, Spinner, Alert, Row, Col } from 'reactstrap';
 import { Formik, FormikHelpers } from 'formik';
-import { RegisterUserDto } from '../../models/RegisterUserDto';
+import { CreateUserDto } from '../../models/CreateUserDto';
 import { UpdateUserDto } from '../../models/UpdateUserDto';
 import { UserModel } from '../../models/UserModel';
 import { userRegistrationSchema, userEditSchema } from '../../validations/userValidationSchema';
@@ -15,13 +15,13 @@ interface UserRegisterModalProps {
   isOpen: boolean;
   toggle: () => void;
   onSuccess: () => void;
-  onRegister: (dto: RegisterUserDto) => Promise<{ success: boolean; message: string }>;
+  onRegister: (dto: CreateUserDto) => Promise<{ success: boolean; message: string }>;
   onUpdate?: (dto: UpdateUserDto) => Promise<{ success: boolean; message: string }>;
   userToEdit?: UserModel | null;
   companyId?: string;
 }
 
-type FormValues = RegisterUserDto | UpdateUserDto;
+type FormValues = CreateUserDto | UpdateUserDto;
 
 interface FormValuesInternal {
   name: string;
@@ -194,7 +194,7 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
       result = await onUpdate(updateDto);
     } else {
       // Modo creación: llamar onRegister
-      const registerDto: RegisterUserDto = {
+      const createDto: CreateUserDto = {
         name: values.name,
         lastName: values.lastName,
         email: values.email,
@@ -206,7 +206,7 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
         avatar: avatarFile,
       };
 
-      result = await onRegister(registerDto);
+      result = await onRegister(createDto);
     }
 
     if (result.success) {
@@ -238,7 +238,7 @@ const UserRegisterModal: React.FC<UserRegisterModalProps> = ({
           {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting, setFieldValue }) => (
             <Form onSubmit={handleSubmit}>
               {serverError && (
-                <Alert color="danger" className="mb-3">
+                <Alert color="danger" className="mb-3" fade={false}>
                   <i className="mdi mdi-alert-circle me-2"></i>
                   {serverError}
                 </Alert>

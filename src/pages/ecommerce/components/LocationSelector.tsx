@@ -12,7 +12,6 @@ import {
   Label,
   Input,
   Badge,
-  UncontrolledTooltip,
 } from 'reactstrap';
 import { LocationModel, LocationChangeDto } from '../models/LocationModel';
 
@@ -110,17 +109,14 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
                     {location.city}, {location.region}
                   </h6>
                   {isManualLocation && (
-                    <>
-                      <Badge color="info" pill id="manual-location-badge">
-                        Manual
-                      </Badge>
-                      <UncontrolledTooltip
-                        placement="top"
-                        target="manual-location-badge"
-                      >
-                        Ubicación establecida manualmente
-                      </UncontrolledTooltip>
-                    </>
+                    <Badge
+                      color="info"
+                      pill
+                      title="Ubicación establecida manualmente"
+                      style={{ cursor: 'help' }}
+                    >
+                      Manual
+                    </Badge>
                   )}
                 </div>
                 <p className="text-muted mb-0 font-size-12">
@@ -141,7 +137,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
                   color="light"
                   size="sm"
                   onClick={onResetLocation}
-                  id="reset-location-btn"
+                  title="Detectar ubicación automáticamente"
                 >
                   <i className="mdi mdi-refresh"></i>
                 </Button>
@@ -151,11 +147,6 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
                 Cambiar
               </Button>
             </div>
-            {isManualLocation && (
-              <UncontrolledTooltip placement="top" target="reset-location-btn">
-                Detectar ubicación automáticamente
-              </UncontrolledTooltip>
-            )}
           </div>
         </CardBody>
       </Card>

@@ -39,8 +39,9 @@ const MenuRenderer: React.FC<MenuRendererProps> = ({ items, t }) => {
         return (
           <li key={item.id}>
             <a
-              href="javascript:void(0);"
+              href="#"
               className="has-arrow"
+              onClick={(e) => e.preventDefault()}
             >
               {item.icon && <i className={item.icon}></i>}
               {item.badge && (

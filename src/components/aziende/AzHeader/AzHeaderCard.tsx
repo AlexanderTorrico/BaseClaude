@@ -53,22 +53,22 @@ const AzHeaderCard: React.FC<AzHeaderCardProps> = React.memo(({
   return (
     <Card className={`border-0 shadow-sm mb-2 ${cardClassName}`}>
       <CardBody className={className}>
-        <Row className="align-items-center">
-          <Col lg={6} md={12}>
-            <h4 className="mb-0">{title}</h4>
+        <div className="d-flex align-items-center justify-content-between gap-2">
+          <div className="flex-grow-1 min-width-0">
+            <h4 className="mb-0 text-truncate">{title}</h4>
             {description && (
-              <p className="text-muted mb-md-0 mb-3">
+              <p className="text-muted mb-0 text-truncate">
                 {description}
                 {badgeContent}
               </p>
             )}
-          </Col>
-          <Col lg={6} md={12}>
-            <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
+          </div>
+          {contentTopRight && (
+            <div className="d-flex flex-nowrap gap-2 flex-shrink-0">
               {contentTopRight}
             </div>
-          </Col>
-        </Row>
+          )}
+        </div>
 
         {showBottomRow && (bottomLeftSlot || bottomRightSlot) && (
           <Row className="mt-3 g-3">

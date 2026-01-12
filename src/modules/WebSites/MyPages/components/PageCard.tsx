@@ -304,12 +304,12 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName, isLatest = fals
       </CardBody>
       {/* Badge "New" - Visible si es el último creado, posicionado en el Card */}
       {isLatest && (
-        <div
-          className="position-absolute top-0 end-0 m-3 badge bg-success p-2 font-size-14"
-          style={{ zIndex: 10 }}
+        <span
+          className="position-absolute badge bg-primary"
+          style={{ zIndex: 10, fontSize: '0.65rem', padding: '0.25em 0.5em', top: '12px', right: '12px' }}
         >
           New
-        </div>
+        </span>
       )}
     </Card>
   );

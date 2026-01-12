@@ -11,6 +11,8 @@ import { CreateUserDto } from '../models/CreateUserDto';
 import { UpdateUserDto } from '../models/UpdateUserDto';
 import { UserModel } from '../models/UserModel';
 
+const MOBILE_BREAKPOINT = 768;
+
 interface HeaderProps {
   loading: boolean;
   onRefresh: (companyId: number) => Promise<void>;
@@ -32,6 +34,20 @@ const Header: React.FC<HeaderProps> = ({
   const dispatch = useDispatch();
   const { getTotalUsers, currentView } = useUsers();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Detectar si estamos en móvil para modo compacto
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < MOBILE_BREAKPOINT : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Abrir modal cuando se selecciona un usuario para editar
   useEffect(() => {
@@ -72,7 +88,6 @@ const Header: React.FC<HeaderProps> = ({
     <>
       <AzHeaderCardViews
         title={t('users.title')}
-        description={t('users.description')}
         badge={{
           count: getTotalUsers(),
           total: getTotalUsers(),
@@ -84,6 +99,7 @@ const Header: React.FC<HeaderProps> = ({
           { key: '0', name: t('users.views.table'), icon: 'mdi-table', title: t('users.views.tableTitle') },
           { key: '1', name: t('users.views.cards'), icon: 'mdi-view-grid', title: t('users.views.cardsTitle') }
         ]}
+        compact={isMobile}
         contentTopRight={
           <>
             <Button
@@ -92,6 +108,7 @@ const Header: React.FC<HeaderProps> = ({
               className="d-flex align-items-center"
               disabled={loading}
               title={t('users.refreshTitle')}
+              size={isMobile ? 'sm' : undefined}
             >
               <i className={`mdi mdi-refresh ${loading ? 'mdi-spin' : ''}`}></i>
               <span className="d-none d-md-inline ms-1">{t('users.refresh')}</span>
@@ -102,6 +119,7 @@ const Header: React.FC<HeaderProps> = ({
               className="d-flex align-items-center"
               disabled={loading}
               title={t('users.newUser')}
+              size={isMobile ? 'sm' : undefined}
             >
               <i className="mdi mdi-plus"></i>
               <span className="d-none d-md-inline ms-1">{t('users.newUser')}</span>

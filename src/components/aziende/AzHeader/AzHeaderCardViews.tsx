@@ -32,6 +32,7 @@ interface AzHeaderCardViewsProps {
   contentBottomRight?: React.ReactNode | undefined;
   hideViewButtons?: boolean | undefined;
   className?: string | undefined;
+  compact?: boolean | undefined;
 }
 
 const DEFAULT_VIEWS_CONFIG: Record<string, { name: string; icon: string; title: string }> = {
@@ -112,7 +113,8 @@ const AzHeaderCardViews: React.FC<AzHeaderCardViewsProps> = React.memo(({
   contentBottomLeft,
   contentBottomRight,
   hideViewButtons = false,
-  className
+  className,
+  compact = false
 }) => {
   const normalizedViews = React.useMemo(() =>
     views.map((view, index) => normalizeViewConfig(view, index)),
@@ -224,6 +226,7 @@ const AzHeaderCardViews: React.FC<AzHeaderCardViewsProps> = React.memo(({
         bottomLeftSlot={combinedContentBottomLeft}
         bottomRightSlot={combinedContentBottomRight}
         className={className}
+        compact={compact}
       />
       {activeViewContent}
     </>

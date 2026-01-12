@@ -71,6 +71,7 @@ const Users: React.FC = () => {
           alwaysVisible={true}
           showCount="always"
           countPosition="top"
+          compact={isMobile}
         >
           {({ filteredData, filters, sorting, onFilterChange, onSortChange, onClearAll }) => (
             <>

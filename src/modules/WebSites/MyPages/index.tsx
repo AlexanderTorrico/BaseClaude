@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Container, Card, CardBody, Spinner } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
 import { useMyPages } from './hooks/useMyPages';
@@ -11,11 +11,26 @@ import Header from './components/Header';
 import ContentCards from './components/ContentCards';
 
 const myPagesService = new MyPagesApiService();
+const MOBILE_BREAKPOINT = 768;
 
 const MyPages: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { mypagess } = useMyPages();
   const { loading, fetchAll, updatePageName } = useMyPagesFetch(myPagesService);
+
+  // Detectar si estamos en móvil
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < MOBILE_BREAKPOINT : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Columnas con traducciones
   const columns = useMemo(() => getMyPagesColumns(t), [t, i18n.language]);
@@ -52,6 +67,7 @@ const MyPages: React.FC = () => {
           alwaysVisible={true}
           showCount="always"
           countPosition="top"
+          compact={isMobile}
         >
           {({ filteredData, filters, onFilterChange }) => (
             <>

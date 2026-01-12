@@ -13,6 +13,7 @@ import { UserModel } from './models/UserModel';
 //import { UserMockService } from './services/UserMockService';
 
 const userService = new UserApiService();
+const MOBILE_BREAKPOINT = 768;
 
 const Users: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -20,12 +21,30 @@ const Users: React.FC = () => {
   const { loading, fetchUsersByCompany, createUser, updateUserData } = useUsersFetch(userService);
   const [userToEdit, setUserToEdit] = useState<UserModel | null>(null);
 
+  // Detectar si estamos en móvil
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < MOBILE_BREAKPOINT : false
+  );
+
   // Columnas de tabla con traducciones - se regeneran cuando cambia el idioma
   const userTableColumns = useMemo(() => getUserTableColumns(t), [t, i18n.language]);
+
+  // Detectar cambios en el tamaño de pantalla
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     fetchUsersByCompany(1);
   }, []);
+
+  // En móvil siempre mostrar cards ('1'), en desktop respetar selección del usuario
+  const effectiveView = isMobile ? '1' : currentView;
 
   const handleEditUser = (userUuid: string) => {
     const user = users.find(u => u.uuid === userUuid);
@@ -55,7 +74,7 @@ const Users: React.FC = () => {
         >
           {({ filteredData, filters, sorting, onFilterChange, onSortChange }) => (
             <>
-              {currentView === '0' && (
+              {effectiveView === '0' && (
                 <Row>
                   <Col xl={12}>
                     <ContentTable
@@ -72,7 +91,7 @@ const Users: React.FC = () => {
                 </Row>
               )}
 
-              {currentView === '1' && (
+              {effectiveView === '1' && (
                 <ContentCards
                   filteredUsers={filteredData}
                   onRefresh={fetchUsersByCompany}

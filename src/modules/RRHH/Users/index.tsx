@@ -1,29 +1,53 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Container, Row, Col } from 'reactstrap';
+import { useTranslation } from 'react-i18next';
 import { useUsers } from './hooks/useUsers';
 import { useUsersFetch } from './hooks/useUsersFetch';
 import AzFilterSummary from '../../../components/aziende/AzFilterSummary';
-import { userTableColumns } from './config/tableColumns';
+import AzMobileFilters from '../../../components/aziende/AzMobileFilters';
+import { getUserTableColumns } from './config/tableColumns';
 import Header from './components/Header';
 import ContentTable from './components/ContentTable';
 import ContentCards from './components/ContentCards';
 import { UserApiService } from './services/UserApiService';
 import { UserModel } from './models/UserModel';
-//import { UserMockService } from './services/UserMockService';
 
 const userService = new UserApiService();
+const MOBILE_BREAKPOINT = 768;
 
 const Users: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { currentView, users } = useUsers();
-  const { loading, fetchUsersByCompany, registerUser, updateUserData } = useUsersFetch(userService);
+  const { loading, fetchUsersByCompany, createUser, updateUserData } = useUsersFetch(userService);
   const [userToEdit, setUserToEdit] = useState<UserModel | null>(null);
+
+  // Detectar si estamos en móvil
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < MOBILE_BREAKPOINT : false
+  );
+
+  // Columnas de tabla con traducciones - se regeneran cuando cambia el idioma
+  const userTableColumns = useMemo(() => getUserTableColumns(t), [t, i18n.language]);
+
+  // Detectar cambios en el tamaño de pantalla
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     fetchUsersByCompany(1);
   }, []);
 
-  const handleEditUser = (userId: number) => {
-    const user = users.find(u => u.id === userId);
+  // En móvil siempre mostrar cards ('1'), en desktop respetar selección del usuario
+  const effectiveView = isMobile ? '1' : currentView;
+
+  const handleEditUser = (userUuid: string) => {
+    const user = users.find(u => u.uuid === userUuid);
     if (user) {
       setUserToEdit(user);
     }
@@ -35,7 +59,7 @@ const Users: React.FC = () => {
         <Header
           loading={loading}
           onRefresh={fetchUsersByCompany}
-          onRegisterUser={registerUser}
+          onRegisterUser={createUser}
           onUpdateUser={updateUserData}
           userToEdit={userToEdit}
           onCloseEditModal={() => setUserToEdit(null)}
@@ -47,10 +71,11 @@ const Users: React.FC = () => {
           alwaysVisible={true}
           showCount="always"
           countPosition="top"
+          compact={isMobile}
         >
-          {({ filteredData, filters, sorting, onFilterChange, onSortChange }) => (
+          {({ filteredData, filters, sorting, onFilterChange, onSortChange, onClearAll }) => (
             <>
-              {currentView === '0' && (
+              {effectiveView === '0' && (
                 <Row>
                   <Col xl={12}>
                     <ContentTable
@@ -67,12 +92,22 @@ const Users: React.FC = () => {
                 </Row>
               )}
 
-              {currentView === '1' && (
-                <ContentCards
-                  filteredUsers={filteredData}
-                  onRefresh={fetchUsersByCompany}
-                  onEdit={handleEditUser}
-                />
+              {effectiveView === '1' && (
+                <>
+                  {/* Filtros móviles colapsables */}
+                  <AzMobileFilters
+                    columns={userTableColumns}
+                    filters={filters}
+                    onFilterChange={onFilterChange}
+                    mobileFilterKeys={['fullName', 'phone']}
+                    className="mb-3"
+                  />
+                  <ContentCards
+                    filteredUsers={filteredData}
+                    onRefresh={fetchUsersByCompany}
+                    onEdit={handleEditUser}
+                  />
+                </>
               )}
             </>
           )}

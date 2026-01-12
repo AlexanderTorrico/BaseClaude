@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Row, Col, Button } from 'reactstrap';
+import { useTranslation } from 'react-i18next';
 import AzTable from '../../../../components/aziende/AzTable';
-import { userTableColumns } from '../config/tableColumns';
+import { getUserTableColumns } from '../config/tableColumns';
 import { UserModel } from '../models/UserModel';
-import UserRolesPermissionsModal from './UserRolesPermissionsModal';
+import UserPermissionsModal from './UserPermissionsModal';
+import UserRolesModal from './UserRolesModal';
+import UserDetailsModal from './modals/UserDetailsModal';
 
 interface ContentTableProps {
   filteredUsers: UserModel[];
@@ -13,7 +16,7 @@ interface ContentTableProps {
   onSortChange?: (config: { field: string; direction: string }) => void;
   loading: boolean;
   onRefresh: (companyId: number) => Promise<void>;
-  onEdit: (userId: number) => void;
+  onEdit: (userUuid: string) => void;
 }
 
 const ContentTable: React.FC<ContentTableProps> = ({
@@ -26,29 +29,50 @@ const ContentTable: React.FC<ContentTableProps> = ({
   onRefresh,
   onEdit,
 }) => {
-  const [isRolesPermissionsModalOpen, setIsRolesPermissionsModalOpen] = useState(false);
+  const { t, i18n } = useTranslation();
+  const [isPermissionsModalOpen, setIsPermissionsModalOpen] = useState(false);
+  const [isRolesModalOpen, setIsRolesModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
 
-  const handleManageRolesPermissions = (userId: number) => {
-    const user = filteredUsers.find(u => u.id === userId);
+  // Columnas con traducciones - se regeneran cuando cambia el idioma
+  const columns = useMemo(() => getUserTableColumns(t), [t, i18n.language]);
+
+  const handleManageRoles = (userUuid: string) => {
+    const user = filteredUsers.find(u => u.uuid === userUuid);
     if (user) {
       setSelectedUser(user);
-      setIsRolesPermissionsModalOpen(true);
+      setIsRolesModalOpen(true);
     }
   };
 
-  const handleRolesPermissionsUpdated = () => {
-    setIsRolesPermissionsModalOpen(false);
+  const handleManagePermissions = (userUuid: string) => {
+    const user = filteredUsers.find(u => u.uuid === userUuid);
+    if (user) {
+      setSelectedUser(user);
+      setIsPermissionsModalOpen(true);
+    }
+  };
+
+  const handlePermissionsUpdated = () => {
+    setIsPermissionsModalOpen(false);
     setSelectedUser(null);
     onRefresh(1);
   };
 
-  const handleDeleteUser = (userId: number) => {
-    console.log('Eliminar usuario:', userId);
+  const handleRolesUpdated = () => {
+    setIsRolesModalOpen(false);
+    setSelectedUser(null);
+    onRefresh(1);
   };
 
-  const handleViewUser = (userId: number) => {
-    console.log('Ver detalles usuario:', userId);
+
+  const handleViewUser = (userUuid: string) => {
+    const user = filteredUsers.find(u => u.uuid === userUuid);
+    if (user) {
+      setSelectedUser(user);
+      setIsDetailsModalOpen(true);
+    }
   };
 
   return (
@@ -57,7 +81,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
         <Col xl={12}>
           <AzTable
             data={filteredUsers}
-            columns={userTableColumns}
+            columns={columns}
             pagination={true}
             filters={filters}
             onFilterChange={onFilterChange}
@@ -67,17 +91,31 @@ const ContentTable: React.FC<ContentTableProps> = ({
             loading={loading}
           >
             <AzTable.Actions>
+              {/* Botón Roles */}
+              <Button
+                size="sm"
+                color="warning"
+                outline
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
+                  handleManageRoles(rowData.uuid);
+                }}
+                title={t('users.roles.manageTitle')}
+              >
+                <i className="mdi mdi-account-group"></i>
+              </Button>
+              {/* Botón Permisos */}
               <Button
                 size="sm"
                 color="success"
                 outline
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
-                  handleManageRolesPermissions(rowData.id);
+                  handleManagePermissions(rowData.uuid);
                 }}
-                title="Gestionar roles y permisos"
+                title={t('users.permissions.manageTitle')}
               >
-                <i className="mdi mdi-shield-account"></i>
+                <i className="mdi mdi-key-variant"></i>
               </Button>
               <Button
                 size="sm"
@@ -85,9 +123,9 @@ const ContentTable: React.FC<ContentTableProps> = ({
                 outline
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
-                  handleViewUser(rowData.id);
+                  handleViewUser(rowData.uuid);
                 }}
-                title="Ver detalles"
+                title={t('users.actions.viewTitle')}
               >
                 <i className="mdi mdi-eye"></i>
               </Button>
@@ -97,36 +135,43 @@ const ContentTable: React.FC<ContentTableProps> = ({
                 outline
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
-                  onEdit(rowData.id);
+                  onEdit(rowData.uuid);
                 }}
-                title="Editar usuario"
+                title={t('users.actions.editTitle')}
               >
                 <i className="mdi mdi-pencil"></i>
-              </Button>
-              <Button
-                size="sm"
-                color="danger"
-                outline
-                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  const rowData = JSON.parse(e.currentTarget.getAttribute('data-row') || '{}') as UserModel;
-                  handleDeleteUser(rowData.id);
-                }}
-                title="Eliminar usuario"
-              >
-                <i className="mdi mdi-trash-can"></i>
               </Button>
             </AzTable.Actions>
           </AzTable>
         </Col>
       </Row>
 
-      {/* Modal para gestionar roles y permisos */}
+      {/* Modal para gestionar permisos */}
       {selectedUser && (
-        <UserRolesPermissionsModal
-          isOpen={isRolesPermissionsModalOpen}
-          toggle={() => setIsRolesPermissionsModalOpen(false)}
+        <UserPermissionsModal
+          isOpen={isPermissionsModalOpen}
+          toggle={() => setIsPermissionsModalOpen(false)}
           user={selectedUser}
-          onSuccess={handleRolesPermissionsUpdated}
+          onSuccess={handlePermissionsUpdated}
+        />
+      )}
+
+      {/* Modal para gestionar roles */}
+      {selectedUser && (
+        <UserRolesModal
+          isOpen={isRolesModalOpen}
+          toggle={() => setIsRolesModalOpen(false)}
+          user={selectedUser}
+          onSuccess={handleRolesUpdated}
+        />
+      )}
+
+      {/* Modal para ver detalles del usuario */}
+      {selectedUser && (
+        <UserDetailsModal
+          isOpen={isDetailsModalOpen}
+          toggle={() => setIsDetailsModalOpen(false)}
+          user={selectedUser}
         />
       )}
     </>

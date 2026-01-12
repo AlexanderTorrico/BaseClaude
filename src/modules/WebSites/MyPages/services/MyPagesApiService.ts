@@ -8,8 +8,9 @@ type SetStateFn = (loading: boolean) => void;
 
 export class MyPagesApiService implements IMyPagesService {
   async getAll(setLoading?: SetStateFn): Promise<ApiResponse<MyPagesModel[]>> {
+    // Usar el endpoint que filtra por compañía del usuario
     const res = await httpRequestWithAuth.get<ApiResponse<any>>(
-      `/api/dsg-page`,
+      `/api/dsg-page/company`,
       setLoading
     );
 

@@ -1,12 +1,55 @@
-import React from 'react';
-import { Badge, UncontrolledTooltip } from 'reactstrap';
+// JSX pragma needed for TSX
+import { Badge } from 'reactstrap';
+import { TFunction } from 'i18next';
 import { UserModel } from '../models/UserModel';
 import UserAvatar from '@/components/Common/UserAvatar';
 
-export const userTableColumns = [
+/**
+ * Genera el texto del tooltip para roles
+ */
+const getRolesTooltipText = (roles: UserModel['roles']): string => {
+  if (!roles || roles.length === 0) return '';
+  return roles.map((role, idx) => `${idx + 1}. ${role.name}`).join('\n');
+};
+
+/**
+ * Genera el texto del tooltip para permisos
+ */
+const getPermissionsTooltipText = (
+  directPermissions: UserModel['permissions'],
+  inheritedCount: number,
+  t?: TFunction
+): string => {
+  const parts: string[] = [];
+
+  if (directPermissions && directPermissions.length > 0) {
+    const directLabel = t ? t('users.permissions.directPermissions') : 'Permisos Directos';
+    parts.push(`${directLabel}:`);
+    directPermissions.slice(0, 5).forEach(perm => {
+      parts.push(`  • ${perm.namePublic || perm.name}`);
+    });
+    if (directPermissions.length > 5) {
+      const moreLabel = t ? t('users.permissions.more') : 'más...';
+      parts.push(`  +${directPermissions.length - 5} ${moreLabel}`);
+    }
+  }
+
+  if (inheritedCount > 0) {
+    const inheritedLabel = t ? t('users.permissions.inheritedFromRoles') : 'Heredados de roles';
+    parts.push(`${inheritedLabel}: ${inheritedCount}`);
+  }
+
+  return parts.join('\n');
+};
+
+/**
+ * Genera las columnas de la tabla de usuarios con traducciones
+ * @param t - Función de traducción de i18next
+ */
+export const getUserTableColumns = (t: TFunction) => [
   {
     key: "fullName",
-    header: "Usuario",
+    header: t('users.table.user'),
     sortable: true,
     filterable: true,
     filterType: "text",
@@ -26,19 +69,19 @@ export const userTableColumns = [
   },
   {
     key: "phone",
-    header: "Teléfono",
+    header: t('users.table.phone'),
     sortable: false,
     filterable: true,
     filterType: "text",
     cell: ({ row: { original } }: { row: { original: UserModel } }) => (
       <span className="text-muted font-family-monospace">
-        {original.phone || <span className="text-muted">N/A</span>}
+        {original.phone || <span className="text-muted">{t('users.card.na')}</span>}
       </span>
     )
   },
   {
     key: "roles",
-    header: "Roles",
+    header: t('users.table.roles'),
     sortable: false,
     filterable: false,
     cell: ({ row: { original } }: { row: { original: UserModel } }) => {
@@ -47,40 +90,36 @@ export const userTableColumns = [
       if (roleCount === 0) {
         return (
           <Badge color="light" className="text-muted">
-            Sin roles
+            {t('users.roles.noRoles')}
           </Badge>
         );
       }
 
-      const firstRole = original.roles?.[0];
-      const tooltipId = `roles-tooltip-${original.id}`;
+      const tooltipText = getRolesTooltipText(original.roles);
 
       return (
         <div className="d-flex align-items-center gap-1">
-          <Badge color="primary" pill id={tooltipId}>
+          <Badge
+            color="primary"
+            pill
+            title={tooltipText}
+            style={{ cursor: 'help' }}
+          >
             <i className="mdi mdi-shield-crown me-1"></i>
-            {roleCount} {roleCount === 1 ? 'rol' : 'roles'}
+            {roleCount} {roleCount === 1 ? t('users.roles.role') : t('users.roles.rolesPlural')}
           </Badge>
-          {firstRole && (
-            <UncontrolledTooltip placement="top" target={tooltipId}>
-              {original.roles?.map((role, idx) => (
-                <div key={role.id}>
-                  {idx + 1}. {role.name}
-                </div>
-              ))}
-            </UncontrolledTooltip>
-          )}
         </div>
       );
     }
   },
   {
     key: "permissions",
-    header: "Permisos",
+    header: t('users.table.permissions'),
     sortable: false,
     filterable: false,
     cell: ({ row: { original } }: { row: { original: UserModel } }) => {
-      const directPermissionCount = original.permissionIds?.length || 0;
+      const directPermissions = original.permissions || [];
+      const directPermissionCount = directPermissions.length;
 
       // Calcular permisos heredados de roles
       const inheritedPermissionCount = original.roles?.reduce((acc, role) => {
@@ -88,39 +127,28 @@ export const userTableColumns = [
       }, 0) || 0;
 
       const totalPermissions = directPermissionCount + inheritedPermissionCount;
-      const tooltipId = `permissions-tooltip-${original.id}`;
 
       if (totalPermissions === 0) {
         return (
           <Badge color="light" className="text-muted">
-            Sin permisos
+            {t('users.permissions.noPermissions')}
           </Badge>
         );
       }
 
+      const tooltipText = getPermissionsTooltipText(directPermissions, inheritedPermissionCount, t);
+
       return (
         <div className="d-flex align-items-center gap-1">
-          <Badge color="info" pill id={tooltipId}>
+          <Badge
+            color="info"
+            pill
+            title={tooltipText}
+            style={{ cursor: 'help' }}
+          >
             <i className="mdi mdi-key-variant me-1"></i>
-            {totalPermissions} {totalPermissions === 1 ? 'permiso' : 'permisos'}
+            {totalPermissions} {totalPermissions === 1 ? t('users.permissions.permission') : t('users.permissions.permissionsPlural')}
           </Badge>
-          <UncontrolledTooltip placement="top" target={tooltipId}>
-            <div className="text-start">
-              {directPermissionCount > 0 && (
-                <div>
-                  <strong>Directos:</strong> {directPermissionCount}
-                </div>
-              )}
-              {inheritedPermissionCount > 0 && (
-                <div>
-                  <strong>Heredados:</strong> {inheritedPermissionCount}
-                </div>
-              )}
-              <div className="mt-1 pt-1 border-top">
-                <strong>Total:</strong> {totalPermissions}
-              </div>
-            </div>
-          </UncontrolledTooltip>
         </div>
       );
     }

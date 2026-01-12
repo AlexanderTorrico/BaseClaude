@@ -10,6 +10,7 @@ interface FilterSummaryProps {
   showCount?: "auto" | "always" | "never";
   countPosition?: "top" | "bottom" | "both";
   alwaysVisible?: boolean;
+  compact?: boolean;
 }
 
 /**
@@ -23,7 +24,8 @@ const FilterSummary: React.FC<FilterSummaryProps> = ({
   className = "",
   showCount = "auto", // "always", "never", "auto" (solo cuando hay filtros)
   countPosition = "top", // "top", "bottom", "both"
-  alwaysVisible = false // true = always show filter summary, false = only when filters are active
+  alwaysVisible = false, // true = always show filter summary, false = only when filters are active
+  compact = false // Modo compacto para reducir espacio vertical
 }) => {
 
   // Validación y warning para desarrolladores
@@ -193,6 +195,7 @@ const FilterSummary: React.FC<FilterSummaryProps> = ({
           alwaysVisible={alwaysVisible}
           data={data}
           filteredData={filteredData}
+          compact={compact}
         />
       )}
 
@@ -218,7 +221,8 @@ const FilterSummaryDisplay = ({
   className,
   alwaysVisible = false,
   data = [],
-  filteredData = []
+  filteredData = [],
+  compact = false
 }) => {
   // Obtener filtros activos
   const activeFilters = Object.entries(filters).filter(([key, value]) =>
@@ -251,55 +255,62 @@ const FilterSummaryDisplay = ({
 
   // Función para formatear la dirección del ordenamiento
   const formatSortDirection = (direction) => {
-    return direction === 'asc' ? 'Ascendente' : 'Descendente';
+    return direction === 'asc' ? 'Asc' : 'Desc';
   };
 
+  const hasFiltersOrSorting = activeFilters.length > 0 || hasActiveSorting;
+
   return (
-    <div className={`d-flex align-items-center justify-content-between p-2 bg-light border-bottom ${className}`}>
-      <div className="d-flex flex-column gap-2">
-        {/* Primera fila: Filtros y ordenamiento */}
-        <div className="d-flex flex-wrap align-items-center gap-2">
-          {/* Mostrar filtros activos */}
-          {activeFilters.length > 0 && (
-            <div className="d-flex flex-wrap align-items-center gap-2">
-              <span className="text-muted small fw-medium">Filtros:</span>
-              {activeFilters.map(([columnKey, value]) => (
-                <span
-                  key={columnKey}
-                  className="badge bg-primary-subtle text-primary border border-primary-subtle"
-                >
-                  {getColumnName(columnKey)}: {formatFilterValue(columnKey, value)}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Separador si hay tanto filtros como ordenamiento */}
-          {activeFilters.length > 0 && hasActiveSorting && (
-            <span className="text-muted">•</span>
-          )}
-
-          {/* Mostrar ordenamiento activo */}
-          {hasActiveSorting && (
-            <div className="d-flex align-items-center gap-2">
-              <span className="text-muted small fw-medium">Ordenado por:</span>
-              <span className="badge bg-info-subtle text-info border border-info-subtle">
-                {getColumnName(sorting.field)} ({formatSortDirection(sorting.direction)})
-              </span>
-            </div>
-          )}
-
-          {/* Mostrar mensaje cuando alwaysVisible es true pero no hay filtros */}
-          {alwaysVisible && activeFilters.length === 0 && !hasActiveSorting && (
-            <span className="text-muted small">Sin filtros aplicados</span>
-          )}
-        </div>
-
-        {/* Segunda fila: Conteo (siempre al final) */}
+    <div className={`d-flex align-items-center justify-content-between ${compact ? 'px-2 py-1' : 'p-2'} bg-light border-bottom ${className}`}>
+      <div className={`d-flex flex-wrap align-items-center ${compact ? 'gap-1' : 'gap-2'}`}>
+        {/* Conteo */}
         {alwaysVisible && (
-          <div className="text-muted small">
-            Total <strong className={activeFilters.length > 0 || hasActiveSorting ? "text-primary" : ""}>{filteredData.length}</strong>/<strong>{data.length}</strong>
+          <span className={`text-muted ${compact ? 'font-size-11' : 'small'}`}>
+            <strong className={hasFiltersOrSorting ? "text-primary" : ""}>{filteredData.length}</strong>/{data.length}
+          </span>
+        )}
+
+        {/* Separador si hay conteo y filtros/ordenamiento */}
+        {alwaysVisible && hasFiltersOrSorting && (
+          <span className="text-muted">•</span>
+        )}
+
+        {/* Mostrar filtros activos */}
+        {activeFilters.length > 0 && (
+          <div className={`d-flex flex-wrap align-items-center ${compact ? 'gap-1' : 'gap-2'}`}>
+            {!compact && <span className="text-muted small fw-medium">Filtros:</span>}
+            {activeFilters.map(([columnKey, value]) => (
+              <span
+                key={columnKey}
+                className={`badge bg-primary-subtle text-primary border border-primary-subtle ${compact ? 'font-size-10 py-0 px-1' : ''}`}
+              >
+                {compact ? value : `${getColumnName(columnKey)}: ${formatFilterValue(columnKey, value)}`}
+              </span>
+            ))}
           </div>
+        )}
+
+        {/* Separador si hay tanto filtros como ordenamiento */}
+        {activeFilters.length > 0 && hasActiveSorting && (
+          <span className="text-muted">•</span>
+        )}
+
+        {/* Mostrar ordenamiento activo */}
+        {hasActiveSorting && (
+          <div className={`d-flex align-items-center ${compact ? 'gap-1' : 'gap-2'}`}>
+            {!compact && <span className="text-muted small fw-medium">Ordenado por:</span>}
+            <span className={`badge bg-info-subtle text-info border border-info-subtle ${compact ? 'font-size-10 py-0 px-1' : ''}`}>
+              {compact
+                ? `${getColumnName(sorting.field)} ${formatSortDirection(sorting.direction)}`
+                : `${getColumnName(sorting.field)} (${formatSortDirection(sorting.direction)})`
+              }
+            </span>
+          </div>
+        )}
+
+        {/* Mostrar mensaje cuando alwaysVisible es true pero no hay filtros */}
+        {alwaysVisible && !hasFiltersOrSorting && (
+          <span className={`text-muted ${compact ? 'font-size-11' : 'small'}`}>Sin filtros</span>
         )}
       </div>
 
@@ -308,12 +319,12 @@ const FilterSummaryDisplay = ({
         color="primary"
         outline
         onClick={onClearAll}
-        className="d-inline-flex align-items-center"
+        className={`d-inline-flex align-items-center ${compact ? 'py-0 px-2' : ''}`}
         size="sm"
-        disabled={activeFilters.length === 0 && !hasActiveSorting}
+        disabled={!hasFiltersOrSorting}
       >
-        <i className="mdi mdi-filter-remove me-2"></i>
-        Limpiar todo
+        <i className={`mdi mdi-filter-remove ${compact ? '' : 'me-1'}`}></i>
+        {!compact && <span className="d-none d-sm-inline">Limpiar</span>}
       </Button>
     </div>
   );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Button } from "reactstrap";
 import AzHeaderCard from "./AzHeaderCard";
 
@@ -31,17 +31,15 @@ interface AzHeaderCardViewsProps {
   contentBottomLeft?: React.ReactNode | undefined;
   contentBottomRight?: React.ReactNode | undefined;
   hideViewButtons?: boolean | undefined;
-  responsiveMode?: boolean | undefined;
-  isManualOverride?: boolean | undefined;
-  responsiveView?: string | undefined;
   className?: string | undefined;
+  compact?: boolean | undefined;
 }
 
 const DEFAULT_VIEWS_CONFIG: Record<string, { name: string; icon: string; title: string }> = {
   web: { name: "Web", icon: "mdi-monitor", title: "Vista Web" },
   table: { name: "Tabla", icon: "mdi-table", title: "Vista Tabla" },
   movil: { name: "Móvil", icon: "mdi-cellphone", title: "Vista Móvil" },
-  cards: { name: "Cards", icon: "mdi-card-multiple", title: "Vista Cards" },
+  cards: { name: "Cards", icon: "mdi-view-grid", title: "Vista Cards" },
   grid: { name: "Grid", icon: "mdi-view-grid", title: "Vista Grid" },
   list: { name: "Lista", icon: "mdi-view-list", title: "Vista Lista" }
 };
@@ -115,15 +113,18 @@ const AzHeaderCardViews: React.FC<AzHeaderCardViewsProps> = React.memo(({
   contentBottomLeft,
   contentBottomRight,
   hideViewButtons = false,
-  responsiveMode = false,
-  isManualOverride = false,
-  responsiveView,
-  className
+  className,
+  compact = false
 }) => {
   const normalizedViews = React.useMemo(() =>
     views.map((view, index) => normalizeViewConfig(view, index)),
     [views]
   );
+
+  // Manejar cambio de vista manual por el usuario
+  const handleViewChange = useCallback((viewKey: string) => {
+    onViewChange?.(viewKey);
+  }, [onViewChange]);
 
   const viewButtons = React.useMemo(() => {
     if (hideViewButtons || normalizedViews.length < 2) return null;
@@ -133,19 +134,15 @@ const AzHeaderCardViews: React.FC<AzHeaderCardViewsProps> = React.memo(({
         {normalizedViews.map((viewConfig, index) => {
           const viewKey = viewConfig.key ?? index.toString();
           const isActive = currentView === viewKey;
-          const isResponsiveMatch = responsiveView === viewKey;
           const viewTitle = viewConfig.title ?? `Vista ${viewConfig.name}`;
 
           return (
             <Button
               key={`${viewKey}-${index}`}
               color={isActive ? 'primary' : 'light'}
-              onClick={() => onViewChange?.(viewKey)}
+              onClick={() => handleViewChange(viewKey)}
               size="sm"
-              title={responsiveMode ?
-                `${viewTitle} ${isResponsiveMatch ? '(Vista responsiva)' : '(Override manual)'}` :
-                viewTitle
-              }
+              title={viewTitle}
               style={{ position: 'relative' }}
             >
               <i className={`mdi ${viewConfig.icon}`}></i>
@@ -155,7 +152,7 @@ const AzHeaderCardViews: React.FC<AzHeaderCardViewsProps> = React.memo(({
         })}
       </div>
     );
-  }, [normalizedViews, currentView, responsiveView, hideViewButtons, onViewChange, responsiveMode]);
+  }, [normalizedViews, currentView, hideViewButtons, handleViewChange]);
 
   const badgeProps = React.useMemo(() => {
     if (!badge) return {};
@@ -229,6 +226,7 @@ const AzHeaderCardViews: React.FC<AzHeaderCardViewsProps> = React.memo(({
         bottomLeftSlot={combinedContentBottomLeft}
         bottomRightSlot={combinedContentBottomRight}
         className={className}
+        compact={compact}
       />
       {activeViewContent}
     </>

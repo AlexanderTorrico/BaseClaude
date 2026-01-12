@@ -1,10 +1,11 @@
 import { WorkStationModel } from '@/modules/RRHH/shared/models/WorkStationModel';
 import { RoleModel } from '../../Roles/models/RoleModel';
-import { PermissionModel } from '../../Roles/models/PermissionModel';
+import { PermissionModel } from '../../Permissions/models/PermissionModel';
 
 
 export interface UserModel {
-  id: number;
+  uuid: string;  // Ahora usamos UUID en lugar de id numérico
+  id?: number;   // Mantenemos id como opcional para retrocompatibilidad
   fullName: string;
   name: string;
   lastName: string;

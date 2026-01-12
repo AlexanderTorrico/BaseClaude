@@ -4,11 +4,14 @@
   "version": "4.3.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"npm run dev:main\" \"npm run dev:editor\"",
+    "dev:main": "vite",
+    "dev:editor": "cd ../AziendePlatformEditor && npm run dev",
     "dev:staging": "vite --mode staging",
     "build": "vite build",
     "build:staging": "vite build --mode staging",
-    "build:production": "vite build --mode production",
+    "build:production": "npm run build:editor && vite build --mode production",
+    "build:editor": "cd ../AziendePlatformEditor && npm run build && xcopy dist ..\\\"Starterkit - ts\"\\dist\\editor /E /I /Y",
     "lint": "eslint .",
     "preview": "vite preview",
     "cp:module": "node scripts/createPage/create.js --type modules",
@@ -64,6 +67,7 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "@eslint/js": "^9.9.0",
     "@originjs/vite-plugin-federation": "^1.4.1",
     "@types/react": "^18.3.3",

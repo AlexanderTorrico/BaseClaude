@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, CardBody, Badge, Tooltip } from 'reactstrap';
+import { Card, CardBody, Badge } from 'reactstrap';
 import { Table, TableStatus } from '../models/TableModel';
 import { Users } from 'lucide-react';
 
@@ -13,6 +13,21 @@ interface TableLayoutMapProps {
 const BASE_WIDTH = 800;
 const BASE_HEIGHT = 600;
 
+/**
+ * Genera el texto del tooltip para la mesa
+ */
+const getTableTooltipText = (table: Table, getStatusText: (status: TableStatus) => string): string => {
+  const parts = [
+    table.table_number,
+    `Capacidad: ${table.capacity} personas`,
+    `Estado: ${getStatusText(table.status)}`
+  ];
+  if (table.zone) {
+    parts.push(`Zona: ${table.zone.name}`);
+  }
+  return parts.join('\n');
+};
+
 const TableLayoutMap: React.FC<TableLayoutMapProps> = ({
   tables,
   onTableClick,
@@ -21,7 +36,6 @@ const TableLayoutMap: React.FC<TableLayoutMapProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [hoveredTable, setHoveredTable] = useState<Table | null>(null);
-  const [tooltipOpen, setTooltipOpen] = useState<{ [key: number]: boolean }>({});
 
   // Calcular escala responsiva
   useEffect(() => {
@@ -53,6 +67,18 @@ const TableLayoutMap: React.FC<TableLayoutMapProps> = ({
   // Obtener color de borde si está seleccionada
   const getBorderColor = (tableId: number): string => {
     return selectedTableId === tableId ? '#007bff' : '#333';
+  };
+
+  // Obtener texto de estado
+  const getStatusText = (status: TableStatus): string => {
+    const texts: Record<TableStatus, string> = {
+      Available: 'Disponible',
+      Reserved: 'Reservada',
+      Occupied: 'Ocupada',
+      Cleaning: 'En limpieza',
+      Maintenance: 'Mantenimiento'
+    };
+    return texts[status];
   };
 
   // Renderizar mesa según su forma
@@ -99,6 +125,8 @@ const TableLayoutMap: React.FC<TableLayoutMapProps> = ({
       setHoveredTable(null);
     };
 
+    const tooltipText = getTableTooltipText(table, getStatusText);
+
     // Renderizar según forma
     switch (table.shape) {
       case 'round':
@@ -106,6 +134,7 @@ const TableLayoutMap: React.FC<TableLayoutMapProps> = ({
           <div
             key={table.id}
             id={`table-${table.id}`}
+            title={tooltipText}
             style={{
               ...commonStyle,
               width: `${size}px`,
@@ -129,6 +158,7 @@ const TableLayoutMap: React.FC<TableLayoutMapProps> = ({
           <div
             key={table.id}
             id={`table-${table.id}`}
+            title={tooltipText}
             style={{
               ...commonStyle,
               width: `${size}px`,
@@ -152,6 +182,7 @@ const TableLayoutMap: React.FC<TableLayoutMapProps> = ({
           <div
             key={table.id}
             id={`table-${table.id}`}
+            title={tooltipText}
             style={{
               ...commonStyle,
               width: `${size * 1.5}px`,
@@ -173,45 +204,6 @@ const TableLayoutMap: React.FC<TableLayoutMapProps> = ({
       default:
         return null;
     }
-  };
-
-  // Tooltip con información de la mesa
-  const renderTooltip = (table: Table) => {
-    return (
-      <Tooltip
-        key={`tooltip-${table.id}`}
-        placement="top"
-        isOpen={hoveredTable?.id === table.id}
-        target={`table-${table.id}`}
-        toggle={() => {}}
-      >
-        <div>
-          <strong>{table.table_number}</strong>
-          <br />
-          Capacidad: {table.capacity} personas
-          <br />
-          Estado: {getStatusText(table.status)}
-          {table.zone && (
-            <>
-              <br />
-              Zona: {table.zone.name}
-            </>
-          )}
-        </div>
-      </Tooltip>
-    );
-  };
-
-  // Obtener texto de estado
-  const getStatusText = (status: TableStatus): string => {
-    const texts: Record<TableStatus, string> = {
-      Available: 'Disponible',
-      Reserved: 'Reservada',
-      Occupied: 'Ocupada',
-      Cleaning: 'En limpieza',
-      Maintenance: 'Mantenimiento'
-    };
-    return texts[status];
   };
 
   if (tables.length === 0) {
@@ -305,7 +297,6 @@ const TableLayoutMap: React.FC<TableLayoutMapProps> = ({
             }}
           >
             {tables.map(table => renderTable(table))}
-            {tables.map(table => renderTooltip(table))}
           </div>
 
           {/* Información adicional */}

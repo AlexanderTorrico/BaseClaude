@@ -38,7 +38,11 @@ const MenuRenderer: React.FC<MenuRendererProps> = ({ items, t }) => {
       case 'dropdown':
         return (
           <li key={item.id}>
-            <Link to={item.path || '/#'} className="has-arrow">
+            <a
+              href="#"
+              className="has-arrow"
+              onClick={(e) => e.preventDefault()}
+            >
               {item.icon && <i className={item.icon}></i>}
               {item.badge && (
                 <span className={`badge rounded-pill bg-${item.badge.color} float-end`}>
@@ -46,7 +50,7 @@ const MenuRenderer: React.FC<MenuRendererProps> = ({ items, t }) => {
                 </span>
               )}
               <span>{t(item.labelKey)}</span>
-            </Link>
+            </a>
             {item.children && item.children.length > 0 && (
               <ul className="sub-menu" aria-expanded="false">
                 {item.children.map(child => renderMenuItem(child))}

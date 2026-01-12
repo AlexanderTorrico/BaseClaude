@@ -1,4 +1,18 @@
 import { Navigate } from "react-router-dom";
+import {
+  WEB_SITES_PERMISSIONS,
+  USER_PERMISSIONS,
+  WORKSTATION_PERMISSIONS,
+  ROLE_PERMISSIONS,
+  PERMISSION_PERMISSIONS,
+  RESERVATION_PERMISSIONS,
+  ORDERS_PERMISSIONS,
+  ECOMMERCE_PERMISSIONS,
+  COMPANY_PERMISSIONS,
+  INFORMATION_PERMISSIONS,
+  PAYMENT_PERMISSIONS,
+  VAULT_PERMISSIONS
+} from '@/core/auth';
 
 // // Authentication related pages
 import { LoginPage } from "../pages/Login";
@@ -7,6 +21,7 @@ import ForgetPwd from "../pages/Authentication/ForgetPassword";
 import UserProfile from "../pages/Authentication/user-profile";
 
 import CrudModern from "../pages/CrudModern/index";
+import Dashboard from "../pages/Dashboard";
 
 import User from "../pages/security/user/index";
 import HeaderViewType from "../modules/Components/Molecules/HeaderViewType/index";
@@ -17,6 +32,8 @@ import FilterSumaryInfo from "../modules/Components/Molecules/FilterSumaryInfo/i
 // RRHH
 import WorkStations from "../modules/RRHH/WorkStations/index";
 import Users from "../modules/RRHH/Users/index";
+import Roles from "../modules/RRHH/Roles/index";
+import Permissions from "../modules/RRHH/Permissions/index";
 
 // -------------------------------------------------------------
 import Landing from "../pages/Landing/Landing";
@@ -38,46 +55,54 @@ import Reservations from "@/modules/Reservation/Reservations";
 import Ecommerce from "@/pages/ecommerce";
 // -------------------------------------------------------------
 
+interface RouteConfig {
+  path: string;
+  component: React.ComponentType<any>;
+  exact?: boolean;
+  permissions?: string[];  // Permisos requeridos para acceder a la ruta
+}
 
-const authProtectedRoutes = [
+const authProtectedRoutes: RouteConfig[] = [
+  { path: "/dashboard", component: Dashboard },  // Dashboard principal
   { path: "/profile", component: UserProfile },
   { path: "/crud_modern", component: CrudModern },
 
-  // Web site
-  { path: "/createpages", component: CreatePage },
-  { path: "/mypages", component: MyPages },
+  // Web site - permisos granulares
+  { path: "/createpages", component: CreatePage, permissions: [WEB_SITES_PERMISSIONS.CREATE] },
+  { path: "/mypages", component: MyPages, permissions: [WEB_SITES_PERMISSIONS.SHOW] },
 
-  // Molecules  
+  // Molecules (componentes de desarrollo - sin restricción por ahora)
   { path: "/header_view_type", component: HeaderViewType },
   { path: "/table", component: Table },
   { path: "/molecules/filter-sumary-info", component: FilterSumaryInfo },
 
 
-  //Security
+  // Security - permisos granulares con .show
   { path: "/security-user", component: User },
+  { path: "/reservation", component: Reservation, permissions: [RESERVATION_PERMISSIONS.SHOW] },
+  { path: "/information", component: Information, permissions: [INFORMATION_PERMISSIONS.SHOW] },
+  { path: "/company", component: Company, permissions: [COMPANY_PERMISSIONS.SHOW] },
+  { path: "/paymentgateway", component: PaymentGateway, permissions: [PAYMENT_PERMISSIONS.SHOW] },
+  { path: "/vault", component: Vault, permissions: [VAULT_PERMISSIONS.SHOW] },
+  { path: "/orders", component: Orders, permissions: [ORDERS_PERMISSIONS.SHOW] },
+  { path: "/ecommerce", component: Ecommerce, permissions: [ECOMMERCE_PERMISSIONS.SHOW] },
 
-  { path: "/reservation", component: Reservation },
-  { path: "/information", component: Information },
-  { path: "/company", component: Company },
-  { path: "/paymentgateway", component: PaymentGateway },
-  // { path: "/roles", component: Roles },
-  { path: "/vault", component: Vault },
-  { path: "/orders", component: Orders },
-  { path: "/ecommerce", component: Ecommerce },
+  // RRHH - permisos granulares con .show
+  { path: "/users", component: Users, permissions: [USER_PERMISSIONS.SHOW] },
+  { path: "/workstations", component: WorkStations, permissions: [WORKSTATION_PERMISSIONS.SHOW] },
+  { path: "/roles", component: Roles, permissions: [ROLE_PERMISSIONS.SHOW] },
+  { path: "/permissions", component: Permissions, permissions: [PERMISSION_PERMISSIONS.SHOW] },
 
-  // RRHH
-  { path: "/users", component: Users },
-  { path: "/workstations", component: WorkStations },
-  // RESERVATION
-  { path: "/tablelayout", component: TableLayout },
-  { path: "/reservations", component: Reservations },
+  // RESERVATION - permisos granulares
+  { path: "/tablelayout", component: TableLayout, permissions: [RESERVATION_PERMISSIONS.SHOW] },
+  { path: "/reservations", component: Reservations, permissions: [RESERVATION_PERMISSIONS.SHOW] },
 
   //   // this route should be at the end of all other routes
   //   // eslint-disable-next-line react/display-name
   { path: "/", exact: true, component: () => <Navigate to="/dashboard" /> },
 ];
 
-const publicRoutes = [
+const publicRoutes: RouteConfig[] = [
   { path: "/login", component: LoginPage },
   { path: "/forgot-password", component: ForgetPwd },
   { path: "/register", component: RegisterPage },
@@ -89,4 +114,5 @@ const publicRoutes = [
   { path: "/license", component: LegalLicense },
 ];
 
-export { authProtectedRoutes, publicRoutes }
+export { authProtectedRoutes, publicRoutes };
+export type { RouteConfig };

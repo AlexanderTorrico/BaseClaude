@@ -1,34 +1,40 @@
-import { MyPagesModel } from '../models/MyPagesModel';
+import { TFunction } from 'i18next';
 
-export const mypagesColumns = [
+/**
+ * Genera las columnas de configuracion para filtros de MyPages
+ * @param t - Funcion de traduccion de i18next
+ */
+export const getMyPagesColumns = (t: TFunction) => [
   {
-    Header: 'ID',
-    accessor: 'id',
+    key: "name",
+    header: t('myPages.filters.name') || "Nombre",
+    sortable: true,
     filterable: true,
+    filterType: "text" as const,
   },
   {
-    Header: 'Acciones',
-    accessor: 'actions',
-    disableFilters: true,
-    Cell: ({ row }: any) => {
-      const item: MyPagesModel = row.original;
+    key: "rutName",
+    header: t('myPages.filters.domain') || "Dominio",
+    sortable: true,
+    filterable: true,
+    filterType: "text" as const,
+  },
+];
 
-      return (
-        <div className="d-flex gap-2">
-          <button
-            className="btn btn-sm btn-primary"
-            onClick={() => console.log('Editar:', item.id)}
-          >
-            <i className="mdi mdi-pencil"></i>
-          </button>
-          <button
-            className="btn btn-sm btn-danger"
-            onClick={() => console.log('Eliminar:', item.id)}
-          >
-            <i className="mdi mdi-delete"></i>
-          </button>
-        </div>
-      );
-    },
+// Columnas por defecto sin traduccion
+export const mypagesColumns = [
+  {
+    key: "name",
+    header: "Nombre",
+    sortable: true,
+    filterable: true,
+    filterType: "text" as const,
+  },
+  {
+    key: "rutName",
+    header: "Dominio",
+    sortable: true,
+    filterable: true,
+    filterType: "text" as const,
   },
 ];

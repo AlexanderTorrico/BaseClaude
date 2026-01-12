@@ -1,0 +1,69 @@
+import React, { useState, useEffect } from 'react';
+import { Button } from 'reactstrap';
+import { useTranslation } from 'react-i18next';
+import AzHeaderCard from '@/components/aziende/AzHeader/AzHeaderCard';
+
+const MOBILE_BREAKPOINT = 768;
+
+interface HeaderProps {
+  loading: boolean;
+  onRefresh: () => Promise<void>;
+  onCreateWithAI: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ loading, onRefresh, onCreateWithAI }) => {
+  const { t } = useTranslation();
+
+  // Detectar si estamos en móvil para modo compacto
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < MOBILE_BREAKPOINT : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const handleRefresh = async () => {
+    await onRefresh();
+  };
+
+  return (
+    <AzHeaderCard
+      title={t('createPage.title')}
+      compact={isMobile}
+      contentTopRight={
+        <>
+          <Button
+            color="light"
+            onClick={handleRefresh}
+            className="d-flex align-items-center"
+            disabled={loading}
+            title={t('createPage.refreshTitle') || 'Actualizar'}
+            size={isMobile ? 'sm' : undefined}
+          >
+            <i className={`mdi mdi-refresh ${loading ? 'mdi-spin' : ''}`}></i>
+            <span className="d-none d-md-inline ms-1">{t('createPage.refresh') || 'Actualizar'}</span>
+          </Button>
+          <Button
+            color="primary"
+            onClick={onCreateWithAI}
+            className="d-flex align-items-center"
+            disabled={loading}
+            title={t('createPage.createWithAI')}
+            size={isMobile ? 'sm' : undefined}
+          >
+            <i className="mdi mdi-auto-fix"></i>
+            <span className="d-none d-md-inline ms-1">{t('createPage.createWithAI')}</span>
+          </Button>
+        </>
+      }
+    />
+  );
+};
+
+export default Header;

@@ -25,11 +25,11 @@ export default defineConfig({
     port: 5000,
     host: true,
     proxy: {
-      // Proxy /editor al servidor del Editor (puerto 5001)
+      // Proxy /editor al servidor del Editor (puerto 5021)
       '/editor': {
-        target: 'http://localhost:5001',
+        target: 'http://localhost:5021',
         changeOrigin: true,
-        rewrite: (path) => path,
+        ws: true,
       },
     },
   },

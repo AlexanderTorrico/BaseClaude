@@ -15,6 +15,7 @@ export interface AzHeaderCardProps {
   bottomRightSlot?: React.ReactNode | undefined;
   className?: string | undefined;
   cardClassName?: string | undefined;
+  compact?: boolean | undefined;
 }
 
 const AzHeaderCard: React.FC<AzHeaderCardProps> = React.memo(({
@@ -30,48 +31,56 @@ const AzHeaderCard: React.FC<AzHeaderCardProps> = React.memo(({
   bottomLeftSlot,
   bottomRightSlot,
   className = "",
-  cardClassName = ""
+  cardClassName = "",
+  compact = false
 }) => {
   const badgeContent = React.useMemo(() => {
     if (!showBadge) return null;
 
-    const content = badgeCount !== undefined && badgeTotal !== undefined
-      ? `${badgeCount}/${badgeTotal}`
-      : badgeText;
+    // Soportar: count/total, solo count, o texto
+    let content: string | number | undefined;
+    if (badgeCount !== undefined && badgeTotal !== undefined) {
+      content = `${badgeCount}/${badgeTotal}`;
+    } else if (badgeCount !== undefined) {
+      content = badgeCount;
+    } else {
+      content = badgeText;
+    }
 
-    if (!content) return null;
+    if (content === undefined) return null;
 
     return (
-      <span className="ms-2">
-        <Badge color={badgeColor} style={{ fontSize: '0.65rem' }}>
-          {content}
-        </Badge>
-      </span>
+      <Badge color={badgeColor} className="ms-2" style={{ fontSize: '0.65rem', padding: '0.2em 0.5em', verticalAlign: 'middle' }}>
+        {content}
+      </Badge>
     );
   }, [showBadge, badgeCount, badgeTotal, badgeText, badgeColor]);
 
   return (
     <Card className={`border-0 shadow-sm mb-2 ${cardClassName}`}>
-      <CardBody className={className}>
-        <Row className="align-items-center">
-          <Col lg={6} md={12}>
-            <h4 className="mb-0">{title}</h4>
+      <CardBody className={`${compact ? 'py-2 px-3' : ''} ${className}`}>
+        <div className="d-flex align-items-center justify-content-between gap-2">
+          <div className="flex-grow-1 min-width-0">
+            <h4 className={`mb-0 text-truncate ${compact ? 'font-size-15' : ''}`}>
+              {title}
+              {!description && badgeContent}
+            </h4>
             {description && (
-              <p className="text-muted mb-md-0 mb-3">
+              <p className={`text-muted mb-0 text-truncate ${compact ? 'font-size-12' : ''}`}>
                 {description}
                 {badgeContent}
               </p>
             )}
-          </Col>
-          <Col lg={6} md={12}>
-            <div className="d-flex flex-wrap gap-2 justify-content-lg-end justify-content-center">
+          </div>
+          {contentTopRight && (
+            <div className="d-flex flex-nowrap gap-2 flex-shrink-0">
               {contentTopRight}
             </div>
-          </Col>
-        </Row>
+          )}
+        </div>
 
         {showBottomRow && (bottomLeftSlot || bottomRightSlot) && (
-          <Row className="mt-3 g-3">
+          <Row className={`${compact ? 'mt-2' : 'mt-3'} g-2`}>
             <Col xs={12} sm={5} md={6} lg={7}>
               {bottomLeftSlot}
             </Col>

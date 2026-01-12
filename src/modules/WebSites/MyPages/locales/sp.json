@@ -1,0 +1,23 @@
+{
+  "myPages.title": "Mis Páginas Web",
+  "myPages.subtitle": "Gestiona tus sitios web creados",
+  "myPages.loading": "Cargando páginas...",
+  "myPages.empty": "No tienes páginas creadas",
+  "myPages.emptyHint": "Crea tu primera página web para comenzar",
+  "myPages.page": "página",
+  "myPages.pages": "páginas",
+  "myPages.editName": "Editar nombre",
+  "myPages.noDomain": "Sin dominio",
+  "myPages.noPreview": "Sin preview",
+  "myPages.visits": "Visitas",
+  "myPages.reservations": "Reservas",
+  "myPages.colorPalette": "Paleta de colores",
+  "myPages.accent": "Acento",
+  "myPages.background": "Fondo",
+  "myPages.text": "Texto",
+  "myPages.seo": "SEO",
+  "myPages.analytics": "Analíticas",
+  "myPages.hosting": "Hospedaje y Dominio",
+  "myPages.share": "Compartir",
+  "myPages.edit": "Editar"
+}

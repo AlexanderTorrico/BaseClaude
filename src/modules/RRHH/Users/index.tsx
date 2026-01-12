@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useUsers } from './hooks/useUsers';
 import { useUsersFetch } from './hooks/useUsersFetch';
 import AzFilterSummary from '../../../components/aziende/AzFilterSummary';
+import AzMobileFilters from '../../../components/aziende/AzMobileFilters';
 import { getUserTableColumns } from './config/tableColumns';
 import Header from './components/Header';
 import ContentTable from './components/ContentTable';
@@ -72,7 +73,7 @@ const Users: React.FC = () => {
           showCount="always"
           countPosition="top"
         >
-          {({ filteredData, filters, sorting, onFilterChange, onSortChange }) => (
+          {({ filteredData, filters, sorting, onFilterChange, onSortChange, onClearAll }) => (
             <>
               {effectiveView === '0' && (
                 <Row>
@@ -92,11 +93,21 @@ const Users: React.FC = () => {
               )}
 
               {effectiveView === '1' && (
-                <ContentCards
-                  filteredUsers={filteredData}
-                  onRefresh={fetchUsersByCompany}
-                  onEdit={handleEditUser}
-                />
+                <>
+                  {/* Filtros móviles colapsables */}
+                  <AzMobileFilters
+                    columns={userTableColumns}
+                    filters={filters}
+                    onFilterChange={onFilterChange}
+                    mobileFilterKeys={['fullName', 'phone']}
+                    className="mb-3"
+                  />
+                  <ContentCards
+                    filteredUsers={filteredData}
+                    onRefresh={fetchUsersByCompany}
+                    onEdit={handleEditUser}
+                  />
+                </>
               )}
             </>
           )}

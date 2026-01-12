@@ -256,50 +256,52 @@ const FilterSummaryDisplay = ({
 
   return (
     <div className={`d-flex align-items-center justify-content-between p-2 bg-light border-bottom ${className}`}>
-      <div className="d-flex flex-column gap-2">
-        {/* Primera fila: Filtros y ordenamiento */}
-        <div className="d-flex flex-wrap align-items-center gap-2">
-          {/* Mostrar filtros activos */}
-          {activeFilters.length > 0 && (
-            <div className="d-flex flex-wrap align-items-center gap-2">
-              <span className="text-muted small fw-medium">Filtros:</span>
-              {activeFilters.map(([columnKey, value]) => (
-                <span
-                  key={columnKey}
-                  className="badge bg-primary-subtle text-primary border border-primary-subtle"
-                >
-                  {getColumnName(columnKey)}: {formatFilterValue(columnKey, value)}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Separador si hay tanto filtros como ordenamiento */}
-          {activeFilters.length > 0 && hasActiveSorting && (
-            <span className="text-muted">•</span>
-          )}
-
-          {/* Mostrar ordenamiento activo */}
-          {hasActiveSorting && (
-            <div className="d-flex align-items-center gap-2">
-              <span className="text-muted small fw-medium">Ordenado por:</span>
-              <span className="badge bg-info-subtle text-info border border-info-subtle">
-                {getColumnName(sorting.field)} ({formatSortDirection(sorting.direction)})
-              </span>
-            </div>
-          )}
-
-          {/* Mostrar mensaje cuando alwaysVisible es true pero no hay filtros */}
-          {alwaysVisible && activeFilters.length === 0 && !hasActiveSorting && (
-            <span className="text-muted small">Sin filtros aplicados</span>
-          )}
-        </div>
-
-        {/* Segunda fila: Conteo (siempre al final) */}
+      <div className="d-flex flex-wrap align-items-center gap-2">
+        {/* Conteo */}
         {alwaysVisible && (
-          <div className="text-muted small">
+          <span className="text-muted small">
             Total <strong className={activeFilters.length > 0 || hasActiveSorting ? "text-primary" : ""}>{filteredData.length}</strong>/<strong>{data.length}</strong>
+          </span>
+        )}
+
+        {/* Separador si hay conteo y filtros/ordenamiento */}
+        {alwaysVisible && (activeFilters.length > 0 || hasActiveSorting) && (
+          <span className="text-muted">•</span>
+        )}
+
+        {/* Mostrar filtros activos */}
+        {activeFilters.length > 0 && (
+          <div className="d-flex flex-wrap align-items-center gap-2">
+            <span className="text-muted small fw-medium">Filtros:</span>
+            {activeFilters.map(([columnKey, value]) => (
+              <span
+                key={columnKey}
+                className="badge bg-primary-subtle text-primary border border-primary-subtle"
+              >
+                {getColumnName(columnKey)}: {formatFilterValue(columnKey, value)}
+              </span>
+            ))}
           </div>
+        )}
+
+        {/* Separador si hay tanto filtros como ordenamiento */}
+        {activeFilters.length > 0 && hasActiveSorting && (
+          <span className="text-muted">•</span>
+        )}
+
+        {/* Mostrar ordenamiento activo */}
+        {hasActiveSorting && (
+          <div className="d-flex align-items-center gap-2">
+            <span className="text-muted small fw-medium">Ordenado por:</span>
+            <span className="badge bg-info-subtle text-info border border-info-subtle">
+              {getColumnName(sorting.field)} ({formatSortDirection(sorting.direction)})
+            </span>
+          </div>
+        )}
+
+        {/* Mostrar mensaje cuando alwaysVisible es true pero no hay filtros */}
+        {alwaysVisible && activeFilters.length === 0 && !hasActiveSorting && (
+          <span className="text-muted small">Sin filtros aplicados</span>
         )}
       </div>
 

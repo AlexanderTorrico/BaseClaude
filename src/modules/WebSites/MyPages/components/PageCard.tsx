@@ -90,12 +90,11 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName, isLatest = fals
   };
 
   /**
-   * Abre el editor en una nueva pestaña guardando el pageId en localStorage
+   * Abre el editor en una nueva pestaña con el pageId en la URL
    */
   const handleEditPage = () => {
-    localStorage.setItem('pageId', String(page.id));
-    // Abre el Editor en una nueva pestaña
-    window.open('/editor/', '_blank');
+    // Abre el Editor en una nueva pestaña con pageId como query param
+    window.open(`/editor/?pageId=${page.id}`, '_blank');
   };
 
   return (

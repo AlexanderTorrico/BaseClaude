@@ -21,6 +21,7 @@ export const adaptApiUserToAuthUser = (apiResponse: any): AuthUser => {
     logo: userData.logo || '',
     language: userData.language || 'es',
     status: userData.status === 1 ? 'active' : 'inactive',
+    gbl_company_id: userData.gbl_company_id || null,  // Obtener company ID del usuario
     modules: apiResponse.data.modules || [],
     roles: apiResponse.data.roles || [],
     permissions: apiResponse.data.direct_permissions || []
@@ -71,7 +72,8 @@ export const saveUserToStorage = (user: AuthUser): void => {
       phone: user.phone,
       logo: user.logo,
       language: user.language,
-      status: user.status
+      status: user.status,
+      gbl_company_id: user.gbl_company_id  // Guardar company ID
     }));
     localStorage.setItem('authToken', user.token);
     localStorage.setItem('lastLogin', new Date().toISOString());

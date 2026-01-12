@@ -7,6 +7,7 @@
 
 // Hooks
 export { useUserPermissions } from './hooks/useUserPermissions';
+export { useUserCompanyId } from './hooks/useUserCompanyId';
 
 // Components
 export { default as ProtectedRoute } from './components/ProtectedRoute';

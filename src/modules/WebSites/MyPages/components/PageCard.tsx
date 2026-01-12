@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Card, CardBody, Button, Row, Col, Input } from 'reactstrap';
+import { Card, CardBody, Button, Row, Col, Input, Collapse } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
 import { MyPagesModel } from '../models/MyPagesModel';
 import { useUserPermissions, WEB_SITES_PERMISSIONS } from '@/core/auth';
+import VisitsChart from './VisitsChart';
 
 interface PageCardProps {
   page: MyPagesModel;
@@ -15,6 +16,7 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName, isLatest = fals
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(page.name);
   const [isSaving, setIsSaving] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   // Obtener permisos del usuario
   const { hasPermission } = useUserPermissions();
@@ -267,7 +269,11 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName, isLatest = fals
                   <i className="mdi mdi-magnify me-1"></i>
                   {t("myPages.seo")}
                 </Button>
-                <Button color="light" size="sm" disabled>
+                <Button
+                  color={showAnalytics ? "primary" : "light"}
+                  size="sm"
+                  onClick={() => setShowAnalytics(!showAnalytics)}
+                >
                   <i className="mdi mdi-chart-line me-1"></i>
                   {t("myPages.analytics")}
                 </Button>
@@ -300,6 +306,12 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName, isLatest = fals
             </div>
           </Col>
         </Row>
+
+        {/* Panel de Analytics - Full width */}
+        <Collapse isOpen={showAnalytics}>
+          <hr className="my-3" />
+          <VisitsChart data={page.count} height={180} />
+        </Collapse>
       </CardBody>
       {/* Badge "New" - Visible si es el último creado, posicionado en el Card */}
       {isLatest && (

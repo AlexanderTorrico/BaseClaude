@@ -31,5 +31,5 @@ export interface MyPagesModel {
   gblCompanyId: number;
   createdAt: string;
   updatedAt: string;
-  count: any[];
+  count: Record<string, string>;  // { "2026-01-12": "5", "2026-01-13": "10" }
 }

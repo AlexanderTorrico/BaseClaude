@@ -7,6 +7,7 @@ import { CreatePageApiService } from './services/CreatePageApiService';
 import Header from './components/Header';
 import ContentTemplates from './components/ContentTemplates';
 import CreatePageModal from './components/CreatePageModal';
+import { useUserCompanyId } from '@/core/auth';
 
 const CreatePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('landing');
@@ -21,6 +22,7 @@ const CreatePage: React.FC = () => {
 
   // Servicio API
   const service = new CreatePageApiService();
+  const companyId = useUserCompanyId();
 
   // Cargar templates del API
   const fetchTemplates = async () => {
@@ -64,7 +66,7 @@ const CreatePage: React.FC = () => {
       const dto: GeneratePageDto = {
         conf: {},
         description: '',
-        gbl_company_id: 1,
+        gbl_company_id: companyId,
         name: pageName,
         template_page_id: selectedTemplate
       };

@@ -11,6 +11,7 @@ import ContentTable from './components/ContentTable';
 import ContentCards from './components/ContentCards';
 import { UserApiService } from './services/UserApiService';
 import { UserModel } from './models/UserModel';
+import { useUserCompanyId } from '@/core/auth';
 
 const userService = new UserApiService();
 const MOBILE_BREAKPOINT = 768;
@@ -20,6 +21,7 @@ const Users: React.FC = () => {
   const { currentView, users } = useUsers();
   const { loading, fetchUsersByCompany, createUser, updateUserData } = useUsersFetch(userService);
   const [userToEdit, setUserToEdit] = useState<UserModel | null>(null);
+  const companyId = useUserCompanyId();
 
   // Detectar si estamos en móvil
   const [isMobile, setIsMobile] = useState(() =>
@@ -40,8 +42,8 @@ const Users: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchUsersByCompany(1);
-  }, []);
+    fetchUsersByCompany(companyId);
+  }, [companyId]);
 
   // En móvil siempre mostrar cards ('1'), en desktop respetar selección del usuario
   const effectiveView = isMobile ? '1' : currentView;

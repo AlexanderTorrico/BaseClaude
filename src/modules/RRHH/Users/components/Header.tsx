@@ -10,6 +10,7 @@ import { setCurrentView } from '../slices/userSlice';
 import { CreateUserDto } from '../models/CreateUserDto';
 import { UpdateUserDto } from '../models/UpdateUserDto';
 import { UserModel } from '../models/UserModel';
+import { useUserCompanyId } from '@/core/auth';
 
 const MOBILE_BREAKPOINT = 768;
 
@@ -34,6 +35,7 @@ const Header: React.FC<HeaderProps> = ({
   const dispatch = useDispatch();
   const { getTotalUsers, currentView } = useUsers();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const companyId = useUserCompanyId();
 
   // Detectar si estamos en móvil para modo compacto
   const [isMobile, setIsMobile] = useState(() =>
@@ -135,7 +137,7 @@ const Header: React.FC<HeaderProps> = ({
         onRegister={onRegisterUser}
         onUpdate={onUpdateUser}
         userToEdit={userToEdit}
-        companyId="1"
+        companyId={String(companyId)}
       />
     </>
   );

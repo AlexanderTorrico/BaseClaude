@@ -38,6 +38,7 @@ export interface AuthUser {
   logo?: string;
   language?: string;
   status: string;
+  gbl_company_id?: number;  // ID de la compañía del usuario
   modules?: any[];
   roles?: any[];
   permissions?: any[];

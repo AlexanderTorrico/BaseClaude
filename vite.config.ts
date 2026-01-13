@@ -25,11 +25,18 @@ export default defineConfig({
     port: 5000,
     host: true,
     proxy: {
-      // Proxy /editor al servidor del Editor (puerto 5021)
-      '^/(editor|viewer|src|@|node_modules)': {
+      // Proxy /editor y todo lo que esté bajo /editor/* al puerto 5021
+      '/editor': {
         target: 'http://localhost:5021',
         changeOrigin: true,
         ws: true,
+      },
+      // Proxy /viewer pero reescribiendo la ruta para que apunte a /editor/viewer
+      '/viewer': {
+        target: 'http://localhost:5021',
+        changeOrigin: true,
+        ws: true,
+        rewrite: (path) => '/editor' + path,
       },
     },
   },

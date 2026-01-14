@@ -50,6 +50,33 @@ export const menuConfig: MenuConfig = {
         },
       ]
     },
+    // Cobros ═══════════════════════════════════════════════════════════════════
+    {
+      id: "section-payments",
+      type: "dropdown",
+      label: "Cobros",
+      labelKey: "Cobros",
+      icon: "bx bx-coins",
+      path: "/#",
+      children: [
+        {
+          id: "payments-paymentMethods",
+          type: "link",
+          label: "Métodos de cobro",
+          labelKey: "Métodos de cobro",
+          path: "/paymentmethods",
+          permissions: [WEB_SITES_PERMISSIONS.CREATE]
+        },
+        {
+          id: "payments-mySales",
+          type: "link",
+          label: "Mis ventas",
+          labelKey: "Mis ventas",
+          path: "/mysales",
+          permissions: [WEB_SITES_PERMISSIONS.SHOW]
+        },
+      ]
+    },
 
     // RRHH ═══════════════════════════════════════════════════════════════════════════
 

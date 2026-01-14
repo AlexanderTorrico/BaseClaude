@@ -19,8 +19,7 @@ const Paymentmethods: React.FC = () => {
     createAccount,
     updateAccountData,
     deleteAccount,
-    toggleActive,
-    setAsDefault
+    toggleActive
   } = usePaymentmethodsFetch(paymentMethodsService);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -87,7 +86,6 @@ const Paymentmethods: React.FC = () => {
                 onEditAccount={handleEditAccount}
                 onDeleteAccount={handleDeleteAccount}
                 onToggleAccountActive={toggleActive}
-                onSetAsDefault={setAsDefault}
               />
             ))}
           </div>

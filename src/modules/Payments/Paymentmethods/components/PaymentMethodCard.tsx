@@ -19,7 +19,6 @@ interface PaymentMethodCardProps {
   onEditAccount: (account: PaymentAccountModel) => void;
   onDeleteAccount: (accountId: number) => void;
   onToggleAccountActive: (accountId: number) => void;
-  onSetAsDefault: (accountId: number, methodId: number) => void;
 }
 
 const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
@@ -29,8 +28,7 @@ const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
   onAddAccount,
   onEditAccount,
   onDeleteAccount,
-  onToggleAccountActive,
-  onSetAsDefault
+  onToggleAccountActive
 }) => {
 
   const hasAccounts = method.accounts.length > 0;
@@ -108,38 +106,21 @@ const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
               <Table responsive className="mb-0">
                 <thead className="table-light">
                   <tr>
-                    <th style={{ width: '60px' }}>Estado</th>
                     <th>Alias</th>
                     <th>Monedas</th>
                     <th>Comisión</th>
                     <th>Límites</th>
-                    <th className="text-center" style={{ width: '150px' }}>Acciones</th>
+                    <th className="text-center" style={{ width: '80px' }}>Estado</th>
+                    <th className="text-center" style={{ width: '100px' }}>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {method.accounts.map(account => (
                     <tr key={account.id} style={!account.isActive ? { opacity: 0.6, backgroundColor: '#f8f9fa' } : {}}>
                       <td className="align-middle">
-                        <div className="form-check form-switch">
-                          <Input
-                            type="switch"
-                            checked={account.isActive}
-                            onChange={() => onToggleAccountActive(account.id)}
-                            style={{ cursor: 'pointer' }}
-                          />
-                        </div>
-                      </td>
-                      <td className="align-middle">
-                        <div className="d-flex align-items-center gap-2">
-                          <span className={account.isActive ? 'fw-medium' : 'text-muted'}>
-                            {account.alias}
-                          </span>
-                          {account.isDefault && (
-                            <Badge color="warning" pill className="font-size-10">
-                              Predeterminada
-                            </Badge>
-                          )}
-                        </div>
+                        <span className={account.isActive ? 'fw-medium' : 'text-muted'}>
+                          {account.alias}
+                        </span>
                         {account.description && (
                           <small className="text-muted d-block">{account.description}</small>
                         )}
@@ -175,38 +156,17 @@ const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
                         </small>
                       </td>
                       <td className="align-middle text-center">
+                        <div className="form-check form-switch d-flex justify-content-center">
+                          <Input
+                            type="switch"
+                            checked={account.isActive}
+                            onChange={() => onToggleAccountActive(account.id)}
+                            style={{ cursor: 'pointer' }}
+                          />
+                        </div>
+                      </td>
+                      <td className="align-middle text-center">
                         <div className="d-flex justify-content-center gap-1">
-                          {account.isDefault ? (
-                            <>
-                              <Button
-                                id={`default-${account.id}`}
-                                size="sm"
-                                color="warning"
-                                disabled
-                                style={{ opacity: 1 }}
-                              >
-                                <i className="mdi mdi-star" />
-                              </Button>
-                              <UncontrolledTooltip target={`default-${account.id}`}>
-                                Cuenta predeterminada
-                              </UncontrolledTooltip>
-                            </>
-                          ) : account.isActive ? (
-                            <>
-                              <Button
-                                id={`default-${account.id}`}
-                                size="sm"
-                                color="warning"
-                                outline
-                                onClick={() => onSetAsDefault(account.id, method.id)}
-                              >
-                                <i className="mdi mdi-star-outline" />
-                              </Button>
-                              <UncontrolledTooltip target={`default-${account.id}`}>
-                                Establecer como predeterminada
-                              </UncontrolledTooltip>
-                            </>
-                          ) : null}
                           <Button
                             id={`edit-${account.id}`}
                             size="sm"

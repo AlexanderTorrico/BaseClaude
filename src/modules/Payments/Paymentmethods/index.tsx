@@ -1,17 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Container } from 'reactstrap';
 import { usePaymentmethods } from './hooks/usePaymentmethods';
 import { usePaymentmethodsFetch } from './hooks/usePaymentmethodsFetch';
-import { PaymentmethodsMockService } from './services/PaymentmethodsMockService';
+import { createPaymentmethodsApiService } from './services/PaymentmethodsApiService';
 import { PaymentMethodModel, PaymentAccountModel } from './models/PaymentmethodsModel';
 import Header from './components/Header';
 import PaymentMethodCard from './components/PaymentMethodCard';
 import PaymentAccountModal from './components/modals/PaymentAccountModal';
 import { Loading } from '@/shared/components/Loading';
-
-const paymentMethodsService = new PaymentmethodsMockService();
+import { useUserCompanyId } from '@/core/auth/hooks/useUserCompanyId';
 
 const Paymentmethods: React.FC = () => {
+  const companyId = useUserCompanyId();
+
+  // Crear servicio con el companyId del usuario
+  const paymentMethodsService = useMemo(
+    () => createPaymentmethodsApiService(companyId),
+    [companyId]
+  );
+
   const { getMethodsWithAccounts, getMethodById } = usePaymentmethods();
   const {
     loading,
@@ -19,13 +26,15 @@ const Paymentmethods: React.FC = () => {
     createAccount,
     updateAccountData,
     deleteAccount,
-    toggleActive
+    toggleActive,
+    testConnection,
   } = usePaymentmethodsFetch(paymentMethodsService);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethodModel | null>(null);
   const [accountToEdit, setAccountToEdit] = useState<PaymentAccountModel | null>(null);
   const [expandedMethodId, setExpandedMethodId] = useState<number | null>(null);
+  const [testingConnectionUuid, setTestingConnectionUuid] = useState<string | null>(null);
 
   const handleToggleExpand = (methodId: number) => {
     setExpandedMethodId(prev => prev === methodId ? null : methodId);
@@ -53,9 +62,9 @@ const Paymentmethods: React.FC = () => {
     }
   };
 
-  const handleDeleteAccount = async (accountId: number) => {
+  const handleDeleteAccount = async (accountUuid: string) => {
     if (window.confirm('¿Estás seguro de eliminar esta cuenta?')) {
-      await deleteAccount(accountId);
+      await deleteAccount(accountUuid);
     }
   };
 
@@ -63,6 +72,16 @@ const Paymentmethods: React.FC = () => {
     setIsModalOpen(false);
     setSelectedMethod(null);
     setAccountToEdit(null);
+  };
+
+  const handleTestConnection = async (accountUuid: string) => {
+    setTestingConnectionUuid(accountUuid);
+    try {
+      await testConnection(accountUuid);
+      // El icono de verificado se actualizará automáticamente con el refetch
+    } finally {
+      setTestingConnectionUuid(null);
+    }
   };
 
   const methodsWithAccounts = getMethodsWithAccounts();
@@ -86,6 +105,8 @@ const Paymentmethods: React.FC = () => {
                 onEditAccount={handleEditAccount}
                 onDeleteAccount={handleDeleteAccount}
                 onToggleAccountActive={toggleActive}
+                onTestConnection={handleTestConnection}
+                testingConnectionUuid={testingConnectionUuid}
               />
             ))}
           </div>

@@ -17,8 +17,10 @@ interface PaymentMethodCardProps {
   onToggleExpand: () => void;
   onAddAccount: (methodId: number) => void;
   onEditAccount: (account: PaymentAccountModel) => void;
-  onDeleteAccount: (accountId: number) => void;
-  onToggleAccountActive: (accountId: number) => void;
+  onDeleteAccount: (accountUuid: string) => void;
+  onToggleAccountActive: (accountUuid: string) => void;
+  onTestConnection?: (accountUuid: string) => Promise<void>;
+  testingConnectionUuid?: string | null;
 }
 
 const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
@@ -28,7 +30,9 @@ const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
   onAddAccount,
   onEditAccount,
   onDeleteAccount,
-  onToggleAccountActive
+  onToggleAccountActive,
+  onTestConnection,
+  testingConnectionUuid,
 }) => {
 
   const hasAccounts = method.accounts.length > 0;
@@ -48,13 +52,28 @@ const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
               style={{
                 width: '48px',
                 height: '48px',
-                backgroundColor: hasActiveAccounts ? `${method.color}15` : '#f5f5f5'
+                backgroundColor: hasActiveAccounts ? `${method.color}15` : '#f5f5f5',
+                padding: method.image ? '8px' : '0'
               }}
             >
-              <i
-                className={`mdi ${method.icon} font-size-24`}
-                style={{ color: hasActiveAccounts ? method.color : '#9e9e9e' }}
-              />
+              {method.image ? (
+                <img
+                  src={method.image}
+                  alt={method.name}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    filter: hasActiveAccounts ? 'none' : 'grayscale(100%)',
+                    opacity: hasActiveAccounts ? 1 : 0.5
+                  }}
+                />
+              ) : (
+                <i
+                  className={`mdi ${method.icon} font-size-24`}
+                  style={{ color: hasActiveAccounts ? method.color : '#9e9e9e' }}
+                />
+              )}
             </div>
 
             <div>
@@ -108,15 +127,15 @@ const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
                   <tr>
                     <th>Alias</th>
                     <th>Monedas</th>
-                    <th>Comisión</th>
-                    <th>Límites</th>
+                    <th>Modo</th>
+                    <th className="text-center" style={{ width: '100px' }}>Verificado</th>
                     <th className="text-center" style={{ width: '80px' }}>Estado</th>
-                    <th className="text-center" style={{ width: '100px' }}>Acciones</th>
+                    <th className="text-center" style={{ width: '140px' }}>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {method.accounts.map(account => (
-                    <tr key={account.id} style={!account.isActive ? { opacity: 0.6, backgroundColor: '#f8f9fa' } : {}}>
+                    <tr key={account.uuid} style={!account.isActive ? { opacity: 0.6, backgroundColor: '#f8f9fa' } : {}}>
                       <td className="align-middle">
                         <span className={account.isActive ? 'fw-medium' : 'text-muted'}>
                           {account.alias}
@@ -140,35 +159,70 @@ const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
                         </div>
                       </td>
                       <td className="align-middle">
-                        {account.commissionPercentage > 0 || account.fixedCommission > 0 ? (
-                          <small>
-                            {account.commissionPercentage > 0 && `${account.commissionPercentage}%`}
-                            {account.commissionPercentage > 0 && account.fixedCommission > 0 && ' + '}
-                            {account.fixedCommission > 0 && `$${account.fixedCommission}`}
-                          </small>
-                        ) : (
-                          <small className="text-success">Gratis</small>
-                        )}
-                      </td>
-                      <td className="align-middle">
-                        <small className="text-muted">
-                          ${account.limits.minAmount} - ${account.limits.maxAmount.toLocaleString()}
-                        </small>
+                        <Badge
+                          color={account.mode === 'production' ? 'danger' : 'warning'}
+                          className="font-size-10"
+                        >
+                          {account.mode === 'production' ? 'Producción' : 'Sandbox'}
+                        </Badge>
                       </td>
                       <td className="align-middle text-center">
-                        <div className="form-check form-switch d-flex justify-content-center">
+                        {testingConnectionUuid === account.uuid ? (
+                          <span className="text-info">
+                            <i className="mdi mdi-loading mdi-spin font-size-18" />
+                          </span>
+                        ) : account.isVerified ? (
+                          <span className="text-success">
+                            <i className="mdi mdi-check-circle font-size-18" />
+                          </span>
+                        ) : (
+                          <span className="text-warning">
+                            <i className="mdi mdi-alert-circle font-size-18" />
+                          </span>
+                        )}
+                      </td>
+                      <td className="align-middle text-center">
+                        <div
+                          className="form-check form-switch d-flex justify-content-center"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <Input
                             type="switch"
                             checked={account.isActive}
-                            onChange={() => onToggleAccountActive(account.id)}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              onToggleAccountActive(account.uuid);
+                            }}
                             style={{ cursor: 'pointer' }}
                           />
                         </div>
                       </td>
                       <td className="align-middle text-center">
                         <div className="d-flex justify-content-center gap-1">
+                          {onTestConnection && method.provider === 'paypal' && (
+                            <>
+                              <Button
+                                id={`test-${account.uuid}`}
+                                size="sm"
+                                color="info"
+                                outline
+                                disabled={testingConnectionUuid === account.uuid}
+                                onClick={() => onTestConnection(account.uuid)}
+                              >
+                                {testingConnectionUuid === account.uuid ? (
+                                  <i className="mdi mdi-loading mdi-spin" />
+                                ) : (
+                                  <i className="mdi mdi-connection" />
+                                )}
+                              </Button>
+                              <UncontrolledTooltip target={`test-${account.uuid}`}>
+                                Probar conexión
+                              </UncontrolledTooltip>
+                            </>
+                          )}
+
                           <Button
-                            id={`edit-${account.id}`}
+                            id={`edit-${account.uuid}`}
                             size="sm"
                             color="primary"
                             outline
@@ -176,20 +230,20 @@ const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
                           >
                             <i className="mdi mdi-pencil" />
                           </Button>
-                          <UncontrolledTooltip target={`edit-${account.id}`}>
+                          <UncontrolledTooltip target={`edit-${account.uuid}`}>
                             Editar cuenta
                           </UncontrolledTooltip>
 
                           <Button
-                            id={`delete-${account.id}`}
+                            id={`delete-${account.uuid}`}
                             size="sm"
                             color="danger"
                             outline
-                            onClick={() => onDeleteAccount(account.id)}
+                            onClick={() => onDeleteAccount(account.uuid)}
                           >
                             <i className="mdi mdi-trash-can" />
                           </Button>
-                          <UncontrolledTooltip target={`delete-${account.id}`}>
+                          <UncontrolledTooltip target={`delete-${account.uuid}`}>
                             Eliminar cuenta
                           </UncontrolledTooltip>
                         </div>

@@ -18,7 +18,8 @@ import {
   TabPane,
   Card,
   CardBody,
-  Badge
+  Badge,
+  Alert
 } from 'reactstrap';
 import {
   PaymentMethodModel,
@@ -71,6 +72,20 @@ const CREDENTIAL_LABELS: Record<string, string> = {
   paypalMode: 'Modo (sandbox/live)'
 };
 
+// Campos que son sensibles y deben mostrarse enmascarados en modo edición
+const SENSITIVE_FIELDS = [
+  'secretKey',
+  'apiKey',
+  'klarnaPassword',
+  'klarnaApiKey',
+  'revolutApiKey',
+  'revolutWebhookSecret',
+  'paypalClientId',
+  'paypalClientSecret'
+];
+
+const MASKED_VALUE = '••••••••••••••••';
+
 const getDefaultFormState = (method: PaymentMethodModel | null): CreatePaymentAccountDto => ({
   paymentMethodId: method?.id || 0,
   alias: '',
@@ -106,6 +121,10 @@ const PaymentAccountModal: React.FC<PaymentAccountModalProps> = ({
   const [activeTab, setActiveTab] = useState('1');
   const [formData, setFormData] = useState<CreatePaymentAccountDto>(getDefaultFormState(selectedMethod));
   const [loading, setLoading] = useState(false);
+  // Track which sensitive fields have been modified by the user
+  const [modifiedFields, setModifiedFields] = useState<Set<string>>(new Set());
+  // Error message from backend validation
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const isEditMode = !!accountToEdit;
 
@@ -128,6 +147,8 @@ const PaymentAccountModal: React.FC<PaymentAccountModalProps> = ({
       setFormData(getDefaultFormState(selectedMethod));
     }
     setActiveTab('1');
+    setModifiedFields(new Set()); // Reset modified fields when modal opens
+    setErrorMessage(null); // Reset error message when modal opens
   }, [accountToEdit, selectedMethod, isOpen]);
 
   const handleCurrencyToggle = (currency: string) => {
@@ -152,6 +173,10 @@ const PaymentAccountModal: React.FC<PaymentAccountModalProps> = ({
   };
 
   const handleCredentialChange = (field: string, value: string) => {
+    // Track that this sensitive field has been modified
+    if (SENSITIVE_FIELDS.includes(field)) {
+      setModifiedFields(prev => new Set(prev).add(field));
+    }
     setFormData(prev => ({
       ...prev,
       credentials: {
@@ -163,12 +188,23 @@ const PaymentAccountModal: React.FC<PaymentAccountModalProps> = ({
 
   const handleSubmit = async () => {
     setLoading(true);
+    setErrorMessage(null);
 
     let result;
     if (isEditMode && accountToEdit) {
+      // In edit mode, only send credentials that were actually modified
+      const filteredCredentials: Record<string, string> = {};
+      Object.entries(formData.credentials).forEach(([key, value]) => {
+        // Include non-sensitive fields always, or sensitive fields only if modified
+        if (!SENSITIVE_FIELDS.includes(key) || modifiedFields.has(key)) {
+          filteredCredentials[key] = value as string;
+        }
+      });
+
       result = await onUpdate({
-        id: accountToEdit.id,
-        ...formData
+        uuid: accountToEdit.uuid,
+        ...formData,
+        credentials: filteredCredentials
       });
     } else {
       result = await onCreate(formData);
@@ -178,6 +214,9 @@ const PaymentAccountModal: React.FC<PaymentAccountModalProps> = ({
 
     if (result.success) {
       onClose();
+    } else {
+      // Show error message from backend
+      setErrorMessage(result.message || 'Error al guardar la configuración');
     }
   };
 
@@ -186,11 +225,39 @@ const PaymentAccountModal: React.FC<PaymentAccountModalProps> = ({
   return (
     <Modal isOpen={isOpen} toggle={onClose} size="lg" centered>
       <ModalHeader toggle={onClose}>
-        <i className={`mdi ${selectedMethod.icon} me-2`} style={{ color: selectedMethod.color }} />
-        {isEditMode ? `Editar Cuenta - ${selectedMethod.name}` : `Nueva Cuenta - ${selectedMethod.name}`}
+        <div className="d-flex align-items-center">
+          {selectedMethod.image ? (
+            <img
+              src={selectedMethod.image}
+              alt={selectedMethod.name}
+              style={{ width: '32px', height: '32px', objectFit: 'contain', marginRight: '10px' }}
+            />
+          ) : (
+            <i className={`mdi ${selectedMethod.icon} me-2`} style={{ color: selectedMethod.color, fontSize: '24px' }} />
+          )}
+          <div>
+            <div>{isEditMode ? `Editar Cuenta - ${selectedMethod.name}` : `Nueva Cuenta - ${selectedMethod.name}`}</div>
+            {selectedMethod.description && (
+              <small className="text-muted fw-normal">{selectedMethod.description}</small>
+            )}
+          </div>
+        </div>
       </ModalHeader>
 
       <ModalBody>
+        {errorMessage && (
+          <Alert color="danger" isOpen={!!errorMessage} toggle={() => setErrorMessage(null)} className="mb-3">
+            <div className="d-flex align-items-start">
+              <i className="mdi mdi-alert-circle-outline me-2 mt-1" />
+              <div>
+                {errorMessage.split('\n').map((line, index) => (
+                  <div key={index}>{line}</div>
+                ))}
+              </div>
+            </div>
+          </Alert>
+        )}
+
         <Nav tabs className="mb-3">
           <NavItem>
             <NavLink
@@ -327,28 +394,47 @@ const PaymentAccountModal: React.FC<PaymentAccountModalProps> = ({
                     Estas se guardan de forma segura.
                   </small>
 
-                  {selectedMethod.credentialFields.map(field => (
-                    <FormGroup key={field}>
-                      <Label>{CREDENTIAL_LABELS[field] || field}</Label>
-                      {field === 'paypalMode' ? (
-                        <Input
-                          type="select"
-                          value={(formData.credentials as PaymentAccountCredentials)[field as keyof PaymentAccountCredentials] || 'sandbox'}
-                          onChange={(e) => handleCredentialChange(field, e.target.value)}
-                        >
-                          <option value="sandbox">Sandbox (Pruebas)</option>
-                          <option value="live">Live (Producción)</option>
-                        </Input>
-                      ) : (
-                        <Input
-                          type={field.toLowerCase().includes('secret') || field.toLowerCase().includes('password') ? 'password' : 'text'}
-                          value={(formData.credentials as PaymentAccountCredentials)[field as keyof PaymentAccountCredentials] || ''}
-                          onChange={(e) => handleCredentialChange(field, e.target.value)}
-                          placeholder={`Ingresa ${CREDENTIAL_LABELS[field] || field}`}
-                        />
-                      )}
-                    </FormGroup>
-                  ))}
+                  {selectedMethod.credentialFields.map(field => {
+                    const isSensitive = SENSITIVE_FIELDS.includes(field);
+                    const isModified = modifiedFields.has(field);
+                    const currentValue = (formData.credentials as PaymentAccountCredentials)[field as keyof PaymentAccountCredentials] || '';
+
+                    // In edit mode, show masked value for sensitive fields that haven't been modified
+                    const showMasked = isEditMode && isSensitive && !isModified;
+                    const displayValue = showMasked ? '' : currentValue;
+                    const placeholder = showMasked
+                      ? MASKED_VALUE
+                      : `Ingresa ${CREDENTIAL_LABELS[field] || field}`;
+
+                    return (
+                      <FormGroup key={field}>
+                        <Label>{CREDENTIAL_LABELS[field] || field}</Label>
+                        {field === 'paypalMode' ? (
+                          <Input
+                            type="select"
+                            value={currentValue || 'sandbox'}
+                            onChange={(e) => handleCredentialChange(field, e.target.value)}
+                          >
+                            <option value="sandbox">Sandbox (Pruebas)</option>
+                            <option value="live">Live (Producción)</option>
+                          </Input>
+                        ) : (
+                          <Input
+                            type={field.toLowerCase().includes('secret') || field.toLowerCase().includes('password') ? 'password' : 'text'}
+                            value={displayValue}
+                            onChange={(e) => handleCredentialChange(field, e.target.value)}
+                            placeholder={placeholder}
+                          />
+                        )}
+                        {showMasked && (
+                          <small className="text-muted">
+                            <i className="mdi mdi-lock me-1" />
+                            Credencial guardada. Ingresa un nuevo valor para actualizar.
+                          </small>
+                        )}
+                      </FormGroup>
+                    );
+                  })}
                 </CardBody>
               </Card>
             </TabPane>

@@ -27,25 +27,25 @@ export const paymentmethodsSlice = createSlice({
       state.accounts.push(action.payload);
     },
     updatePaymentAccount: (state, action: PayloadAction<PaymentAccountModel>) => {
-      const index = state.accounts.findIndex(item => item.id === action.payload.id);
+      const index = state.accounts.findIndex(item => item.uuid === action.payload.uuid);
       if (index !== -1) {
         state.accounts[index] = action.payload;
       }
     },
-    removePaymentAccount: (state, action: PayloadAction<number>) => {
-      state.accounts = state.accounts.filter(item => item.id !== action.payload);
+    removePaymentAccount: (state, action: PayloadAction<string>) => {
+      state.accounts = state.accounts.filter(item => item.uuid !== action.payload);
     },
-    toggleAccountActive: (state, action: PayloadAction<number>) => {
-      const account = state.accounts.find(item => item.id === action.payload);
+    toggleAccountActive: (state, action: PayloadAction<string>) => {
+      const account = state.accounts.find(item => item.uuid === action.payload);
       if (account) {
         account.isActive = !account.isActive;
         account.updatedAt = new Date().toISOString();
       }
     },
-    setAccountAsDefault: (state, action: PayloadAction<{ accountId: number; methodId: number }>) => {
+    setAccountAsDefault: (state, action: PayloadAction<{ accountUuid: string; methodId: number }>) => {
       state.accounts.forEach(account => {
         if (account.paymentMethodId === action.payload.methodId) {
-          account.isDefault = account.id === action.payload.accountId;
+          account.isDefault = account.uuid === action.payload.accountUuid;
           account.updatedAt = new Date().toISOString();
         }
       });

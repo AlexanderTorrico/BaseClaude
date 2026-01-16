@@ -17,6 +17,8 @@ import vaultReducer from '../modules/Security/Vault/slices/vaultSlice';
 import tableLayoutReducer from '../modules/Reservation/TableLayout/slices/tablelayoutSlice';
 import securityOrdersReducer from '../modules/Security/Orders/slices/orderSlice';
 import ecommerceCartReducer from '../pages/ecommerce/slices/cartSlice';
+import paymentmethodsReducer from '../modules/Payments/Paymentmethods/slices/paymentmethodsSlice';
+import mysalesReducer from '../modules/Payments/Mysales/slices/mysalesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -36,6 +38,8 @@ export const store = configureStore({
     reservation_tableLayout: tableLayoutReducer,
     security_orders: securityOrdersReducer,
     ecommerce_cart: ecommerceCartReducer,
+    paymentmethods: paymentmethodsReducer,
+    mysales: mysalesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

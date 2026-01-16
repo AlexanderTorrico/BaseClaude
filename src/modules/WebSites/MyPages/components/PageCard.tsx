@@ -30,8 +30,10 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName, isLatest = fals
   const PROJECT_DOMAIN = 'http://localhost:5173';
   const shareUrl = `${PROJECT_DOMAIN}/viewer/${page.viewKey}`;
 
-  // Datos estáticos por ahora (TODO: obtener de API)
-  const visits = 1234; // Placeholder
+  // Calcular visitas totales desde page.count
+  const visits = page.count
+    ? Object.values(page.count).reduce((sum, val) => sum + (parseInt(val, 10) || 0), 0)
+    : 0;
   const reservations = 56; // Placeholder
 
   // Determinar si tiene dominio personalizado

@@ -3,10 +3,12 @@ import { Container } from 'reactstrap';
 import { toast } from 'react-toastify';
 import { TemplateModel } from './models/TemplateModel';
 import { GeneratePageDto } from './models/GeneratePageDto';
+import { GenerateWithAIDto } from './models/GenerateWithAIDto';
 import { CreatePageApiService } from './services/CreatePageApiService';
 import Header from './components/Header';
 import ContentTemplates from './components/ContentTemplates';
 import CreatePageModal from './components/CreatePageModal';
+import CreateWithAIModal from './components/CreateWithAIModal';
 import { useUserCompanyId } from '@/core/auth';
 
 const CreatePage: React.FC = () => {
@@ -15,10 +17,17 @@ const CreatePage: React.FC = () => {
   const [apiTemplates, setApiTemplates] = useState<TemplateModel[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Estado para el modal de creación
+  // Estado para el modal de creación normal
   const [modalOpen, setModalOpen] = useState(false);
   const [pageName, setPageName] = useState('');
   const [generating, setGenerating] = useState(false);
+
+  // Estado para el modal de IA
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [aiPageName, setAiPageName] = useState('');
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiSelectedTemplate, setAiSelectedTemplate] = useState<number | null>(null);
+  const [generatingAI, setGeneratingAI] = useState(false);
 
   // Servicio API
   const service = new CreatePageApiService();
@@ -41,8 +50,39 @@ const CreatePage: React.FC = () => {
   };
 
   const handleCreateWithAI = () => {
-    console.log('Crear página con IA');
-    // Aquí iría la lógica para crear con IA
+    setAiPageName('');
+    setAiPrompt('');
+    setAiSelectedTemplate(null);
+    setAiModalOpen(true);
+  };
+
+  const toggleAiModal = () => setAiModalOpen(!aiModalOpen);
+
+  const handleGenerateWithAI = async () => {
+    if (!aiPageName.trim() || !aiPrompt.trim() || !aiSelectedTemplate) return;
+
+    setGeneratingAI(true);
+    try {
+      const dto: GenerateWithAIDto = {
+        template_page_id: aiSelectedTemplate,
+        name: aiPageName,
+        prompt: aiPrompt
+      };
+
+      const res = await service.generateWithAI(dto);
+      if (res.status === 200 || res.status === 201) {
+        console.log('Page generated with AI:', res.data);
+        toggleAiModal();
+        toast.success(`Página creada con IA: ${aiPageName}`, { autoClose: 3000 });
+      } else {
+        toast.error('Error al generar la página con IA');
+      }
+    } catch (error) {
+      console.error('Error generating page with AI:', error);
+      toast.error('Error al generar la página con IA');
+    } finally {
+      setGeneratingAI(false);
+    }
   };
 
   const handleSelectTemplate = (templateId: number) => {
@@ -108,6 +148,7 @@ const CreatePage: React.FC = () => {
           onPreviewTemplate={handlePreviewTemplate}
         />
 
+        {/* Modal para crear página normal */}
         <CreatePageModal
           isOpen={modalOpen}
           toggle={toggleModal}
@@ -116,6 +157,21 @@ const CreatePage: React.FC = () => {
           onGenerate={handleGenerate}
           generating={generating}
           selectedTemplateName={getSelectedTemplateName()}
+        />
+
+        {/* Modal para crear con IA */}
+        <CreateWithAIModal
+          isOpen={aiModalOpen}
+          toggle={toggleAiModal}
+          pageName={aiPageName}
+          onPageNameChange={setAiPageName}
+          prompt={aiPrompt}
+          onPromptChange={setAiPrompt}
+          selectedTemplateId={aiSelectedTemplate}
+          onTemplateChange={setAiSelectedTemplate}
+          templates={apiTemplates}
+          onGenerate={handleGenerateWithAI}
+          generating={generatingAI}
         />
       </Container>
     </div>

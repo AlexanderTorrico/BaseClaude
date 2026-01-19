@@ -44,8 +44,8 @@ const RubroCard: React.FC<RubroCardProps> = ({ rubro, onClick }) => {
                 e.currentTarget.style.borderColor = '#edf0f5';
             }}
         >
-            <div className="d-flex justify-content-between align-items-start">
-                <div className="d-flex align-items-start">
+            <div className="d-flex justify-content-between align-items-start gap-2">
+                <div className="d-flex align-items-start" style={{ flex: 1, minWidth: 0 }}>
                     <div
                         className="d-flex align-items-center justify-content-center me-3"
                         style={{
@@ -58,14 +58,17 @@ const RubroCard: React.FC<RubroCardProps> = ({ rubro, onClick }) => {
                     >
                         <i className="mdi mdi-tag-outline text-white" style={{ fontSize: '20px' }}></i>
                     </div>
-                    <div>
+                    <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                         <h5
                             className="mb-1 text-capitalize"
                             style={{
                                 fontSize: '16px',
                                 fontWeight: 600,
                                 color: '#1a1a2e',
-                                marginBottom: '6px'
+                                marginBottom: '6px',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
                             }}
                         >
                             {rubro.name}

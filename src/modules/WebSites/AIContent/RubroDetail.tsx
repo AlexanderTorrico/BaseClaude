@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Card, CardBody, Spinner, Alert, Button, Modal, ModalHeader, ModalBody, ModalFooter, Input } from 'reactstrap';
+import { Container, Card, CardBody, Spinner, Alert, Button, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label } from 'reactstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import { RubroModel, RubroTemplatePageModel } from './models';
 import { AIContentApiService } from './services';
+import { useUserCompanyId } from '@/core/auth';
+import { toast } from 'react-toastify';
 
 const RubroDetail: React.FC = () => {
     const { rubroId } = useParams<{ rubroId: string }>();
     const navigate = useNavigate();
+    const companyId = useUserCompanyId();
 
     const [rubro, setRubro] = useState<RubroModel | null>(null);
     const [loading, setLoading] = useState(true);
@@ -17,6 +20,12 @@ const RubroDetail: React.FC = () => {
     const [verifyModalOpen, setVerifyModalOpen] = useState(false);
     const [verifyTemplateId, setVerifyTemplateId] = useState<number | null>(null);
     const [verifyDescription, setVerifyDescription] = useState('');
+
+    // Modal de convertir a página
+    const [convertModalOpen, setConvertModalOpen] = useState(false);
+    const [convertTemplateId, setConvertTemplateId] = useState<number | null>(null);
+    const [convertPageName, setConvertPageName] = useState('');
+    const [isConverting, setIsConverting] = useState(false);
 
     const service = new AIContentApiService();
 
@@ -82,6 +91,46 @@ const RubroDetail: React.FC = () => {
         setVerifyModalOpen(false);
         setVerifyTemplateId(null);
         setVerifyDescription('');
+    };
+
+    // Convert to Page modal functions
+    const openConvertModal = (templatePageId: number, templateName: string) => {
+        setConvertTemplateId(templatePageId);
+        setConvertPageName(templateName || 'New Page');
+        setConvertModalOpen(true);
+    };
+
+    const closeConvertModal = () => {
+        setConvertModalOpen(false);
+        setConvertTemplateId(null);
+        setConvertPageName('');
+    };
+
+    const handleConvertToPage = async () => {
+        if (!convertTemplateId || !convertPageName.trim()) return;
+
+        setIsConverting(true);
+        try {
+            const response = await service.convertIaToPage(
+                convertTemplateId,
+                convertPageName.trim(),
+                companyId
+            );
+
+            if (response.status === 200 || response.status === 201) {
+                toast.success('Page created successfully!');
+                closeConvertModal();
+                // Navigate to my pages
+                navigate('/mypages');
+            } else {
+                toast.error(response.message || 'Error creating page');
+            }
+        } catch (err) {
+            toast.error('Error creating page');
+            console.error('Error converting to page:', err);
+        } finally {
+            setIsConverting(false);
+        }
     };
 
     const handleVerify = async () => {
@@ -411,6 +460,39 @@ const RubroDetail: React.FC = () => {
                                                         Verificar
                                                     </button>
                                                     <button
+                                                        onClick={() => openConvertModal(tp.id, rubro?.name || 'New Page')}
+                                                        style={{
+                                                            background: isConverting && convertTemplateId === tp.id ? '#9ca3af' : '#f0f9ff',
+                                                            border: '1.5px solid #3b82f6',
+                                                            color: '#3b82f6',
+                                                            padding: '8px 16px',
+                                                            borderRadius: '8px',
+                                                            fontSize: '13px',
+                                                            fontWeight: 500,
+                                                            cursor: isConverting && convertTemplateId === tp.id ? 'not-allowed' : 'pointer',
+                                                            transition: 'all 0.2s ease',
+                                                            display: 'inline-flex',
+                                                            alignItems: 'center',
+                                                            gap: '6px'
+                                                        }}
+                                                        disabled={isConverting && convertTemplateId === tp.id}
+                                                        onMouseEnter={(e) => {
+                                                            if (!isConverting || convertTemplateId !== tp.id) {
+                                                                e.currentTarget.style.background = '#3b82f6';
+                                                                e.currentTarget.style.color = '#fff';
+                                                            }
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            if (!isConverting || convertTemplateId !== tp.id) {
+                                                                e.currentTarget.style.background = '#f0f9ff';
+                                                                e.currentTarget.style.color = '#3b82f6';
+                                                            }
+                                                        }}
+                                                    >
+                                                        <i className={`mdi ${isConverting && convertTemplateId === tp.id ? 'mdi-loading mdi-spin' : 'mdi-file-document-plus-outline'}`}></i>
+                                                        Convert to Page
+                                                    </button>
+                                                    <button
                                                         onClick={() => handleViewSections(tp.id)}
                                                         style={{
                                                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -484,6 +566,54 @@ const RubroDetail: React.FC = () => {
                         >
                             <i className="mdi mdi-check me-1"></i>
                             Confirmar Verificación
+                        </Button>
+                    </ModalFooter>
+                </Modal>
+
+                {/* Modal de convertir a página */}
+                <Modal isOpen={convertModalOpen} toggle={closeConvertModal}>
+                    <ModalHeader toggle={closeConvertModal}>
+                        <i className="mdi mdi-file-document-plus-outline me-2" style={{ color: '#3b82f6' }}></i>
+                        Convert to Page
+                    </ModalHeader>
+                    <ModalBody>
+                        <p style={{ color: '#4a5568', marginBottom: '16px' }}>
+                            Enter a name for the new page:
+                        </p>
+                        <FormGroup>
+                            <Label for="pageName">Page Name *</Label>
+                            <Input
+                                type="text"
+                                id="pageName"
+                                value={convertPageName}
+                                onChange={(e) => setConvertPageName(e.target.value)}
+                                placeholder="Enter page name"
+                            />
+                        </FormGroup>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button color="light" onClick={closeConvertModal} disabled={isConverting}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleConvertToPage}
+                            disabled={!convertPageName.trim() || isConverting}
+                            style={{
+                                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                                border: 'none'
+                            }}
+                        >
+                            {isConverting ? (
+                                <>
+                                    <Spinner size="sm" className="me-1" />
+                                    Converting...
+                                </>
+                            ) : (
+                                <>
+                                    <i className="mdi mdi-check me-1"></i>
+                                    Create Page
+                                </>
+                            )}
                         </Button>
                     </ModalFooter>
                 </Modal>

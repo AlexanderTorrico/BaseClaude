@@ -51,6 +51,7 @@ import CreatePage from "@/modules/WebSites/CreatePage";
 import AIContent from "@/modules/WebSites/AIContent";
 import RubroDetail from "@/modules/WebSites/AIContent/RubroDetail";
 import SectionViewer from "@/modules/WebSites/AIContent/SectionViewer";
+import PageViewer from "@/modules/WebSites/Viewer";
 import Vault from "@/modules/Security/Vault";
 import Orders from "@/modules/Security/Orders";
 import TableLayout from "@/modules/Reservation/TableLayout";
@@ -116,6 +117,7 @@ const authProtectedRoutes: RouteConfig[] = [
 ];
 
 const publicRoutes: RouteConfig[] = [
+  { path: "/viewer/:viewKey", component: PageViewer },
   { path: "/login", component: LoginPage },
   { path: "/forgot-password", component: ForgetPwd },
   { path: "/register", component: RegisterPage },

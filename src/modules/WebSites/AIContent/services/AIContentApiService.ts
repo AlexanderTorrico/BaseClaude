@@ -187,4 +187,30 @@ export class AIContentApiService {
             data: res.data?.data ?? res.data ?? []
         };
     }
+
+    /**
+     * Convierte un template IA a una página regular
+     */
+    async convertIaToPage(
+        iaRubroTemplatePageId: number,
+        pageName: string,
+        companyId: number,
+        setLoading?: SetStateFn
+    ): Promise<ApiResponse<any>> {
+        const res = await httpRequestWithAuth.post<ApiResponse<any>>(
+            `/api/dsg-page/convert-ia-to-page`,
+            {
+                ia_rubro_template_page_id: iaRubroTemplatePageId,
+                page_name: pageName,
+                company_id: companyId
+            },
+            setLoading
+        );
+
+        return {
+            status: res.status,
+            message: res.message || (res.status === 200 || res.status === 201 ? 'Page created successfully' : 'Error creating page'),
+            data: res.data?.data ?? res.data
+        };
+    }
 }

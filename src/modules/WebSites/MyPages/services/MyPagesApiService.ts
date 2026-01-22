@@ -67,4 +67,57 @@ export class MyPagesApiService implements IMyPagesService {
       } as any // Retornamos solo los campos actualizados
     };
   }
+
+  async convertToTemplate(
+    pageId: number,
+    templateName: string,
+    templateDescription: string,
+    categoryId: number,
+    setLoading?: SetStateFn
+  ): Promise<ApiResponse<any>> {
+    // Build payload - only include description if it has a value
+    const payload: any = {
+      page_id: pageId,
+      template_name: templateName,
+      category_id: categoryId
+    };
+
+    // Only add description if provided
+    if (templateDescription && templateDescription.trim()) {
+      payload.template_description = templateDescription.trim();
+    }
+
+    const res = await httpRequestWithAuth.post<ApiResponse<any>>(
+      `/api/dsg-page/convert-to-template`,
+      payload,
+      setLoading
+    );
+
+    return {
+      status: res.status,
+      message: res.message || (res.status === 200 || res.status === 201 ? 'Template created successfully' : 'Error creating template'),
+      data: res.data?.data ?? res.data
+    };
+  }
+
+  async getPreviewUrl(
+    viewKey: string,
+    setLoading?: SetStateFn
+  ): Promise<ApiResponse<string>> {
+    const res = await httpRequestWithAuth.post<ApiResponse<any>>(
+      `/api/dsg-page/preview_`,
+      { view_key: viewKey },
+      setLoading
+    );
+
+    // The API should return a URL or the data to construct the URL
+    const responseData = res.data as any;
+    const previewUrl = responseData?.data?.url ?? responseData?.url ?? responseData?.data ?? responseData;
+
+    return {
+      status: res.status,
+      message: res.message,
+      data: typeof previewUrl === 'string' ? previewUrl : ''
+    };
+  }
 }

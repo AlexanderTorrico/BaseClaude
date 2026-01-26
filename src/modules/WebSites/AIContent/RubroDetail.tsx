@@ -45,9 +45,14 @@ const RubroDetail: React.FC = () => {
             const verificationsResponse = await service.getTemplatesWithVerifications(parseInt(rubroId));
 
             if (verificationsResponse.status === 200 && verificationsResponse.data) {
+                // Asegurar que sea un array antes de usar .map()
+                const verificationsArray = Array.isArray(verificationsResponse.data)
+                    ? verificationsResponse.data
+                    : [];
+
                 // Mapear los datos de verificación a los template_pages existentes
                 const verificationsMap = new Map(
-                    verificationsResponse.data.map((tp: any) => [tp.id, tp])
+                    verificationsArray.map((tp: any) => [tp.id, tp])
                 );
 
                 if (rubroData.template_pages) {

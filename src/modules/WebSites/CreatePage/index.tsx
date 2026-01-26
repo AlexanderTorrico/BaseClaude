@@ -52,7 +52,7 @@ const CreatePage: React.FC = () => {
   const handleCreateWithAI = () => {
     setAiPageName('');
     setAiPrompt('');
-    setAiSelectedTemplate(null);
+    setAiSelectedTemplate(1); // Seleccionar automáticamente el diseño base con id 1
     setAiModalOpen(true);
   };
 
@@ -168,8 +168,6 @@ const CreatePage: React.FC = () => {
           prompt={aiPrompt}
           onPromptChange={setAiPrompt}
           selectedTemplateId={aiSelectedTemplate}
-          onTemplateChange={setAiSelectedTemplate}
-          templates={apiTemplates}
           onGenerate={handleGenerateWithAI}
           generating={generatingAI}
         />

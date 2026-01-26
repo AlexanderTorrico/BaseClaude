@@ -10,7 +10,6 @@ import {
     FormGroup,
     Spinner
 } from 'reactstrap';
-import { TemplateModel } from '../models/TemplateModel';
 
 interface CreateWithAIModalProps {
     isOpen: boolean;
@@ -20,8 +19,6 @@ interface CreateWithAIModalProps {
     prompt: string;
     onPromptChange: (prompt: string) => void;
     selectedTemplateId: number | null;
-    onTemplateChange: (templateId: number) => void;
-    templates: TemplateModel[];
     onGenerate: () => void;
     generating: boolean;
 }
@@ -34,8 +31,6 @@ const CreateWithAIModal: React.FC<CreateWithAIModalProps> = ({
     prompt,
     onPromptChange,
     selectedTemplateId,
-    onTemplateChange,
-    templates,
     onGenerate,
     generating
 }) => {
@@ -48,27 +43,6 @@ const CreateWithAIModal: React.FC<CreateWithAIModalProps> = ({
                 Crear Página con IA
             </ModalHeader>
             <ModalBody>
-                <FormGroup>
-                    <Label for="templateSelect">Selecciona un diseño base</Label>
-                    <Input
-                        id="templateSelect"
-                        type="select"
-                        value={selectedTemplateId || ''}
-                        onChange={(e) => onTemplateChange(Number(e.target.value))}
-                        disabled={generating}
-                    >
-                        <option value="">-- Seleccionar diseño --</option>
-                        {templates.map((template) => (
-                            <option key={template.id} value={template.id}>
-                                {template.name}
-                            </option>
-                        ))}
-                    </Input>
-                    <small className="text-muted">
-                        La IA usará este diseño como base para crear tu página.
-                    </small>
-                </FormGroup>
-
                 <FormGroup>
                     <Label for="pageName">Nombre de la página</Label>
                     <Input
@@ -98,9 +72,75 @@ const CreateWithAIModal: React.FC<CreateWithAIModalProps> = ({
                 </FormGroup>
 
                 {generating && (
-                    <div className="text-center py-3">
-                        <Spinner color="primary" className="me-2" />
-                        <span className="text-muted">Generando página con IA... Esto puede tardar unos minutos.</span>
+                    <div className="py-4">
+                        <div className="d-flex align-items-center justify-content-between mb-2">
+                            <span className="text-muted" style={{ fontSize: '13px' }}>
+                                <i className="mdi mdi-robot me-1"></i>
+                                Generando página con IA...
+                            </span>
+                            <span className="text-muted" style={{ fontSize: '12px' }}>
+                                Esto puede tardar unos minutos
+                            </span>
+                        </div>
+                        <div
+                            style={{
+                                height: '8px',
+                                background: '#e9ecef',
+                                borderRadius: '4px',
+                                overflow: 'hidden'
+                            }}
+                        >
+                            <div
+                                style={{
+                                    height: '100%',
+                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    borderRadius: '4px',
+                                    animation: 'progressAnimation 2s ease-in-out infinite',
+                                    width: '30%'
+                                }}
+                            />
+                        </div>
+                        <style>
+                            {`
+                                @keyframes progressAnimation {
+                                    0% { width: 5%; margin-left: 0; }
+                                    50% { width: 40%; margin-left: 30%; }
+                                    100% { width: 5%; margin-left: 95%; }
+                                }
+                            `}
+                        </style>
+                        <div className="d-flex align-items-center justify-content-center mt-3 gap-3">
+                            <span style={{
+                                fontSize: '12px',
+                                color: '#667eea',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                            }}>
+                                <i className="mdi mdi-check-circle"></i>
+                                Procesando prompt
+                            </span>
+                            <span style={{
+                                fontSize: '12px',
+                                color: '#9ca3af',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                            }}>
+                                <i className="mdi mdi-loading mdi-spin"></i>
+                                Generando contenido
+                            </span>
+                            <span style={{
+                                fontSize: '12px',
+                                color: '#d1d5db',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                            }}>
+                                <i className="mdi mdi-circle-outline"></i>
+                                Finalizando
+                            </span>
+                        </div>
                     </div>
                 )}
             </ModalBody>

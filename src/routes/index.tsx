@@ -55,6 +55,7 @@ import Reservations from "@/modules/Reservation/Reservations";
 import Ecommerce from "@/pages/ecommerce";
 import Mysales from "@/modules/Payments/Mysales";
 import Paymentmethods from "@/modules/Payments/Paymentmethods";
+import PaymentTest from "@/modules/Payments/PaymentTest";
 // -------------------------------------------------------------
 
 interface RouteConfig {
@@ -76,6 +77,7 @@ const authProtectedRoutes: RouteConfig[] = [
   // Web site - permisos granulares
   { path: "/paymentmethods", component: Paymentmethods, permissions: [WEB_SITES_PERMISSIONS.CREATE] },
   { path: "/mysales", component: Mysales, permissions: [WEB_SITES_PERMISSIONS.SHOW] },
+  { path: "/payment-test", component: PaymentTest, permissions: [WEB_SITES_PERMISSIONS.SHOW] },
 
   // Molecules (componentes de desarrollo - sin restricción por ahora)
   { path: "/header_view_type", component: HeaderViewType },

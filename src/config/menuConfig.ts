@@ -75,6 +75,14 @@ export const menuConfig: MenuConfig = {
           path: "/mysales",
           permissions: [WEB_SITES_PERMISSIONS.SHOW]
         },
+        {
+          id: "payments-test",
+          type: "link",
+          label: "Pruebas de Pago",
+          labelKey: "Pruebas de Pago",
+          path: "/payment-test",
+          permissions: [WEB_SITES_PERMISSIONS.SHOW]
+        },
       ]
     },
 

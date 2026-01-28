@@ -28,6 +28,7 @@ import {
   UpdatePaymentAccountDto,
   PaymentAccountCredentials
 } from '../../models/PaymentmethodsModel';
+import PayPalOAuthConnect from '../PayPalOAuthConnect';
 
 interface PaymentAccountModalProps {
   isOpen: boolean;
@@ -48,24 +49,38 @@ const DAYS_OF_WEEK = [
   { value: 6, label: 'Sáb' }
 ];
 
+// Métodos que usan OAuth en lugar de credenciales manuales
+const OAUTH_METHODS = ['paypal'];
+
 const CREDENTIAL_LABELS: Record<string, string> = {
-  // Visa / Mastercard
+  // Stripe (PayPal ya no usa credenciales manuales, usa OAuth)
+  secret_key: 'Secret Key de Stripe',
+  publishable_key: 'Publishable Key de Stripe',
+  webhook_secret: 'Webhook Secret',
+
+  // MercadoPago
+  access_token: 'Access Token de MercadoPago',
+  public_key: 'Public Key de MercadoPago',
+
+  // Klarna
+  username: 'Usuario de Klarna (API Username)',
+  password: 'Contraseña de Klarna (API Password)',
+  api_key: 'API Key',
+
+  // Revolut
+  merchant_id: 'Merchant ID',
+
+  // Square
+  application_id: 'Application ID de Square',
+  location_id: 'Location ID de Square',
+
+  // Visa / Mastercard (legacy)
   merchantId: 'ID del Comercio (Merchant ID)',
   terminalId: 'ID del Terminal (Terminal ID)',
   apiKey: 'API Key',
   secretKey: 'Secret Key',
 
-  // Klarna
-  klarnaUsername: 'Usuario de Klarna (API Username)',
-  klarnaPassword: 'Contraseña de Klarna (API Password)',
-  klarnaApiKey: 'API Key de Klarna',
-
-  // Revolut
-  revolutApiKey: 'API Key de Revolut',
-  revolutMerchantId: 'Merchant ID de Revolut',
-  revolutWebhookSecret: 'Webhook Secret de Revolut',
-
-  // PayPal
+  // Legacy PayPal
   paypalClientId: 'Client ID de PayPal',
   paypalClientSecret: 'Client Secret de PayPal',
   paypalWebhookId: 'Webhook ID de PayPal',
@@ -74,20 +89,32 @@ const CREDENTIAL_LABELS: Record<string, string> = {
 
 // Campos que son sensibles y deben mostrarse enmascarados en modo edición
 const SENSITIVE_FIELDS = [
+  // Credenciales sensibles (PayPal ya no usa estas - usa OAuth)
+  'secret_key',
+  'publishable_key',
+  'webhook_secret',
+  'access_token',
+  'public_key',
+  'api_key',
+  'password',
+  'merchant_id',
+  'application_id',
+  'location_id',
+  // Legacy
   'secretKey',
   'apiKey',
   'klarnaPassword',
   'klarnaApiKey',
   'revolutApiKey',
   'revolutWebhookSecret',
-  'paypalClientId',
-  'paypalClientSecret'
 ];
 
 const MASKED_VALUE = '••••••••••••••••';
 
 const getDefaultFormState = (method: PaymentMethodModel | null): CreatePaymentAccountDto => ({
   paymentMethodId: method?.id || 0,
+  methodCode: method?.code, // Incluir el código del método para el adapter
+  mode: 'sandbox', // Modo por defecto: sandbox para pruebas
   alias: '',
   description: '',
   isActive: true,
@@ -132,6 +159,8 @@ const PaymentAccountModal: React.FC<PaymentAccountModalProps> = ({
     if (accountToEdit) {
       setFormData({
         paymentMethodId: accountToEdit.paymentMethodId,
+        methodCode: selectedMethod?.code, // Incluir el código del método
+        mode: accountToEdit.mode || 'sandbox', // Modo desde la cuenta existente
         alias: accountToEdit.alias,
         description: accountToEdit.description || '',
         isActive: accountToEdit.isActive,
@@ -383,60 +412,94 @@ const PaymentAccountModal: React.FC<PaymentAccountModalProps> = ({
 
           {selectedMethod.requiresCredentials && (
             <TabPane tabId="2">
-              <Card className="border">
-                <CardBody>
-                  <h6 className="mb-3">
-                    <i className="mdi mdi-key me-2" />
-                    Credenciales de {selectedMethod.name}
-                  </h6>
-                  <small className="text-muted d-block mb-3">
-                    Ingresa las credenciales de tu cuenta de {selectedMethod.name}.
-                    Estas se guardan de forma segura.
-                  </small>
+              {/* PayPal usa OAuth - mostrar componente de conexión */}
+              {OAUTH_METHODS.includes(selectedMethod.code) ? (
+                <div>
+                  <Alert color="info" className="mb-3">
+                    <i className="mdi mdi-information me-2" />
+                    <strong>Conexión Segura:</strong> PayPal utiliza OAuth 2.0 para una conexión segura.
+                    No necesitas ingresar credenciales manualmente.
+                  </Alert>
 
-                  {selectedMethod.credentialFields.map(field => {
-                    const isSensitive = SENSITIVE_FIELDS.includes(field);
-                    const isModified = modifiedFields.has(field);
-                    const currentValue = (formData.credentials as PaymentAccountCredentials)[field as keyof PaymentAccountCredentials] || '';
+                  <PayPalOAuthConnect
+                    onConfigConnected={(configUuid) => {
+                      // Cerrar modal tras conexión exitosa
+                      onClose();
+                    }}
+                    showExistingConfigs={true}
+                  />
+                </div>
+              ) : (
+                /* Otros métodos usan credenciales manuales */
+                <Card className="border">
+                  <CardBody>
+                    <h6 className="mb-3">
+                      <i className="mdi mdi-key me-2" />
+                      Credenciales de {selectedMethod.name}
+                    </h6>
+                    <small className="text-muted d-block mb-3">
+                      Ingresa las credenciales de tu cuenta de {selectedMethod.name}.
+                      Estas se guardan de forma segura.
+                    </small>
 
-                    // In edit mode, show masked value for sensitive fields that haven't been modified
-                    const showMasked = isEditMode && isSensitive && !isModified;
-                    const displayValue = showMasked ? '' : currentValue;
-                    const placeholder = showMasked
-                      ? MASKED_VALUE
-                      : `Ingresa ${CREDENTIAL_LABELS[field] || field}`;
+                    {/* Selector de modo (Sandbox/Production) */}
+                    <FormGroup>
+                      <Label>Modo de Operación *</Label>
+                      <Input
+                        type="select"
+                        value={formData.mode || 'sandbox'}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          mode: e.target.value as 'sandbox' | 'production'
+                        }))}
+                      >
+                        <option value="sandbox">Sandbox (Pruebas)</option>
+                        <option value="production">Producción (Real)</option>
+                      </Input>
+                      <small className="text-muted">
+                        {formData.mode === 'production'
+                          ? '⚠️ Modo producción: Se procesarán transacciones reales'
+                          : '🧪 Modo sandbox: Para pruebas, sin transacciones reales'}
+                      </small>
+                    </FormGroup>
 
-                    return (
-                      <FormGroup key={field}>
-                        <Label>{CREDENTIAL_LABELS[field] || field}</Label>
-                        {field === 'paypalMode' ? (
-                          <Input
-                            type="select"
-                            value={currentValue || 'sandbox'}
-                            onChange={(e) => handleCredentialChange(field, e.target.value)}
-                          >
-                            <option value="sandbox">Sandbox (Pruebas)</option>
-                            <option value="live">Live (Producción)</option>
-                          </Input>
-                        ) : (
+                    <hr className="my-3" />
+
+                    {selectedMethod.credentialFields
+                      .filter(field => field !== 'paypalMode') // Excluir paypalMode legacy
+                      .map(field => {
+                      const isSensitive = SENSITIVE_FIELDS.includes(field);
+                      const isModified = modifiedFields.has(field);
+                      const currentValue = (formData.credentials as PaymentAccountCredentials)[field as keyof PaymentAccountCredentials] || '';
+
+                      // In edit mode, show masked value for sensitive fields that haven't been modified
+                      const showMasked = isEditMode && isSensitive && !isModified;
+                      const displayValue = showMasked ? '' : currentValue;
+                      const placeholder = showMasked
+                        ? MASKED_VALUE
+                        : `Ingresa ${CREDENTIAL_LABELS[field] || field}`;
+
+                      return (
+                        <FormGroup key={field}>
+                          <Label>{CREDENTIAL_LABELS[field] || field}</Label>
                           <Input
                             type={field.toLowerCase().includes('secret') || field.toLowerCase().includes('password') ? 'password' : 'text'}
                             value={displayValue}
                             onChange={(e) => handleCredentialChange(field, e.target.value)}
                             placeholder={placeholder}
                           />
-                        )}
-                        {showMasked && (
-                          <small className="text-muted">
-                            <i className="mdi mdi-lock me-1" />
-                            Credencial guardada. Ingresa un nuevo valor para actualizar.
-                          </small>
-                        )}
-                      </FormGroup>
-                    );
-                  })}
-                </CardBody>
-              </Card>
+                          {showMasked && (
+                            <small className="text-muted">
+                              <i className="mdi mdi-lock me-1" />
+                              Credencial guardada. Ingresa un nuevo valor para actualizar.
+                            </small>
+                          )}
+                        </FormGroup>
+                      );
+                    })}
+                  </CardBody>
+                </Card>
+              )}
             </TabPane>
           )}
 

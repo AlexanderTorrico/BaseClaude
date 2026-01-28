@@ -19,6 +19,7 @@ import securityOrdersReducer from '../modules/Security/Orders/slices/orderSlice'
 import ecommerceCartReducer from '../pages/ecommerce/slices/cartSlice';
 import paymentmethodsReducer from '../modules/Payments/Paymentmethods/slices/paymentmethodsSlice';
 import mysalesReducer from '../modules/Payments/Mysales/slices/mysalesSlice';
+import paymentTestReducer from '../modules/Payments/PaymentTest/slices/paymentTestSlice';
 
 export const store = configureStore({
   reducer: {
@@ -40,6 +41,7 @@ export const store = configureStore({
     ecommerce_cart: ecommerceCartReducer,
     paymentmethods: paymentmethodsReducer,
     mysales: mysalesReducer,
+    paymentTest: paymentTestReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

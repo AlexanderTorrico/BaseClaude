@@ -10,6 +10,9 @@ import {
   CreatePaymentConfigDto,
   UpdatePaymentConfigDto,
   TestConnectionResponse,
+  CredentialFieldsApiResponse,
+  PaymentCredentials,
+  PaymentSettings,
 } from '../models/PaymentmethodsModel';
 import {
   adaptPayMethodsArrayToPaymentMethodModels,
@@ -17,6 +20,8 @@ import {
   adaptPayConfigToPaymentAccountModel,
   adaptCreateAccountDtoToApiFormat,
   adaptUpdateAccountDtoToApiFormat,
+  createPaymentConfigDto,
+  updatePaymentConfigDto,
 } from '../adapters/paymentmethodsAdapter';
 import { ApiResponse } from '@/shared/types';
 import { SetStateFn } from '@/shared/types/commonTypes';
@@ -133,7 +138,22 @@ export class PaymentmethodsApiService implements IPaymentmethodsService {
   }
 
   /**
-   * Crear una nueva configuración de pago
+   * Obtener campos de credenciales y settings requeridos por método de pago
+   */
+  async getCredentialFields(
+    payMethodId: number,
+    setLoading?: SetStateFn
+  ): Promise<ApiResponse<CredentialFieldsApiResponse>> {
+    const res = await httpRequestWithAuth.get<BackendResponse<CredentialFieldsApiResponse>>(
+      `/api/payment-config/credential-fields/${payMethodId}`,
+      setLoading
+    );
+
+    return extractBackendData(res, (data) => data);
+  }
+
+  /**
+   * Crear una nueva configuración de pago (legacy - compatibilidad)
    */
   async createAccount(
     dto: CreatePaymentAccountDto,
@@ -153,7 +173,40 @@ export class PaymentmethodsApiService implements IPaymentmethodsService {
   }
 
   /**
-   * Actualizar una configuración de pago existente
+   * Crear una nueva configuración de pago con credenciales y settings dinámicos
+   */
+  async createPaymentConfig(
+    payMethodId: number,
+    credentials: PaymentCredentials,
+    mode: 'sandbox' | 'production',
+    settings?: PaymentSettings,
+    brandName?: string,
+    defaultCurrency: string = 'EUR',
+    setLoading?: SetStateFn
+  ): Promise<ApiResponse<PaymentAccountModel>> {
+    const apiDto = createPaymentConfigDto(
+      this.companyId,
+      payMethodId,
+      credentials,
+      mode,
+      settings,
+      brandName,
+      defaultCurrency
+    );
+
+    const res = await httpRequestWithAuth.post<BackendResponse<PayCompanyPaymentConfigApiResponse>>(
+      `/api/payment-config`,
+      apiDto,
+      setLoading
+    );
+
+    return extractBackendData(res, (data) =>
+      adaptPayConfigToPaymentAccountModel(data)
+    );
+  }
+
+  /**
+   * Actualizar una configuración de pago existente (legacy - compatibilidad)
    */
   async updateAccount(
     dto: UpdatePaymentAccountDto,
@@ -163,6 +216,31 @@ export class PaymentmethodsApiService implements IPaymentmethodsService {
 
     const res = await httpRequestWithAuth.put<BackendResponse<PayCompanyPaymentConfigApiResponse>>(
       `/api/payment-config/${dto.uuid}`,
+      apiDto,
+      setLoading
+    );
+
+    return extractBackendData(res, (data) =>
+      adaptPayConfigToPaymentAccountModel(data)
+    );
+  }
+
+  /**
+   * Actualizar una configuración de pago con credenciales y settings dinámicos
+   */
+  async updatePaymentConfig(
+    uuid: string,
+    credentials?: PaymentCredentials,
+    settings?: PaymentSettings,
+    mode?: 'sandbox' | 'production',
+    brandName?: string,
+    defaultCurrency?: string,
+    setLoading?: SetStateFn
+  ): Promise<ApiResponse<PaymentAccountModel>> {
+    const apiDto = updatePaymentConfigDto(credentials, settings, mode, brandName, defaultCurrency);
+
+    const res = await httpRequestWithAuth.put<BackendResponse<PayCompanyPaymentConfigApiResponse>>(
+      `/api/payment-config/${uuid}`,
       apiDto,
       setLoading
     );
@@ -229,7 +307,7 @@ export class PaymentmethodsApiService implements IPaymentmethodsService {
   }
 
   /**
-   * Probar conexión con el proveedor de pago (PayPal)
+   * Probar conexión con el proveedor de pago
    */
   async testConnection(
     uuid: string,

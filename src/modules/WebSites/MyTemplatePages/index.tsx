@@ -13,7 +13,7 @@ const templateService = new MyTemplatePagesApiService();
 
 const MyTemplatePages: React.FC = () => {
   const { mytemplatepagess } = useMyTemplatePages();
-  const { loading, fetchAll, publishTemplate } = useMyTemplatePagesFetch(templateService);
+  const { loading, fetchAll, publishTemplate, loadVerifications } = useMyTemplatePagesFetch(templateService);
 
   const handlePublish = async (templateId: number) => {
     const result = await publishTemplate(templateId);
@@ -52,7 +52,12 @@ const MyTemplatePages: React.FC = () => {
     <div className="page-content" style={{ overflowX: 'clip' }}>
       <Container fluid style={{ overflowX: 'clip' }}>
         <Header loading={loading} onRefresh={fetchAll} />
-        <ContentCards filteredTemplates={mytemplatepagess} onPublish={handlePublish} onEdit={handleEdit} />
+        <ContentCards
+          filteredTemplates={mytemplatepagess}
+          onPublish={handlePublish}
+          onEdit={handleEdit}
+          onLoadVerifications={loadVerifications}
+        />
       </Container>
     </div>
   );

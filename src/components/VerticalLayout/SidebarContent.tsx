@@ -66,12 +66,9 @@ const SidebarContent: React.FC = () => {
 
   const removeActivation = (items: HTMLCollectionOf<HTMLAnchorElement>) => {
     for (let i = 0; i < items.length; ++i) {
-      const item = items[i];
       const parent = items[i].parentElement;
 
-      if (item && item.classList.contains("active")) {
-        item.classList.remove("active");
-      }
+      // Note: Don't remove "active" class from anchors - NavLink handles that
       if (parent) {
         const parent2El =
           parent.childNodes && parent.childNodes.length && parent.childNodes[1]
@@ -119,7 +116,11 @@ const SidebarContent: React.FC = () => {
     removeActivation(items);
 
     for (let i = 0; i < items.length; ++i) {
-      if (pathName === items[i].pathname) {
+      const itemPathname = items[i].pathname;
+      const itemHref = items[i].getAttribute("href");
+
+      // Compare with pathname property or href attribute
+      if (pathName === itemPathname || pathName === itemHref) {
         matchingMenuItem = items[i];
         break;
       }

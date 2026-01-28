@@ -426,6 +426,11 @@ body[data-sidebar="dark"] {
               &:hover {
                 color: $sidebar-dark-menu-item-hover-color;
               }
+
+              // Active state for sub-menu items
+              &.active {
+                color: $sidebar-dark-menu-item-active-color !important;
+              }
             }
           }
         }

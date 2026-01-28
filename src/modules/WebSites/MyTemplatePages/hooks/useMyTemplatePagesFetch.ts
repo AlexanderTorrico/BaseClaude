@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { IMyTemplatePagesService } from '../services/IMyTemplatePagesService';
+import { TemplateVerificationsResponse } from '../models/TemplateVerificationModel';
 import { setMyTemplatePagess, updateMyTemplatePages } from '../slices/mytemplatepagesSlice';
 
 export const useMyTemplatePagesFetch = (service: IMyTemplatePagesService) => {
@@ -25,9 +26,15 @@ export const useMyTemplatePagesFetch = (service: IMyTemplatePagesService) => {
     };
   };
 
+  const loadVerifications = async (templateId: number): Promise<TemplateVerificationsResponse | null> => {
+    const result = await service.getVerifications(templateId);
+    return result.data || null;
+  };
+
   return {
     loading,
     fetchAll,
     publishTemplate,
+    loadVerifications,
   };
 };

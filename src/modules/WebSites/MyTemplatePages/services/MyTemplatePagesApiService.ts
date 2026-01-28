@@ -1,7 +1,8 @@
 import { httpRequestWithAuth } from '@/services/httpService';
 import { IMyTemplatePagesService } from './IMyTemplatePagesService';
 import { MyTemplatePagesModel, TemplateStatus } from '../models/MyTemplatePagesModel';
-import { adaptMyTemplatePagesArrayToMyTemplatePagesModels, adaptMyTemplatePagesResponseToMyTemplatePagesModel } from '../adapters/mytemplatepagesAdapter';
+import { TemplateVerificationsResponse } from '../models/TemplateVerificationModel';
+import { adaptMyTemplatePagesArrayToMyTemplatePagesModels, adaptMyTemplatePagesResponseToMyTemplatePagesModel, adaptVerificationsResponse } from '../adapters/mytemplatepagesAdapter';
 import { ApiResponse, transformApiData } from '@/shared/types';
 
 type SetStateFn = (loading: boolean) => void;
@@ -27,6 +28,17 @@ export class MyTemplatePagesApiService implements IMyTemplatePagesService {
 
     return transformApiData(res, (data) =>
       adaptMyTemplatePagesResponseToMyTemplatePagesModel(data.data ?? data)
+    );
+  }
+
+  async getVerifications(templateId: number, setLoading?: SetStateFn): Promise<ApiResponse<TemplateVerificationsResponse>> {
+    const res = await httpRequestWithAuth.get<ApiResponse<any>>(
+      `/api/dsg-template-page/${templateId}/verifications`,
+      setLoading
+    );
+
+    return transformApiData(res, (data) =>
+      adaptVerificationsResponse(data.data ?? data)
     );
   }
 }

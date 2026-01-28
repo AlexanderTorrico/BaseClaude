@@ -1,15 +1,17 @@
 import React from 'react';
 import { Row, Col, Card, CardBody } from 'reactstrap';
 import { MyTemplatePagesModel } from '../models/MyTemplatePagesModel';
+import { TemplateVerificationsResponse } from '../models/TemplateVerificationModel';
 import TemplateCard from './TemplateCard';
 
 interface ContentCardsProps {
   filteredTemplates: MyTemplatePagesModel[];
   onPublish?: (templateId: number) => void;
   onEdit?: (templateId: number) => void;
+  onLoadVerifications?: (templateId: number) => Promise<TemplateVerificationsResponse | null>;
 }
 
-const ContentCards: React.FC<ContentCardsProps> = ({ filteredTemplates, onPublish, onEdit }) => {
+const ContentCards: React.FC<ContentCardsProps> = ({ filteredTemplates, onPublish, onEdit, onLoadVerifications }) => {
   if (filteredTemplates.length === 0) {
     return (
       <Card className="border">
@@ -31,6 +33,7 @@ const ContentCards: React.FC<ContentCardsProps> = ({ filteredTemplates, onPublis
             template={template}
             onPublish={onPublish}
             onEdit={onEdit}
+            onLoadVerifications={onLoadVerifications}
           />
         ))}
       </Col>

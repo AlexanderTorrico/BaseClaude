@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { MenuItem } from '@/config/types/MenuTypes';
 import { withTranslation } from 'react-i18next';
 
@@ -23,7 +23,10 @@ const MenuRenderer: React.FC<MenuRendererProps> = ({ items, t }) => {
       case 'link':
         return (
           <li key={item.id}>
-            <Link to={item.path || '#'} className="">
+            <NavLink
+              to={item.path || '#'}
+              className={({ isActive }) => isActive ? 'active' : ''}
+            >
               {item.icon && <i className={item.icon}></i>}
               {item.badge && (
                 <span className={`badge rounded-pill bg-${item.badge.color} float-end`}>
@@ -31,7 +34,7 @@ const MenuRenderer: React.FC<MenuRendererProps> = ({ items, t }) => {
                 </span>
               )}
               <span>{t(item.labelKey)}</span>
-            </Link>
+            </NavLink>
           </li>
         );
 

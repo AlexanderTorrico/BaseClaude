@@ -48,6 +48,11 @@ import Reservation from "@/modules/Security/Reservation";
 import Company from "@/modules/Security/Company";
 import MyPages from "@/modules/WebSites/MyPages";
 import CreatePage from "@/modules/WebSites/CreatePage";
+import MyTemplatePages from "@/modules/WebSites/MyTemplatePages";
+import AIContent from "@/modules/WebSites/AIContent";
+import RubroDetail from "@/modules/WebSites/AIContent/RubroDetail";
+import SectionViewer from "@/modules/WebSites/AIContent/SectionViewer";
+import PageViewer from "@/modules/WebSites/Viewer";
 import Vault from "@/modules/Security/Vault";
 import Orders from "@/modules/Security/Orders";
 import TableLayout from "@/modules/Reservation/TableLayout";
@@ -73,7 +78,12 @@ const authProtectedRoutes: RouteConfig[] = [
   // Web site - permisos granulares
   { path: "/createpages", component: CreatePage, permissions: [WEB_SITES_PERMISSIONS.CREATE] },
   { path: "/mypages", component: MyPages, permissions: [WEB_SITES_PERMISSIONS.SHOW] },
+  { path: "/mytemplates", component: MyTemplatePages, permissions: [WEB_SITES_PERMISSIONS.SHOW] },
 
+  // AI Content - dentro de WebSites
+  { path: "/websites/ai-content", component: AIContent, permissions: [WEB_SITES_PERMISSIONS.SHOW] },
+  { path: "/websites/ai-content/:rubroId", component: RubroDetail, permissions: [WEB_SITES_PERMISSIONS.SHOW] },
+  { path: "/websites/ai-content/:rubroId/template/:templatePageId", component: SectionViewer, permissions: [WEB_SITES_PERMISSIONS.SHOW] },
   // Web site - permisos granulares
   { path: "/paymentmethods", component: Paymentmethods, permissions: [WEB_SITES_PERMISSIONS.CREATE] },
   { path: "/mysales", component: Mysales, permissions: [WEB_SITES_PERMISSIONS.SHOW] },
@@ -111,6 +121,7 @@ const authProtectedRoutes: RouteConfig[] = [
 ];
 
 const publicRoutes: RouteConfig[] = [
+  { path: "/viewer/:viewKey", component: PageViewer },
   { path: "/login", component: LoginPage },
   { path: "/forgot-password", component: ForgetPwd },
   { path: "/register", component: RegisterPage },

@@ -25,19 +25,32 @@ export default defineConfig({
     port: 5000,
     host: true,
     proxy: {
+      // Proxy API calls to backend - avoids CORS issues
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+      },
       // Proxy /editor y todo lo que esté bajo /editor/* al puerto 5021
       '/editor': {
         target: 'http://localhost:5021',
         changeOrigin: true,
         ws: true,
       },
-      // Proxy /viewer pero reescribiendo la ruta para que apunte a /editor/viewer
-      '/viewer': {
+      // Proxy /template_editor al puerto 5021, reescribiendo a /editor
+      '/template_editor': {
         target: 'http://localhost:5021',
         changeOrigin: true,
         ws: true,
-        rewrite: (path) => '/editor' + path,
+        rewrite: (path) => path.replace(/^\/template_editor/, '/editor'),
       },
+      // Proxy /viewer pero reescribiendo la ruta para que apunte a /editor/viewer
+      //'/viewer': {
+      // target: 'http://localhost:5021',
+      // changeOrigin: true,
+      // ws: true,
+      // rewrite: (path) => '/editor' + path,
+      //},
     },
   },
 })

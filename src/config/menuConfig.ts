@@ -48,6 +48,22 @@ export const menuConfig: MenuConfig = {
           path: "/mypages",
           permissions: [WEB_SITES_PERMISSIONS.SHOW]
         },
+        {
+          id: "website-mytemplates",
+          type: "link",
+          label: "Mis templates",
+          labelKey: "Mis templates",
+          path: "/mytemplates",
+          permissions: [WEB_SITES_PERMISSIONS.SHOW]
+        },
+        {
+          id: "website-aicontent",
+          type: "link",
+          label: "Contenido IA",
+          labelKey: "Contenido IA",
+          path: "/websites/ai-content",
+          permissions: [WEB_SITES_PERMISSIONS.SHOW]
+        },
       ]
     },
     // Cobros ═══════════════════════════════════════════════════════════════════

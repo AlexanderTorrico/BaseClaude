@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Card, CardBody, Button, Row, Col, Input, Collapse } from 'reactstrap';
+import { Card, CardBody, Button, Row, Col, Input, Collapse, Modal, ModalHeader, ModalBody, ModalFooter, Spinner, FormGroup, Label } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
 import { MyPagesModel } from '../models/MyPagesModel';
 import { useUserPermissions, WEB_SITES_PERMISSIONS } from '@/core/auth';
 import VisitsChart from './VisitsChart';
+import { MyPagesApiService } from '../services/MyPagesApiService';
+import { toast } from 'react-toastify';
 
 interface PageCardProps {
   page: MyPagesModel;
@@ -18,6 +20,16 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName, isLatest = fals
   const [isSaving, setIsSaving] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
 
+  // Convert to Template modal state
+  const [showConvertModal, setShowConvertModal] = useState(false);
+  const [templateName, setTemplateName] = useState('');
+  const [templateDescription, setTemplateDescription] = useState('');
+  const [categoryId, setCategoryId] = useState(1);
+  const [isConverting, setIsConverting] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+
+  const service = new MyPagesApiService();
+
   // Obtener permisos del usuario
   const { hasPermission } = useUserPermissions();
 
@@ -26,12 +38,13 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName, isLatest = fals
   const canViewHosting = hasPermission(WEB_SITES_PERMISSIONS.HOSTING);
   const canViewDomain = hasPermission(WEB_SITES_PERMISSIONS.DOMAIN);
 
-  // URL base del proyecto (dominio de aziende)
-  const PROJECT_DOMAIN = 'http://localhost:5173';
-  const shareUrl = `${PROJECT_DOMAIN}/viewer/${page.viewKey}`;
+  // URL base del proyecto para compartir (usa el dominio actual)
+  const shareUrl = `${window.location.origin}/viewer/${page.viewKey}`;
 
-  // Datos estáticos por ahora (TODO: obtener de API)
-  const visits = 1234; // Placeholder
+  // Calcular visitas totales desde page.count
+  const visits = page.count
+    ? Object.values(page.count).reduce((sum, val) => sum + (parseInt(val, 10) || 0), 0)
+    : 0;
   const reservations = 56; // Placeholder
 
   // Determinar si tiene dominio personalizado
@@ -95,8 +108,79 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName, isLatest = fals
    * Abre el editor en una nueva pestaña con el pageId en la URL
    */
   const handleEditPage = () => {
-    // Abre el Editor en una nueva pestaña con pageId como query param
-    window.open(`/editor/?pageId=${page.id}`, '_blank');
+    // Abre el Editor en una nueva pestaña con pageId como parámetro de ruta
+    window.open(`/editor/${page.id}`, '_blank');
+  };
+
+  /**
+   * Handles sharing the page - gets preview URL from backend and opens it
+   */
+  const handleShare = async () => {
+    setIsSharing(true);
+    try {
+      const response = await service.getPreviewUrl(page.viewKey);
+      if ((response.status === 200 || response.status === 201) && response.data) {
+        window.open(response.data, '_blank');
+      } else {
+        toast.error(response.message || 'Error getting preview URL');
+      }
+    } catch (error) {
+      toast.error('Error getting preview URL');
+      console.error('Error getting preview URL:', error);
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
+  /**
+   * Opens the convert to template modal
+   */
+  const openConvertModal = () => {
+    setTemplateName(page.name);
+    setTemplateDescription('');
+    setCategoryId(1);
+    setShowConvertModal(true);
+  };
+
+  /**
+   * Closes the convert to template modal
+   */
+  const closeConvertModal = () => {
+    setShowConvertModal(false);
+    setTemplateName('');
+    setTemplateDescription('');
+  };
+
+  /**
+   * Handles converting the page to a template
+   */
+  const handleConvertToTemplate = async () => {
+    if (!templateName.trim()) {
+      toast.error('Template name is required');
+      return;
+    }
+
+    setIsConverting(true);
+    try {
+      const response = await service.convertToTemplate(
+        page.id,
+        templateName.trim(),
+        templateDescription.trim(),
+        categoryId
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        toast.success('Page converted to template successfully!');
+        closeConvertModal();
+      } else {
+        toast.error(response.message || 'Error converting to template');
+      }
+    } catch (error) {
+      toast.error('Error converting to template');
+      console.error('Error converting to template:', error);
+    } finally {
+      setIsConverting(false);
+    }
   };
 
   return (
@@ -302,6 +386,12 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName, isLatest = fals
                     {t("myPages.edit")}
                   </Button>
                 )}
+
+                {/* Convert to Template button */}
+                <Button color="info" size="sm" onClick={openConvertModal}>
+                  <i className="mdi mdi-file-document-outline me-1"></i>
+                  Convert to Template
+                </Button>
               </div>
             </div>
           </Col>
@@ -322,6 +412,60 @@ const PageCard: React.FC<PageCardProps> = ({ page, onUpdateName, isLatest = fals
           New
         </span>
       )}
+
+      {/* Convert to Template Modal */}
+      <Modal isOpen={showConvertModal} toggle={closeConvertModal}>
+        <ModalHeader toggle={closeConvertModal}>
+          <i className="mdi mdi-file-document-outline me-2"></i>
+          Convert to Template
+        </ModalHeader>
+        <ModalBody>
+          <FormGroup>
+            <Label for="templateName">Template Name *</Label>
+            <Input
+              type="text"
+              id="templateName"
+              value={templateName}
+              onChange={(e) => setTemplateName(e.target.value)}
+              placeholder="Enter template name"
+            />
+          </FormGroup>
+          <FormGroup>
+            <Label for="templateDescription">Description</Label>
+            <Input
+              type="textarea"
+              id="templateDescription"
+              rows={3}
+              value={templateDescription}
+              onChange={(e) => setTemplateDescription(e.target.value)}
+              placeholder="Enter template description (optional)"
+            />
+          </FormGroup>
+          <FormGroup>
+            <Label for="categoryId">Category ID</Label>
+            <Input
+              type="number"
+              id="categoryId"
+              value={categoryId}
+              onChange={(e) => setCategoryId(parseInt(e.target.value, 10) || 1)}
+              min={1}
+            />
+          </FormGroup>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="light" onClick={closeConvertModal} disabled={isConverting}>
+            Cancel
+          </Button>
+          <Button
+            color="info"
+            onClick={handleConvertToTemplate}
+            disabled={isConverting || !templateName.trim()}
+          >
+            {isConverting ? <Spinner size="sm" className="me-1" /> : <i className="mdi mdi-check me-1"></i>}
+            Convert
+          </Button>
+        </ModalFooter>
+      </Modal>
     </Card>
   );
 };

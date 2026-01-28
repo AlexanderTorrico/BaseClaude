@@ -48,6 +48,7 @@ import Reservation from "@/modules/Security/Reservation";
 import Company from "@/modules/Security/Company";
 import MyPages from "@/modules/WebSites/MyPages";
 import CreatePage from "@/modules/WebSites/CreatePage";
+import MyTemplatePages from "@/modules/WebSites/MyTemplatePages";
 import AIContent from "@/modules/WebSites/AIContent";
 import RubroDetail from "@/modules/WebSites/AIContent/RubroDetail";
 import SectionViewer from "@/modules/WebSites/AIContent/SectionViewer";
@@ -76,6 +77,7 @@ const authProtectedRoutes: RouteConfig[] = [
   // Web site - permisos granulares
   { path: "/createpages", component: CreatePage, permissions: [WEB_SITES_PERMISSIONS.CREATE] },
   { path: "/mypages", component: MyPages, permissions: [WEB_SITES_PERMISSIONS.SHOW] },
+  { path: "/mytemplates", component: MyTemplatePages, permissions: [WEB_SITES_PERMISSIONS.SHOW] },
 
   // AI Content - dentro de WebSites
   { path: "/websites/ai-content", component: AIContent, permissions: [WEB_SITES_PERMISSIONS.SHOW] },

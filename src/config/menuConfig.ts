@@ -49,6 +49,14 @@ export const menuConfig: MenuConfig = {
           permissions: [WEB_SITES_PERMISSIONS.SHOW]
         },
         {
+          id: "website-mytemplates",
+          type: "link",
+          label: "Mis templates",
+          labelKey: "Mis templates",
+          path: "/mytemplates",
+          permissions: [WEB_SITES_PERMISSIONS.SHOW]
+        },
+        {
           id: "website-aicontent",
           type: "link",
           label: "Contenido IA",
